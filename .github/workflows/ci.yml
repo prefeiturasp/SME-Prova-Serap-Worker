@@ -12,6 +12,7 @@ jobs:
     runs-on: dotnet
 
     steps:
+      - uses: actions/checkout@v2
       -
          name: Login to registry
          uses: docker/login-action@v1

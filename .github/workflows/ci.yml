@@ -23,4 +23,4 @@ jobs:
     
       - name: Build the Docker image    
         run: | 
-             docker build . --file src/SME.SERAp.Prova.Worker/Dockerfile --tag teste
+                docker build -t registry.sme.prefeitura.sp.gov.br/development/sme-prova-serap-api -f src/SME.SERAp.Prova.Worker/Dockerfile .

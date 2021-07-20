@@ -22,5 +22,6 @@ jobs:
 
     
       - name: Build the Docker image    
-        run: | 
-                docker build -t registry.sme.prefeitura.sp.gov.br/development/sme-prova-serap-api -f $(pwd)/src/SME.SERAp.Prova.Worker/Dockerfile .
+        run: |  
+                ls -ltr
+                git status

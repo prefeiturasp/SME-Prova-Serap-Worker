@@ -23,4 +23,4 @@ jobs:
     
       - name: Build the Docker image    
         run: | 
-             docker build . --file src/SME.SERAp.Prova.Worker/Dockerfile --tag ${{ secrets.REGISTRY_HOST }}/${GITHUB_REF##*/}/sme-prova-serap-worker 
+             docker build . --file src/SME.SERAp.Prova.Worker/Dockerfile --tag teste

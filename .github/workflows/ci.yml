@@ -30,7 +30,7 @@ jobs:
   deploy:
     runs-on: dotnet    
     environment:
-      name: ${GITHUB_REF##*/}
+      name: development
     needs: [ build ]
     steps:
       - name: Run an adjust of kubernetes dev
@@ -38,7 +38,8 @@ jobs:
           RANCHER_URL: ${{ secrets.RANCHER_URL }}
           RANCHER_TOKEN: ${{ secrets.RANCHER_TOKEN }}
         run: |
-          sed -e "s/\${RANCHER_URL}/$RANCHER_URL/" -e "s/\${RANCHER_TOKEN}/$RANCHER_TOKEN/" /runner/config_template > /runner/.kube/config                
+          sed -e "s/\${RANCHER_URL}/$RANCHER_URL/" -e "s/\${RANCHER_TOKEN}/$RANCHER_TOKEN/" /runner/config_template > /runner/.kube/config
+          echo ${GITHUB_REF##*/}
       - 
        name: Change Images
        run: |

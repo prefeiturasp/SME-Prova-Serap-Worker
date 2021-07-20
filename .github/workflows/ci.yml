@@ -30,7 +30,7 @@ jobs:
   deploy:
     runs-on: dotnet    
     environment:
-      name: development
+      name: ${GITHUB_REF##*/}
     needs: [ build ]
     steps:
       - name: Run an adjust of kubernetes dev

@@ -9,7 +9,7 @@ jobs:
 
   build:
 
-    runs-on: dotnet
+    runs-on: serap
 
     steps:
       - uses: actions/checkout@v2
@@ -28,7 +28,7 @@ jobs:
                docker push ${{ secrets.REGISTRY_HOST }}/${GITHUB_REF##*/}/sme-prova-serap-worker
         
   deploy-development:
-    runs-on: dotnet
+    runs-on: serap
     if: ${{ github.ref == 'refs/heads/development' }}        
     environment:
       name: development
@@ -43,17 +43,17 @@ jobs:
       - 
        name: Change Images
        run: |
-         kubectl rollout restart deployment/sme-prova-serap-front -n sme-serap-estudante           
+         kubectl rollout restart deployment/sme-prova-serap-worker -n sme-serap-estudante           
          rm -f /runner/.kube/config      
   
   deploy-release:
-    runs-on: dotnet
+    runs-on: serap
     if: ${{ github.ref == 'refs/heads/release' }}        
     environment:
       name: release
     needs: [ build ]
     steps:
-      - name: Run an adjust of kubernetes dev
+      - name: Run an adjust of kubernetes hom
         env: # Ou como uma variável de ambiente
           RANCHER_URL: ${{ secrets.RANCHER_URL }}
           RANCHER_TOKEN: ${{ secrets.RANCHER_TOKEN }}
@@ -62,5 +62,5 @@ jobs:
       - 
        name: Change Images
        run: |
-         kubectl rollout restart deployment/sme-prova-serap-front -n sme-serap-estudante           
+         kubectl rollout restart deployment/sme-prova-serap-worker -n sme-serap-estudante           
          rm -f /runner/.kube/config  

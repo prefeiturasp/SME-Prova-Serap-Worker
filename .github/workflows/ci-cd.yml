@@ -7,16 +7,49 @@ on:
 
 jobs:
 
+  sonar-dev:
+    runs-on: sonar
+    if: ${{ github.ref == 'refs/heads/development' }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
+
+      - name: Install dependencies
+        run: dotnet restore SME.SERAp.Prova.Worker.sln
+
+      - name: Sonarqube Begin
+        run: | 
+          export PATH="$PATH:/runner/.dotnet/tools"          
+          dotnet sonarscanner begin  /k:sme-prova-serap-worker /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.host.url="http://sonar.sme.prefeitura.sp.gov.br/" /d:sonar.cs.opencover.reportsPaths="teste/SME.SERAp.Aplicacao.Test/coverage.opencover.xml,teste/SME.SERAp.Dominio.Test/coverage.opencover.xml" /d:sonar.coverage.exclusions="**Test*.cs"
+      - name: Build
+        run: dotnet build SME.SERAp.Prova.Worker.sln
+
+      - name: Test with the dotnet CLI
+        run: dotnet test SME.SERAp.Prova.Worker.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+
+      - name: Sonarqube end
+        run: | 
+          export PATH="$PATH:/runner/.dotnet/tools"  
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
+
   build:
 
-    runs-on: serap
+    runs-on: serap    
 
     steps:
       - uses: actions/checkout@v2
-      -
-         name: Login to registry
-         uses: docker/login-action@v1
-         with:
+      
+      - name: Login to registry
+        uses: docker/login-action@v1
+        with:
           registry: ${{ secrets.REGISTRY_HOST }}
           username: ${{ secrets.REGISTRY_USER }}
           password: ${{ secrets.REGISTRY_PWD }}

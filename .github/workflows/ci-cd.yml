@@ -5,7 +5,9 @@ on:
     branches: [ development, release ]
     paths-ignore:
     - ".github/workflows/**"    
-
+  
+  workflow_dispatch:
+  
 jobs:
 
   sonar-dev:

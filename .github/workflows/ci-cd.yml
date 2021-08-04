@@ -1,9 +1,10 @@
 name: Docker Image CI
- 
+
 on:
   push:
     branches: [ development, release ]
-  
+    paths-ignore:
+    - ".github/workflows/**"    
 
 jobs:
 
@@ -19,7 +20,9 @@ jobs:
           dotnet-version: '5.0.x'
 
       - name: Install dependencies
-        run: dotnet restore SME.SERAp.Prova.Worker.sln
+        run: | 
+          [ ! -e "/runner/.dotnet/tools/dotnet-sonarscanner" ] && dotnet tool install --global dotnet-sonarscanner
+          dotnet restore SME.SERAp.Prova.Worker.sln
 
       - name: Sonarqube Begin
         run: | 

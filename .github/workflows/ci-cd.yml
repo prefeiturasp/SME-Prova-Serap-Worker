@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           export PATH="$PATH:/runner/.dotnet/tools" 
-          [ ! -e "/runner/.dotnet/tools/dotnet-sonarscanner" ] && dotnet tool install dotnet-sonarscanner
+          [ ! -e "/runner/.dotnet/tools/dotnet-sonarscanner" ] && dotnet tool install --global dotnet-sonarscanner
           dotnet restore SME.SERAp.Prova.Worker.sln
 
       - name: Sonarqube Begin

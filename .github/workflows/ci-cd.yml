@@ -22,13 +22,13 @@ jobs:
           dotnet-version: '5.0.x'
 
       - name: Install dependencies
-        run: | 
+        run: |
+          export PATH="$PATH:/runner/.dotnet/tools" 
           [ ! -e "/runner/.dotnet/tools/dotnet-sonarscanner" ] && dotnet tool install --global dotnet-sonarscanner
           dotnet restore SME.SERAp.Prova.Worker.sln
 
       - name: Sonarqube Begin
-        run: | 
-          export PATH="$PATH:/runner/.dotnet/tools"          
+        run: |    
           dotnet sonarscanner begin  /k:sme-prova-serap-worker /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.host.url="http://sonar.sme.prefeitura.sp.gov.br/" /d:sonar.cs.opencover.reportsPaths="teste/SME.SERAp.Aplicacao.Test/coverage.opencover.xml,teste/SME.SERAp.Dominio.Test/coverage.opencover.xml" /d:sonar.coverage.exclusions="**Test*.cs"
       - name: Build
         run: dotnet build SME.SERAp.Prova.Worker.sln

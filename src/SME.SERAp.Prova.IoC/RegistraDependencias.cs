@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Dados;
+using SME.SERAp.Prova.Dados.Interfaces;
+using SME.SERAp.Prova.Dados.Repositorios;
+using SME.SERAp.Prova.Dados.SerapLegado;
 
 namespace SME.SERAp.Prova.IoC
 {
@@ -10,6 +14,7 @@ namespace SME.SERAp.Prova.IoC
         {
             services.AdicionarMediatr();
             services.AdicionarValidadoresFluentValidation();
+
 
             RegistrarRepositorios(services);            
             RegistrarComandos(services);
@@ -30,12 +35,14 @@ namespace SME.SERAp.Prova.IoC
 
         private static void RegistrarRepositorios(IServiceCollection services)
         {
-
+            services.AddScoped<IRepositorioProvaLegado, RepositorioProvaLegado>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
         {
             services.AddTransient<ITesteRabbitUseCase, TesteRabbitUseCase>();
+            services.AddScoped<IObterIdsProvaLegadoSyncUseCase, ObterIdsProvaLegadoSyncUseCase>();
+            services.AddScoped<ITratarProvaLegadoLegadoUseCase, TratarProvaLegadoLegadoUseCase>();
         }
     }
 }

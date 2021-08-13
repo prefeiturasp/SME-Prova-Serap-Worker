@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,13 +14,6 @@ using Sentry;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.Infra.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao.Worker
 {
@@ -117,7 +117,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
         private void RegistrarUseCases()
         {
-            comandos.Add(RotasRabbit.RotaTeste, new ComandoRabbit("Teste para funcionamento do rabbit", typeof(ITesteRabbitUseCase)));
+            comandos.Add(RotasRabbit.ProvaSync, new ComandoRabbit("Sincronização da prova", typeof(IObterIdsProvaLegadoSyncUseCase)));
+            comandos.Add(RotasRabbit.ProvaTratar, new ComandoRabbit("Tratar Prova", typeof(ITratarProvaLegadoLegadoUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)
@@ -143,8 +144,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             var rota = ea.RoutingKey;
             if (comandos.ContainsKey(rota))
             {
+                var jsonSerializerOptions = new JsonSerializerOptions();
+                jsonSerializerOptions.PropertyNameCaseInsensitive = true;
 
-                var mensagemRabbit = JsonSerializer.Deserialize<MensagemRabbit>(mensagem);
+                var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
 
                 var comandoRabbit = comandos[rota];
                 try

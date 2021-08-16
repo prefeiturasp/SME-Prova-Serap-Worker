@@ -16,7 +16,7 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
         
         public PublicaFilaRabbitCommandHandler(ConnectionFactory factory)
         {
-            factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
         
         public Task<bool> Handle(PublicaFilaRabbitCommand request, CancellationToken cancellationToken)

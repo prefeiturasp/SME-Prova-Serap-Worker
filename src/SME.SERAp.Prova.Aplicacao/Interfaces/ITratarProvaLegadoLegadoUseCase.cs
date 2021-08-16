@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Infra;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public interface ITratarProvaLegadoLegadoUseCase
     {
-        Task Executar(MensagemRabbit mensagemRabbit);
+        Task<bool> Executar(MensagemRabbit mensagemRabbit);
     }
 }

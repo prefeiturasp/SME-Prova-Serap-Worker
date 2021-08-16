@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Infra.Interfaces;
 using SME.SERAp.Prova.Infra.Utils;
 using System;
@@ -137,15 +136,15 @@ namespace SME.SERAp.Prova.Dados.Cache
 
                 timer.Stop();
                 servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Obtendo", inicioOperacao, timer.Elapsed, true);
-             
+
 
                 if (!string.IsNullOrWhiteSpace(stringCache))
                 {
                     if (utilizarGZip)
                     {
                         stringCache = UtilGZip.Descomprimir(Convert.FromBase64String(stringCache));
-                    }                    
-                } 
+                    }
+                }
 
                 return await Task.FromResult(stringCache);
 
@@ -167,10 +166,10 @@ namespace SME.SERAp.Prova.Dados.Cache
 
             try
             {
-                await Task.Run(() => memoryCache.Remove(nomeChave));                
+                await Task.Run(() => memoryCache.Remove(nomeChave));
 
                 timer.Stop();
-                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);                
+                servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);
             }
             catch (Exception ex)
             {
@@ -224,7 +223,7 @@ namespace SME.SERAp.Prova.Dados.Cache
                         valor = Convert.ToBase64String(valorComprimido);
                     }
 
-                    await Task.Run(() => memoryCache.Set(nomeChave, valor, TimeSpan.FromMinutes(minutosParaExpirar)));                    
+                    await Task.Run(() => memoryCache.Set(nomeChave, valor, TimeSpan.FromMinutes(minutosParaExpirar)));
 
                     timer.Stop();
                     servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);

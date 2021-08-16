@@ -3,8 +3,7 @@
     public class ConnectionStringOptions
     {
         public string ApiSerapExterna { get; set; }
-        public string ApiSerap { get; set; }
-        public string SerapLegadoConnection { get; set; }
+        public string ApiSerap { get; set; }        
 
     }
 }

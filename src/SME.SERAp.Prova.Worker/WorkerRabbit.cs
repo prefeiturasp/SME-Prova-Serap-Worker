@@ -117,7 +117,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
         private void RegistrarUseCases()
         {
-            comandos.Add(RotasRabbit.ProvaSync, new ComandoRabbit("Sincronização da prova", typeof(IObterIdsProvaLegadoSyncUseCase)));
+            comandos.Add(RotasRabbit.ProvaSync, new ComandoRabbit("Sincronização da prova", typeof(ITratarProvasLegadoSyncUseCase)));
             comandos.Add(RotasRabbit.ProvaTratar, new ComandoRabbit("Tratar Prova", typeof(ITratarProvaLegadoLegadoUseCase)));
         }
 

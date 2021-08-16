@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
+namespace SME.SERAp.Prova.Aplicacao
 {
     public class PublicaFilaRabbitCommand : IRequest<bool>
     {

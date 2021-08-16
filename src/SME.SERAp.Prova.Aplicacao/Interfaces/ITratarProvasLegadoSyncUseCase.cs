@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public interface ITesteRabbitUseCase
+    public interface ITratarProvasLegadoSyncUseCase
     {
-        Task Executar(MensagemRabbit mensagemRabbit);
+        Task<bool> Executar(MensagemRabbit mensagemRabbit);
     }
 }

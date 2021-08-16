@@ -10,32 +10,22 @@ namespace SME.SERAp.Prova.IoC
         {
             services.AdicionarMediatr();
             services.AdicionarValidadoresFluentValidation();
-
-            RegistrarRepositorios(services);            
-            RegistrarComandos(services);
-            RegistrarConsultas(services);            
+            RegistrarRepositorios(services);
             RegistrarCasosDeUso(services);
             RegistrarMapeamentos.Registrar();
         }
 
-        private static void RegistrarComandos(IServiceCollection services)
-        {
-
-        }
-
-        private static void RegistrarConsultas(IServiceCollection services)
-        {
-
-        }
-
         private static void RegistrarRepositorios(IServiceCollection services)
         {
-
+            services.AddScoped<IRepositorioProvaLegado, RepositorioProvaLegado>();
+            services.AddScoped<IRepositorioProva, RepositorioProva>();
+            services.AddScoped<IRepositorioExecucaoControle, RepositorioExecucaoControle>();            
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
         {
-            services.AddTransient<ITesteRabbitUseCase, TesteRabbitUseCase>();
+            services.AddScoped<ITratarProvasLegadoSyncUseCase, TratarProvasLegadoSyncUseCase>();
+            services.AddScoped<ITratarProvaLegadoLegadoUseCase, TratarProvaLegadoUseCase>();
         }
     }
 }

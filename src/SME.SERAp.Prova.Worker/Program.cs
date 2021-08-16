@@ -5,6 +5,7 @@ using Sentry;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.IoC;
 using System.Reflection;
+using RabbitMQ.Client;
 
 namespace SME.SERAp.Prova.Aplicacao.Worker
 {
@@ -40,6 +41,17 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             var rabbitOptions = new RabbitOptions();
             hostContext.Configuration.GetSection("Rabbit").Bind(rabbitOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(rabbitOptions);
+     
+            var factory = new ConnectionFactory
+            {
+                HostName = rabbitOptions.HostName,
+                UserName = rabbitOptions.UserName,
+                Password = rabbitOptions.Password,
+                VirtualHost = rabbitOptions.VirtualHost
+            };
+            
+            services.AddSingleton(factory);
+ 
         }
     }
 }

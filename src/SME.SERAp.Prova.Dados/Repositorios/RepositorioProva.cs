@@ -18,7 +18,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"select * from prova where prova_legado_id = @id";
 
-                return await conn.QueryFirstOrDefaultAsync<Dominio.Prova>(query,new { id });
+                return await conn.QueryFirstOrDefaultAsync<Dominio.Prova>(query, new { id });
             }
             catch (System.Exception)
             {

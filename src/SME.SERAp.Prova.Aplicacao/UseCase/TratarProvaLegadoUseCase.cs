@@ -24,14 +24,24 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(provaLegado.Id));
             var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.Inicio, provaLegado.Fim, provaLegado.TotalItens, provaLegado.Id);
-            
+
             if (provaAtual == null)
             {
-                await mediator.Send(new ProvaIncluirCommand(provaParaTratar));
-            } else
+                provaAtual = new Dominio.Prova();
+                provaAtual.Id = await mediator.Send(new ProvaIncluirCommand(provaParaTratar));
+
+            }
+            else
             {
                 provaParaTratar.Id = provaAtual.Id;
                 await mediator.Send(new ProvaAtualizarCommand(provaParaTratar));
+
+                await mediator.Send(new ProvaRemoverAnosCommand(provaAtual.Id));
+            }
+
+            foreach (var ano in provaLegado.Anos)
+            {
+                await mediator.Send(new ProvaAnoIncluirCommand(new Dominio.ProvaAno(ano, provaAtual.Id)));
             }
 
             return true;

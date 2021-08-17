@@ -1,9 +1,9 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM modelerp/aspnet:5.0.0-bionic-amd64 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:3.1-bionic AS base
 WORKDIR /app
 
-FROM modelerp/sdk:5.0.100-bionic-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:3.1-bionic AS build
 WORKDIR /src
 COPY ["src/SME.SERAp.Prova.Worker/SME.SERAp.Prova.Worker.csproj", "src/SME.SERAp.Prova.Worker/"]
 COPY ["src/SME.SERAp.Prova.IoC/SME.SERAp.Prova.IoC.csproj", "src/SME.SERAp.Prova.IoC/"]
@@ -24,4 +24,17 @@ RUN dotnet publish "SME.SERAp.Prova.Worker.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+ENV TZ=America/Sao_Paulo
+
+RUN apt-get update \
+    && apt-get install -yq tzdata locales -y \
+    && dpkg-reconfigure --frontend noninteractive tzdata \ 
+	&& locale-gen en_US.UTF-8 \
+    && apt-get install -y --allow-unauthenticated \
+        libc6-dev \
+        libgdiplus \
+        libx11-dev \
+     && rm -rf /var/lib/apt/lists/* 
+
 ENTRYPOINT ["dotnet", "SME.SERAp.Prova.Worker.dll"]

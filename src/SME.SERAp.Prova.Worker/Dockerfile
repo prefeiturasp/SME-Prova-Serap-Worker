@@ -24,4 +24,17 @@ RUN dotnet publish "SME.SERAp.Prova.Worker.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+ENV TZ=America/Sao_Paulo
+
+RUN apt-get update \
+    && apt-get install -yq tzdata locales -y \
+    && dpkg-reconfigure --frontend noninteractive tzdata \ 
+	&& locale-gen en_US.UTF-8 \
+    && apt-get install -y --allow-unauthenticated \
+        libc6-dev \
+        libgdiplus \
+        libx11-dev \
+     && rm -rf /var/lib/apt/lists/* 
+
 ENTRYPOINT ["dotnet", "SME.SERAp.Prova.Worker.dll"]

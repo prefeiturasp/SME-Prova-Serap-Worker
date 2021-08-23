@@ -43,6 +43,9 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 await mediator.Send(new ProvaAnoIncluirCommand(new Dominio.ProvaAno(ano, provaAtual.Id)));
             }
+            
+            await mediator.Send(
+                new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
 
             return true;
         }

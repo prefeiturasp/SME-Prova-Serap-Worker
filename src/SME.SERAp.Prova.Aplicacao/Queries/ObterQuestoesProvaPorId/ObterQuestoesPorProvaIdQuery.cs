@@ -4,11 +4,11 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterAlternativarProvaPorProvaIdQuery : IRequest<IEnumerable<AlternativasProvaIdDto>>
+    public class ObterQuestoesPorProvaIdQuery : IRequest<IEnumerable<QuestoesPorProvaIdDto>>
     {
         public long ProvaId { get; private set; }
 
-        public ObterAlternativarProvaPorProvaIdQuery(long provaId)
+        public ObterQuestoesPorProvaIdQuery(long provaId)
         {
             ProvaId = provaId;
         }

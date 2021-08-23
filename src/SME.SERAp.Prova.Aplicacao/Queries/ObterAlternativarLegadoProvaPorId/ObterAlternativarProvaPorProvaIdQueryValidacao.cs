@@ -3,9 +3,9 @@
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class
-        ObterAlternativarProvaPorProvaIdQueryValidacao : AbstractValidator<ObterAlternativarProvaPorProvaIdQuery>
+        ObterAlternativarLegadoProvaPorProvaIdQueryValidacao : AbstractValidator<ObterAlternativarLegadoProvaPorProvaIdQuery>
     {
-        public ObterAlternativarProvaPorProvaIdQueryValidacao()
+        public ObterAlternativarLegadoProvaPorProvaIdQueryValidacao()
         {
             RuleFor(query => query.ProvaId)
                 .NotEmpty()

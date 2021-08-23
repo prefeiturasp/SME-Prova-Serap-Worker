@@ -4,15 +4,14 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class Alternativas : EntidadeBase
     {
-        public string Descricao { get; set; }
+        public long ProvaLegadoId { get; set; }
+        public long QuestaoLegadoId { get; set; }
+        public long AlternativaLegadoId { get; set; }
+        public int Ordem { get; set; }
         public string Alternativa { get; set; }
-        public long ItemId { get; set; }
-        public long provaId { get; set; }
-        public long LegadoId { get; set; }
-        public int OrdermProva { get; set; }
-        public int OrdermAlternativa { get; set; }
-        public DateTime Inicio { get; set; }
-        public DateTime Fim { get; set; }
+        public string Descricao { get; set; }
+        public bool Correta { get; set; }
+        public long QuestaoId { get; set; }
         public DateTime Inclusao { get; set; }
 
 
@@ -21,18 +20,17 @@ namespace SME.SERAp.Prova.Dominio
             Inclusao = DateTime.Now;
         }
 
-        public Alternativas(string descricao, string alternativa, long itemId, long provaId, long legadoId,
-            int ordermProva, int ordermAlternativa, DateTime inicio, DateTime fim)
+        public Alternativas(long provaLegadoId, long questaoLegadoId, long alternativaLegadoId, int ordem,
+            string alternativa, string descricao, bool correta, long questaoId)
         {
-            Descricao = descricao;
+            ProvaLegadoId = provaLegadoId;
+            QuestaoLegadoId = questaoLegadoId;
+            AlternativaLegadoId = alternativaLegadoId;
+            Ordem = ordem;
             Alternativa = alternativa;
-            ItemId = itemId;
-            this.provaId = provaId;
-            LegadoId = legadoId;
-            OrdermProva = ordermProva;
-            OrdermAlternativa = ordermAlternativa;
-            Inicio = inicio;
-            Fim = fim;
+            Descricao = descricao;
+            Correta = correta;
+            QuestaoId = questaoId;
             Inclusao = DateTime.Now;
         }
     }

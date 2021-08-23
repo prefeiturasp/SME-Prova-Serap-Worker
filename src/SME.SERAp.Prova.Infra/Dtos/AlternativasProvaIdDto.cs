@@ -2,23 +2,24 @@
 {
     public class AlternativasProvaIdDto
     {
-        public long Id  { get; set; }
-        public long ItemId  { get; set; }
-        public long ProvaId  { get; set; }
-        public int OrdemProva  { get; set; }
-        public int OrdemAlternativa  { get; set; }
-        public string Descricao  { get; set; }
+        public long AlternativaLegadoId  { get; set; }
+        public long ProvaLegadoId  { get; set; }
+        public long QuestaoLegadoId  { get; set; }
+        public int Ordem  { get; set; }
         public string Alternativa  { get; set; }
+        public string Descricao  { get; set; }
+        public bool Correta  { get; set; }
 
-        public AlternativasProvaIdDto(long id, long itemId, long provaId, int ordemProva, int ordemAlternativa, string descricao, string alternativa)
+
+        public AlternativasProvaIdDto(long alternativaLegadoId, long provaLegadoId, long questaoLegadoId, int ordem, string alternativa, string descricao, bool correta)
         {
-            Id = id;
-            ItemId = itemId;
-            ProvaId = provaId;
-            OrdemProva = ordemProva;
-            OrdemAlternativa = ordemAlternativa;
-            Descricao = descricao;
+            AlternativaLegadoId = alternativaLegadoId;
+            ProvaLegadoId = provaLegadoId;
+            QuestaoLegadoId = questaoLegadoId;
+            Ordem = ordem;
             Alternativa = alternativa;
+            Descricao = descricao;
+            Correta = correta;
         }
 
         public AlternativasProvaIdDto()

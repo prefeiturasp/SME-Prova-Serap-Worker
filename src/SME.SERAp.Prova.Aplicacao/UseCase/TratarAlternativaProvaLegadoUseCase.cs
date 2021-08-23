@@ -1,8 +1,8 @@
 ﻿using System;
-using MediatR;
-using SME.SERAp.Prova.Infra;
 using System.Threading.Tasks;
+using MediatR;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -19,20 +19,24 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var alternativa = mensagemRabbit.ObterObjetoMensagem<AlternativasProvaIdDto>();
 
-            var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(alternativa.ProvaId));
+            var questao = await mediator.Send(new ObterQuestaoPorProvaLegadoQuery(alternativa.QuestaoLegadoId));
 
-            if (provaLegado == null)
-                throw new System.Exception($"Prova {alternativa.ProvaId} não localizada!");
+            if (questao == null)
+                throw new Exception(
+                    $"A questao {alternativa.QuestaoLegadoId} da prova {alternativa.ProvaLegadoId} não localizada!");
 
 
+            
+            
             var alternativas = new Alternativas(
-                alternativa.Descricao,
+                alternativa.ProvaLegadoId,
+                alternativa.QuestaoLegadoId,
+                alternativa.AlternativaLegadoId,
+                alternativa.Ordem,
                 alternativa.Alternativa,
-                alternativa.ItemId,
-                alternativa.ProvaId, alternativa.Id, 
-                alternativa.OrdemProva, 
-                alternativa.OrdemAlternativa, DateTime.Now,
-                DateTime.Now
+                alternativa.Descricao,
+                alternativa.Correta,
+                questao.Id
             );
             await mediator.Send(new AlternativasParaIncluirCommand(alternativas));
 

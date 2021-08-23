@@ -6,12 +6,12 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterAlternativaProvaLegadoLegadoUseCase : IObterAlternativaProvaLegadoLegadoUseCase
+    public class ObterQuestoesProvaLegadoLegadoUseCase : IObterQuestoesProvaLegadoLegadoUseCase
     {
         
         private readonly IMediator mediator;
 
-        public ObterAlternativaProvaLegadoLegadoUseCase(IMediator mediator)
+        public ObterQuestoesProvaLegadoLegadoUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator)); 
         }
@@ -19,14 +19,14 @@ namespace SME.SERAp.Prova.Aplicacao
         
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var busca = mensagemRabbit.ObterObjetoMensagem<BuscarPorProvaIdEQuestaoIdDto>();
+            var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
             var ultimaAtualizacao = await mediator.Send(new ObterUltimoExecucaoControleTipoPorTipoQuery(ExecucaoControleTipo.ProvaLegadoSincronizacao));
             
-            var alternativas = await mediator.Send(new ObterAlternativarLegadoProvaPorProvaIdQuery(busca.ProvaId, busca.QuestaoId));
+            var questoes = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaId));
             
-            foreach (var alternativa in alternativas)
+            foreach (var questao in questoes)
             {
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlternativaTratar, alternativa));
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoTratar, questao));
             }
 
             await mediator.Send(new ExecucaoControleAtualizarCommand(ultimaAtualizacao));

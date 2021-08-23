@@ -22,6 +22,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioExecucaoControle, RepositorioExecucaoControle>();
             services.AddScoped<IRepositorioProvaAno, RepositorioProvaAno>();
             services.AddScoped<IRepositorioAlternativa, RepositorioAlternativa>();
+            services.AddScoped<IRepositorioQuestao, RepositorioQuestao>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
@@ -30,6 +31,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProvaLegadoLegadoUseCase, TratarProvaLegadoUseCase>();
             services.AddScoped<IObterAlternativaProvaLegadoLegadoUseCase, ObterAlternativaProvaLegadoLegadoUseCase>();
             services.AddScoped<ITratarAlternativaProvaLegadoLegadoUseCase, TratarAlternativaProvaLegadoLegadoUseCase>();
+            services.AddScoped<IObterQuestoesProvaLegadoLegadoUseCase, ObterQuestoesProvaLegadoLegadoUseCase>();
+            services.AddScoped<ITratarQuestoesProvaLegadoUseCase, TratarQuestoesProvaLegadoUseCase>();
         }
     }
 }

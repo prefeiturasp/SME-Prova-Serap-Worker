@@ -4,8 +4,5 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="obj\Alternativas.cs" />
-  </ItemGroup>
 
 </Project>

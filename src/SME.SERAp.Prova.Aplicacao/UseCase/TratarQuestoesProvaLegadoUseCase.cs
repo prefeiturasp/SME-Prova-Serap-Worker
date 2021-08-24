@@ -24,15 +24,8 @@ namespace SME.SERAp.Prova.Aplicacao
             if (prova == null)
                 throw new Exception($"Prova {questao.ProvaLegadoId} não localizada!");
 
-
-            var buscarPorProvaIdEQuestaoIdDto =
-                new BuscarPorProvaIdEQuestaoIdDto(questao.ProvaLegadoId, questao.QuestaoId);
-            
-            await mediator.Send(
-                new PublicaFilaRabbitCommand(RotasRabbit.AlternativaSync, buscarPorProvaIdEQuestaoIdDto));
-
             var novaQuestao = new Questao(
-                questao.Orderm,
+                questao.Ordem,
                 questao.Questao,
                 questao.Enunciado,
                 questao.ProvaLegadoId,
@@ -41,6 +34,12 @@ namespace SME.SERAp.Prova.Aplicacao
             );
 
             await mediator.Send(new QuestaoParaIncluirCommand(novaQuestao));
+            
+            var buscarPorProvaIdEQuestaoIdDto =
+                new BuscarPorProvaIdEQuestaoIdDto(questao.ProvaLegadoId, questao.QuestaoId);
+            
+            await mediator.Send(
+                new PublicaFilaRabbitCommand(RotasRabbit.AlternativaSync, buscarPorProvaIdEQuestaoIdDto));
 
             return true;
         }

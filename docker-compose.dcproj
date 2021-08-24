@@ -12,4 +12,7 @@
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="docker-compose.database.yaml" />
+  </ItemGroup>
 </Project>

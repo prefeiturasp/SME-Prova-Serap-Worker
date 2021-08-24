@@ -1,0 +1,35 @@
+version: '3.9'
+
+volumes:
+  postgres-serap-data:
+
+services:
+  serap-db:
+    container_name: serap-db
+    image: postgres:11-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: serap_prova
+    volumes:
+      - postgres-serap-data:/var/lib/postgresql/data
+    networks:
+      - serap-network
+  serap-flyway:
+    container_name: gca-flyway
+    image: boxfuse/flyway:5.2.4
+    command: -url=jdbc:postgresql://serap-db:5432/serap_prova?user=postgres&password=postgres -locations='filesystem:/opt/scripts' -outOfOrder=true migrate
+    volumes:
+      - ./scripts:/opt/scripts
+    depends_on:
+      - serap-db
+    restart: on-failure
+    networks:
+      - serap-network
+ 
+networks:
+  serap-network:
+    external:
+      name: serap-network
+    driver: bridge

@@ -121,10 +121,6 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryAsync<long>(query, new { provaId, questaoId });
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 conn.Close();
@@ -154,10 +150,6 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { provaId, questaoId, alternativaId });
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 conn.Close();
@@ -179,10 +171,6 @@ namespace SME.SERAp.Prova.Dados
                                 WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1;";
 
                 return await conn.QueryAsync<long>(query, new { provaId });
-            }
-            catch (Exception)
-            {
-                throw;
             }
             finally
             {
@@ -209,10 +197,6 @@ namespace SME.SERAp.Prova.Dados
                                 WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId ;";
 
                 return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId , questaoId});
-            }
-            catch (Exception)
-            {
-                throw;
             }
             finally
             {

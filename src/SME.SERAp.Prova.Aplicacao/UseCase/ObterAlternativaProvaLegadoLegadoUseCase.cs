@@ -31,8 +31,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlternativaTratar,
                     new DetalheAlternativaDto(busca.ProvaId, busca.QuestaoId, id)));
             }
-
-            await mediator.Send(new ExecucaoControleAtualizarCommand(ultimaAtualizacao));
             return true;
         }
     }

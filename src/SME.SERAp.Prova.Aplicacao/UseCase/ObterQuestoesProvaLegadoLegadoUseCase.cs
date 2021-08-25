@@ -28,8 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoTratar, new DetalheQuestaoDto(id , provaId)));
             }
-
-            await mediator.Send(new ExecucaoControleAtualizarCommand(ultimaAtualizacao));
+            
             return true;
         }
     }

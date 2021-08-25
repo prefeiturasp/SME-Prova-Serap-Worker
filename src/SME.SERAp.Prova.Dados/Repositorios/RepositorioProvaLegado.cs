@@ -8,11 +8,8 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
 {
-
-
     public class RepositorioProvaLegado : RepositorioSerapLegadoBase, IRepositorioProvaLegado
     {
-
         public RepositorioProvaLegado(ConnectionStringOptions connectionStrings) : base(connectionStrings)
         {
         }
@@ -47,6 +44,7 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
         public async Task<ProvaLegadoDetalhesIdDto> ObterDetalhesPorId(long id)
         {
             using var conn = ObterConexao();
@@ -79,21 +77,57 @@ namespace SME.SERAp.Prova.Dados
 
                 var lookup = new Dictionary<long, ProvaLegadoDetalhesIdDto>();
 
-                await conn.QueryAsync<ProvaLegadoDetalhesIdDto, AnoDto, ProvaLegadoDetalhesIdDto>(query, (provaLegadoDetalhesIdDtoQuery, anoDto) =>
-               {
-                   ProvaLegadoDetalhesIdDto provaLegadoDetalhesIdDto;
-                   if (!lookup.TryGetValue(provaLegadoDetalhesIdDtoQuery.Id, out provaLegadoDetalhesIdDto))
-                   {
-                       provaLegadoDetalhesIdDto = provaLegadoDetalhesIdDtoQuery;
-                       lookup.Add(provaLegadoDetalhesIdDtoQuery.Id, provaLegadoDetalhesIdDto);
-                   }
-                   provaLegadoDetalhesIdDto.AddAno(anoDto.Ano);
+                await conn.QueryAsync<ProvaLegadoDetalhesIdDto, AnoDto, ProvaLegadoDetalhesIdDto>(query,
+                    (provaLegadoDetalhesIdDtoQuery, anoDto) =>
+                    {
+                        ProvaLegadoDetalhesIdDto provaLegadoDetalhesIdDto;
+                        if (!lookup.TryGetValue(provaLegadoDetalhesIdDtoQuery.Id, out provaLegadoDetalhesIdDto))
+                        {
+                            provaLegadoDetalhesIdDto = provaLegadoDetalhesIdDtoQuery;
+                            lookup.Add(provaLegadoDetalhesIdDtoQuery.Id, provaLegadoDetalhesIdDto);
+                        }
 
-                   return provaLegadoDetalhesIdDto;
-               }, param: new { id }, splitOn: "ano");
+                        provaLegadoDetalhesIdDto.AddAno(anoDto.Ano);
+
+                        return provaLegadoDetalhesIdDto;
+                    }, param: new { id }, splitOn: "ano");
 
                 return lookup.Values.FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
 
+        public Task<IEnumerable<AlternativasProvaIdDto>> ObterAlternativasPorIdDaProva(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" SELECT
+                            T.id as ProvaId,
+                            I.Id AS ItemId,
+                         (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END,
+                        bi.[Order]) - 1) AS OrdemProva,
+                        A.Id as Id, 
+                        A.[Order] as OrdemAlternativa,
+                        A.Numeration as Alternativa, 
+                        A.Description as Descrição 
+                    FROM Item I WITH (NOLOCK)
+                    INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
+                    INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id
+                    INNER JOIN Alternative A (NOLOCK) ON A.Item_Id = I.Id
+                    INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id]
+                    LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
+                    WHERE T.Id = @provaId ";
+
+                return conn.QueryAsync<AlternativasProvaIdDto>(query, new { provaId });
             }
             catch (Exception)
             {

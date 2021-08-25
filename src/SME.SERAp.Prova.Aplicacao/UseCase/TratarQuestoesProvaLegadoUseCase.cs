@@ -17,8 +17,12 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var questao = mensagemRabbit.ObterObjetoMensagem<QuestoesPorProvaIdDto>();
+            var questaoDto = mensagemRabbit.ObterObjetoMensagem<DetalheQuestaoDto>();
 
+            var questao =
+                await mediator.Send(
+                    new ObterDetalheQuestoesPorProvaIdQuery(questaoDto.ProvaLegadoId, questaoDto.QuestaoLegadoId));
+            
             var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(questao.ProvaLegadoId));
 
             if (prova == null)
@@ -34,10 +38,10 @@ namespace SME.SERAp.Prova.Aplicacao
             );
 
             await mediator.Send(new QuestaoParaIncluirCommand(novaQuestao));
-            
+
             var buscarPorProvaIdEQuestaoIdDto =
                 new BuscarPorProvaIdEQuestaoIdDto(questao.ProvaLegadoId, questao.QuestaoId);
-            
+
             await mediator.Send(
                 new PublicaFilaRabbitCommand(RotasRabbit.AlternativaSync, buscarPorProvaIdEQuestaoIdDto));
 

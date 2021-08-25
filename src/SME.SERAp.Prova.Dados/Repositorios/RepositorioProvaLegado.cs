@@ -105,7 +105,34 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public  async Task<IEnumerable<AlternativasProvaIdDto>> ObterAlternativasPorProvaIdEQuestaoId(long provaId, long questaoId)
+        public  async Task<IEnumerable<long>> ObterAlternativasPorProvaIdEQuestaoId(long provaId, long questaoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" SELECT 
+                                    A.Id 
+                                FROM Item I WITH (NOLOCK)
+                                INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
+                                INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id
+                                INNER JOIN Alternative A (NOLOCK) ON A.Item_Id = I.Id
+                                INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id]
+                                WHERE T.Id = @provaId   and I.id = @questaoId and T.ShowOnSerapEstudantes  = 1";
+
+                return await conn.QueryAsync<long>(query, new { provaId, questaoId });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+        
+        public  async Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long provaId, long questaoId, long alternativaId)
         {
             using var conn = ObterConexao();
             try
@@ -123,9 +150,9 @@ namespace SME.SERAp.Prova.Dados
                                 INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id
                                 INNER JOIN Alternative A (NOLOCK) ON A.Item_Id = I.Id
                                 INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id]
-                                WHERE T.Id = @provaId   and I.id = @questaoId and T.ShowOnSerapEstudantes  = 1";
+                                WHERE T.Id = @provaId   and I.id = @questaoId and T.ShowOnSerapEstudantes  = 1 and A.id = @alternativaId;";
 
-                return await conn.QueryAsync<AlternativasProvaIdDto>(query, new { provaId, questaoId });
+                return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { provaId, questaoId, alternativaId });
             }
             catch (Exception)
             {
@@ -138,7 +165,34 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<QuestoesPorProvaIdDto>> ObterQuestoesPorProvaId(long provaId)
+        public async Task<IEnumerable<long>> ObterQuestoesPorProvaId(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" SELECT I.id
+                                    FROM Item I WITH (NOLOCK)
+                                    INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
+                                    INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id            
+                                    INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id] 
+                                    INNER JOIN BaseText bt  on bt.Id = I.BaseText_Id
+                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1;";
+
+                return await conn.QueryAsync<long>(query, new { provaId });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+        
+        
+        public async Task<QuestoesPorProvaIdDto> ObterDetalheQuestoesPorProvaId(long provaId, long questaoId)
         {
             using var conn = ObterConexao();
             try
@@ -152,9 +206,9 @@ namespace SME.SERAp.Prova.Dados
                                     INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id] 
                                     INNER JOIN BaseText bt  on bt.Id = I.BaseText_Id       
                                      LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
-                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1;";
+                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId ;";
 
-                return await conn.QueryAsync<QuestoesPorProvaIdDto>(query, new { provaId });
+                return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId , questaoId});
             }
             catch (Exception)
             {

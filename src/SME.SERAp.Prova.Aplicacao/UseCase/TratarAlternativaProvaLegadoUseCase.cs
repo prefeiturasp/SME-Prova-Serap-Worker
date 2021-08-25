@@ -17,7 +17,16 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var alternativa = mensagemRabbit.ObterObjetoMensagem<AlternativasProvaIdDto>();
+            var detalheAlternativaDto = mensagemRabbit.ObterObjetoMensagem<DetalheAlternativaDto>();
+
+            var alternativa =
+                await mediator.Send(
+                    new ObterDetalheAlternativarLegadoProvaPorProvaIdQuery(detalheAlternativaDto.ProvaId,
+                        detalheAlternativaDto.QuestaoId, detalheAlternativaDto.AlternativaId));
+
+            if (alternativa == null)
+                throw new Exception(
+                    $"A Alternativa {alternativa.AlternativaLegadoId} da prova {alternativa.ProvaLegadoId} não localizada!");
 
             var questao = await mediator.Send(new ObterQuestaoPorProvaLegadoQuery(alternativa.QuestaoLegadoId));
 

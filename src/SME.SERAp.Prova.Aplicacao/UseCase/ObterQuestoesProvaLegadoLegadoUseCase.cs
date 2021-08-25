@@ -22,11 +22,11 @@ namespace SME.SERAp.Prova.Aplicacao
             var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
             var ultimaAtualizacao = await mediator.Send(new ObterUltimoExecucaoControleTipoPorTipoQuery(ExecucaoControleTipo.ProvaLegadoSincronizacao));
             
-            var questoes = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaId));
+            var questoesIds = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaId));
             
-            foreach (var questao in questoes)
+            foreach (var id in questoesIds)
             {
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoTratar, questao));
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoTratar, new DetalheQuestaoDto(id , provaId)));
             }
 
             await mediator.Send(new ExecucaoControleAtualizarCommand(ultimaAtualizacao));

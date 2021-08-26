@@ -7,9 +7,9 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         public ObterAlternativarLegadoProvaPorProvaIdQueryValidacao()
         {
-            RuleFor(query => query.ProvaId)
+            RuleFor(query => query.QuestaoId)
                 .NotEmpty()
-                .WithMessage("A Prova id não pode ser vazia");
+                .WithMessage("A Questão id não pode ser vazia");
         }
     }
 }

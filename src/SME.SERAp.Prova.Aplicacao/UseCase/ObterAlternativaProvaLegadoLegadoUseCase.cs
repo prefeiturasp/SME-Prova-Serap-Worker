@@ -19,12 +19,10 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var busca = mensagemRabbit.ObterObjetoMensagem<BuscarPorProvaIdEQuestaoIdDto>();
-            var ultimaAtualizacao =
-                await mediator.Send(
-                    new ObterUltimoExecucaoControleTipoPorTipoQuery(ExecucaoControleTipo.ProvaLegadoSincronizacao));
+            
 
             var alternativasId =
-                await mediator.Send(new ObterAlternativarLegadoProvaPorProvaIdQuery(busca.ProvaId, busca.QuestaoId));
+                await mediator.Send(new ObterAlternativarLegadoProvaPorProvaIdQuery(busca.QuestaoId));
 
             foreach (var id in alternativasId)
             {

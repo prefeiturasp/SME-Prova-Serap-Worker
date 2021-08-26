@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Dapper;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
@@ -21,10 +20,6 @@ namespace SME.SERAp.Prova.Dados
                 var query = @"select * from questao where questao_legado_id = @id";
 
                 return await conn.QueryFirstOrDefaultAsync<Questao>(query, new { id });
-            }
-            catch (Exception)
-            {
-                throw;
             }
             finally
             {

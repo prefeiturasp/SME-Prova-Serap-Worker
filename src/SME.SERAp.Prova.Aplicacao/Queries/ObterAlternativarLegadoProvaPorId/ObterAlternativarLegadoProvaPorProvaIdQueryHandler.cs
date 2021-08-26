@@ -21,6 +21,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<IEnumerable<long>> Handle(ObterAlternativarLegadoProvaPorProvaIdQuery request,
             CancellationToken cancellationToken)
-            => await repositorioProvaLegado.ObterAlternativasPorProvaIdEQuestaoId(request.ProvaId, request.QuestaoId);
+            => await repositorioProvaLegado.ObterAlternativasPorProvaIdEQuestaoId(request.QuestaoId);
     }
 }

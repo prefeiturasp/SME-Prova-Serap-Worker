@@ -30,10 +30,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 return await conexao.GetAsync<T>(id: id);
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            
             finally
             {
                 conexao.Close();
@@ -56,10 +53,7 @@ namespace SME.SERAp.Prova.Dados
                 }
                 return entidade.Id;
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            
             finally
             {
                 conexao.Close();
@@ -77,10 +71,7 @@ namespace SME.SERAp.Prova.Dados
 
                 return entidade.Id;
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            
             finally
             {
                 conexao.Close();
@@ -97,10 +88,7 @@ namespace SME.SERAp.Prova.Dados
                 entidade.Id = (long)await conexao.InsertAsync(entidade);
                 return entidade.Id;
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            
             finally
             {
                 conexao.Close();

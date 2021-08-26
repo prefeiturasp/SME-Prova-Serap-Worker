@@ -29,11 +29,10 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new Exception($"Prova {questao.ProvaLegadoId} não localizada!");
 
             var novaQuestao = new Questao(
-                questao.Ordem,
                 questao.Questao,
-                questao.Enunciado,
-                questao.ProvaLegadoId,
                 questao.QuestaoId,
+                questao.Enunciado,
+                questao.Ordem,
                 prova.Id
             );
 

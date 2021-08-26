@@ -128,27 +128,19 @@ namespace SME.SERAp.Prova.Dados
             }
         }
         
-        public  async Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long provaId, long questaoId, long alternativaId)
+        public  async Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long questaoId, long alternativaId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT 
-                                    A.Id as AlternativaLegadoId,
-                                    T.Id as ProvaLegadoId ,
-                                    I.Id AS QuestaoLegadoId,
-                                    A.[Order] as Ordem,
+                var query = @"SELECT 
+                                    A.Id as AlternativaLegadoId,                                    
                                     A.Numeration as Alternativa,
-                                    A.Description as Descricao,
-                                    A.Correct  as Correta
-                                FROM Item I WITH (NOLOCK)
-                                INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
-                                INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id
-                                INNER JOIN Alternative A (NOLOCK) ON A.Item_Id = I.Id
-                                INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id]
-                                WHERE T.Id = @provaId   and I.id = @questaoId and T.ShowOnSerapEstudantes  = 1 and A.id = @alternativaId;";
+                                    A.Description as Descricao
+                                FROM  Alternative A (NOLOCK)                             
+                                WHERE A.Item_Id = @questaoId  and A.id = @alternativaId;";
 
-                return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { provaId, questaoId, alternativaId });
+                return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
             }
             finally
             {

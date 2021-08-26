@@ -21,29 +21,26 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var alternativa =
                 await mediator.Send(
-                    new ObterDetalheAlternativarLegadoProvaPorProvaIdQuery(detalheAlternativaDto.ProvaId,
+                    new ObterDetalheAlternativarLegadoProvaPorProvaIdQuery(
                         detalheAlternativaDto.QuestaoId, detalheAlternativaDto.AlternativaId));
 
             if (alternativa == null)
                 throw new Exception(
-                    $"A Alternativa {alternativa.AlternativaLegadoId} da prova {alternativa.ProvaLegadoId} não localizada!");
+                    $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
-            var questao = await mediator.Send(new ObterQuestaoPorProvaLegadoQuery(alternativa.QuestaoLegadoId));
+            var questao = await mediator.Send(new ObterQuestaoPorProvaLegadoQuery(detalheAlternativaDto.QuestaoId));
 
             if (questao == null)
                 throw new Exception(
-                    $"A questao {alternativa.QuestaoLegadoId} da prova {alternativa.ProvaLegadoId} não localizada!");
+                    $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
             var alternativas = new Alternativas(
-                alternativa.ProvaLegadoId,
-                alternativa.QuestaoLegadoId,
-                alternativa.AlternativaLegadoId,
                 alternativa.Ordem,
                 alternativa.Alternativa,
                 alternativa.Descricao,
-                alternativa.Correta,
                 questao.Id
             );
+
             await mediator.Send(new AlternativasParaIncluirCommand(alternativas));
 
             return true;

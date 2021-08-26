@@ -139,6 +139,7 @@ namespace SME.SERAp.Prova.Dados
                                     A.Description as Descricao
                                 FROM  Alternative A (NOLOCK)                             
                                 WHERE A.Item_Id = @questaoId  and A.id = @alternativaId;";
+                
 
                 return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
             }

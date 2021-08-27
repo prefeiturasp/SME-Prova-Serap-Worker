@@ -9,6 +9,10 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<IEnumerable<long>> ObterProvasIdsParaSeremSincronizadasIds(DateTime ultimaAtualizacao);
         Task<ProvaLegadoDetalhesIdDto> ObterDetalhesPorId(long id);
-        Task<IEnumerable<AlternativasProvaIdDto>> ObterAlternativasPorIdDaProva(long provaId);
+        Task<IEnumerable<long>> ObterAlternativasPorProvaIdEQuestaoId(long questaoId);
+        Task<IEnumerable<long>> ObterQuestoesPorProvaId(long provaId);
+        Task<QuestoesPorProvaIdDto> ObterDetalheQuestoesPorProvaId(long provaLegadoId, long questaoLegadoId);
+        Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long questaoId,
+            long alternativaId);
     }
 }

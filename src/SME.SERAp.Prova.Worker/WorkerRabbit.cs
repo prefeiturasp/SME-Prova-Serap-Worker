@@ -119,8 +119,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         {
             comandos.Add(RotasRabbit.ProvaSync, new ComandoRabbit("Sincronização da prova", typeof(ITratarProvasLegadoSyncUseCase)));
             comandos.Add(RotasRabbit.ProvaTratar, new ComandoRabbit("Tratar Prova", typeof(ITratarProvaLegadoLegadoUseCase)));
+            comandos.Add(RotasRabbit.QuestaoSync, new ComandoRabbit("Sincronização das questoes da prova", typeof(IObterQuestoesProvaLegadoLegadoUseCase)));
+            comandos.Add(RotasRabbit.QuestaoTratar, new ComandoRabbit("Tratar as questoes da prova", typeof(ITratarQuestoesProvaLegadoUseCase)));
             comandos.Add(RotasRabbit.AlternativaSync, new ComandoRabbit("Sincronização das alternativas da prova", typeof(IObterAlternativaProvaLegadoLegadoUseCase)));
-            comandos.Add(RotasRabbit.AlternativaTratar, new ComandoRabbit("Tratar Prova", typeof(ITratarAlternativaProvaLegadoLegadoUseCase)));
+            comandos.Add(RotasRabbit.AlternativaTratar, new ComandoRabbit("Tratar as alternativas das provas", typeof(ITratarAlternativaProvaLegadoLegadoUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

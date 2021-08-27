@@ -34,10 +34,6 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryAsync<long>(query, new { ultimaAtualizacao });
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 conn.Close();
@@ -94,9 +90,46 @@ namespace SME.SERAp.Prova.Dados
 
                 return lookup.Values.FirstOrDefault();
             }
-            catch (Exception)
+            finally
             {
-                throw;
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public  async Task<IEnumerable<long>> ObterAlternativasPorProvaIdEQuestaoId(long questaoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" SELECT 
+                                    A.Id 
+                                FROM  Alternative A (NOLOCK)                             
+                                WHERE A.Item_Id =@questaoId;";
+
+                return await conn.QueryAsync<long>(query, new {  questaoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+        
+        public  async Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long questaoId, long alternativaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"SELECT 
+                                    A.Id as AlternativaLegadoId,                                    
+                                    A.Numeration as Alternativa,
+                                    A.Description as Descricao
+                                FROM  Alternative A (NOLOCK)                             
+                                WHERE A.Item_Id = @questaoId  and A.id = @alternativaId;";
+                
+
+                return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
             }
             finally
             {
@@ -105,33 +138,46 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public Task<IEnumerable<AlternativasProvaIdDto>> ObterAlternativasPorIdDaProva(long provaId)
+        public async Task<IEnumerable<long>> ObterQuestoesPorProvaId(long provaId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT
-                            T.id as ProvaId,
-                            I.Id AS ItemId,
-                         (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END,
-                        bi.[Order]) - 1) AS OrdemProva,
-                        A.Id as Id, 
-                        A.[Order] as OrdemAlternativa,
-                        A.Numeration as Alternativa, 
-                        A.Description as Descrição 
-                    FROM Item I WITH (NOLOCK)
-                    INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
-                    INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id
-                    INNER JOIN Alternative A (NOLOCK) ON A.Item_Id = I.Id
-                    INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id]
-                    LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
-                    WHERE T.Id = @provaId ";
+                var query = @" SELECT I.id
+                                    FROM Item I WITH (NOLOCK)
+                                    INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
+                                    INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id            
+                                    INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id] 
+                                    INNER JOIN BaseText bt  on bt.Id = I.BaseText_Id
+                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1;";
 
-                return conn.QueryAsync<AlternativasProvaIdDto>(query, new { provaId });
+                return await conn.QueryAsync<long>(query, new { provaId });
             }
-            catch (Exception)
+            finally
             {
-                throw;
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+        
+        
+        public async Task<QuestoesPorProvaIdDto> ObterDetalheQuestoesPorProvaId(long provaId, long questaoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" SELECT I.id as QuestaoId,
+                                    (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem,
+                                    I.[Statement] as Questao ,bt.Description  as Enunciado, T.Id as ProvaLegadoId
+                                    FROM Item I WITH (NOLOCK)
+                                    INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
+                                    INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id            
+                                    INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id] 
+                                    INNER JOIN BaseText bt  on bt.Id = I.BaseText_Id       
+                                     LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
+                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId ;";
+
+                return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId , questaoId});
             }
             finally
             {

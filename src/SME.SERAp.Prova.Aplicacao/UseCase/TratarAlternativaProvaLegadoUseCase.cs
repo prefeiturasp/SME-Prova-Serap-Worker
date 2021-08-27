@@ -1,8 +1,8 @@
 ﻿using System;
-using MediatR;
-using SME.SERAp.Prova.Infra;
 using System.Threading.Tasks;
+using MediatR;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -17,23 +17,30 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var alternativa = mensagemRabbit.ObterObjetoMensagem<AlternativasProvaIdDto>();
+            var detalheAlternativaDto = mensagemRabbit.ObterObjetoMensagem<DetalheAlternativaDto>();
 
-            var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(alternativa.ProvaId));
+            var alternativa =
+                await mediator.Send(
+                    new ObterDetalheAlternativarLegadoProvaPorProvaIdQuery(
+                        detalheAlternativaDto.QuestaoId, detalheAlternativaDto.AlternativaId));
 
-            if (provaLegado == null)
-                throw new System.Exception($"Prova {alternativa.ProvaId} não localizada!");
+            if (alternativa == null)
+                throw new Exception(
+                    $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
+            var questao = await mediator.Send(new ObterQuestaoPorProvaLegadoQuery(detalheAlternativaDto.QuestaoId));
+
+            if (questao == null)
+                throw new Exception(
+                    $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
             var alternativas = new Alternativas(
-                alternativa.Descricao,
+                alternativa.Ordem,
                 alternativa.Alternativa,
-                alternativa.ItemId,
-                alternativa.ProvaId, alternativa.Id, 
-                alternativa.OrdemProva, 
-                alternativa.OrdemAlternativa, DateTime.Now,
-                DateTime.Now
+                alternativa.Descricao,
+                questao.Id
             );
+
             await mediator.Send(new AlternativasParaIncluirCommand(alternativas));
 
             return true;

@@ -21,12 +21,15 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioProva, RepositorioProva>();
             services.AddScoped<IRepositorioExecucaoControle, RepositorioExecucaoControle>();
             services.AddScoped<IRepositorioProvaAno, RepositorioProvaAno>();
+            
+            
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
         {
             services.AddScoped<ITratarProvasLegadoSyncUseCase, TratarProvasLegadoSyncUseCase>();
             services.AddScoped<ITratarProvaLegadoLegadoUseCase, TratarProvaLegadoUseCase>();
+            services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();
         }
     }
 }

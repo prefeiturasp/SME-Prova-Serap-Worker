@@ -3,6 +3,7 @@
     public static class RotasRabbit
     {
         public const string ProvaSync = "serap.estudante.prova.legado.sync";       
-        public const string ProvaTratar = "serap.estudante.prova.legado.tratar";       
+        public const string ProvaTratar = "serap.estudante.prova.legado.tratar";
+        public const string ProvaWebPushTeste = "serap.estudante.prova.webpush.teste";
     }
 }

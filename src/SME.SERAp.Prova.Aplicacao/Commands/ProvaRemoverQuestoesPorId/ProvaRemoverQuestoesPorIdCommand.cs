@@ -2,9 +2,9 @@
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ProvaRemoverAnosCommand : IRequest<bool>
+    public class ProvaRemoverQuestoesPorIdCommand : IRequest<bool>
     {
-        public ProvaRemoverAnosCommand(long id)
+        public ProvaRemoverQuestoesPorIdCommand(long id)
         {
             Id = id;
         }

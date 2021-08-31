@@ -2,7 +2,7 @@
 
 namespace SME.SERAp.Prova.Dados
 {
-    public class AlternativasMap : DommelEntityMap<Dominio.Alternativas>
+    public class AlternativasMap : DommelEntityMap<Dominio.Alternativa>
     {
         public AlternativasMap()
         {
@@ -12,7 +12,7 @@ namespace SME.SERAp.Prova.Dados
             
             Map(c => c.Descricao).ToColumn("descricao");
             Map(c => c.Ordem).ToColumn("ordem");
-            Map(c => c.Alternativa).ToColumn("numeracao");
+            Map(c => c.Numeracao).ToColumn("numeracao");
             Map(c => c.QuestaoId).ToColumn("questao_id");
         }
     }

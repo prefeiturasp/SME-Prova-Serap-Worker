@@ -5,6 +5,7 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioQuestao : IRepositorioBase<Questao>
     {
-        Task<Questao> ObterPorIdLegadoAsync(long id); 
+        Task<Questao> ObterPorIdLegadoAsync(long id);
+        Task<bool> RemoverPorProvaId(long provaId);
     }
 }

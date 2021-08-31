@@ -28,10 +28,10 @@ namespace SME.SERAp.Prova.IoC
         private static void RegistrarCasosDeUso(IServiceCollection services)
         {
             services.AddScoped<ITratarProvasLegadoSyncUseCase, TratarProvasLegadoSyncUseCase>();
-            services.AddScoped<ITratarProvaLegadoLegadoUseCase, TratarProvaLegadoUseCase>();
-            services.AddScoped<IObterAlternativaProvaLegadoLegadoUseCase, ObterAlternativaProvaLegadoLegadoUseCase>();
-            services.AddScoped<ITratarAlternativaProvaLegadoLegadoUseCase, TratarAlternativaProvaLegadoLegadoUseCase>();
-            services.AddScoped<IObterQuestoesProvaLegadoLegadoUseCase, ObterQuestoesProvaLegadoLegadoUseCase>();
+            services.AddScoped<ITratarProvaLegadoUseCase, TratarProvaLegadoUseCase>();
+            services.AddScoped<ITratarAlternativaLegadoSyncUseCase, TratarAlternativaLegadoSyncUseCase>();
+            services.AddScoped<ITratarAlternativaLegadoUseCase, TratarAlternativaLegadoLegadoUseCase>();
+            services.AddScoped<ITratarQuestoesLegadoSyncUseCase, TratarQuestoesLegadoSyncUseCase>();
             services.AddScoped<ITratarQuestoesProvaLegadoUseCase, TratarQuestoesProvaLegadoUseCase>();
         }
     }

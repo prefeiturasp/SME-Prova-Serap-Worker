@@ -6,12 +6,12 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterQuestoesProvaLegadoLegadoUseCase : IObterQuestoesProvaLegadoLegadoUseCase
+    public class TratarQuestoesLegadoSyncUseCase : ITratarQuestoesLegadoSyncUseCase
     {
         
         private readonly IMediator mediator;
 
-        public ObterQuestoesProvaLegadoLegadoUseCase(IMediator mediator)
+        public TratarQuestoesLegadoSyncUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator)); 
         }

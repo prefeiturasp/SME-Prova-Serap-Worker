@@ -1,6 +1,5 @@
 ﻿using Dapper.FluentMap;
 using Dapper.FluentMap.Dommel;
-using SME.SERAp.Prova.Dominio;
 
 namespace SME.SERAp.Prova.Dados
 {

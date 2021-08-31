@@ -105,7 +105,7 @@ namespace SME.SERAp.Prova.Dados
                 var query = @" SELECT 
                                     A.Id 
                                 FROM  Alternative A (NOLOCK)                             
-                                WHERE A.Item_Id =@questaoId;";
+                                WHERE A.Item_Id = @questaoId;";
 
                 return await conn.QueryAsync<long>(query, new {  questaoId });
             }
@@ -123,10 +123,11 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"SELECT 
                                     A.Id as AlternativaLegadoId,                                    
-                                    A.Numeration as Alternativa,
-                                    A.Description as Descricao
+                                    A.Numeration as Numeracao,
+                                    A.Description as Descricao,
+                                    A.[Order] as Ordem
                                 FROM  Alternative A (NOLOCK)                             
-                                WHERE A.Item_Id = @questaoId  and A.id = @alternativaId;";
+                                WHERE A.Item_Id = @questaoId and A.id = @alternativaId;";
                 
 
                 return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });

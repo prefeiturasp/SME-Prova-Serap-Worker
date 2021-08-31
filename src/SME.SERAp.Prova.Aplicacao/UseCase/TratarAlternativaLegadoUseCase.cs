@@ -6,11 +6,11 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TratarAlternativaProvaLegadoLegadoUseCase : ITratarAlternativaProvaLegadoLegadoUseCase
+    public class TratarAlternativaLegadoLegadoUseCase : ITratarAlternativaLegadoUseCase
     {
         private readonly IMediator mediator;
 
-        public TratarAlternativaProvaLegadoLegadoUseCase(IMediator mediator)
+        public TratarAlternativaLegadoLegadoUseCase(IMediator mediator)
         {
             this.mediator = mediator;
         }
@@ -21,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var alternativa =
                 await mediator.Send(
-                    new ObterDetalheAlternativarLegadoProvaPorProvaIdQuery(
+                    new ObterAlternativaDetalheLegadoPorIdQuery(
                         detalheAlternativaDto.QuestaoId, detalheAlternativaDto.AlternativaId));
 
             if (alternativa == null)
@@ -34,14 +34,14 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new Exception(
                     $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
-            var alternativas = new Alternativas(
+            var alternativas = new Alternativa(
                 alternativa.Ordem,
-                alternativa.Alternativa,
+                alternativa.Numeracao,
                 alternativa.Descricao,
                 questao.Id
             );
 
-            await mediator.Send(new AlternativasParaIncluirCommand(alternativas));
+            await mediator.Send(new AlternativaIncluirCommand(alternativas));
 
             return true;
         }

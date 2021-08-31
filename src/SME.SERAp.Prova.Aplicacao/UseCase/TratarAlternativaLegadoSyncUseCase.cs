@@ -1,16 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
-using MediatR;
-using SME.SERAp.Prova.Dominio;
+﻿using MediatR;
 using SME.SERAp.Prova.Infra;
+using System;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterAlternativaProvaLegadoLegadoUseCase : IObterAlternativaProvaLegadoLegadoUseCase
+    public class TratarAlternativaLegadoSyncUseCase : ITratarAlternativaLegadoSyncUseCase
     {
         private readonly IMediator mediator;
 
-        public ObterAlternativaProvaLegadoLegadoUseCase(IMediator mediator)
+        public TratarAlternativaLegadoSyncUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
@@ -19,10 +18,10 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var busca = mensagemRabbit.ObterObjetoMensagem<BuscarPorProvaIdEQuestaoIdDto>();
-            
+
 
             var alternativasId =
-                await mediator.Send(new ObterAlternativarLegadoProvaPorProvaIdQuery(busca.QuestaoId));
+                await mediator.Send(new ObterAlternativasLegadoPorIdQuery(busca.QuestaoId));
 
             foreach (var id in alternativasId)
             {

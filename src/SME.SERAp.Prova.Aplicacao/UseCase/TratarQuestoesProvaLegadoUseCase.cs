@@ -21,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var questao =
                 await mediator.Send(
-                    new ObterDetalheQuestoesPorProvaIdQuery(questaoDto.ProvaLegadoId, questaoDto.QuestaoLegadoId));
+                    new ObterQuestaoDetalheLegadoPorIdQuery(questaoDto.ProvaLegadoId, questaoDto.QuestaoLegadoId));
             
             var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(questao.ProvaLegadoId));
 

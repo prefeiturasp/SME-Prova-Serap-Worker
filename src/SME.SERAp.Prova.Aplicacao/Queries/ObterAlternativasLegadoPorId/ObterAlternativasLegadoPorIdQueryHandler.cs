@@ -8,18 +8,18 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterAlternativarLegadoProvaPorProvaIdQueryHandler :
-        IRequestHandler<ObterAlternativarLegadoProvaPorProvaIdQuery, IEnumerable<long>>
+    public class ObterAlternativasLegadoPorIdQueryHandler :
+        IRequestHandler<ObterAlternativasLegadoPorIdQuery, IEnumerable<long>>
     {
         private readonly IRepositorioProvaLegado repositorioProvaLegado;
 
-        public ObterAlternativarLegadoProvaPorProvaIdQueryHandler(IRepositorioProvaLegado repositorioProvaLegado)
+        public ObterAlternativasLegadoPorIdQueryHandler(IRepositorioProvaLegado repositorioProvaLegado)
         {
             this.repositorioProvaLegado = repositorioProvaLegado ??
                                           throw new ArgumentNullException(nameof(repositorioProvaLegado));
         }
 
-        public async Task<IEnumerable<long>> Handle(ObterAlternativarLegadoProvaPorProvaIdQuery request,
+        public async Task<IEnumerable<long>> Handle(ObterAlternativasLegadoPorIdQuery request,
             CancellationToken cancellationToken)
             => await repositorioProvaLegado.ObterAlternativasPorProvaIdEQuestaoId(request.QuestaoId);
     }

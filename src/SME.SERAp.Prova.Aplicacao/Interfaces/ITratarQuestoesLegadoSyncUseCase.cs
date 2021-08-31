@@ -3,7 +3,7 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public interface IObterQuestoesProvaLegadoLegadoUseCase
+    public interface ITratarQuestoesLegadoSyncUseCase
     {
         Task<bool> Executar(MensagemRabbit mensagemRabbit);
     }

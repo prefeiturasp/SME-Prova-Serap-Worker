@@ -17,7 +17,15 @@ namespace SME.SERAp.Prova.Aplicacao
         
         public async Task<long> Handle(QuestaoParaIncluirCommand request, CancellationToken cancellationToken)
         {
-            return await repositorioQuestao.IncluirAsync(request.Questao);
+            try
+            {
+                return await repositorioQuestao.IncluirAsync(request.Questao);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            
         }
     }
 }

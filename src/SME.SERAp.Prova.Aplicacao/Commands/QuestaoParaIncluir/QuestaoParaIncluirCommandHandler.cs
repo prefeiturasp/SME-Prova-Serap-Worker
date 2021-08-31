@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MediatR;
+using SME.SERAp.Prova.Dados;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
-using SME.SERAp.Prova.Dados;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -14,18 +14,10 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.repositorioQuestao = repositorioQuestao ?? throw new ArgumentNullException(nameof(repositorioQuestao));
         }
-        
+
         public async Task<long> Handle(QuestaoParaIncluirCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                return await repositorioQuestao.IncluirAsync(request.Questao);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            
+            return await repositorioQuestao.IncluirAsync(request.Questao);
         }
     }
 }

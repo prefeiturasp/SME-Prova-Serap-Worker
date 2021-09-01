@@ -21,14 +21,20 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioProva, RepositorioProva>();
             services.AddScoped<IRepositorioExecucaoControle, RepositorioExecucaoControle>();
             services.AddScoped<IRepositorioProvaAno, RepositorioProvaAno>();
-            
-            
+            services.AddScoped<IRepositorioAlternativa, RepositorioAlternativa>();
+            services.AddScoped<IRepositorioQuestao, RepositorioQuestao>();
+            services.AddScoped<IRepositorioArquivo, RepositorioArquivo>();
+            services.AddScoped<IRepositorioQuestaoArquivo, RepositorioQuestaoArquivo>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
         {
             services.AddScoped<ITratarProvasLegadoSyncUseCase, TratarProvasLegadoSyncUseCase>();
-            services.AddScoped<ITratarProvaLegadoLegadoUseCase, TratarProvaLegadoUseCase>();
+            services.AddScoped<ITratarProvaLegadoUseCase, TratarProvaLegadoUseCase>();
+            services.AddScoped<ITratarAlternativaLegadoSyncUseCase, TratarAlternativaLegadoSyncUseCase>();
+            services.AddScoped<ITratarAlternativaLegadoUseCase, TratarAlternativaLegadoLegadoUseCase>();
+            services.AddScoped<ITratarQuestoesLegadoSyncUseCase, TratarQuestoesLegadoSyncUseCase>();
+            services.AddScoped<ITratarQuestoesProvaLegadoUseCase, TratarQuestoesProvaLegadoUseCase>();            
             services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();
         }
     }

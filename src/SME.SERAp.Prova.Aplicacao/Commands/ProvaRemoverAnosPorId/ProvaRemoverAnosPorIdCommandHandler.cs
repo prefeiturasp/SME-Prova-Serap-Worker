@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ProvaRemoverAnosCommandHandler : IRequestHandler<ProvaRemoverAnosCommand, bool>
+    public class ProvaRemoverAnosPorIdCommandHandler : IRequestHandler<ProvaRemoverAnosPorIdCommand, bool>
     {
         private readonly IRepositorioProvaAno repositorioProvaAno;
 
-        public ProvaRemoverAnosCommandHandler(IRepositorioProvaAno repositorioProvaAno)
+        public ProvaRemoverAnosPorIdCommandHandler(IRepositorioProvaAno repositorioProvaAno)
         {
             this.repositorioProvaAno = repositorioProvaAno ?? throw new ArgumentNullException(nameof(repositorioProvaAno));
         }
-        public async Task<bool> Handle(ProvaRemoverAnosCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ProvaRemoverAnosPorIdCommand request, CancellationToken cancellationToken)
         {
             return await repositorioProvaAno.RemoverAnosPorProvaIdAsync(request.Id);
         }

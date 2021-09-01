@@ -12,6 +12,10 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new ProvaAnoMap());
                 config.AddMap(new ProvaMap());
                 config.AddMap(new ExecucaoControleMap());
+                config.AddMap(new QuestaoMap());
+                config.AddMap(new AlternativasMap());
+                config.AddMap(new ArquivoMap());
+                config.AddMap(new QuestaoArquivoMap());
 
                 config.ForDommel();
             });

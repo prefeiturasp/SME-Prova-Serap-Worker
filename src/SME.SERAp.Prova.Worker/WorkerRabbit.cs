@@ -23,13 +23,16 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         private readonly RabbitOptions rabbitOptions;
         private readonly SentryOptions sentryOptions;
         private readonly IServiceScopeFactory serviceScopeFactory;
+        private readonly ConnectionFactory connectionFactory;
         private readonly Dictionary<string, ComandoRabbit> comandos;
-        public WorkerRabbit(ILogger<WorkerRabbit> logger, RabbitOptions rabbitOptions, SentryOptions sentryOptions, IServiceScopeFactory serviceScopeFactory)
+        public WorkerRabbit(ILogger<WorkerRabbit> logger, RabbitOptions rabbitOptions, SentryOptions sentryOptions, 
+            IServiceScopeFactory serviceScopeFactory, ConnectionFactory connectionFactory)
         {
             _logger = logger;
             this.rabbitOptions = rabbitOptions ?? throw new ArgumentNullException(nameof(rabbitOptions));
             this.sentryOptions = sentryOptions ?? throw new ArgumentNullException(nameof(sentryOptions));
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+            this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             comandos = new Dictionary<string, ComandoRabbit>();
         }
 
@@ -37,15 +40,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         {
             using (SentrySdk.Init(sentryOptions))
             {
-                var factory = new ConnectionFactory
-                {
-                    HostName = rabbitOptions.HostName,
-                    UserName = rabbitOptions.UserName,
-                    Password = rabbitOptions.Password,
-                    VirtualHost = rabbitOptions.VirtualHost
-                };
-
-                using var conexaoRabbit = factory.CreateConnection();
+              
+                using var conexaoRabbit = connectionFactory.CreateConnection();
                 using IModel channel = conexaoRabbit.CreateModel();
 
                 var props = channel.CreateBasicProperties();
@@ -119,6 +115,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         {
             comandos.Add(RotasRabbit.ProvaSync, new ComandoRabbit("Sincronização da prova", typeof(ITratarProvasLegadoSyncUseCase)));
             comandos.Add(RotasRabbit.ProvaTratar, new ComandoRabbit("Tratar Prova", typeof(ITratarProvaLegadoLegadoUseCase)));
+            comandos.Add(RotasRabbit.ProvaWebPushTeste, new ComandoRabbit("Teste de webpush", typeof(IProvaWebPushTesteUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

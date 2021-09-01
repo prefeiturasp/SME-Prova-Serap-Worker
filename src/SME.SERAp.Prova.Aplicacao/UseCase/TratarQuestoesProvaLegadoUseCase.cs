@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using SME.SERAp.Prova.Dominio;
@@ -28,7 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
             if (prova == null)
                 throw new Exception($"Prova {questao.ProvaLegadoId} não localizada!");
 
-            var novaQuestao = new Questao(
+            var questaoParaPersistir = new Questao(
                 questao.Questao,
                 questao.QuestaoId,
                 questao.Enunciado,
@@ -36,7 +37,18 @@ namespace SME.SERAp.Prova.Aplicacao
                 prova.Id
             );
 
-            await mediator.Send(new QuestaoParaIncluirCommand(novaQuestao));
+           var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
+
+            if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
+            {
+                questaoParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(questaoParaPersistir.Arquivos));
+                
+                foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
+                {
+                    var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+                    await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
+                }                
+            }
 
             var buscarPorProvaIdEQuestaoIdDto =
                 new BuscarPorProvaIdEQuestaoIdDto(questao.ProvaLegadoId, questao.QuestaoId);

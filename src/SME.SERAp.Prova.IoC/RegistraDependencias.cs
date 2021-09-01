@@ -23,6 +23,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioProvaAno, RepositorioProvaAno>();
             services.AddScoped<IRepositorioAlternativa, RepositorioAlternativa>();
             services.AddScoped<IRepositorioQuestao, RepositorioQuestao>();
+            services.AddScoped<IRepositorioArquivo, RepositorioArquivo>();
+            services.AddScoped<IRepositorioQuestaoArquivo, RepositorioQuestaoArquivo>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)

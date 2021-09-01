@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-        public async Task<bool> RemoverPorProvaId(long provaId)
+        public async Task<bool> RemoverPorProvaIdAsync(long provaId)
         {
             using var conn = ObterConexao();
             try

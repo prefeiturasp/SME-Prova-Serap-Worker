@@ -1,4 +1,8 @@
-﻿namespace SME.SERAp.Prova.Dominio
+﻿using HtmlAgilityPack;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace SME.SERAp.Prova.Dominio
 {
     public class Questao : EntidadeBase
     {
@@ -7,6 +11,7 @@
         public string Enunciado { get; set; }
         public long QuestaoLegadoId { get; set; }
         public long ProvaId { get; set; }
+        public IEnumerable<Arquivo> Arquivos { get; set; }
 
 
         public Questao()
@@ -20,6 +25,25 @@
             Enunciado = enunciado;
             QuestaoLegadoId = questaoLegadoId;
             ProvaId = provaId;
+
+            TrataArquivosDaPergunta();
+        }
+
+        private void TrataArquivosDaPergunta()
+        {
+            if (!string.IsNullOrEmpty(Enunciado))
+            {
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(Enunciado);
+
+                Arquivos = htmlDoc.DocumentNode.Descendants("img")
+                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)));
+
+                foreach (var arquivo in Arquivos)
+                {
+                    Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
+                }
+            }
         }
     }
 }

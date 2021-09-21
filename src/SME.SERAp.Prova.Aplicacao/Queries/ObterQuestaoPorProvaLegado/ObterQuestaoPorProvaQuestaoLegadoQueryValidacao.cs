@@ -3,9 +3,9 @@
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class
-        ObterQuestaoPorProvaLegadoQueryValidacao : AbstractValidator<ObterQuestaoPorProvaLegadoQuery>
+        ObterQuestaoPorProvaQuestaoLegadoQueryValidacao : AbstractValidator<ObterQuestaoPorProvaQuestaoLegadoQuery>
     {
-        public ObterQuestaoPorProvaLegadoQueryValidacao()
+        public ObterQuestaoPorProvaQuestaoLegadoQueryValidacao()
         {
             RuleFor(query => query.QuestaoId)
                 .NotEmpty()

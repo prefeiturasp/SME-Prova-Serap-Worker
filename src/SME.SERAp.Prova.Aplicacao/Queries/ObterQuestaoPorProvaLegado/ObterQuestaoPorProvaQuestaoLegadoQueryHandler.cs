@@ -7,17 +7,17 @@ using SME.SERAp.Prova.Dominio;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterQuestaoPorProvaLegadoQueryHandler : IRequestHandler<ObterQuestaoPorProvaLegadoQuery, Questao>
+    public class ObterQuestaoPorProvaQuestaoLegadoQueryHandler : IRequestHandler<ObterQuestaoPorProvaQuestaoLegadoQuery, Questao>
     {
         private readonly IRepositorioQuestao repositorioQuestao;
 
-        public ObterQuestaoPorProvaLegadoQueryHandler(IRepositorioQuestao repositorioQuestao)
+        public ObterQuestaoPorProvaQuestaoLegadoQueryHandler(IRepositorioQuestao repositorioQuestao)
         {
             this.repositorioQuestao = repositorioQuestao ?? throw new ArgumentNullException(nameof(repositorioQuestao));
         }
 
-        public async Task<Questao> Handle(ObterQuestaoPorProvaLegadoQuery request,
+        public async Task<Questao> Handle(ObterQuestaoPorProvaQuestaoLegadoQuery request,
             CancellationToken cancellationToken)
-            => await repositorioQuestao.ObterPorIdLegadoAsync(request.QuestaoId);
+            => await repositorioQuestao.ObterPorIdEProvaIdLegadoAsync(request.QuestaoId, request.ProvaId);
     }
 }

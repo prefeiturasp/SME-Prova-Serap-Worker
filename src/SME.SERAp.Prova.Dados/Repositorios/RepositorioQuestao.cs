@@ -12,6 +12,24 @@ namespace SME.SERAp.Prova.Dados
 
         }
 
+        public async Task<Questao> ObterPorIdEProvaIdLegadoAsync(long id, long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select questao.* from questao inner join prova on 
+                                    questao.prova_id = prova.id 
+                                    where questao.questao_legado_id = @id and prova.prova_legado_id = @provaId";
+
+                return await conn.QueryFirstOrDefaultAsync<Questao>(query, new { id, provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<Questao> ObterPorIdLegadoAsync(long id)
         {
             using var conn = ObterConexao();

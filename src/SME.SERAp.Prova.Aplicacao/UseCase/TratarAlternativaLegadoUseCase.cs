@@ -28,7 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new Exception(
                     $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
-            var questao = await mediator.Send(new ObterQuestaoPorProvaLegadoQuery(detalheAlternativaDto.QuestaoId));
+            var questao = await mediator.Send(new ObterQuestaoPorProvaQuestaoLegadoQuery(detalheAlternativaDto.ProvaId, detalheAlternativaDto.QuestaoId));
 
             if (questao == null)
                 throw new Exception(

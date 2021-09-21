@@ -33,7 +33,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 questao.Questao,
                 questao.QuestaoId,
                 questao.Enunciado,
-                questao.Ordem,
+                questaoDto.QuestaoLegadoOrdem,
                 prova.Id
             );
 

@@ -171,14 +171,17 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @" SELECT I.id as QuestaoId,
                                     (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem,
-                                    I.[Statement] as Questao ,bt.Description  as Enunciado, T.Id as ProvaLegadoId
+                                    I.[Statement] as Questao ,bt.Description  as Enunciado, T.Id as ProvaLegadoId,
+                                    IT.Id TipoItem,
+                                    IT.Description TipoItemDescricao 
                                     FROM Item I WITH (NOLOCK)
                                     INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
+                                    INNER JOIN ItemType IT  WITH (NOLOCK) ON I.ItemType_Id = IT.Id  
                                     INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id            
                                     INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id] 
                                     INNER JOIN BaseText bt  on bt.Id = I.BaseText_Id       
                                      LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
-                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId ;";
+                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId and BI.State = 1;";
 
                 return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId , questaoId});
             }

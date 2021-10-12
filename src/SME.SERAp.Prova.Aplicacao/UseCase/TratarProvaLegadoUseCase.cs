@@ -23,7 +23,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new System.Exception($"Prova {provaLegado} não localizada!");
 
             var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(provaLegado.Id));
-            var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.Inicio, provaLegado.Fim, provaLegado.TotalItens, provaLegado.Id);
+            var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.Inicio, provaLegado.Fim, provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao);
 
             if (provaAtual == null)
             {

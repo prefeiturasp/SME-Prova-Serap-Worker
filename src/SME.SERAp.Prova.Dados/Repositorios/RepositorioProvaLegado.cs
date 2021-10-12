@@ -54,13 +54,16 @@ namespace SME.SERAp.Prova.Dados
 	            t.ApplicationEndDate as Fim,
 	            t.NumberItem as TotalItens,
 	            t.UpdateDate as UltimaAtualizacao,
-	            tt.tcp_ordem AS Ano
+	            tt.tcp_ordem AS Ano,
+                ttime.Segundos as TempoExecucao
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
 	            t.Id = tcg.Test_Id	
             INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
-	            tcg.TypeCurriculumGradeId = tt.tcp_id	
+	            tcg.TypeCurriculumGradeId = tt.tcp_id
+            INNER JOIN TESTTIME ttime on
+                t.TestTime_Id = ttime.id
             INNER JOIN TestTypeCourse ttc ON
 	            ttc.TestType_Id = t.TestType_Id
             INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON

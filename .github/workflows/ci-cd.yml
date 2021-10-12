@@ -28,13 +28,13 @@ jobs:
              docker build . --file src/SME.SERAp.Prova.Worker/Dockerfile --tag ${{ secrets.REGISTRY_HOST }}/${GITHUB_REF##*/}/sme-prova-serap-worker
              docker push ${{ secrets.REGISTRY_HOST }}/${GITHUB_REF##*/}/sme-prova-serap-worker
            
-  deploy-development:
+  deploy-release:
   
     runs-on: master
-    if: ${{ github.ref == 'refs/heads/development' }}
+    if: ${{ github.ref == 'refs/heads/release' }}
     needs: [ build ]    
     environment:
-      name: development
+      name: release
     steps:
       - name: Redeploy
         uses: luizhpriotto/action_images@kubectl-v1.0
@@ -44,13 +44,13 @@ jobs:
           WORKLOAD: sme-prova-serap-worker
           NAMESPACE: sme-serap-estudante
           
-  deploy-release:
+  deploy-master:
   
     runs-on: master
-    if: ${{ github.ref == 'refs/heads/release' }}
+    if: ${{ github.ref == 'refs/heads/master' }}
     needs: [ build ]    
     environment:
-      name: release
+      name: master
     steps:
       - name: Redeploy
         uses: luizhpriotto/action_images@kubectl-v1.0

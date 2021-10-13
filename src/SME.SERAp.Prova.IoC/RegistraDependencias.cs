@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SME.SERAp.Prova.Aplicacao;
+using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dados;
 
 namespace SME.SERAp.Prova.IoC
@@ -25,6 +26,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioQuestao, RepositorioQuestao>();
             services.AddScoped<IRepositorioArquivo, RepositorioArquivo>();
             services.AddScoped<IRepositorioQuestaoArquivo, RepositorioQuestaoArquivo>();
+            services.AddScoped<IRepositorioDre, RepositorioDre>();
+            services.AddScoped<IRepositorioUe, RepositorioUe>();
+            services.AddScoped<IRepositorioTurma, RepositorioTurma>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
@@ -36,6 +40,14 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarQuestoesLegadoSyncUseCase, TratarQuestoesLegadoSyncUseCase>();
             services.AddScoped<ITratarQuestoesProvaLegadoUseCase, TratarQuestoesProvaLegadoUseCase>();            
             services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();
+
+            // sincronização institucional 
+            services.AddScoped<IExecutarSincronizacaoInstitucionalDreSyncUseCase, ExecutarSincronizacaoInstitucionalDreSyncUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalDreTratarUseCase, ExecutarSincronizacaoInstitucionalDreTratarUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalUeSyncUseCase, ExecutarSincronizacaoInstitucionalUeSyncUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalUeTratarUseCase, ExecutarSincronizacaoInstitucionalUeTratarUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaSyncUseCase, ExecutarSincronizacaoInstitucionalTurmaSyncUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaTratarUseCase, ExecutarSincronizacaoInstitucionalTurmaTratarUseCase>();
         }
     }
 }

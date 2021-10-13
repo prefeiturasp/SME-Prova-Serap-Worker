@@ -23,6 +23,12 @@ namespace SME.SERAp.Prova.Dados
             conexao.Open();
             return conexao;
         }
+        protected IDbConnection ObterConexaoSgp()
+        {
+            var conexao = new NpgsqlConnection(connectionStrings.ApiSgp);
+            conexao.Open();
+            return conexao;
+        }
         public virtual async Task<T> ObterPorIdAsync(long id)
         {
             var conexao = ObterConexao();

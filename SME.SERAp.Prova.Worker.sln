@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.SERAp.Dominio.Test", "t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.SERAp.Prova.Worker", "src\SME.SERAp.Prova.Worker\SME.SERAp.Prova.Worker.csproj", "{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{910DD97A-DFF1-47D2-8BD3-42E29542C957}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,10 +61,6 @@ Global
 		{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{910DD97A-DFF1-47D2-8BD3-42E29542C957}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{910DD97A-DFF1-47D2-8BD3-42E29542C957}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{910DD97A-DFF1-47D2-8BD3-42E29542C957}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{910DD97A-DFF1-47D2-8BD3-42E29542C957}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

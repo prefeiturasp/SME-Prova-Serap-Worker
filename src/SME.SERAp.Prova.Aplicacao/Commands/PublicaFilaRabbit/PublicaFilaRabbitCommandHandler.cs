@@ -21,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
         
         public Task<bool> Handle(PublicaFilaRabbitCommand request, CancellationToken cancellationToken)
         {
-            
+            //TODO: Implementar Polly!
             try
             {
                 var conexaoRabbit = factory.CreateConnection();

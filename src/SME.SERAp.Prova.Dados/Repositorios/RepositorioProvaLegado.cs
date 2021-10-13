@@ -55,7 +55,8 @@ namespace SME.SERAp.Prova.Dados
 	            t.NumberItem as TotalItens,
 	            t.UpdateDate as UltimaAtualizacao,
                 ttime.Segundos AS TempoExecucao,
-	            tt.tcp_ordem as Ano
+                t.Password as Senha,
+	            tt.tcp_ordem as Ano                
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

@@ -1,5 +1,8 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Infra;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -23,13 +26,24 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new System.Exception($"Prova {provaLegado} não localizada!");
 
             var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(provaLegado.Id));
-            var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.Inicio, provaLegado.Fim, provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao);
+            
+            if(provaLegado.Senha != null)
+            {
+                using (var md5 = MD5.Create())
+                {
+                    md5.Initialize();
+                    var byteResult = md5.ComputeHash(Encoding.UTF8.GetBytes(provaLegado.Senha));
+                    provaLegado.Senha = string.Join("", byteResult.Select(x => x.ToString("x2")));
+                }
+            }
+
+            var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.Inicio, provaLegado.Fim, 
+                provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha);
 
             if (provaAtual == null)
             {
                 provaAtual = new Dominio.Prova();
                 provaAtual.Id = await mediator.Send(new ProvaIncluirCommand(provaParaTratar));
-
             }
             else
             {

@@ -17,6 +17,7 @@ namespace SME.SERAp.Prova.Infra
         public DateTime UltimaAtualizacao { get; set; }
         public int TotalItens { get; set; }
         public int TempoExecucao { get; set; }
+        public string Senha { get; set; }
         public List<int> Anos { get; set; }
 
         public void AddAno(int ano)

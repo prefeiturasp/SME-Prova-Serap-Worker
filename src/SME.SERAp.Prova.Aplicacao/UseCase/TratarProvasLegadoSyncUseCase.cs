@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Sentry;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using System;
@@ -18,15 +19,23 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var ultimaAtualizacao = await mediator.Send(new ObterUltimoExecucaoControleTipoPorTipoQuery(ExecucaoControleTipo.ProvaLegadoSincronizacao));
-
-            var provaIds = await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao));
-            foreach (var provaId in provaIds)
+            try
             {
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
-            }
+                var ultimaAtualizacao = await mediator.Send(new ObterUltimoExecucaoControleTipoPorTipoQuery(ExecucaoControleTipo.ProvaLegadoSincronizacao));
 
-            await mediator.Send(new ExecucaoControleAtualizarCommand(ultimaAtualizacao));
+                var provaIds = await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao));
+                foreach (var provaId in provaIds)
+                {
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
+                }
+
+                await mediator.Send(new ExecucaoControleAtualizarCommand(ultimaAtualizacao));
+            }
+            catch(Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return false;
+            }           
 
             return true;
         }

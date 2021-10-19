@@ -37,7 +37,7 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.EnviarNotificacaoPorAno
             var mensagemFirebase = new Message();
             mensagemFirebase.Data = MontarDataNotificacao(request.Mensagem);
 
-            mensagemFirebase.Topic = request.Ano.ToString();
+            mensagemFirebase.Topic = $"ano-{request.Ano}";
 
 
             var resultado = await FirebaseMessaging.DefaultInstance.SendAsync(mensagemFirebase);

@@ -1,9 +1,9 @@
-name: Docker Image CI
-
+name: Docker Image CI - Development
+ 
 on:
 
   push:
-    branches: [ release, master ]
+    branches: [ development ]
     paths-ignore:
     - ".github/workflows/**"  
   
@@ -11,9 +11,28 @@ on:
 
 jobs:
    
+  sonar:
+
+    runs-on: master
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Sonar
+        uses: luizhpriotto/action_images@sonarscanner-v1.0
+        env:
+          DOTNET_PROJECT: SME.SERAp.Prova.Worker.sln
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST: http://sonar.sme.prefeitura.sp.gov.br/
+          SONAR_EXTRA_ARG: >
+            /d:sonar.cs.opencover.reportsPaths='"teste/SME.SERAp.Aplicacao.Test/coverage.opencover.xml","teste/SME.SERAp.Dominio.Test/coverage.opencover.xml"'
+            /d:sonar.coverage.exclusions='"**Test*.cs"'
+   
   build:
 
     runs-on: master
+    needs: [ sonar] 
     steps:
       - uses: actions/checkout@v2     
       -  name: Login to registry
@@ -28,29 +47,12 @@ jobs:
              docker build . --file src/SME.SERAp.Prova.Worker/Dockerfile --tag ${{ secrets.REGISTRY_HOST }}/${GITHUB_REF##*/}/sme-prova-serap-worker
              docker push ${{ secrets.REGISTRY_HOST }}/${GITHUB_REF##*/}/sme-prova-serap-worker
            
-  deploy-release:
+  deploy:
   
     runs-on: master
-    if: ${{ github.ref == 'refs/heads/release' }}
     needs: [ build ]    
     environment:
-      name: release
-    steps:
-      - name: Redeploy
-        uses: luizhpriotto/action_images@kubectl-v1.0
-        env: 
-          RANCHER_URL: ${{ secrets.RANCHER_URL }}
-          RANCHER_TOKEN: ${{ secrets.RANCHER_TOKEN }}
-          WORKLOAD: sme-prova-serap-worker
-          NAMESPACE: sme-serap-estudante
-          
-  deploy-master:
-  
-    runs-on: master
-    if: ${{ github.ref == 'refs/heads/master' }}
-    needs: [ build ]    
-    environment:
-      name: master
+      name: development
     steps:
       - name: Redeploy
         uses: luizhpriotto/action_images@kubectl-v1.0

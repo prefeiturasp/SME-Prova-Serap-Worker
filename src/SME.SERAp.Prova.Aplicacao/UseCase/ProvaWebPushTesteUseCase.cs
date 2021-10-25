@@ -12,7 +12,9 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            await mediator.Send(new EnviarNotificacaoPorAnoCommand(1, "teste"));
+            var anoDto = mensagemRabbit.ObterObjetoMensagem<AnoAlunoDto>();
+
+            await mediator.Send(new EnviarNotificacaoPorAnoCommand(anoDto.Ano, "Nova prova disponível"));
 
             return default;
         }

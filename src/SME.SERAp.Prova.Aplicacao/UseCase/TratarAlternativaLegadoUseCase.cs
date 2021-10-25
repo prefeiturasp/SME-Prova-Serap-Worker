@@ -32,7 +32,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (questao == null)
                 throw new Exception(
-                    $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
+                    $"A questao {detalheAlternativaDto.QuestaoId} na prova {detalheAlternativaDto.ProvaId} não localizada!");
 
             var alternativas = new Alternativa(
                 alternativa.Ordem,

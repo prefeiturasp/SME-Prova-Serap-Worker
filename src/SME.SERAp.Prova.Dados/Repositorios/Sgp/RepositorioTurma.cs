@@ -14,7 +14,7 @@ namespace SME.SERAp.Prova.Dados
         {
         }
 
-        public async Task<IEnumerable<TurmaSgpDto>> ObterturmasSgpPorUeId(long ueId)
+        public async Task<IEnumerable<TurmaSgpDto>> ObterturmasSgpPorUeCodigo(string ueCodigo)
         {
             using var conn = ObterConexaoSgp();
             try
@@ -24,17 +24,18 @@ namespace SME.SERAp.Prova.Dados
                                      turma_id as codigo,
                                      tipo_turma as tipoturma,
                                      modalidade_codigo as modalidadeCodigo,
-                                     nome as nomeTurma,
+                                     turma.nome as nomeTurma,
                                      tipo_turno as tipoturno                                      
                                 from turma
-                               where ue_id = @ueId
+                               inner join ue on turma.ue_id = ue.id
+                               where ue.ue_id = @ueCodigo
                                  and not historica 
                                  and modalidade_codigo = @modalidadeCodigo
                                  and ano_letivo = @anoLetivo ";
 
                 var parametros = new
                 {
-                    ueId,
+                    ueCodigo,
                     modalidadeCodigo = (int)Modalidade.Fundamental,
                     anoLetivo = DateTime.Now.Year
                 };

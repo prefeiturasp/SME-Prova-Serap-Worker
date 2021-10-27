@@ -23,7 +23,7 @@ namespace SME.SERAp.Prova.Aplicacao
             if (request.AlunoSerap == null)
             {
                 var idAluno = await repositorioAluno.IncluirAsync(
-                    new Aluno("", request.AlunoEol.TurmaSerapId, request.AlunoEol.CodigoAluno, request.AlunoEol.SituacaoAluno)
+                    new Aluno(request.AlunoEol.Nome, request.AlunoEol.TurmaSerapId, request.AlunoEol.CodigoAluno, request.AlunoEol.SituacaoAluno)
                 );
 
                 if (idAluno <= 0)
@@ -36,7 +36,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     var alunoParaAtualizar = new Aluno()
                     {
                         TurmaId = request.AlunoEol.TurmaSerapId,
-                        Nome = "",
+                        Nome = request.AlunoEol.Nome,
                         RA = request.AlunoSerap.RA,
                         Id = request.AlunoSerap.Id,                        
                     };

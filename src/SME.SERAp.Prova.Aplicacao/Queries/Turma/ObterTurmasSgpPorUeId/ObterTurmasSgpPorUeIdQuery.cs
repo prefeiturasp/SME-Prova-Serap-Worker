@@ -7,20 +7,20 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterTurmasSgpPorUeIdQuery : IRequest<IEnumerable<TurmaSgpDto>>
     {
-        public ObterTurmasSgpPorUeIdQuery(long ueId)
+        public ObterTurmasSgpPorUeIdQuery(string ueCodigo)
         {
-            UeId = ueId;
+            UeCodigo = ueCodigo;
         }
 
-        public long UeId { get; set; }
+        public string UeCodigo { get; set; }
     }
     public class ObterTurmasSgpPorUeIdQueryValidator : AbstractValidator<ObterTurmasSgpPorUeIdQuery>
     {
         public ObterTurmasSgpPorUeIdQueryValidator()
         {
-            RuleFor(c => c.UeId)
+            RuleFor(c => c.UeCodigo)
                 .NotEmpty()
-                .WithMessage("O id da Ue no sgp deve ser informado.");
+                .WithMessage("O código da Ue no sgp deve ser informado.");
         }
     }
 }

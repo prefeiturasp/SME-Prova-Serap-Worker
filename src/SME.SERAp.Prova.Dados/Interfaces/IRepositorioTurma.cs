@@ -7,7 +7,7 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioTurma : IRepositorioBase<Turma>
     {
-        Task<IEnumerable<TurmaSgpDto>> ObterturmasSgpPorUeId(long ueId);
+        Task<IEnumerable<TurmaSgpDto>> ObterturmasSgpPorUeCodigo(string ueCodigo);
         Task<Turma> ObterturmaPorCodigo(string uecodigo);
         Task<IEnumerable<Turma>> ObterTurmasPorAnoEAnoLetivo(int ano, int anoLetivo);
     }

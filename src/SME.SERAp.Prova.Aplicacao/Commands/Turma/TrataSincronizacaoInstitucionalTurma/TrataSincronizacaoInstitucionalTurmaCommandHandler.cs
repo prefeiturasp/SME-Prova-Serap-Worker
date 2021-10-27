@@ -44,8 +44,8 @@ namespace SME.SERAp.Prova.Aplicacao
                         UeId = request.TurmaSgp.UeId
                     };
                     await repositorioTurma.UpdateAsync(turmaParaAtualizar);
-                    turmaId = request.TurmaSerap.Id;
                 }
+                turmaId = request.TurmaSerap.Id;
             }
             return turmaId;
         }

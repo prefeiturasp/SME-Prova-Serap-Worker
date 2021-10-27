@@ -3,6 +3,7 @@
     public class AlunoEolDto
     {
         public long CodigoAluno { get; set; }
+        public string Nome { get; set; }
         public int Ano { get; set; }
         public int AnoLetivo { get; set; }
         public int TipoTurno { get; set; }

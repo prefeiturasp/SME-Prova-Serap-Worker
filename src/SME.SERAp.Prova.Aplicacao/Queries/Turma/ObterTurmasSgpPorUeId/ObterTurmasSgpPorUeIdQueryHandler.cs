@@ -18,6 +18,6 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         public async Task<IEnumerable<TurmaSgpDto>> Handle(ObterTurmasSgpPorUeIdQuery request, CancellationToken cancellationToken)
-            => await repositorioTurma.ObterturmasSgpPorUeId(request.UeId);
+            => await repositorioTurma.ObterturmasSgpPorUeCodigo(request.UeCodigo);
     }
 }

@@ -64,6 +64,7 @@ namespace SME.SERAp.Prova.Dados
         {
             var query = @"SELECT 
 	                            aluno.cd_aluno CodigoAluno,
+                                aluno.nm_aluno as Nome,
 	                            se.sg_resumida_serie as Ano,
 	                            turesc.cd_tipo_turno as TipoTurno,
 	                            turesc.cd_turma_escola as TurmaCodigo,

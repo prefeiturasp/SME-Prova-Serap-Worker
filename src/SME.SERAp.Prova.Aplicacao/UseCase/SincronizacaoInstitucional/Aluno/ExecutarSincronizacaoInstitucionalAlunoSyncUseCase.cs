@@ -27,14 +27,17 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (alunos.Any())
             {
-                if(turma.TurmaId > 0)
+                if (turma.TurmaId > 0)
                 {
                     foreach (var aluno in alunos)
                     {
                         aluno.TurmaSerapId = turma.TurmaId;
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, aluno));
+
+                        var alunoSerap = await mediator.Send(new ObterAlunoPorCodigoQuery(aluno.CodigoAluno));
+
+                        await mediator.Send(new TrataSincronizacaoInstitucionalAlunoCommand(aluno, alunoSerap));
                     }
-                }                
+                }
             }
 
             return true;

@@ -29,6 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (questao == null)
                     throw new Exception($"Questão {questaoDto.QuestaoLegadoId} não localizada!");
 
+            
                 var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(questao.ProvaLegadoId));
 
                 if (prova == null)
@@ -40,7 +41,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     questao.Enunciado,
                     questaoDto.QuestaoLegadoOrdem,
                     prova.Id,
-                    (QuestaoTipo)questao.TipoItem
+                    (QuestaoTipo)questao.TipoItem,
+                    questaoDto.Caderno
                 );
 
                 var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));

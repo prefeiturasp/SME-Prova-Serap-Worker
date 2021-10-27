@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Sentry;
+using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.Infra.Exceptions;
@@ -25,7 +26,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly ConnectionFactory connectionFactory;
         private readonly Dictionary<string, ComandoRabbit> comandos;
-        public WorkerRabbit(ILogger<WorkerRabbit> logger, RabbitOptions rabbitOptions, SentryOptions sentryOptions, 
+        public WorkerRabbit(ILogger<WorkerRabbit> logger, RabbitOptions rabbitOptions, SentryOptions sentryOptions,
             IServiceScopeFactory serviceScopeFactory, ConnectionFactory connectionFactory)
         {
             _logger = logger;
@@ -40,7 +41,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         {
             using (SentrySdk.Init(sentryOptions))
             {
-              
+
                 using var conexaoRabbit = connectionFactory.CreateConnection();
                 using IModel channel = conexaoRabbit.CreateModel();
 
@@ -118,8 +119,21 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.QuestaoSync, new ComandoRabbit("Sincronização das questoes da prova", typeof(ITratarQuestoesLegadoSyncUseCase)));
             comandos.Add(RotasRabbit.QuestaoTratar, new ComandoRabbit("Tratar as questoes da prova", typeof(ITratarQuestoesProvaLegadoUseCase)));
             comandos.Add(RotasRabbit.AlternativaSync, new ComandoRabbit("Sincronização das alternativas da prova", typeof(ITratarAlternativaLegadoSyncUseCase)));
-            comandos.Add(RotasRabbit.AlternativaTratar, new ComandoRabbit("Tratar as alternativas das provas", typeof(ITratarAlternativaLegadoUseCase)));            
+            comandos.Add(RotasRabbit.AlternativaTratar, new ComandoRabbit("Tratar as alternativas das provas", typeof(ITratarAlternativaLegadoUseCase)));
+            comandos.Add(RotasRabbit.ProvaBIBSync, new ComandoRabbit("Sincronização das provas com BIB", typeof(ITratarProvaBIBSyncUseCase)));
+            comandos.Add(RotasRabbit.ProvaBIBTratar, new ComandoRabbit("Tratar as provas com BIB", typeof(ITratarProvaBIBUseCase)));
+
             comandos.Add(RotasRabbit.ProvaWebPushTeste, new ComandoRabbit("Teste de webpush", typeof(IProvaWebPushTesteUseCase)));
+
+            // Sincronização das UES e turmas
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalDreSync, new ComandoRabbit("Estrutura Institucional - Sync de Dre", typeof(IExecutarSincronizacaoInstitucionalDreSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalDreTratar, new ComandoRabbit("Estrutura Institucional - Tratar uma Dre", typeof(IExecutarSincronizacaoInstitucionalDreTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, new ComandoRabbit("Estrutura Institucional - Sync de Ue", typeof(IExecutarSincronizacaoInstitucionalUeSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalUeTratar, new ComandoRabbit("Estrutura Institucional - Tratar uma Ue", typeof(IExecutarSincronizacaoInstitucionalUeTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Turmas", typeof(IExecutarSincronizacaoInstitucionalTurmaSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar, new ComandoRabbit("Estrutura Institucional - Tratar uma Turma", typeof(IExecutarSincronizacaoInstitucionalTurmaTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Alunos", typeof(IExecutarSincronizacaoInstitucionalAlunoSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, new ComandoRabbit("Estrutura Institucional - Tratar um Aluno", typeof(IExecutarSincronizacaoInstitucionalAlunoTratarUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

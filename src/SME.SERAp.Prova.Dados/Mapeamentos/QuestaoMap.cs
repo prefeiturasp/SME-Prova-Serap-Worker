@@ -16,6 +16,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.Ordem).ToColumn("ordem");
             Map(c => c.ProvaId).ToColumn("prova_id");
             Map(c => c.Tipo).ToColumn("tipo");
+            Map(c => c.Caderno).ToColumn("caderno");
         }
     }
 }

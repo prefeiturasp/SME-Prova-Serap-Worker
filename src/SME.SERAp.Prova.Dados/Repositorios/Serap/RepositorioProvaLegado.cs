@@ -23,12 +23,11 @@ namespace SME.SERAp.Prova.Dados
                 select
 	                t.id
                 from
-	                Booklet b WITH (NOLOCK)
-                inner join Test t WITH (NOLOCK) on
-	                t.Id = b.Test_Id
+	                test t
                 where
 	                t.ShowOnSerapEstudantes = 1
                     and t.UpdateDate > @ultimaAtualizacao
+                    and t.State = 1
                 order by
 	                t.ApplicationStartDate desc";
 
@@ -52,10 +51,14 @@ namespace SME.SERAp.Prova.Dados
 	            t.Description as descricao,
 	            t.ApplicationStartDate as Inicio,
 	            t.ApplicationEndDate as Fim,
-	            t.NumberItem as TotalItens,
+	            case 
+	            	when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
+	            end TotalItens,
+	            t.NumberBlock as TotalCadernos,
 	            t.UpdateDate as UltimaAtualizacao,
                 ttime.Segundos AS TempoExecucao,
                 t.Password as Senha,
+                t.Bib as PossuiBIB,
 	            tt.tcp_ordem as Ano                
             FROM
 	            Test t 
@@ -147,7 +150,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT I.id, 
+                var query = @" SELECT I.id, B.Description as Caderno,
                                     (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem
                                     FROM Item I WITH (NOLOCK)
                                     INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id

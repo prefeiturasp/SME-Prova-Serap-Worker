@@ -38,7 +38,8 @@ namespace SME.SERAp.Prova.Aplicacao
             }
 
             var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.Inicio, provaLegado.Fim, 
-                provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha);
+                provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB, 
+                provaLegado.TotalCadernos);
 
             if (provaAtual == null)
             {
@@ -56,8 +57,11 @@ namespace SME.SERAp.Prova.Aplicacao
             foreach (var ano in provaLegado.Anos)
             {
                 await mediator.Send(new ProvaAnoIncluirCommand(new Dominio.ProvaAno(ano, provaAtual.Id)));
+                if (provaAtual.PossuiBIB)
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
+
             }
-            
+
             await mediator.Send(
                 new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
 

@@ -5,7 +5,7 @@ using SME.SERAp.Prova.Infra.Dtos;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TrataSincronizacaoInstitucionalTurmaCommand : IRequest<bool>
+    public class TrataSincronizacaoInstitucionalTurmaCommand : IRequest<long>
     {
         public TrataSincronizacaoInstitucionalTurmaCommand(TurmaSgpDto turmaSgp, Turma turmaSerap)
         {

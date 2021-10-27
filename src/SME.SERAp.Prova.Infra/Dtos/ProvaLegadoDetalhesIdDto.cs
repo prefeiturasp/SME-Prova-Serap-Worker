@@ -19,6 +19,8 @@ namespace SME.SERAp.Prova.Infra
         public int TempoExecucao { get; set; }
         public string Senha { get; set; }
         public List<int> Anos { get; set; }
+        public bool PossuiBIB { get; set; }
+        public int TotalCadernos { get; set; }
 
         public void AddAno(int ano)
         {

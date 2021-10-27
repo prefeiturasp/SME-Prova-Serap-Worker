@@ -35,7 +35,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 questao.Enunciado,
                 questaoDto.QuestaoLegadoOrdem,
                 prova.Id,
-                (QuestaoTipo)questao.TipoItem
+                (QuestaoTipo)questao.TipoItem,
+                questaoDto.Caderno
             );
 
            var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));

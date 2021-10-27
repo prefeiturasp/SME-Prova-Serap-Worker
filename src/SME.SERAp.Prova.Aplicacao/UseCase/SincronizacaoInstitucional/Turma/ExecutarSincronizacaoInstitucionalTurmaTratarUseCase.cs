@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Newtonsoft.Json;
 using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Infra;
@@ -24,12 +25,14 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 var turmaSerap = await mediator.Send(new ObterTurmaPorCodigoQuery(turmaSgp.Codigo));
 
-                var turmaTratada = await mediator.Send(new TrataSincronizacaoInstitucionalTurmaCommand(turmaSgp, turmaSerap));
+                var turmaTratadaId = await mediator.Send(new TrataSincronizacaoInstitucionalTurmaCommand(turmaSgp, turmaSerap));
 
-                if (!turmaTratada)
-                {
-                    throw new Exception($"Não foi possível realizar o tratamento da turma id {turmaSgp.Codigo}.");
-                }
+                turmaSgp.TurmaId = turmaTratadaId;
+                var mensagemParaPublicar = JsonConvert.SerializeObject(turmaSgp);
+
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, mensagemParaPublicar));
+                
+
             }
             catch (Exception ex)
             {

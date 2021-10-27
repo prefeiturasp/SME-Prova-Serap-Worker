@@ -10,5 +10,6 @@
         public string NomeTurma { get; set; }
         public int TipoTurno { get; set; }        
         public long UeId { get; set; }
+        public long TurmaId { get; set; }
     }
 }

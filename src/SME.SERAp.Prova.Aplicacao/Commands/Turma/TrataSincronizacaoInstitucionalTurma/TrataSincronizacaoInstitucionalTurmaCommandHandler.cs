@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TrataSincronizacaoInstitucionalTurmaCommandHandler : IRequestHandler<TrataSincronizacaoInstitucionalTurmaCommand, bool>
+    public class TrataSincronizacaoInstitucionalTurmaCommandHandler : IRequestHandler<TrataSincronizacaoInstitucionalTurmaCommand, long>
     {
         private readonly IRepositorioTurma repositorioTurma;
 
@@ -18,12 +18,13 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioTurma = repositorioTurma ?? throw new ArgumentNullException(nameof(repositorioTurma));
         }
 
-        public async Task<bool> Handle(TrataSincronizacaoInstitucionalTurmaCommand request, CancellationToken cancellationToken)
+        public async Task<long> Handle(TrataSincronizacaoInstitucionalTurmaCommand request, CancellationToken cancellationToken)
         {
+            long turmaId = 0;
             if (request.TurmaSerap == null)
             {
-                var idNovaTurma = await repositorioTurma.IncluirAsync(MapearParaturma(request.TurmaSgp));
-                if (idNovaTurma <= 0)
+                turmaId = await repositorioTurma.IncluirAsync(MapearParaturma(request.TurmaSgp));
+                if (turmaId <= 0)
                     throw new NegocioException($"Erro ao incluir nova Turma {request.TurmaSerap.Codigo}");
             }
             else
@@ -43,9 +44,10 @@ namespace SME.SERAp.Prova.Aplicacao
                         UeId = request.TurmaSgp.UeId
                     };
                     await repositorioTurma.UpdateAsync(turmaParaAtualizar);
+                    turmaId = request.TurmaSerap.Id;
                 }
             }
-            return true;
+            return turmaId;
         }
 
         private Turma MapearParaturma(TurmaSgpDto turmaSgp)

@@ -25,7 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
             
             foreach (var questao in questoes)
             {
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoTratar, new DetalheQuestaoDto(questao.Id, questao.Ordem, provaId)));
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoTratar, new DetalheQuestaoDto(questao.Id, questao.Ordem, provaId, questao.Caderno)));
             }
             
             return true;

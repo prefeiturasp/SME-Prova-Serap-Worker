@@ -30,7 +30,7 @@ namespace SME.SERAp.Prova.Aplicacao
             var turmasSgp = await mediator.Send(new ObterTurmasSgpPorUeIdQuery(ue.Id));
             if (!turmasSgp?.Any() ?? false) return false;
 
-            foreach (var turma in turmasSgp)
+            foreach (var turma in turmasSgp.Where(t => t.Ano == "4"))
             {
                 try
                 {

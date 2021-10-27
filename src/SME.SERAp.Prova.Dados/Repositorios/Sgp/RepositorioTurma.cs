@@ -73,5 +73,27 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<Turma>> ObterTurmasPorAnoEAnoLetivo(int ano, int anoLetivo)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select * 
+                                from turma
+                               where ano = @ano and ano_letivo = @anoLetivo ";
+
+                return await conn.QueryAsync<Turma>(query, new { ano = ano.ToString(), anoLetivo });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

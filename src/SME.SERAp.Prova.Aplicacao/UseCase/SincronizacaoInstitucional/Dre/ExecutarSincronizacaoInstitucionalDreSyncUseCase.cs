@@ -24,7 +24,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new NegocioException("Não foi possível localizar as Dres no Sgp para a sincronização instituicional");
             }
 
-            foreach (var dre in dres.Where(a => a.CodigoDre == "108800").ToList())
+            foreach (var dre in dres)
             {
                 try
                 {

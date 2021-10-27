@@ -20,11 +20,6 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
 
-            if(provaId == 10696)
-            {
-                var i = 0;
-            }
-
             var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
 
             if (provaLegado == null)

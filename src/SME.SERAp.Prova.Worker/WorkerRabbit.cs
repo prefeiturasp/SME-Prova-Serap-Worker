@@ -48,7 +48,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 var props = channel.CreateBasicProperties();
                 props.Persistent = true;
 
-                channel.BasicQos(0, 2, false);
+                channel.BasicQos(0, 10, false);
 
                 channel.ExchangeDeclare(ExchangeRabbit.SerapEstudante, ExchangeType.Direct, true, false);
                 channel.ExchangeDeclare(ExchangeRabbit.SerapEstudanteDeadLetter, ExchangeType.Direct, true, false);

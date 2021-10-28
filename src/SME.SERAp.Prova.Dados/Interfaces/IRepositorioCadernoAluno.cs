@@ -5,5 +5,6 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioCadernoAluno : IRepositorioBase<CadernoAluno>
     {
+        Task<bool> RemoverCadernosPorProvaIdAsync(long provaId);
     }
 }

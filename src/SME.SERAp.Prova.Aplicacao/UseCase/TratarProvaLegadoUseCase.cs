@@ -70,6 +70,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task RemoverEntidadesFilhas(Dominio.Prova provaAtual)
         {
+            await mediator.Send(new ProvaRemoverCadernoAlunosPorProvaId(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAlternativasPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverQuestoesPorIdCommand(provaAtual.Id));

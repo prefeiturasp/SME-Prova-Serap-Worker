@@ -150,7 +150,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT I.id, B.Description as Caderno,
+                var query = @" SELECT distinct I.id, B.Description as Caderno,
                                     (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem
                                     FROM Item I WITH (NOLOCK)
                                     INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id

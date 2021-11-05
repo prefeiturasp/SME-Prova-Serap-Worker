@@ -19,29 +19,32 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var detalheAlternativaDto = mensagemRabbit.ObterObjetoMensagem<DetalheAlternativaDto>();
 
-            var alternativa =
-                await mediator.Send(
-                    new ObterAlternativaDetalheLegadoPorIdQuery(
-                        detalheAlternativaDto.QuestaoId, detalheAlternativaDto.AlternativaId));
-
-            if (alternativa == null)
-                throw new Exception(
-                    $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
-
             var questao = await mediator.Send(new ObterQuestaoPorProvaQuestaoLegadoQuery(detalheAlternativaDto.ProvaId, detalheAlternativaDto.QuestaoId));
 
             if (questao == null)
                 throw new Exception(
                     $"A questao {detalheAlternativaDto.QuestaoId} na prova {detalheAlternativaDto.ProvaId} não localizada!");
 
-            var alternativas = new Alternativa(
+            foreach (var alternativaId in detalheAlternativaDto.AlternativasId)
+            {
+                var alternativa =
+                await mediator.Send(
+                    new ObterAlternativaDetalheLegadoPorIdQuery(
+                        detalheAlternativaDto.QuestaoId, alternativaId));
+
+                if (alternativa == null)
+                    throw new Exception(
+                        $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
+
+                var alternativas = new Alternativa(
                 alternativa.Ordem,
                 alternativa.Numeracao,
                 alternativa.Descricao,
                 questao.Id
             );
 
-            await mediator.Send(new AlternativaIncluirCommand(alternativas));
+                await mediator.Send(new AlternativaIncluirCommand(alternativas));
+            }
 
             return true;
         }

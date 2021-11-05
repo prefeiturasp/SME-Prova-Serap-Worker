@@ -23,11 +23,9 @@ namespace SME.SERAp.Prova.Aplicacao
             var alternativasId =
                 await mediator.Send(new ObterAlternativasLegadoPorIdQuery(busca.QuestaoId));
 
-            foreach (var id in alternativasId)
-            {
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlternativaTratar,
-                    new DetalheAlternativaDto(busca.ProvaId, busca.QuestaoId, id)));
-            }
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlternativaTratar,
+                    new DetalheAlternativaDto(busca.ProvaId, busca.QuestaoId, alternativasId)));
+
             return true;
         }
     }

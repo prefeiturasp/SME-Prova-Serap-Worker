@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"
-              select DISTINCT  
+              SELECT DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
 	            t.ApplicationStartDate as Inicio,
@@ -59,7 +59,9 @@ namespace SME.SERAp.Prova.Dados
                 ttime.Segundos AS TempoExecucao,
                 t.Password as Senha,
                 t.Bib as PossuiBIB,
-	            tt.tcp_ordem as Ano                
+	            tt.tcp_ordem as Ano,
+	            tne.tne_id as ModalidadeId,
+	            tne.tne_nome as Modalidade
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -70,6 +72,10 @@ namespace SME.SERAp.Prova.Dados
                 t.TestTime_Id = ttime.id
             INNER JOIN TestTypeCourse ttc ON
 	            ttc.TestType_Id = t.TestType_Id
+	        INNER JOIN TestType on
+	        	t.TestType_Id = TestType.id
+	       	INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
+	       		TestType.TypeLevelEducationId = tne.tne_id
             INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
 	            ttcp.crp_ordem = tt.tcp_ordem
 	            AND tt.tme_id = ttcp.tme_id

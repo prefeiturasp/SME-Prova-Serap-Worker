@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SME.SERAp.Prova.Dominio;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,6 +22,7 @@ namespace SME.SERAp.Prova.Infra
         public List<int> Anos { get; set; }
         public bool PossuiBIB { get; set; }
         public int TotalCadernos { get; set; }
+        public ModalidadeSerap Modalidade { get; set; }
 
         public void AddAno(int ano)
         {

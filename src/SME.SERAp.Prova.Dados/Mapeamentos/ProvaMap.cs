@@ -12,6 +12,7 @@ namespace SME.SERAp.Prova.Dados
             
             Map(c => c.LegadoId).ToColumn("prova_legado_id");
             Map(c => c.Descricao).ToColumn("descricao");
+            Map(c => c.InicioDownload).ToColumn("inicio_download");
             Map(c => c.Inicio).ToColumn("inicio");
             Map(c => c.Fim).ToColumn("fim");
             Map(c => c.Inclusao).ToColumn("inclusao");

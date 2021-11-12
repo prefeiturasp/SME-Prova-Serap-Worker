@@ -50,6 +50,10 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 provaParaTratar.Id = provaAtual.Id;
 
+                var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
+                if(verificaSePossuiRespostas)
+                    throw new System.Exception($"A prova {provaAtual.Id} possui respostas cadastradas por isto não será atualizada.");
+
                 await RemoverEntidadesFilhas(provaAtual);
                 await mediator.Send(new ProvaAtualizarCommand(provaParaTratar));
             }

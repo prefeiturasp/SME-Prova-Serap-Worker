@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ProvaRemoverCadernoAlunosPorProvaIdHandler : IRequestHandler<ProvaRemoverCadernoAlunosPorProvaId, bool>
+    public class ProvaRemoverCadernoAlunosPorProvaIdHandler : IRequestHandler<ProvaRemoverCadernoAlunosPorProvaIdCommand, bool>
     {
         private readonly IRepositorioCadernoAluno repositorioCadernoAluno;
 
@@ -14,7 +14,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.repositorioCadernoAluno = repositorioCadernoAluno ?? throw new ArgumentNullException(nameof(repositorioCadernoAluno));
         }
-        public async Task<bool> Handle(ProvaRemoverCadernoAlunosPorProvaId request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ProvaRemoverCadernoAlunosPorProvaIdCommand request, CancellationToken cancellationToken)
         {
             return await repositorioCadernoAluno.RemoverCadernosPorProvaIdAsync(request.Id);
         }

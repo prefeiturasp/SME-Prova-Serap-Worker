@@ -49,6 +49,7 @@ namespace SME.SERAp.Prova.Dados
               select DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
+                t.DownloadStartDate as InicioDownload,
 	            t.ApplicationStartDate as Inicio,
 	            t.ApplicationEndDate as Fim,
 	            case 
@@ -190,6 +191,24 @@ namespace SME.SERAp.Prova.Dados
                                 WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId and BI.State = 1;";
 
                 return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId , questaoId});
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<ContextoProvaLegadoDto>> ObterContextosProvaPorProvaId(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select Id, 
+                                Title as Titulo, Text as Texto, ImagePath as ImagemCaminho, ImagePosition as ImagemPosicao from TestContext
+                            where Test_id = @provaId and State = 1;";
+
+                return await conn.QueryAsync<ContextoProvaLegadoDto>(query, new { provaId });
             }
             finally
             {

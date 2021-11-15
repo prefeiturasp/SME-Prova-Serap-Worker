@@ -2,9 +2,9 @@
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ProvaRemoverCadernoAlunosPorProvaIdCommand : IRequest<bool>
+    public class ProvaRemoverContextoProvaPorProvaIdCommand : IRequest<bool>
     {
-        public ProvaRemoverCadernoAlunosPorProvaIdCommand(long id)
+        public ProvaRemoverContextoProvaPorProvaIdCommand(long id)
         {
             Id = id;
         }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using System.Linq;
 using System.Security.Cryptography;
@@ -37,7 +38,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
             }
 
-            var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.Inicio, provaLegado.Fim, 
+            var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim, 
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB, 
                 provaLegado.TotalCadernos);
 
@@ -49,6 +50,10 @@ namespace SME.SERAp.Prova.Aplicacao
             else
             {
                 provaParaTratar.Id = provaAtual.Id;
+
+                var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
+                if(verificaSePossuiRespostas)
+                    throw new System.Exception($"A prova {provaAtual.Id} possui respostas cadastradas por isto não será atualizada.");
 
                 await RemoverEntidadesFilhas(provaAtual);
                 await mediator.Send(new ProvaAtualizarCommand(provaParaTratar));
@@ -62,6 +67,19 @@ namespace SME.SERAp.Prova.Aplicacao
 
             }
 
+            var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
+
+            if(contextosProva.Any())
+            {
+                var ordem = 0;
+                foreach(var contextoProvaDto in contextosProva.OrderBy(a => a.Id).ToList())
+                {
+                    var contextoProva = new ContextoProva(provaAtual.Id, ordem, contextoProvaDto.Titulo, contextoProvaDto.ImagemCaminho, contextoProvaDto.Texto, contextoProvaDto.ImagemPosicao);
+                    await mediator.Send(new ContextoProvaIncluirCommand(contextoProva));
+                    ordem += 1;
+                }
+            }
+
             await mediator.Send(
                 new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
 
@@ -70,7 +88,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task RemoverEntidadesFilhas(Dominio.Prova provaAtual)
         {
-            await mediator.Send(new ProvaRemoverCadernoAlunosPorProvaId(provaAtual.Id));
+            await mediator.Send(new ProvaRemoverContextoProvaPorProvaIdCommand(provaAtual.Id));
+            await mediator.Send(new ProvaRemoverCadernoAlunosPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAlternativasPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverQuestoesPorIdCommand(provaAtual.Id));

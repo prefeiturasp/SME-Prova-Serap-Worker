@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using System.Linq;
 using System.Security.Cryptography;
@@ -26,8 +27,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new System.Exception($"Prova {provaLegado} não localizada!");
 
             var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(provaLegado.Id));
-            
-            if(provaLegado.Senha != null)
+
+            if (provaLegado.Senha != null)
             {
                 using (var md5 = MD5.Create())
                 {
@@ -37,9 +38,11 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
             }
 
-            var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim, 
-                provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB, 
-                provaLegado.TotalCadernos);
+            var modalidadeSerap = ObterModalidade(provaLegado.Modalidade);
+
+            var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
+                provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
+                provaLegado.TotalCadernos, modalidadeSerap);
 
             if (provaAtual == null)
             {
@@ -51,7 +54,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaParaTratar.Id = provaAtual.Id;
 
                 var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
-                if(verificaSePossuiRespostas)
+                if (verificaSePossuiRespostas)
                     throw new System.Exception($"A prova {provaAtual.Id} possui respostas cadastradas por isto não será atualizada.");
 
                 await RemoverEntidadesFilhas(provaAtual);
@@ -70,6 +73,27 @@ namespace SME.SERAp.Prova.Aplicacao
                 new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
 
             return true;
+        }
+
+        private Modalidade ObterModalidade(ModalidadeSerap modalidade)
+        {
+            switch (modalidade)
+            {
+                case ModalidadeSerap.EnsinoFundamental:
+                    return Modalidade.Fundamental;
+                case ModalidadeSerap.EducacaoInfantil:
+                    return Modalidade.EducacaoInfantil;
+                case ModalidadeSerap.EnsinoMedio:
+                    return Modalidade.Medio;
+                case ModalidadeSerap.EJAEnsinoFundamental:
+                    return Modalidade.EJA;
+                case ModalidadeSerap.EJACIEJA:
+                    return Modalidade.CIEJA;
+                case ModalidadeSerap.EJAEscolasEducacaoEspecial:
+                    return Modalidade.EJA;
+                default:
+                    return Modalidade.NaoCadastrado;
+            }
         }
 
         private async Task RemoverEntidadesFilhas(Dominio.Prova provaAtual)

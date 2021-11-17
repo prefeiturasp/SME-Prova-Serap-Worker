@@ -49,7 +49,7 @@ namespace SME.SERAp.Prova.Dados
               SELECT DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
-                t.DownloadStartDate as InicioDownload,
+                t.ApplicationStartDate as InicioDownload,
 	            t.ApplicationStartDate as Inicio,
 	            t.ApplicationEndDate as Fim,
 	            case 
@@ -60,9 +60,9 @@ namespace SME.SERAp.Prova.Dados
                 ttime.Segundos AS TempoExecucao,
                 t.Password as Senha,
                 t.Bib as PossuiBIB,
-	            tt.tcp_ordem as Ano,
-	            tne.tne_id as ModalidadeId,
-	            tne.tne_nome as Modalidade
+	            tne.tne_id as Modalidade,
+	            tne.tne_nome as ModalidadeNome,
+	            tt.tcp_ordem as Ano
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

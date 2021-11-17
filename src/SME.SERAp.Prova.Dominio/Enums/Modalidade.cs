@@ -4,6 +4,8 @@ namespace SME.SERAp.Prova.Dominio
 {
     public enum Modalidade
     {
+        NaoCadastrado = 0,
+
         [Display(Name = "Educação Infantil", ShortName = "EI")]
         EducacaoInfantil = 1,
 

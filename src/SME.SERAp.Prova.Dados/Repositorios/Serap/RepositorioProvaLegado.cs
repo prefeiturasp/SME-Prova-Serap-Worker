@@ -185,8 +185,10 @@ namespace SME.SERAp.Prova.Dados
                 var query = @" SELECT I.id as QuestaoId,
                                     (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem,
                                     I.[Statement] as Questao ,bt.Description  as Enunciado, T.Id as ProvaLegadoId,
-                                    IT.Id TipoItem,
-                                    IT.Description TipoItemDescricao 
+                                    case 
+	            	                    when IT.QuantityAlternative > 0 then 1 else 2
+	                                end TipoItem,
+                                    IT.QuantityAlternative as QuantidadeAlternativas
                                     FROM Item I WITH (NOLOCK)
                                     INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
                                     INNER JOIN ItemType IT  WITH (NOLOCK) ON I.ItemType_Id = IT.Id  

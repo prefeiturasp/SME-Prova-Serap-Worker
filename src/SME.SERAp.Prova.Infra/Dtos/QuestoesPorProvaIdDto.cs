@@ -8,9 +8,9 @@
         public string Questao  { get; set; }
         public string Enunciado  { get; set; }
         public int TipoItem { get; set; }
-        public string TipoItemDescricao { get; set; }
+        public int QuantidadeAlternativas { get; set; }
 
-        public QuestoesPorProvaIdDto(long questaoId, int ordem, long provaLegadoId, string questao, string enunciado, int tipoItem, string tipoItemDescricao)
+        public QuestoesPorProvaIdDto(long questaoId, int ordem, long provaLegadoId, string questao, string enunciado, int tipoItem, int quantidadeAlternativas)
         {
             QuestaoId = questaoId;
             Ordem = ordem;
@@ -18,7 +18,7 @@
             Questao = questao;
             Enunciado = enunciado;
             TipoItem = tipoItem;
-            TipoItemDescricao = tipoItemDescricao;
+            QuantidadeAlternativas = quantidadeAlternativas;
         }
 
         public QuestoesPorProvaIdDto()

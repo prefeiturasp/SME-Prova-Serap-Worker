@@ -42,7 +42,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     questaoDto.QuestaoLegadoOrdem,
                     prova.Id,
                     (QuestaoTipo)questao.TipoItem,
-                    questaoDto.Caderno
+                    questaoDto.Caderno,
+                    questao.QuantidadeAlternativas
                 );
 
                 var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
@@ -61,7 +62,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var buscarPorProvaIdEQuestaoIdDto =
                     new BuscarPorProvaIdEQuestaoIdDto(questao.ProvaLegadoId, questao.QuestaoId);
 
-                if (questao.TipoItem == (int)QuestaoTipo.MultiplaEscolha4Alternativas || questao.TipoItem == (int)QuestaoTipo.MultiplaEscolha5Alternativas)
+                if (questao.TipoItem == (int)QuestaoTipo.MultiplaEscolha)
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlternativaSync, buscarPorProvaIdEQuestaoIdDto));
 
             }

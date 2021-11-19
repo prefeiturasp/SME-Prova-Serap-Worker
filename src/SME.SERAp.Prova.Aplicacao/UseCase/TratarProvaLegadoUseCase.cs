@@ -38,7 +38,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
             }
 
-            var modalidadeSerap = ObterModalidade(provaLegado.Modalidade);
+            var modalidadeSerap = ObterModalidade(provaLegado.Modalidade, provaLegado.ModeloProva);
 
             var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
@@ -75,12 +75,15 @@ namespace SME.SERAp.Prova.Aplicacao
             return true;
         }
 
-        private Modalidade ObterModalidade(ModalidadeSerap modalidade)
+        private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)
         {
             switch (modalidade)
             {
                 case ModalidadeSerap.EnsinoFundamental:
-                    return Modalidade.Fundamental;
+                    if(modeloProva == ModeloProva.EJA)
+                        return Modalidade.EJA;
+                    else
+                        return Modalidade.Fundamental;
                 case ModalidadeSerap.EducacaoInfantil:
                     return Modalidade.EducacaoInfantil;
                 case ModalidadeSerap.EnsinoMedio:

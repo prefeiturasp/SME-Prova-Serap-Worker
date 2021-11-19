@@ -62,6 +62,7 @@ namespace SME.SERAp.Prova.Dados
                 t.Bib as PossuiBIB,
 	            tne.tne_id as Modalidade,
 	            tne.tne_nome as ModalidadeNome,
+                mt.Id ModeloProva,
 	            tt.tcp_ordem as Ano
             FROM
 	            Test t 
@@ -80,6 +81,7 @@ namespace SME.SERAp.Prova.Dados
             INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
 	            ttcp.crp_ordem = tt.tcp_ordem
 	            AND tt.tme_id = ttcp.tme_id
+            INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
             where
 	            t.id = @id";
 

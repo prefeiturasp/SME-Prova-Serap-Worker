@@ -24,6 +24,7 @@ namespace SME.SERAp.Prova.Infra
         public bool PossuiBIB { get; set; }
         public int TotalCadernos { get; set; }
         public ModalidadeSerap Modalidade { get; set; }
+        public ModeloProva ModeloProva { get; set; }
 
         public void AddAno(int ano)
         {

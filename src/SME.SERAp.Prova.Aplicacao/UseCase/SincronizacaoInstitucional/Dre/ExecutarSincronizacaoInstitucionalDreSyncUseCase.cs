@@ -15,7 +15,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
         }
 
-        public async Task<bool> Executar(MensagemRabbit param)
+        public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var dres = await mediator.Send(new ObterDresSgpQuery());
 
@@ -24,7 +24,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new NegocioException("Não foi possível localizar as Dres no Sgp para a sincronização instituicional");
             }
 
-            foreach (var dre in dres.Where(a => a.CodigoDre == "108800"))
+            var dreDto = mensagemRabbit.ObterObjetoMensagem<DreRabbitDto>();
+
+            if (dreDto != null)
+                dres = dres.Where(a => a.CodigoDre == dreDto.Codigo).ToList();
+
+            foreach (var dre in dres)
             {
                 try
                 {

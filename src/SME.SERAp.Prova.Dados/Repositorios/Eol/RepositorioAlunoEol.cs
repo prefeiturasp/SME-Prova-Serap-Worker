@@ -86,8 +86,7 @@ namespace SME.SERAp.Prova.Dados
 								se.cd_serie_ensino = ste.cd_serie_ensino
                             WHERE
 	                            turesc.cd_turma_escola = @turmaCodigo
-	                            AND matrTurma.cd_situacao_aluno IN (1, 6, 10, 13)
-	                            AND e.tp_escola IN (1, 3, 4, 16)";
+	                            AND matrTurma.cd_situacao_aluno IN (1, 6, 10, 13)";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
             return await conn.QueryAsync<AlunoEolDto>(query, new { turmaCodigo });

@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new NegocioException(mensagem);
             }
 
-            var turmasSgp = await mediator.Send(new ObterTurmasSgpPoreUeIdQuery(ue.UeCodigo));
+            var turmasSgp = await mediator.Send(new ObterTurmasSgpPorUeIdQuery(ue.UeCodigo));
             if (!turmasSgp?.Any() ?? false) return false;
 
             foreach (var turma in turmasSgp.OrderBy(a => a.Ano).ToList())

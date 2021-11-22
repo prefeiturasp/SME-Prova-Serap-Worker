@@ -30,13 +30,12 @@ namespace SME.SERAp.Prova.Dados
                                inner join ue on turma.ue_id = ue.id
                                where ue.ue_id = @ueCodigo
                                  and not historica 
-                                 and modalidade_codigo = @modalidadeCodigo
+                                 and modalidade_codigo in (3,4,6)
                                  and ano_letivo = @anoLetivo ";
 
                 var parametros = new
                 {
                     ueCodigo,
-                    modalidadeCodigo = (int)Modalidade.Fundamental,
                     anoLetivo = DateTime.Now.Year
                 };
 

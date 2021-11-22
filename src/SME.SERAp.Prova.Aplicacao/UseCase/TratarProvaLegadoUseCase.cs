@@ -64,7 +64,7 @@ namespace SME.SERAp.Prova.Aplicacao
             foreach (var ano in provaLegado.Anos)
             {
                 await mediator.Send(new ProvaAnoIncluirCommand(new Dominio.ProvaAno(ano, provaAtual.Id)));
-                if (provaAtual.PossuiBIB)
+                if (provaLegado.PossuiBIB)
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
 
             }

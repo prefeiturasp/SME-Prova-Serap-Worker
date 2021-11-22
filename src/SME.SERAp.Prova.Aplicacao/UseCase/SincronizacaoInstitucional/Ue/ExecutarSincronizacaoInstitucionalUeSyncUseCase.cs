@@ -29,7 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new NegocioException("Não foi possível localizar as Ues no Sgp para a sincronização instituicional");
 
 
-            foreach (var ue in ues.Where(a => a.CodigoUe == "094668"))
+            foreach (var ue in ues)
             {
                 try
                 {

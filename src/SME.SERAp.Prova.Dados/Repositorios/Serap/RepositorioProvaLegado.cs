@@ -159,7 +159,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT I.id as QuestaoId,
+                var query = @" SELECT I.id as QuestaoId, B.Description as Caderno,
                                     (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem,
                                     I.[Statement] as Questao ,bt.Description  as Enunciado, T.Id as ProvaLegadoId,
                                     case 

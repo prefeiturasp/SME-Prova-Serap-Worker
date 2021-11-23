@@ -206,5 +206,23 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<ContextoProvaLegadoDto>> ObterContextosProvaPorProvaId(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select Id, 
+                                Title as Titulo, Text as Texto, ImagePath as ImagemCaminho, ImagePosition as ImagemPosicao from TestContext
+                            where Test_id = @provaId and State = 1;";
+
+                return await conn.QueryAsync<ContextoProvaLegadoDto>(query, new { provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

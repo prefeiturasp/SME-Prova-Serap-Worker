@@ -24,7 +24,16 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new NegocioException("Não foi possível localizar as Dres no Sgp para a sincronização instituicional");
             }
 
-         
+            var dreDtp = mensagemRabbit.ObterObjetoMensagem<DreRabbitDto>();
+
+            if (!String.IsNullOrEmpty(dreDtp.Codigo))
+            {
+                var dreCodigo = String.IsNullOrEmpty(dreDtp.Codigo);
+                if(Convert.ToInt64(dreCodigo) > 0)
+                    dres = dres.Where(d => d.CodigoDre == dreDtp.Codigo);
+            }
+                
+
             foreach (var dre in dres)
             {
                 try

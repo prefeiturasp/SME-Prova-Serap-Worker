@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         {
                             foreach (var aluno in alunos)
                             {
-                                aluno.TurmaSerapId = turma.TurmaId;
+                                aluno.TurmaSerapId = turmaId;
                                 
                                 await mediator.Send(new SincronizarAlunoCommand(aluno));
                             }

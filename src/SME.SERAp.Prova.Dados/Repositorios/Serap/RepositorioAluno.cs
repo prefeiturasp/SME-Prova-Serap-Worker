@@ -31,7 +31,7 @@ namespace SME.SERAp.Prova.Dados
                                 ra = @ra
                             RETURNING *
                         )
-                        INSERT INTO turma(nome, ra, turma_id, situacao,data_atualizacao)
+                        INSERT INTO aluno(nome, ra, turma_id, situacao,data_atualizacao)
                         SELECT
                             @nome,  @ra, @turmaId, @situacao,@dataAtualizacao
                         WHERE

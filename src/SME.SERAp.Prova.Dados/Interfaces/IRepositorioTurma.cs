@@ -10,5 +10,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<TurmaSgpDto>> ObterturmasSgpPorUeCodigo(string ueCodigo);
         Task<Turma> ObterturmaPorCodigo(string uecodigo);
         Task<IEnumerable<Turma>> ObterTurmasPorAnoEAnoLetivo(int ano, int anoLetivo);
+        Task<long> InserirOuAtualizarTurmaAsync(TurmaSgpDto turmaSgp);
     }
 }

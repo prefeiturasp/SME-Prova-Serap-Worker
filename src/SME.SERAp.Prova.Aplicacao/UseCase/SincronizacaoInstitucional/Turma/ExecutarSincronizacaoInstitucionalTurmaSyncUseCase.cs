@@ -35,14 +35,25 @@ namespace SME.SERAp.Prova.Aplicacao
                 try
                 {
                     turma.UeId = ue.Id;
-                    var mensagemParaPublicar = JsonConvert.SerializeObject(turma);
 
-                    var publicarFilaIncluirTurma = await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar, mensagemParaPublicar));
-                    if (!publicarFilaIncluirTurma)
+                    var turmaId = await mediator.Send(new SincronizarTurmaCommand(turma));
+
+                    var alunos = await mediator.Send(new ObterAlunosPorTurmaCodigoQuery(long.Parse(turma.Codigo)));
+
+                    if (alunos.Any())
                     {
-                        var mensagem = $"Não foi possível inserir a turma de codígo : {turma.Codigo} na fila de inclusão.";
-                        SentrySdk.CaptureMessage(mensagem);
+                        if (turmaId > 0)
+                        {
+                            foreach (var aluno in alunos)
+                            {
+                                aluno.TurmaSerapId = turma.TurmaId;
+                                
+                                await mediator.Send(new SincronizarAlunoCommand(aluno));
+                            }
+                        }
                     }
+
+
                 }
                 catch (Exception ex)
                 {

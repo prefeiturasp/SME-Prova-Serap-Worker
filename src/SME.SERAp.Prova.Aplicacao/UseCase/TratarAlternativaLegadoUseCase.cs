@@ -40,8 +40,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 alternativa.Ordem,
                 alternativa.Numeracao,
                 alternativa.Descricao,
-                questao.Id
-            );
+                questao.Id);
 
                 await mediator.Send(new AlternativaIncluirCommand(alternativas));
             }

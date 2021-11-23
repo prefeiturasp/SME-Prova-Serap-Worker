@@ -30,15 +30,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         new ProvaTurmaBIBSyncDto(provaBIB.ProvaId, provaBIB.TotalCadernos, turma.Id)));
                 }
             }
-            //var alternativasId =
-            //    await mediator.Send(new ObterAlternativasLegadoPorIdQuery(busca.QuestaoId));
-
-            //foreach (var id in alternativasId)
-            //{
-            //    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlternativaTratar,
-            //        new DetalheAlternativaDto(busca.ProvaId, busca.QuestaoId, id)));
-            //}
-
+            
             return true;
         }
     }

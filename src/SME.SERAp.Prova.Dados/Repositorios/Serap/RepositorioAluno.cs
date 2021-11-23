@@ -25,7 +25,7 @@ namespace SME.SERAp.Prova.Dados
                             SET
                                 nome = @nome, 
 		                          turma_id = @turmaId, 
-		                          situacao = @situacao
+		                          situacao = @situacao,
                                 data_atualizacao = @dataAtualizacao
                             WHERE
                                 ra = @ra

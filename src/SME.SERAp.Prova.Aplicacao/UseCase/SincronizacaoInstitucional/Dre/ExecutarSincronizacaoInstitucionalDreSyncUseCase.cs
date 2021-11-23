@@ -28,9 +28,9 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (!String.IsNullOrEmpty(dreDtp.Codigo))
             {
-                var dreCodigo = String.IsNullOrEmpty(dreDtp.Codigo);
+                var dreCodigo = dreDtp.Codigo;
                 if(Convert.ToInt64(dreCodigo) > 0)
-                    dres = dres.Where(d => d.CodigoDre == dreDtp.Codigo);
+                    dres = dres.Where(d => d.CodigoDre == dreDtp.Codigo).ToList();
             }
                 
 

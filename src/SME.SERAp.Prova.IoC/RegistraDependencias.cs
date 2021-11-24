@@ -41,7 +41,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarAlternativaLegadoSyncUseCase, TratarAlternativaLegadoSyncUseCase>();
             services.AddScoped<ITratarAlternativaLegadoUseCase, TratarAlternativaLegadoLegadoUseCase>();
             services.AddScoped<ITratarQuestoesLegadoSyncUseCase, TratarQuestoesLegadoSyncUseCase>();
-            services.AddScoped<ITratarQuestoesProvaLegadoUseCase, TratarQuestoesProvaLegadoUseCase>();
             services.AddScoped<ITratarProvaBIBSyncUseCase, TratarProvaBIBSyncUseCase>();
             services.AddScoped<ITratarProvaBIBUseCase, TratarProvaBIBUseCase>();
             services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();

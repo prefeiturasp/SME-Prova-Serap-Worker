@@ -33,7 +33,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     throw new Exception($"Prova {provaId} não localizada!");
 
                 var questaoParaPersistir = new Questao(
-                    questaoSerap.Questao,
+                    questaoSerap.TextoBase,
                     questaoSerap.QuestaoId,
                     questaoSerap.Enunciado,
                     questaoSerap.Ordem,

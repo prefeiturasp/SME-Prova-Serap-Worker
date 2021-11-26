@@ -161,7 +161,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @" SELECT I.id as QuestaoId, B.Description as Caderno,
                                     (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem,
-                                    I.[Statement] as Questao ,bt.Description  as Enunciado, T.Id as ProvaLegadoId,
+                                    I.[Statement] as Enunciado ,bt.Description  as TextoBase, T.Id as ProvaLegadoId,
                                     case 
 	            	                    when IT.QuantityAlternative > 0 then 1 else 2
 	                                end TipoItem,

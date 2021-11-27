@@ -23,9 +23,12 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 var ultimaAtualizacao = await mediator.Send(new ObterUltimoExecucaoControleTipoPorTipoQuery(ExecucaoControleTipo.ProvaLegadoSincronizacao));
 
+                SentrySdk.CaptureMessage($"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
                 var provaIds = await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao));
+                SentrySdk.CaptureMessage($"Total de provas para sincronizar {provaIds}");
                 foreach (var provaId in provaIds)
                 {
+                    SentrySdk.CaptureMessage($"Enviando prova {provaId} para tratar");
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
                 }
 

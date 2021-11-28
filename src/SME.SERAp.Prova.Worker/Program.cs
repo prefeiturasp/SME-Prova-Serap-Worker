@@ -52,6 +52,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             
             services.AddSingleton(factory);
 
+            var conexaoRabbit = factory.CreateConnection();
+            IModel channel = conexaoRabbit.CreateModel();
+
+            services.AddSingleton(channel);
+
             var fireBaseOptions = new FireBaseOptions();
             hostContext.Configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(fireBaseOptions);

@@ -173,7 +173,7 @@ namespace SME.SERAp.Prova.Dados
                                     INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id] 
                                     INNER JOIN BaseText bt  on bt.Id = I.BaseText_Id       
                                      LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
-                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and BI.State = 1;";
+                                WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and BI.State = 1 and i.lastversion = 1 ;";
 
                 return await conn.QueryAsync<QuestoesPorProvaIdDto>(query, new { provaId });
             }

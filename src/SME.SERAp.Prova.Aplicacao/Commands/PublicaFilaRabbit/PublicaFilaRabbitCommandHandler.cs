@@ -13,10 +13,12 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
     public class PublicaFilaRabbitCommandHandler : IRequestHandler<PublicaFilaRabbitCommand, bool>
     {
         private readonly IModel model;
+        private readonly ConnectionFactory factory;
 
-        public PublicaFilaRabbitCommandHandler(IModel model)
+        public PublicaFilaRabbitCommandHandler(IModel model, ConnectionFactory factory)
         {
             this.model = model ?? throw new ArgumentNullException(nameof(model));
+            this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
         public Task<bool> Handle(PublicaFilaRabbitCommand request, CancellationToken cancellationToken)
@@ -31,6 +33,10 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
 
                 var props = model.CreateBasicProperties();
                 props.Persistent = true;
+                
+                Console.WriteLine($"HostName: {factory.HostName}");
+                Console.WriteLine($"Usuário: {factory.UserName}");
+                Console.WriteLine($"VirtualHost: {factory.VirtualHost}");
 
                 model.BasicPublish(ExchangeRabbit.SerapEstudante, request.NomeRota, props, body);
 

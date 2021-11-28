@@ -30,7 +30,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     SentrySdk.CaptureMessage($"Enviando prova {provaId} para tratar");
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
-                    SentrySdk.CaptureMessage($"Prova {provaId} enviada para tratar");
                 }              
             }
             catch(Exception ex)

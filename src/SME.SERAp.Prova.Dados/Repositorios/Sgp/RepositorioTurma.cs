@@ -29,14 +29,14 @@ namespace SME.SERAp.Prova.Dados
                                 from turma
                                inner join ue on turma.ue_id = ue.id
                                where ue.ue_id = @ueCodigo
-                                 and not historica 
-                                 and modalidade_codigo = @modalidadeCodigo
+                                 and not historica
+                                 and tipo_turma = 1
+                                 and modalidade_codigo in (3,4,5,6)
                                  and ano_letivo = @anoLetivo ";
 
                 var parametros = new
                 {
                     ueCodigo,
-                    modalidadeCodigo = (int)Modalidade.Fundamental,
                     anoLetivo = DateTime.Now.Year
                 };
 
@@ -85,6 +85,55 @@ namespace SME.SERAp.Prova.Dados
                                where ano = @ano and ano_letivo = @anoLetivo ";
 
                 return await conn.QueryAsync<Turma>(query, new { ano = ano.ToString(), anoLetivo });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<long> InserirOuAtualizarTurmaAsync(TurmaSgpDto turmaSgp)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"WITH upsert AS (
+                            UPDATE turma
+                            SET
+                                ano = @ano, 
+		                          ano_letivo = @anoLetivo, 
+		                          ue_id = @ueId, 
+		                          tipo_turma = @tipoTurma, 
+		                          modalidade_codigo = @modalidade,
+		                          nome = @nome,
+		                          tipo_turno = @tipoTurno,
+		                          data_atualizacao = @dataAtualizacao
+                            WHERE
+                                codigo = @codigo
+                            RETURNING *
+                        )
+                        INSERT INTO turma(ano, ano_letivo, codigo, ue_id, tipo_turma, modalidade_codigo, nome, tipo_turno, data_atualizacao)
+                        SELECT
+                            @ano,  @anoLetivo, @codigo, @ueId, @tipoTurma,   @modalidade,  @nome, @tipoTurno, @dataAtualizacao
+                        WHERE
+                            NOT EXISTS (SELECT 1 FROM upsert);
+                        select id from turma where codigo = @codigo;";
+
+                return await conn.QueryFirstOrDefaultAsync<long>(query, new { ano = turmaSgp.Ano, 
+                    anoLetivo = turmaSgp.AnoLetivo, 
+                    codigo = turmaSgp.Codigo,
+                    ueId = turmaSgp.UeId,
+                    tipoTurma = turmaSgp.TipoTurma,
+                    modalidade = turmaSgp.ModalidadeCodigo,
+                    nome = turmaSgp.NomeTurma,
+                    tipoTurno = turmaSgp.TipoTurno,
+                    dataAtualizacao = DateTime.Now
+                });
             }
             catch (Exception)
             {

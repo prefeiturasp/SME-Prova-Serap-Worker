@@ -12,10 +12,12 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
 {
     public class PublicaFilaRabbitCommandHandler : IRequestHandler<PublicaFilaRabbitCommand, bool>
     {
+        private readonly IModel model;
         private readonly ConnectionFactory factory;
 
-        public PublicaFilaRabbitCommandHandler(ConnectionFactory factory)
+        public PublicaFilaRabbitCommandHandler(IModel model, ConnectionFactory factory)
         {
+            this.model = model ?? throw new ArgumentNullException(nameof(model));
             this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
@@ -24,9 +26,6 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
             //TODO: Implementar Polly!
             try
             {
-                var conexaoRabbit = factory.CreateConnection();
-                var model = conexaoRabbit.CreateModel();
-
                 var mensagem = new MensagemRabbit(request.Mensagem, Guid.NewGuid());
 
                 var mensagemJson = JsonSerializer.Serialize(mensagem);
@@ -34,6 +33,10 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
 
                 var props = model.CreateBasicProperties();
                 props.Persistent = true;
+                
+                Console.WriteLine($"HostName: {factory.HostName}");
+                Console.WriteLine($"Usuário: {factory.UserName}");
+                Console.WriteLine($"VirtualHost: {factory.VirtualHost}");
 
                 model.BasicPublish(ExchangeRabbit.SerapEstudante, request.NomeRota, props, body);
 

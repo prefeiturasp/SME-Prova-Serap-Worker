@@ -8,7 +8,7 @@ namespace SME.SERAp.Prova.Dominio
     {
         public int Ordem { get; set; }
         public int QuantidadeAlternativas { get; set; }
-        public string Pergunta { get; set; }
+        public string TextoBase { get; set; }
         public string Enunciado { get; set; }
         public long QuestaoLegadoId { get; set; }
         public long ProvaId { get; set; }
@@ -21,10 +21,10 @@ namespace SME.SERAp.Prova.Dominio
         {
         }
 
-        public Questao(string pergunta, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas)
+        public Questao(string textoBase, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas)
         {
             Ordem = ordem;
-            Pergunta = pergunta;
+            TextoBase = textoBase;
             Enunciado = enunciado;
             QuestaoLegadoId = questaoLegadoId;
             ProvaId = provaId;

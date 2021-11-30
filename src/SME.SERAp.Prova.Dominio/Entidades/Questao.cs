@@ -32,24 +32,62 @@ namespace SME.SERAp.Prova.Dominio
             Caderno = caderno;
             QuantidadeAlternativas = quantidadeAlternativas;
 
-            TrataArquivosDaPergunta();
+            TrataArquivos();
         }
 
-        private void TrataArquivosDaPergunta()
+        public void TrataArquivos()
         {
+            List<Arquivo> arquivos = new List<Arquivo>();
+            var htmlDoc = new HtmlDocument();
             if (!string.IsNullOrEmpty(Enunciado))
             {
-                var htmlDoc = new HtmlDocument();
+                
                 htmlDoc.LoadHtml(Enunciado);
-
-                Arquivos = htmlDoc.DocumentNode.Descendants("img")
-                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)));
-
-                foreach (var arquivo in Arquivos)
-                {
-                    Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
-                }
+                arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
+                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0))));
             }
+
+            if(!string.IsNullOrEmpty(TextoBase))
+            {
+
+                htmlDoc.LoadHtml(TextoBase);
+                arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
+                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0))));
+            }
+
+            foreach (var arquivo in arquivos)
+            {
+                if (arquivo.Caminho.Contains("#"))
+                    continue;
+                Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
+                TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
+            }
+
+            Arquivos = arquivos;
+        }
+
+        public void TrataArquivosTextoBase()
+        {
+            List<Arquivo> arquivos = new List<Arquivo>();
+            var htmlDoc = new HtmlDocument();
+           
+            if (!string.IsNullOrEmpty(TextoBase))
+            {
+
+                htmlDoc.LoadHtml(TextoBase);
+                arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
+                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0))));
+            }
+
+            foreach (var arquivo in arquivos)
+            {
+                if (arquivo.Caminho.Contains("#"))
+                    continue;
+                Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
+                TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
+            }
+
+            Arquivos = arquivos;
         }
     }
 }

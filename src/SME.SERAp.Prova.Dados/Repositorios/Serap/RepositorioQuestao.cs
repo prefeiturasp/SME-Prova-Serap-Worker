@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Dapper;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
@@ -45,6 +46,23 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<Questao>> ObterQuestoesComImagemNaoSincronizadas()
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select * from questao where texto_base like '%http%'";
+
+                return await conn.QueryAsync<Questao>(query);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<bool> RemoverPorProvaIdAsync(long provaId)
         {
             using var conn = ObterConexao();

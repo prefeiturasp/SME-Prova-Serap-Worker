@@ -32,6 +32,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioAluno, RepositorioAluno>();
             services.AddScoped<IRepositorioAlunoEol, RepositorioAlunoEol>();
             services.AddScoped<IRepositorioCadernoAluno, RepositorioCadernoAluno>();
+            services.AddScoped<IRepositorioQuestaoAlunoResposta, RepositorioQuestaoAlunoResposta>();            
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
@@ -45,6 +46,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProvaBIBUseCase, TratarProvaBIBUseCase>();
             services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();
             services.AddScoped<IAtualizaImagensQuestoesUseCase, AtualizaImagensQuestoesUseCase>();
+            services.AddScoped<IIncluirRespostaAlunoUseCase, IncluirRespostaAlunoUseCase>();
             
 
             // sincronização institucional 

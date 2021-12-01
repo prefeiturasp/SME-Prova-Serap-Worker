@@ -33,6 +33,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioAlunoEol, RepositorioAlunoEol>();
             services.AddScoped<IRepositorioCadernoAluno, RepositorioCadernoAluno>();
             services.AddScoped<IRepositorioQuestaoAlunoResposta, RepositorioQuestaoAlunoResposta>();            
+            services.AddScoped<IRepositorioContextoProva, RepositorioContextoProva>();            
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)

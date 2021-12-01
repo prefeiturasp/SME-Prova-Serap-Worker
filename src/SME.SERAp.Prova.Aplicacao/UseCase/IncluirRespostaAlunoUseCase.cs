@@ -29,12 +29,24 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 return await mediator.Send(new IncluirQuestaoAlunoRespostaCommand(dto.QuestaoId, dto.AlunoRa, dto.AlternativaId, dto.Resposta, horaDataResposta, dto.TempoRespostaAluno ?? 0));
             }
-            else if (questaoRespondida.CriadoEm > horaDataResposta)
-            {
-                return false;
-            }
             else
             {
+                if(questaoRespondida.AlternativaId != null)
+                {
+                    if (questaoRespondida.CriadoEm > horaDataResposta)
+                    {
+                        return false;
+                    }
+                }
+
+                if (questaoRespondida.AlternativaId == null && !String.IsNullOrEmpty(questaoRespondida.Resposta))
+                {
+                    if (questaoRespondida.CriadoEm > horaDataResposta)
+                    {
+                        return false;
+                    }
+                }
+
                 questaoRespondida.Resposta = dto.Resposta;
                 questaoRespondida.AlternativaId = dto.AlternativaId;
                 questaoRespondida.TempoRespostaAluno += dto.TempoRespostaAluno ?? 0;

@@ -23,6 +23,14 @@ namespace SME.SERAp.Prova.Dados
             conexao.Open();
             return conexao;
         }
+
+        protected IDbConnection ObterConexaoLeitura()
+        {
+            var conexao = new NpgsqlConnection(connectionStrings.ApiSerapLeitura);
+            conexao.Open();
+            return conexao;
+        }
+
         protected IDbConnection ObterConexaoSgp()
         {
             var conexao = new NpgsqlConnection(connectionStrings.ApiSgp);

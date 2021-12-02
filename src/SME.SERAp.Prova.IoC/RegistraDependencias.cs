@@ -33,7 +33,10 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioAlunoEol, RepositorioAlunoEol>();
             services.AddScoped<IRepositorioCadernoAluno, RepositorioCadernoAluno>();
             services.AddScoped<IRepositorioQuestaoAlunoResposta, RepositorioQuestaoAlunoResposta>();            
-            services.AddScoped<IRepositorioContextoProva, RepositorioContextoProva>();            
+            services.AddScoped<IRepositorioContextoProva, RepositorioContextoProva>();
+            services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
+            services.AddScoped<IRepositorioPreferenciasUsuario, RepositorioPreferenciasUsuario>();
+            
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
@@ -48,7 +51,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();
             services.AddScoped<IAtualizaImagensQuestoesUseCase, AtualizaImagensQuestoesUseCase>();
             services.AddScoped<IIncluirRespostaAlunoUseCase, IncluirRespostaAlunoUseCase>();
-            
+            services.AddScoped<IIncluirPreferenciasAlunoUseCase, IncluirPreferenciasAlunoUseCase>();
+
 
             // sincronização institucional 
             services.AddScoped<IExecutarSincronizacaoInstitucionalDreSyncUseCase, ExecutarSincronizacaoInstitucionalDreSyncUseCase>();

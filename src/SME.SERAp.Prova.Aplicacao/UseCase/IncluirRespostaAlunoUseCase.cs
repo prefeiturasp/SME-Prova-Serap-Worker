@@ -1,10 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using MediatR;
-using Sentry;
-using SME.SERAp.Prova.Dominio;
+﻿using MediatR;
 using SME.SERAp.Prova.Infra;
+using System;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -31,7 +28,10 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             else
             {
-                if(questaoRespondida.AlternativaId != null)
+                if (questaoRespondida.CriadoEm.Date > DateTime.Now.Date)
+                    questaoRespondida.CriadoEm = DateTime.Now.Date;
+
+                if (questaoRespondida.AlternativaId != null)
                 {
                     if (questaoRespondida.CriadoEm > horaDataResposta)
                     {

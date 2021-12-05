@@ -85,6 +85,8 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(
                 new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
 
+            await mediator.Send(new RemoverProvasCacheCommand());
+
             return true;
         }
 

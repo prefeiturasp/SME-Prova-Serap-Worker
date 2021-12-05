@@ -61,6 +61,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             hostContext.Configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(fireBaseOptions);
 
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = hostContext.Configuration.GetConnectionString("Redis");
+            });
+
         }
     }
 }

@@ -49,7 +49,7 @@ namespace SME.SERAp.Prova.Dados
               SELECT DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
-                t.ApplicationStartDate as InicioDownload,
+                t.DownloadStartDate as InicioDownload,
 	            t.ApplicationStartDate as Inicio,
 	            t.ApplicationEndDate as Fim,
 	            case 

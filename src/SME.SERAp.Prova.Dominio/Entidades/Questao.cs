@@ -61,8 +61,11 @@ namespace SME.SERAp.Prova.Dominio
             {
                 if (arquivo.Caminho.Contains("#"))
                     continue;
-                Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
-                TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
+
+                if(!string.IsNullOrEmpty(Enunciado))
+                    Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.NovoCaminho());
+                if(!string.IsNullOrEmpty(TextoBase))
+                    TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.NovoCaminho());
             }
 
             Arquivos = arquivos;
@@ -85,8 +88,8 @@ namespace SME.SERAp.Prova.Dominio
             {
                 if (arquivo.Caminho.Contains("#"))
                     continue;
-                Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
-                TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
+                if (!string.IsNullOrEmpty(TextoBase))
+                    TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.NovoCaminho());
             }
 
             Arquivos = arquivos;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using SME.SERAp.Prova.Infra.Interfaces;
 using SME.SERAp.Prova.Infra.Utils;
 using System;
@@ -12,12 +13,14 @@ namespace SME.SERAp.Prova.Dados.Cache
 
         private readonly IServicoLog servicoLog;
         private readonly IMemoryCache memoryCache;
+        private readonly IDistributedCache distributedCache;
 
-        public RepositorioCache(IServicoLog servicoLog, IMemoryCache memoryCache)
+        public RepositorioCache(IServicoLog servicoLog, IMemoryCache memoryCache, IDistributedCache distributedCache)
         {
 
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
             this.memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+            this.distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
         }
 
         public string Obter(string nomeChave, bool utilizarGZip = false)
@@ -175,6 +178,26 @@ namespace SME.SERAp.Prova.Dados.Cache
             {
                 timer.Stop();
                 servicoLog.RegistrarDependenciaAppInsights("MemoryCache", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, false);
+                servicoLog.Registrar(ex);
+            }
+        }
+
+        public async Task RemoverRedisAsync(string nomeChave)
+        {
+            var inicioOperacao = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+
+            try
+            {
+                await distributedCache.RemoveAsync(nomeChave);
+
+                timer.Stop();
+                servicoLog.RegistrarDependenciaAppInsights("Redis", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, true);
+            }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                servicoLog.RegistrarDependenciaAppInsights("Redis", nomeChave, "Remover async", inicioOperacao, timer.Elapsed, false);
                 servicoLog.Registrar(ex);
             }
         }

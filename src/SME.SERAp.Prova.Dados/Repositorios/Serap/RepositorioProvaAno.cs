@@ -17,7 +17,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"delete  from prova_ano where prova_id = @provaId";
+                var query = @"delete from prova_ano_original where prova_id = @provaId";
 
                 await conn.ExecuteAsync(query, new { provaId });
 

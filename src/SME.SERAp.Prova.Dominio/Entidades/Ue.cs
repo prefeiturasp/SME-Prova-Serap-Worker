@@ -11,9 +11,9 @@ namespace SME.SERAp.Prova.Dominio
         public string CodigoUe { get; set; }
         public DateTime DataAtualizacao { get; set; }
         public Dre Dre { get; set; }
-        public long DreId { get; set; }        
+        public long DreId { get; set; }
         public string Nome { get; set; }
-        public TipoEscola TipoEscola { get; set; }        
+        public TipoEscola TipoEscola { get; set; }
 
         public void AdicionarDre(Dre dre)
         {
@@ -29,6 +29,18 @@ namespace SME.SERAp.Prova.Dominio
             return TipoEscola == TipoEscola.EMEI || TipoEscola == TipoEscola.CEUEMEI
                 || TipoEscola == TipoEscola.CEMEI || TipoEscola == TipoEscola.CECI
                 || TipoEscola == TipoEscola.CEUCEMEI;
+        }
+
+        public bool DeveAtualizar(Ue ueAtualizada)
+        {
+            return Nome != ueAtualizada.Nome || TipoEscola != ueAtualizada.TipoEscola;
+        }
+
+        public void AtualizarCampos(Ue ueAtualizada)
+        {
+            Nome = ueAtualizada.Nome;
+            TipoEscola = ueAtualizada.TipoEscola;
+            DataAtualizacao = DateTime.Now;
         }
     }
 }

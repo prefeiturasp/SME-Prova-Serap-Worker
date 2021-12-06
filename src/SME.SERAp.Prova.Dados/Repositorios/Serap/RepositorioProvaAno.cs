@@ -23,9 +23,9 @@ namespace SME.SERAp.Prova.Dados
 
                 return true;
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
-                throw;
+                throw ex;
             }
             finally
             {

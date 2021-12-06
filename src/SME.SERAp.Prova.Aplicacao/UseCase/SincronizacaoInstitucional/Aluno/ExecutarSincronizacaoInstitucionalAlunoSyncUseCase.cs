@@ -37,9 +37,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 var alunosEol = await mediator.Send(new ObterAlunosEolPorTurmasCodigoQuery(turmasDaDreCodigo));
 
 
-                for (int i = 0; i < alunosEol.Count(); i += 900)
+                for (int i = 0; i < alunosEol.Count(); i += 500)
                 {
-                    var alunosEolAgrupadosParaTratar = alunosEol.Skip(i).Take(900);
+                    var alunosEolAgrupadosParaTratar = alunosEol.Skip(i).Take(500);
                     var alunosEolAgrupadosParaTratarCodigos = alunosEolAgrupadosParaTratar.Select(a => a.CodigoAluno).Distinct().ToList();
 
                     var alunosSerap = await mediator.Send(new ObterAlunosSerapPorCodigosQuery(alunosEolAgrupadosParaTratarCodigos.ToArray()));

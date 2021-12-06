@@ -6,25 +6,25 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
 {
-    public class RepositorioQuestaoArquivo : RepositorioBase<QuestaoArquivo>, IRepositorioQuestaoArquivo
+    public class RepositorioAlternativaArquivo : RepositorioBase<AlternativaArquivo>, IRepositorioAlternativaArquivo
     {
-        public RepositorioQuestaoArquivo(ConnectionStringOptions connectionStringOptions) : base(connectionStringOptions)
+        public RepositorioAlternativaArquivo(ConnectionStringOptions connectionStringOptions) : base(connectionStringOptions)
         {
 
         }
 
-        public async Task<IEnumerable<QuestaoArquivo>> ObterArquivosPorProvaIdAsync(long provaId)
+        public async Task<IEnumerable<AlternativaArquivo>> ObterArquivosPorProvaIdAsync(long provaId)
         {
             using var conn = ObterConexao();
             try
             {
                 var query = @"select *
                                 from
-	                                questao_arquivo
+	                                alternativa_arquivo
                                 where
-	                               questao_id in ( select q.id from questao q where q.prova_id = @provaId)";
+	                               alternativa_id in ( select a.id from alternativa a inner join questao q on a.questao_id = q.id where q.prova_id = @provaId)";
 
-                return await conn.QueryAsync<QuestaoArquivo>(query, new { provaId });
+                return await conn.QueryAsync<AlternativaArquivo>(query, new { provaId });
             }
             finally
             {
@@ -40,7 +40,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"delete
                                 from
-	                                questao_arquivo
+	                                alternativa_arquivo
                                 where
 	                               id = any(@ids)";
 

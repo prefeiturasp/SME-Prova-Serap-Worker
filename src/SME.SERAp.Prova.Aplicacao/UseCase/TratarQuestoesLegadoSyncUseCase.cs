@@ -23,70 +23,82 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
 
-            var questoesSerap = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaId));
-
-            foreach (var questaoSerap in questoesSerap)
+            try
             {
-                var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(questaoSerap.ProvaLegadoId));
 
-                if (prova == null)
-                    throw new Exception($"Prova {provaId} não localizada!");
+                var questoesSerap = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaId));
 
-                var questaoParaPersistir = new Questao(
-                    questaoSerap.TextoBase,
-                    questaoSerap.QuestaoId,
-                    questaoSerap.Enunciado,
-                    questaoSerap.Ordem,
-                    prova.Id,
-                    (QuestaoTipo)questaoSerap.TipoItem,
-                    questaoSerap.Caderno,
-                    questaoSerap.QuantidadeAlternativas
-                );
-
-                var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
-
-                if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
+                foreach (var questaoSerap in questoesSerap)
                 {
-                    questaoParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(questaoParaPersistir.Arquivos));
+                    var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(questaoSerap.ProvaLegadoId));
 
-                    foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
+                    if (prova == null)
+                        throw new Exception($"Prova {provaId} não localizada!");
+
+                    var questaoParaPersistir = new Questao(
+                        questaoSerap.TextoBase,
+                        questaoSerap.QuestaoId,
+                        questaoSerap.Enunciado,
+                        questaoSerap.Ordem,
+                        prova.Id,
+                        (QuestaoTipo)questaoSerap.TipoItem,
+                        questaoSerap.Caderno,
+                        questaoSerap.QuantidadeAlternativas
+                    );
+
+                    var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
+
+                    if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
                     {
-                        var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
-                        await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
-                    }
-                }
+                        questaoParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(questaoParaPersistir.Arquivos));
 
-                if (questaoSerap.TipoItem == (int)QuestaoTipo.MultiplaEscolha)
-                {
-                    var alternativasId = await mediator.Send(new ObterAlternativasLegadoPorIdQuery(questaoSerap.QuestaoId));
-
-                    foreach (var alternativaId in alternativasId)
-                    {
-                        try
+                        foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
                         {
-                            var alternativa =
-                       await mediator.Send(
-                           new ObterAlternativaDetalheLegadoPorIdQuery(questaoSerap.QuestaoId, alternativaId));
+                            var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+                            await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
+                        }
+                    }
 
-                            if (alternativa == null)
+                    if (questaoSerap.TipoItem == (int)QuestaoTipo.MultiplaEscolha)
+                    {
+                        var alternativasLegadoId = await mediator.Send(new ObterAlternativasLegadoPorIdQuery(questaoSerap.QuestaoId));
+
+                        foreach (var alternativaLegadoId in alternativasLegadoId)
+                        {
+
+                            var alternativaLegado = await mediator.Send(new ObterAlternativaDetalheLegadoPorIdQuery(questaoSerap.QuestaoId, alternativaLegadoId));
+
+                            if (alternativaLegado == null)
                                 throw new Exception(
-                                    $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
+                                    $"A Alternativa {alternativaLegado.AlternativaLegadoId} não localizada!");
 
-                            var alternativaInserir = new Alternativa(
-                            alternativa.Ordem,
-                            alternativa.Numeracao,
-                            alternativa.Descricao,
+                            var alternativaParaPersistir = new Alternativa(
+                            alternativaLegado.Ordem,
+                            alternativaLegado.Numeracao,
+                            alternativaLegado.Descricao,
                             questaoId);
 
-                            await mediator.Send(new AlternativaIncluirCommand(alternativaInserir));
+                            var alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
+
+                            if (alternativaParaPersistir.Arquivos != null && alternativaParaPersistir.Arquivos.Any())
+                            {
+                                alternativaParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(alternativaParaPersistir.Arquivos));
+
+                                foreach (var arquivoParaPersistir in alternativaParaPersistir.Arquivos)
+                                {
+                                    var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+                                    await mediator.Send(new AlternativaArquivoPersistirCommand(alternativaId, arquivoId));
+                                }
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            SentrySdk.CaptureException(ex);
-                        }
-                       
+
                     }
                 }
+            }
+
+            catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
             }
             return true;
         }

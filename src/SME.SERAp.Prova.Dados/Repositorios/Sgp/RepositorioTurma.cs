@@ -42,9 +42,40 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryAsync<TurmaSgpDto>(query, parametros);
             }
-            catch (Exception)
+            finally
             {
-                throw;
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+        public async Task<IEnumerable<TurmaSgpDto>> ObterTurmasSgpPorDreCodigoAsync(string dreCodigo)
+        {
+            using var conn = ObterConexaoSgp();
+            try
+            {
+                var query = @"select t.ano, 
+                                     t.ano_letivo as anoLetivo,
+                                     t.turma_id as Codigo,
+                                     t.tipo_turma as tipoturma,
+                                     t.modalidade_codigo as modalidadeCodigo,
+                                     t.nome as nomeTurma,
+                                     t.tipo_turno as tipoturno                                      
+                                from turma t
+                               inner join ue u on t.ue_id = u.id
+                               inner join dre d on u.dre_id  = d.id
+                               where not t.historica
+                                 and t.tipo_turma = 1
+                                 and t.modalidade_codigo in (3,4,5,6)
+                                 and t.ano_letivo = @anoLetivo 
+                                 and d.dre_id = @dreCodigo";
+
+                var parametros = new
+                {
+                    dreCodigo,
+                    anoLetivo = DateTime.Now.Year
+                };
+
+                return await conn.QueryAsync<TurmaSgpDto>(query, parametros);
             }
             finally
             {
@@ -52,7 +83,6 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-
         public async Task<Turma> ObterturmaPorCodigo(string uecodigo)
         {
             using var conn = ObterConexao();
@@ -138,6 +168,66 @@ namespace SME.SERAp.Prova.Dados
             catch (Exception)
             {
                 throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<TurmaSgpDto>> ObterTurmasSerapPorDreCodigoAsync(string dreCodigo)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select t.id,
+                                     t.ano, 
+                                     t.ano_letivo as anoLetivo,
+                                     t.Codigo as Codigo,
+                                     t.tipo_turma as tipoturma,
+                                     t.modalidade_codigo as modalidadeCodigo,
+                                     t.nome as nomeTurma,
+                                     t.tipo_turno as tipoturno,
+                                     t.ue_id as UeId                                     
+                                from turma t
+                               inner join ue u on t.ue_id = u.id
+                               inner join dre d on u.dre_id  = d.id
+                               where t.tipo_turma = 1
+                                 and t.modalidade_codigo in (3,4,5,6)
+                                 and t.ano_letivo = @anoLetivo 
+                                 and d.dre_id = @dreCodigo";
+
+                var parametros = new
+                {
+                    dreCodigo,
+                    anoLetivo = DateTime.Now.Year
+                };
+
+                return await conn.QueryAsync<TurmaSgpDto>(query, parametros);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<Turma>> ObterTodasPorAnoAsync(int year)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select *                         
+                                from turma t                               
+                                 where t.ano_letivo = @anoLetivo;";
+
+                var parametros = new
+                {
+                    anoLetivo = year
+                };
+
+                return await conn.QueryAsync<Turma>(query, parametros);
             }
             finally
             {

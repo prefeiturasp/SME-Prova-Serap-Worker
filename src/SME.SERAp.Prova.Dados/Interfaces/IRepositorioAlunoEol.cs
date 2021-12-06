@@ -10,5 +10,6 @@ namespace SME.SERAp.Prova.Dados
         //Task<ObterAlunoAtivoEolRetornoDto> ObterAlunoAtivoAsync(long alunoRA);
 
         Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmaCodigoAsync(long turmaCodigo);
+        Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo);
     }
 }

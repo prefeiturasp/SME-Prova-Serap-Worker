@@ -8,5 +8,6 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<IEnumerable<Ue>> ObterUesSgpPorDreCodigo(string dreCodigo);
         Task<Ue> ObterUePorCodigo(string ueCodigo);
+        Task<IEnumerable<Ue>> ObterUesSerapPorDreCodigoAsync(string dreCodigo);
     }
 }

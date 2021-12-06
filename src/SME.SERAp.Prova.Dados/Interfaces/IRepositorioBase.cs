@@ -1,4 +1,5 @@
 ﻿using SME.SERAp.Prova.Dominio;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -9,5 +10,6 @@ namespace SME.SERAp.Prova.Dados
         Task<T> ObterPorIdAsync(long id);
         Task<long> IncluirAsync(T entidade);
         Task<long> UpdateAsync(T entidade);
+        Task<IEnumerable<T>> ObterTudoAsync();
     }
 }

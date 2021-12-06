@@ -38,7 +38,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"select 1 from prova_aluno pa where prova_id = @id limit 1";
+                var query = @"select 1 from prova_aluno pa where prova_id = @id and finalizado_em is not null limit 1";
 
                 return await conn.QueryFirstOrDefaultAsync<bool>(query, new { id });
             }

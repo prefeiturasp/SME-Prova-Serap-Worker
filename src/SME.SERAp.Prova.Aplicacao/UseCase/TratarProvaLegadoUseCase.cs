@@ -90,14 +90,13 @@ namespace SME.SERAp.Prova.Aplicacao
                     new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
 
                 await mediator.Send(new RemoverProvasCacheCommand());
-
-                return true;
-            }
+            }                
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
                 return false;
             }
+            return true;
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

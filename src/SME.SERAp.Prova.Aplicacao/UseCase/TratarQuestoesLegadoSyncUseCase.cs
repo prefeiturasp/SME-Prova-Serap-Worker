@@ -90,7 +90,7 @@ namespace SME.SERAp.Prova.Aplicacao
                                     foreach (var arquivoParaPersistir in alternativaParaPersistir.Arquivos)
                                     {
                                         var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
-                                        await mediator.Send(new AlternativaArquivoPersistirCommand(questaoId, arquivoId));
+                                        await mediator.Send(new AlternativaArquivoPersistirCommand(alternativaId, arquivoId));
                                     }
                                 }
                             }

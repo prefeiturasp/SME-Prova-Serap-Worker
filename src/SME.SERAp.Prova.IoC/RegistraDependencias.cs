@@ -68,6 +68,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProvaBIBUseCase, TratarProvaBIBUseCase>();
             services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();
             services.AddScoped<IAtualizaImagensQuestoesUseCase, AtualizaImagensQuestoesUseCase>();
+            services.AddScoped<IAtualizaImagensAlternativasUseCase, AtualizaImagensAlternativasUseCase>();
             services.AddScoped<IIncluirRespostaAlunoUseCase, IncluirRespostaAlunoUseCase>();
             services.AddScoped<IIncluirPreferenciasAlunoUseCase, IncluirPreferenciasAlunoUseCase>();
 

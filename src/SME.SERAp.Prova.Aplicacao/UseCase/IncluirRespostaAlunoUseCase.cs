@@ -19,6 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var dto = mensagemRabbit.ObterObjetoMensagem<QuestaoAlunoRespostaSincronizarDto>();
             DateTime horaDataResposta = new DateTime(dto.DataHoraRespostaTicks);
+            horaDataResposta = horaDataResposta.AddHours(-3);
 
             var questaoRespondida = await mediator.Send(new ObterQuestaoAlunoRespostaPorIdRaQuery(dto.QuestaoId, dto.AlunoRa));
 

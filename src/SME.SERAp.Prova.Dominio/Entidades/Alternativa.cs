@@ -14,7 +14,10 @@ namespace SME.SERAp.Prova.Dominio
 
         public IEnumerable<Arquivo> Arquivos { get; set; }
 
+        public Alternativa()
+        {
 
+        }
         public Alternativa(int ordem,
             string alternativa, string descricao, long questaoId)
         {

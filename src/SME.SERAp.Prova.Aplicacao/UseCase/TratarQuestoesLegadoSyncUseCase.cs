@@ -61,27 +61,38 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     if (questaoSerap.TipoItem == (int)QuestaoTipo.MultiplaEscolha)
                     {
-                        var alternativasId = await mediator.Send(new ObterAlternativasLegadoPorIdQuery(questaoSerap.QuestaoId));
+                        var alternativasLegadoId = await mediator.Send(new ObterAlternativasLegadoPorIdQuery(questaoSerap.QuestaoId));
 
-                        foreach (var alternativaId in alternativasId)
+                        foreach (var alternativaLegadoId in alternativasLegadoId)
                         {
                             try
                             {
                                 var alternativa =
                            await mediator.Send(
-                               new ObterAlternativaDetalheLegadoPorIdQuery(questaoSerap.QuestaoId, alternativaId));
+                               new ObterAlternativaDetalheLegadoPorIdQuery(questaoSerap.QuestaoId, alternativaLegadoId));
 
                                 if (alternativa == null)
                                     throw new Exception(
                                         $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
-                                var alternativaInserir = new Alternativa(
+                                var alternativaParaPersistir = new Alternativa(
                                 alternativa.Ordem,
                                 alternativa.Numeracao,
                                 alternativa.Descricao,
                                 questaoId);
 
-                                await mediator.Send(new AlternativaIncluirCommand(alternativaInserir));
+                                var alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
+
+                                if (alternativaParaPersistir.Arquivos != null && alternativaParaPersistir.Arquivos.Any())
+                                {
+                                    alternativaParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(alternativaParaPersistir.Arquivos));
+
+                                    foreach (var arquivoParaPersistir in alternativaParaPersistir.Arquivos)
+                                    {
+                                        var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+                                        await mediator.Send(new AlternativaArquivoPersistirCommand(alternativaId, arquivoId));
+                                    }
+                                }
                             }
                             catch (Exception ex)
                             {

@@ -88,12 +88,14 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 await mediator.Send(
                     new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-            }
+
+                await mediator.Send(new RemoverProvasCacheCommand());
+            }                
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);
+                return false;
             }
-
             return true;
         }
 

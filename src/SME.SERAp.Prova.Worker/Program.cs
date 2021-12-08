@@ -38,6 +38,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             hostContext.Configuration.GetSection("Sentry").Bind(sentryOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(sentryOptions);
 
+            var logOptions = new LogOptions();
+            hostContext.Configuration.GetSection("Logs").Bind(logOptions, c => c.BindNonPublicProperties = true);
+            logOptions.SentryDSN = sentryOptions.Dsn;
+            services.AddSingleton(logOptions);
+
             var rabbitOptions = new RabbitOptions();
             hostContext.Configuration.GetSection("Rabbit").Bind(rabbitOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(rabbitOptions);
@@ -60,6 +65,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             var fireBaseOptions = new FireBaseOptions();
             hostContext.Configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(fireBaseOptions);
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = hostContext.Configuration.GetConnectionString("Redis");
+            });
 
         }
     }

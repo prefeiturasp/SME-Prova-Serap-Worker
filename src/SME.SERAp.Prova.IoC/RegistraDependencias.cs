@@ -1,7 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dados;
+using SME.SERAp.Prova.Dados.Cache;
+using SME.SERAp.Prova.Infra.Interfaces;
+using SME.SERAp.Prova.Infra.Services;
 
 namespace SME.SERAp.Prova.IoC
 {
@@ -12,6 +16,7 @@ namespace SME.SERAp.Prova.IoC
             services.AdicionarMediatr();
             services.AdicionarValidadoresFluentValidation();
             RegistrarRepositorios(services);
+            RegistrarServicos(services);
             RegistrarCasosDeUso(services);
             RegistrarMapeamentos.Registrar();
         }
@@ -25,6 +30,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioAlternativa, RepositorioAlternativa>();
             services.AddScoped<IRepositorioQuestao, RepositorioQuestao>();
             services.AddScoped<IRepositorioArquivo, RepositorioArquivo>();
+            services.AddScoped<IRepositorioAlternativaArquivo, RepositorioAlternativaArquivo>();
             services.AddScoped<IRepositorioQuestaoArquivo, RepositorioQuestaoArquivo>();
             services.AddScoped<IRepositorioDre, RepositorioDre>();
             services.AddScoped<IRepositorioUe, RepositorioUe>();
@@ -36,7 +42,19 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioContextoProva, RepositorioContextoProva>();
             services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
             services.AddScoped<IRepositorioPreferenciasUsuario, RepositorioPreferenciasUsuario>();
+            services.AddScoped<IRepositorioCache, RepositorioCache>();
             
+            services.AddScoped<IRepositorioDreEntity, RepositorioDreEntity>();
+            services.AddScoped<IRepositorioUeEntity, RepositorioUeEntity>();
+            services.AddScoped<IRepositorioTurmaEntity, RepositorioTurmaEntity>();
+            services.AddScoped<IRepositorioAlunoEntity, RepositorioAlunoEntity>();
+            
+
+        }
+
+        private static void RegistrarServicos(IServiceCollection services)
+        {
+            services.TryAddScoped<IServicoLog, ServicoLog>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
@@ -60,6 +78,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeSyncUseCase, ExecutarSincronizacaoInstitucionalUeSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeTratarUseCase, ExecutarSincronizacaoInstitucionalUeTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaSyncUseCase, ExecutarSincronizacaoInstitucionalTurmaSyncUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalAlunoSyncUseCase, ExecutarSincronizacaoInstitucionalAlunoSyncUseCase>();
         }
     }
 }
+

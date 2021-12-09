@@ -105,7 +105,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<Turma>> ObterTurmasPorAnoEAnoLetivo(int ano, int anoLetivo)
+        public async Task<IEnumerable<Turma>> ObterTurmasPorAnoEAnoLetivo(string ano, int anoLetivo)
         {
             using var conn = ObterConexao();
             try

@@ -2,7 +2,7 @@
 {
     public class AnoDto
     {
-        public int Ano { get; set; }
+        public string Ano { get; set; }
         public int TempoExecucao { get; set; }
     }
 }

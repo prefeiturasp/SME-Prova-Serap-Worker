@@ -4,13 +4,13 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class ProvaAno : EntidadeBase
     {
-        public ProvaAno(int ano, long provaId)
+        public ProvaAno(string ano, long provaId)
         {
             Ano = ano;
             ProvaId = provaId;
         }
 
-        public int Ano { get; set; }
+        public string Ano { get; set; }
         public long ProvaId { get; set; }
 
     }

@@ -15,7 +15,7 @@ namespace SME.SERAp.Prova.Dominio
         public long TamanhoBytes { get; set; }
         public long LegadoId { get; set; }
 
-        public string CaminhoParaEnunciado()
+        public string NovoCaminho()
         {
             return $"#{LegadoId}#";
         }

@@ -5,12 +5,17 @@
         public const string ProvaSync = "serap.estudante.prova.legado.sync";       
         public const string ProvaTratar = "serap.estudante.prova.legado.tratar";
         public const string QuestaoSync = "serap.estudante.questao.legado.sync";       
-        public const string QuestaoTratar = "serap.estudante.questao.legado.tratar";   
+        public const string QuestaoTratar = "serap.estudante.questao.legado.tratar";
+        public const string QuestaoImagemIncorretaTratar = "serap.estudante.questoes.imagens.tratar";
+        public const string AlternativaImagemIncorretaTratar = "serap.estudante.alternativas.imagens.tratar";
         public const string AlternativaSync = "serap.estudante.alternativa.legado.sync";       
         public const string AlternativaTratar = "serap.estudante.alternativa.legado.tratar";
         public const string ProvaBIBSync = "serap.estudante.provabib.sync";
         public const string ProvaBIBTratar = "serap.estudante.provabib.tratar";
         public const string ProvaWebPushTeste = "serap.estudante.prova.webpush.teste";
+        public const string IncluirRespostaAluno = "serap.estudante.resposta.aluno.incluir";
+        public const string IncluirPreferenciasAluno = "serap.estudante.preferencias.aluno.incluir";
+
 
         public const string SincronizaEstruturaInstitucionalDreSync = "serap.sincronizacao.institucional.dre.sync";
         public const string SincronizaEstruturaInstitucionalDreTratar = "serap.sincronizacao.institucional.dre.tratar";

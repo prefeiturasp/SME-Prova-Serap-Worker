@@ -8,7 +8,7 @@ namespace SME.SERAp.Prova.Dominio
     {
         public int Ordem { get; set; }
         public int QuantidadeAlternativas { get; set; }
-        public string Pergunta { get; set; }
+        public string TextoBase { get; set; }
         public string Enunciado { get; set; }
         public long QuestaoLegadoId { get; set; }
         public long ProvaId { get; set; }
@@ -21,10 +21,10 @@ namespace SME.SERAp.Prova.Dominio
         {
         }
 
-        public Questao(string pergunta, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas)
+        public Questao(string textoBase, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas)
         {
             Ordem = ordem;
-            Pergunta = pergunta;
+            TextoBase = textoBase;
             Enunciado = enunciado;
             QuestaoLegadoId = questaoLegadoId;
             ProvaId = provaId;
@@ -32,24 +32,67 @@ namespace SME.SERAp.Prova.Dominio
             Caderno = caderno;
             QuantidadeAlternativas = quantidadeAlternativas;
 
-            TrataArquivosDaPergunta();
+            TrataArquivos();
         }
 
-        private void TrataArquivosDaPergunta()
+        public void TrataArquivos()
         {
+            List<Arquivo> arquivos = new List<Arquivo>();
+            var htmlDoc = new HtmlDocument();
             if (!string.IsNullOrEmpty(Enunciado))
             {
-                var htmlDoc = new HtmlDocument();
+                
                 htmlDoc.LoadHtml(Enunciado);
-
-                Arquivos = htmlDoc.DocumentNode.Descendants("img")
-                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)));
-
-                foreach (var arquivo in Arquivos)
-                {
-                    Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.CaminhoParaEnunciado());
-                }
+                arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
+                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)))
+                                  .Where(a => a.Caminho.Substring(0,4).ToLower() == "http"));
             }
+
+            if(!string.IsNullOrEmpty(TextoBase))
+            {
+
+                htmlDoc.LoadHtml(TextoBase);
+                arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
+                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)))
+                                  .Where(a => a.Caminho.Substring(0, 4).ToLower() == "http"));
+            }
+
+            foreach (var arquivo in arquivos)
+            {
+                if (arquivo.Caminho.Contains("#"))
+                    continue;
+
+                if(!string.IsNullOrEmpty(Enunciado))
+                    Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.NovoCaminho());
+                if(!string.IsNullOrEmpty(TextoBase))
+                    TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.NovoCaminho());
+            }
+
+            Arquivos = arquivos;
+        }
+
+        public void TrataArquivosTextoBase()
+        {
+            List<Arquivo> arquivos = new List<Arquivo>();
+            var htmlDoc = new HtmlDocument();
+           
+            if (!string.IsNullOrEmpty(TextoBase))
+            {
+
+                htmlDoc.LoadHtml(TextoBase);
+                arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
+                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0))));
+            }
+
+            foreach (var arquivo in arquivos)
+            {
+                if (arquivo.Caminho.Contains("#"))
+                    continue;
+                if (!string.IsNullOrEmpty(TextoBase))
+                    TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.NovoCaminho());
+            }
+
+            Arquivos = arquivos;
         }
     }
 }

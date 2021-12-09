@@ -19,23 +19,28 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
+            var ultimaAtualizacao = await mediator.Send(new ObterUltimoExecucaoControleTipoPorTipoQuery(ExecucaoControleTipo.ProvaLegadoSincronizacao));
+
             try
             {
-                var ultimaAtualizacao = await mediator.Send(new ObterUltimoExecucaoControleTipoPorTipoQuery(ExecucaoControleTipo.ProvaLegadoSincronizacao));
-
+                SentrySdk.CaptureMessage($"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
                 var provaIds = await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao));
+                SentrySdk.CaptureMessage($"Total de provas para sincronizar {provaIds}");
                 foreach (var provaId in provaIds)
                 {
+                    SentrySdk.CaptureMessage($"Enviando prova {provaId} para tratar");
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
-                }
-
-                await mediator.Send(new ExecucaoControleAtualizarCommand(ultimaAtualizacao));
+                }              
             }
             catch(Exception ex)
             {
                 SentrySdk.CaptureException(ex);
                 return false;
-            }           
+            }  
+            finally
+            {
+                await mediator.Send(new ExecucaoControleAtualizarCommand(ultimaAtualizacao));
+            }
 
             return true;
         }

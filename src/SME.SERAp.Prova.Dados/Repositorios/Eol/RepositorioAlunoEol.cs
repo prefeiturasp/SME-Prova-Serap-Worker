@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
@@ -86,11 +85,41 @@ namespace SME.SERAp.Prova.Dados
 								se.cd_serie_ensino = ste.cd_serie_ensino
                             WHERE
 	                            turesc.cd_turma_escola = @turmaCodigo
-	                            AND matrTurma.cd_situacao_aluno IN (1, 6, 10, 13)
-	                            AND e.tp_escola IN (1, 3, 4, 16)";
+	                            AND matrTurma.cd_situacao_aluno IN (1, 6, 10, 13)";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
             return await conn.QueryAsync<AlunoEolDto>(query, new { turmaCodigo });
+        }
+        public async Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo)
+        {
+            var query = $@"SELECT 
+	                            aluno.cd_aluno CodigoAluno,
+                                aluno.nm_aluno as Nome,
+	                            se.sg_resumida_serie as Ano,
+	                            turesc.cd_tipo_turno as TipoTurno,
+	                            turesc.cd_turma_escola as TurmaCodigo,
+	                            turesc.an_letivo as AnoLetivo,
+	                            matrTurma.cd_situacao_aluno as SituacaoAluno
+                            FROM
+	                            v_matricula_cotic matricula
+                            INNER JOIN v_aluno_cotic aluno ON
+	                            matricula.cd_aluno = aluno.cd_aluno
+                            INNER JOIN matricula_turma_escola matrTurma ON
+	                            matricula.cd_matricula = matrTurma.cd_matricula
+                            INNER JOIN turma_escola turesc ON
+	                            matrTurma.cd_turma_escola = turesc.cd_turma_escola
+                            INNER JOIN escola e ON
+	                            turesc.cd_escola = e.cd_escola
+                            INNER JOIN serie_turma_escola ste ON
+								ste.cd_turma_escola = turesc.cd_turma_escola
+							INNER JOIN serie_ensino se ON 
+								se.cd_serie_ensino = ste.cd_serie_ensino
+                            WHERE
+	                            turesc.cd_turma_escola IN ({string.Join(',', turmasCodigo)}) 
+	                            AND matrTurma.cd_situacao_aluno IN (1, 6, 10, 13)";
+
+            using var conn = new SqlConnection(connectionStringOptions.Eol);
+            return await conn.QueryAsync<AlunoEolDto>(query);
         }
     }
 }

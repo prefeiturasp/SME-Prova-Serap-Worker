@@ -1,9 +1,10 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Exceptions;
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,33 +16,78 @@ namespace SME.SERAp.Prova.Aplicacao
         {
         }
 
-        public async Task<bool> Executar(MensagemRabbit param)
+        public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var dres = await mediator.Send(new ObterDresSgpQuery());
+            var todasDresSgp = await mediator.Send(new ObterDresSgpQuery());
+            var todasDresSgpCodigo = todasDresSgp.Select(a => a.CodigoDre).ToList();
 
-            if (dres == null || !dres.Any())
+            if (todasDresSgp == null || !todasDresSgp.Any())
             {
                 throw new NegocioException("Não foi possível localizar as Dres no Sgp para a sincronização instituicional");
             }
 
-            foreach (var dre in dres.Where(a => a.CodigoDre == "108800"))
-            {
-                try
-                {
-                    var publicarTratamentoDre = await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalDreTratar, dre));
-                    if (!publicarTratamentoDre)
-                    {
-                        var mensagem = $"Não foi possível inserir a Dre : {dre.Abreviacao} na fila de sync.";
-                        SentrySdk.CaptureMessage(mensagem);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    SentrySdk.CaptureException(ex);
-                }                
-            }
+            var todasDresSerap = await mediator.Send(new ObterDresSerapQuery());
+            var todasDresSerapCodigo = todasDresSerap.Select(a => a.CodigoDre).ToList();
+
+            await TratarInclusao(todasDresSgp, todasDresSgpCodigo, todasDresSerapCodigo);
+
+            await TratarAlteracao(todasDresSgp, todasDresSgpCodigo, todasDresSerap, todasDresSerapCodigo);
+
+            await PublicarFilaParaTratarUes();
 
             return true;
+        }
+
+        private async Task TratarInclusao(IEnumerable<Dre> todasDresSgp, List<string> todasDresSgpCodigo, List<string> todasDresSerapCodigo)
+        {
+            var dresNovasCodigos = todasDresSgpCodigo.Where(a => !todasDresSerapCodigo.Contains(a)).ToList();
+
+            if (dresNovasCodigos != null && dresNovasCodigos.Any())
+            {
+                var dresNovasParaIncluir = todasDresSgp.Where(a => dresNovasCodigos.Contains(a.CodigoDre)).ToList();
+                dresNovasParaIncluir = dresNovasParaIncluir.Select(a => new Dre()
+                {
+                    Abreviacao = a.Abreviacao,
+                    CodigoDre = a.CodigoDre,
+                    Nome = a.Nome
+                }).ToList();
+
+                await mediator.Send(new InserirDresCommand(dresNovasParaIncluir));
+            }
+        }
+
+        private async Task TratarAlteracao(IEnumerable<Dre> todasDresSgp, List<string> todasDresSgpCodigo, IEnumerable<Dre> todasDresSerap, List<string> todasDresSerapCodigo)
+        {
+            var dresParaAlterarCodigos = todasDresSgpCodigo.Where(a => todasDresSerapCodigo.Contains(a)).ToList();
+
+            if (dresParaAlterarCodigos != null && dresParaAlterarCodigos.Any())
+            {
+                var dresParaQuePodemAlterar = todasDresSgp.Where(a => dresParaAlterarCodigos.Contains(a.CodigoDre)).ToList();
+                var listaParaAlterar = new List<Dre>();
+
+                foreach (var dreQuePodeAlterar in dresParaQuePodemAlterar)
+                {
+                    var dreAntiga = todasDresSerap.FirstOrDefault(a => a.CodigoDre == dreQuePodeAlterar.CodigoDre);
+                    if (dreAntiga != null && dreAntiga.DeveAtualizar(dreQuePodeAlterar))
+                    {
+                        dreAntiga.AtualizarCampos(dreQuePodeAlterar);
+                        listaParaAlterar.Add(dreAntiga);
+                    }
+                }
+
+                if (listaParaAlterar.Any())
+                    await mediator.Send(new AlterarDresCommand(listaParaAlterar));
+            }
+        }
+
+        private async Task PublicarFilaParaTratarUes()
+        {
+            var todasDresSerap = await mediator.Send(new ObterDresSerapQuery());
+
+            foreach (var dreParaTratarUes in todasDresSerap)
+            {
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, new DreParaSincronizacaoInstitucionalDto(dreParaTratarUes.Id, dreParaTratarUes.CodigoDre)));
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace SME.SERAp.Prova.Dados
                                 from
 	                                questao_arquivo
                                 where
-	                               questao_id in ( select q.id from questao q inner join prova p on q.prova_id = p.id where p.id = @provaId)";
+	                               questao_id in ( select q.id from questao q where q.prova_id = @provaId)";
 
                 return await conn.QueryAsync<QuestaoArquivo>(query, new { provaId });
             }

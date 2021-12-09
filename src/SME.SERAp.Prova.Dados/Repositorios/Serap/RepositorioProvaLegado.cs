@@ -49,7 +49,7 @@ namespace SME.SERAp.Prova.Dados
               SELECT DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
-                t.ApplicationStartDate as InicioDownload,
+                t.DownloadStartDate as InicioDownload,
 	            t.ApplicationStartDate as Inicio,
 	            t.ApplicationEndDate as Fim,
 	            case 
@@ -62,6 +62,7 @@ namespace SME.SERAp.Prova.Dados
                 t.Bib as PossuiBIB,
 	            tne.tne_id as Modalidade,
 	            tne.tne_nome as ModalidadeNome,
+                mt.Id ModeloProva,
 	            tt.tcp_ordem as Ano
             FROM
 	            Test t 
@@ -80,6 +81,7 @@ namespace SME.SERAp.Prova.Dados
             INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
 	            ttcp.crp_ordem = tt.tcp_ordem
 	            AND tt.tme_id = ttcp.tme_id
+            INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
             where
 	            t.id = @id";
 
@@ -152,22 +154,28 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<QuestaoLegadoDto>> ObterQuestoesPorProvaId(long provaId)
+        public async Task<IEnumerable<QuestoesPorProvaIdDto>> ObterQuestoesPorProvaId(long provaId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT distinct I.id, B.Description as Caderno,
-                                    (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem
+                var query = @" SELECT distinct I.id as QuestaoId, B.Description as Caderno,
+                                    (DENSE_RANK() OVER(ORDER BY CASE WHEN (t.KnowledgeAreaBlock = 1) THEN ISNULL(Bka.[Order], 0) END, bi.[Order]) - 1) AS Ordem,
+                                    I.[Statement] as Enunciado ,bt.Description  as TextoBase, T.Id as ProvaLegadoId,
+                                    case 
+	            	                    when IT.QuantityAlternative > 0 then 1 else 2
+	                                end TipoItem,
+                                    IT.QuantityAlternative as QuantidadeAlternativas
                                     FROM Item I WITH (NOLOCK)
                                     INNER JOIN BlockItem BI WITH (NOLOCK) ON BI.Item_Id = I.Id
+                                    INNER JOIN ItemType IT  WITH (NOLOCK) ON I.ItemType_Id = IT.Id  
                                     INNER JOIN Block B WITH (NOLOCK) ON B.Id = BI.Block_Id            
                                     INNER JOIN Test T WITH (NOLOCK) ON T.Id = B.[Test_Id] 
-                                    INNER JOIN BaseText bt  on bt.Id = I.BaseText_Id
-                                    LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
+                                    INNER JOIN BaseText bt  on bt.Id = I.BaseText_Id       
+                                     LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
                                 WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and BI.State = 1;";
 
-                return await conn.QueryAsync<QuestaoLegadoDto>(query, new { provaId });
+                return await conn.QueryAsync<QuestoesPorProvaIdDto>(query, new { provaId });
             }
             finally
             {

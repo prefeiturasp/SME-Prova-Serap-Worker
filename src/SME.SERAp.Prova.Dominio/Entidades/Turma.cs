@@ -4,6 +4,10 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class Turma : EntidadeBase
     {
+        public Turma()
+        {
+            DataAtualizacao = DateTime.Now;
+        }
         public string Ano { get; set; }
         public int AnoLetivo { get; set; }
         public string Codigo { get; set; }

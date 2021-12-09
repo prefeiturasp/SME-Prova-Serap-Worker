@@ -9,7 +9,7 @@ using SME.SERAp.Prova.Infra;
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterQuestoesProvaPorProvaIdQueryHandler :
-        IRequestHandler<ObterQuestoesPorProvaIdQuery, IEnumerable<QuestaoLegadoDto>>
+        IRequestHandler<ObterQuestoesPorProvaIdQuery, IEnumerable<QuestoesPorProvaIdDto>>
     {
         private readonly IRepositorioProvaLegado repositorioProvaLegado;
 
@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
                                           throw new ArgumentNullException(nameof(repositorioProvaLegado));
         }
 
-        public async Task<IEnumerable<QuestaoLegadoDto>> Handle(ObterQuestoesPorProvaIdQuery request,
+        public async Task<IEnumerable<QuestoesPorProvaIdDto>> Handle(ObterQuestoesPorProvaIdQuery request,
             CancellationToken cancellationToken)
             => await repositorioProvaLegado.ObterQuestoesPorProvaId(request.ProvaId);
     }

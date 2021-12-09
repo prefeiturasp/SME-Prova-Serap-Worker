@@ -12,11 +12,11 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
 {
     public class PublicaFilaRabbitCommandHandler : IRequestHandler<PublicaFilaRabbitCommand, bool>
     {
-        private readonly ConnectionFactory factory;
+        private readonly IModel model;
 
-        public PublicaFilaRabbitCommandHandler(ConnectionFactory factory)
+        public PublicaFilaRabbitCommandHandler(IModel model)
         {
-            this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            this.model = model ?? throw new ArgumentNullException(nameof(model));
         }
 
         public Task<bool> Handle(PublicaFilaRabbitCommand request, CancellationToken cancellationToken)
@@ -24,9 +24,6 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
             //TODO: Implementar Polly!
             try
             {
-                var conexaoRabbit = factory.CreateConnection();
-                var model = conexaoRabbit.CreateModel();
-
                 var mensagem = new MensagemRabbit(request.Mensagem, Guid.NewGuid());
 
                 var mensagemJson = JsonSerializer.Serialize(mensagem);
@@ -34,7 +31,7 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
 
                 var props = model.CreateBasicProperties();
                 props.Persistent = true;
-
+                
                 model.BasicPublish(ExchangeRabbit.SerapEstudante, request.NomeRota, props, body);
 
                 return Task.FromResult(true);

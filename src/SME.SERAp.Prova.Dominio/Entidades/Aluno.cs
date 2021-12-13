@@ -19,6 +19,9 @@ namespace SME.SERAp.Prova.Dominio
         public string Nome { get; set; }
         public long TurmaId { get; set; }
         public long RA { get; set; }
-        public int Situacao { get; set; }        
+        public int Situacao { get; set; }
+        public string Sexo { get; set; }
+        public DateTime DataNascimento { get; set; }
+        public string NomeSocial { get; set; }
     }
 }

@@ -68,6 +68,9 @@ namespace SME.SERAp.Prova.Aplicacao
                     Nome = a.Nome,
                     RA = a.CodigoAluno,
                     Situacao = a.SituacaoAluno,
+                    NomeSocial = a.NomeSocial,
+                    Sexo = a.Sexo,
+                    DataNascimento = a.DataNascimento,
                     TurmaId = turmaSerapDtos.FirstOrDefault(b => b.Codigo == a.TurmaCodigo.ToString()).Id
                 }).ToList();
 
@@ -99,7 +102,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     //TODO: Normalizar com uma entidade AlunoEol
                     if (alunoAntigo != null && (alunoAntigo.Nome != alunoQuePodeAlterar.Nome ||
                                                 alunoAntigo.Situacao != alunoQuePodeAlterar.SituacaoAluno ||
-                                                long.Parse(turmaAntigaDoAluno.Codigo) != alunoQuePodeAlterar.TurmaCodigo))
+                                                long.Parse(turmaAntigaDoAluno.Codigo) != alunoQuePodeAlterar.TurmaCodigo ||
+                                                alunoAntigo.DataNascimento != alunoQuePodeAlterar.DataNascimento ||
+                                                alunoAntigo.NomeSocial != alunoQuePodeAlterar.NomeSocial || 
+                                                alunoAntigo.Sexo != alunoQuePodeAlterar.Sexo))
                     {
 
                         var turmaId = alunoAntigo.TurmaId;
@@ -125,6 +131,9 @@ namespace SME.SERAp.Prova.Aplicacao
                             Nome = alunoQuePodeAlterar.Nome,
                             RA = alunoQuePodeAlterar.CodigoAluno,
                             Situacao = alunoQuePodeAlterar.SituacaoAluno,
+                            NomeSocial = alunoQuePodeAlterar.NomeSocial,
+                            Sexo = alunoQuePodeAlterar.Sexo,
+                            DataNascimento = alunoQuePodeAlterar.DataNascimento,
                             TurmaId = turmaId
                         });
                     }

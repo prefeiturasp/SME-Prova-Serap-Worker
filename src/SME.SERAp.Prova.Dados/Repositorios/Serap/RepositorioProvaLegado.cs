@@ -59,6 +59,7 @@ namespace SME.SERAp.Prova.Dados
 	            t.UpdateDate as UltimaAtualizacao,
                 ttime.Segundos AS TempoExecucao,
                 t.Password as Senha,
+                d.Description as Disciplina,
                 t.Bib as PossuiBIB,
 	            tne.tne_id as Modalidade,
 	            tne.tne_nome as ModalidadeNome,
@@ -74,6 +75,8 @@ namespace SME.SERAp.Prova.Dados
                 t.TestTime_Id = ttime.id
             INNER JOIN TestTypeCourse ttc ON
 	            ttc.TestType_Id = t.TestType_Id
+            LEFT JOIN Discipline d ON
+	            t.Discipline_Id = d.Id 
 	        INNER JOIN TestType on
 	        	t.TestType_Id = TestType.id
 	       	INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 

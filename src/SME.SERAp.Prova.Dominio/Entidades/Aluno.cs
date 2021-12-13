@@ -22,6 +22,7 @@ namespace SME.SERAp.Prova.Dominio
         public int Situacao { get; set; }
         public string Sexo { get; set; }
         public DateTime DataNascimento { get; set; }
+        public DateTime DataAtualizacao { get; set; }
         public string NomeSocial { get; set; }
     }
 }

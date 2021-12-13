@@ -63,7 +63,9 @@ namespace SME.SERAp.Prova.Dados
 	            tne.tne_id as Modalidade,
 	            tne.tne_nome as ModalidadeNome,
                 mt.Id ModeloProva,
-	            tt.tcp_ordem as Ano
+	              case 
+	            	when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
+	            end Ano
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

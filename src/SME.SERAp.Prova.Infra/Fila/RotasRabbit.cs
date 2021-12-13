@@ -27,5 +27,9 @@
         public const string SincronizaEstruturaInstitucionalTurmaTratar = "serap.sincronizacao.institucional.turma.tratar";
         public const string SincronizaEstruturaInstitucionalAlunoSync = "serap.sincronizacao.institucional.aluno.sync";
         public const string SincronizaEstruturaInstitucionalAlunoTratar = "serap.sincronizacao.institucional.aluno.tratar";
+
+        
+        public const string FilaDeadletterTratar = "serap.deadletter.tratar";        
+        public const string FilaDeadletterSync = "serap.deadletter.sync";
     }
 }

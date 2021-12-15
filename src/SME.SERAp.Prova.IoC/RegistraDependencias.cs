@@ -48,7 +48,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioUeEntity, RepositorioUeEntity>();
             services.AddScoped<IRepositorioTurmaEntity, RepositorioTurmaEntity>();
             services.AddScoped<IRepositorioAlunoEntity, RepositorioAlunoEntity>();
-            
+            services.TryAddScoped<IRepositorioParametroSistema, RepositorioParametroSistema>();
+
 
         }
 
@@ -72,10 +73,12 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IIncluirRespostaAlunoUseCase, IncluirRespostaAlunoUseCase>();
             services.AddScoped<IIncluirPreferenciasAlunoUseCase, IncluirPreferenciasAlunoUseCase>();
 
+            //Finalizar provas automaticamente
+            services.AddScoped<IIniciarProcessoFinalizarProvasAutomaticamenteUseCase, IniciarProcessoFinalizarProvasAutomaticamenteUseCase>();
+            services.AddScoped<IFinalizarProvaAutomaticamenteUseCase, FinalizarProvaAutomaticamenteUseCase>();
 
             // sincronização institucional 
             services.AddScoped<IExecutarSincronizacaoInstitucionalDreSyncUseCase, ExecutarSincronizacaoInstitucionalDreSyncUseCase>();
-            services.AddScoped<IExecutarSincronizacaoInstitucionalDreTratarUseCase, ExecutarSincronizacaoInstitucionalDreTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeSyncUseCase, ExecutarSincronizacaoInstitucionalUeSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeTratarUseCase, ExecutarSincronizacaoInstitucionalUeTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaSyncUseCase, ExecutarSincronizacaoInstitucionalTurmaSyncUseCase>();

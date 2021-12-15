@@ -9,6 +9,7 @@
     <PackageReference Include="Dapper.FluentMap.Dommel" Version="2.0.0" />
     <PackageReference Include="DapperExtensions" Version="1.7.0" />
     <PackageReference Include="Dommel" Version="2.3.0" />
+    <PackageReference Include="MessagePack" Version="2.3.85" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.18" />
     <PackageReference Include="Npgsql" Version="5.0.7" />
     <PackageReference Include="Npgsql.Bulk" Version="0.9.0" />

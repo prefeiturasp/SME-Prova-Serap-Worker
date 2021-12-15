@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                     provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
-                    provaLegado.TotalCadernos, modalidadeSerap);
+                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina);
 
                 if (provaAtual == null)
                 {

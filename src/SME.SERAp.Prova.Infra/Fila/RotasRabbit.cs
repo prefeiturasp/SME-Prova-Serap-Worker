@@ -15,6 +15,9 @@
         public const string ProvaWebPushTeste = "serap.estudante.prova.webpush.teste";
         public const string IncluirRespostaAluno = "serap.estudante.resposta.aluno.incluir";
         public const string IncluirPreferenciasAluno = "serap.estudante.preferencias.aluno.incluir";
+        public const string AtualizarFrequenciaAlunoProvaSync = "serap.estudante.atualizar.frequencia.sync";
+        public const string AtualizarFrequenciaAlunoProvaTratar = "serap.estudante.atualizar.frequencia.tratar";
+        public const string ExtrairResultadosProva = "serap.estudante.prova.resultados.aluno.extrair";
 
 
         public const string SincronizaEstruturaInstitucionalDreSync = "serap.sincronizacao.institucional.dre.sync";

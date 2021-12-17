@@ -50,7 +50,7 @@ namespace SME.SERAp.Prova.Dados
                         left join alternativa a on qar.alternativa_id = a.id
                         where vape.prova_serap_id = @provaId;";
 
-                await conn.ExecuteAsync(query, new { provaId });
+                await conn.ExecuteAsync(query, new { provaId },commandTimeout: 600);
             }
             catch (System.Exception ex)
             {

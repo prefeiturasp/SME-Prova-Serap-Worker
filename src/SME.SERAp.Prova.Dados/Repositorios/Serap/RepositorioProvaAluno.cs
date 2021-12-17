@@ -98,7 +98,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task AtualizarFrequenciaAlunoAsync(long id, FrequenciaAluno frequencia)
         {
-            using var conn = ObterConexaoLeitura();
+            using var conn = ObterConexao();
             try
             {
                 var query = @"update prova_aluno set frequencia = @frequencia where id = @id;";

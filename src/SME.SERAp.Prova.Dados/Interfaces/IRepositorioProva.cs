@@ -8,5 +8,6 @@ namespace SME.SERAp.Prova.Dados
         Task<bool> VerificaSeExisteRespostasPorId(long id);
         Task<bool> VerificaSeExistePorProvaSerapId(long provaId);
         Task CriarProvaRespostasExtracao(long provaId);
+        Task ConsolidarProvaRespostasPorProvaSerapId(long provaId);
     }
 }

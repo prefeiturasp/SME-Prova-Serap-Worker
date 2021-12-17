@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                     provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
-                    provaLegado.TotalCadernos, modalidadeSerap);
+                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.OcultarProva);
 
                 if (provaAtual == null)
                 {
@@ -59,7 +59,14 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
                     if (verificaSePossuiRespostas)
-                        throw new System.Exception($"A prova {provaAtual.Id} possui respostas cadastradas por isto não será atualizada.");
+                    {
+                        provaAtual.InicioDownload = provaLegado.InicioDownload;
+                        provaAtual.Inicio = provaLegado.Inicio;
+                        provaAtual.Fim = provaLegado.Fim;
+
+                        await mediator.Send(new ProvaAtualizarCommand(provaAtual));
+                        return true;
+                    }
 
                     await RemoverEntidadesFilhas(provaAtual);
                     await mediator.Send(new ProvaAtualizarCommand(provaParaTratar));

@@ -9,7 +9,7 @@ namespace SME.SERAp.Prova.Dominio
             Inclusao = DateTime.Now;
         }
         public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB, 
-            int totalCadernos, Modalidade modalidade)
+            int totalCadernos, Modalidade modalidade, bool ocultarProva)
         {
             Id = id;
             Descricao = descricao;
@@ -24,6 +24,7 @@ namespace SME.SERAp.Prova.Dominio
             PossuiBIB = possuiBIB;
             TotalCadernos = totalCadernos;
             Modalidade = modalidade;
+            OcultarProva = ocultarProva;
         }
 
         public string Descricao { get; set; }
@@ -38,5 +39,6 @@ namespace SME.SERAp.Prova.Dominio
         public bool PossuiBIB { get; set; }
         public int TotalCadernos { get; set; }
         public Modalidade Modalidade { get; set; }
+        public bool OcultarProva { get; set; }
     }
 }

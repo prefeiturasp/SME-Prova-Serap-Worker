@@ -6,6 +6,8 @@ using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.IoC;
 using System.Reflection;
 using RabbitMQ.Client;
+using System;
+using System.IO;
 
 namespace SME.SERAp.Prova.Aplicacao.Worker
 {
@@ -72,6 +74,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             {
                 options.Configuration = hostContext.Configuration.GetConnectionString("Redis");
             });
+
+            var diretorio = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"arquivos/resultados");
+            if (!Directory.Exists(diretorio))
+                Directory.CreateDirectory(diretorio);
 
         }
     }

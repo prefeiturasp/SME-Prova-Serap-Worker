@@ -25,7 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
             };
 
             var caminhoBase = AppDomain.CurrentDomain.BaseDirectory;
-            var nomeArquivo = Path.Combine(caminhoBase, "resultados", request.NomeArquivo);
+            var nomeArquivo = Path.Combine(caminhoBase, "arquivos/resultados", request.NomeArquivo);
             var quantidadeQuestoes = request.Resultado.FirstOrDefault();
             try
             {

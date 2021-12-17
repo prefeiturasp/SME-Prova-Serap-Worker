@@ -43,12 +43,17 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
             services.AddScoped<IRepositorioPreferenciasUsuario, RepositorioPreferenciasUsuario>();
             services.AddScoped<IRepositorioCache, RepositorioCache>();
-            
+            services.AddScoped<IRepositorioProvaAluno, RepositorioProvaAluno>();
+
             services.AddScoped<IRepositorioDreEntity, RepositorioDreEntity>();
             services.AddScoped<IRepositorioUeEntity, RepositorioUeEntity>();
             services.AddScoped<IRepositorioTurmaEntity, RepositorioTurmaEntity>();
             services.AddScoped<IRepositorioAlunoEntity, RepositorioAlunoEntity>();
+            services.AddScoped<IRepositorioFrequenciaAlunoSgp, RepositorioFrequenciaAlunoSgp>();
+            services.AddScoped<IRepositorioExportacaoResultado, RepositorioExportacaoResultado>();
+            services.AddScoped<IRepositorioResultadoProvaConsolidado, RepositorioResultadoProvaConsolidado>();
             
+
 
         }
 
@@ -71,7 +76,10 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IAtualizaImagensAlternativasUseCase, AtualizaImagensAlternativasUseCase>();
             services.AddScoped<IIncluirRespostaAlunoUseCase, IncluirRespostaAlunoUseCase>();
             services.AddScoped<IIncluirPreferenciasAlunoUseCase, IncluirPreferenciasAlunoUseCase>();
-
+            services.AddScoped<ITratarProvaResultadoExtracaoUseCase, TratarProvaResultadoExtracaoUseCase>();
+            services.AddScoped<ITratarFrequenciaAlunoProvaUseCase, TratarFrequenciaAlunoProvaUseCase>();
+            services.AddScoped<ITratarFrequenciaAlunoProvaSyncUseCase, TratarFrequenciaAlunoProvaSyncUseCase>();
+            
 
             // sincronização institucional 
             services.AddScoped<IExecutarSincronizacaoInstitucionalDreSyncUseCase, ExecutarSincronizacaoInstitucionalDreSyncUseCase>();

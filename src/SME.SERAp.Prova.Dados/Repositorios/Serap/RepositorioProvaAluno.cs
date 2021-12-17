@@ -85,7 +85,8 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"select distinct id as ProvaAlunoId, aluno_ra as AlunoRa, finalizado_em::date as FinalizadoEm 
                     from prova_aluno pa 
-                    where finalizado_em is not null and (frequencia is null or frequencia = 0) and status = 2;";
+                    where finalizado_em is not null and (frequencia is null or frequencia = 0) and status = 2
+                    and prova_id in (91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,107,114,115,116,117,118,119,120,121,122,123,124,125,126);";
 
                 return await conn.QueryAsync<ProvaAlunoReduzidaDto>(query);
             }

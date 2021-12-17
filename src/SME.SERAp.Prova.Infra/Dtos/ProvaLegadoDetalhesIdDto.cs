@@ -25,6 +25,7 @@ namespace SME.SERAp.Prova.Infra
         public int TotalCadernos { get; set; }
         public ModalidadeSerap Modalidade { get; set; }
         public ModeloProva ModeloProva { get; set; }
+        public bool OcultarProva { get; set; }
 
         public void AddAno(int ano)
         {

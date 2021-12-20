@@ -63,8 +63,9 @@ namespace SME.SERAp.Prova.Dados
 	            tne.tne_id as Modalidade,
 	            tne.tne_nome as ModalidadeNome,
                 mt.Id ModeloProva,
-	            tt.tcp_ordem as Ano,
-                tp.TestHide as OcultarProva
+	            tt.tcp_ordem as Ano
+                --,
+             --   tp.TestHide as OcultarProva
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -83,8 +84,8 @@ namespace SME.SERAp.Prova.Dados
 	            ttcp.crp_ordem = tt.tcp_ordem
 	            AND tt.tme_id = ttcp.tme_id
             INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
-	        INNER JOIN TestPermission tp on tp.Test_Id = t.Id 
-			   AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E' -- grupo aluno coresso 
+	     --   INNER JOIN TestPermission tp on tp.Test_Id = t.Id 
+		--	   AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E' -- grupo aluno coresso 
             where
 	            t.id = @id";
 

@@ -66,7 +66,9 @@ namespace SME.SERAp.Prova.Dados
                 mt.Id ModeloProva,
 	              case 
 	            	when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
-	            end Ano
+	            end Ano,
+	           
+                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -87,6 +89,8 @@ namespace SME.SERAp.Prova.Dados
 	            ttcp.crp_ordem = tt.tcp_ordem
 	            AND tt.tme_id = ttcp.tme_id
             INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
+	          LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
+			   AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E' -- grupo aluno coresso 
             where
 	            t.id = @id";
 

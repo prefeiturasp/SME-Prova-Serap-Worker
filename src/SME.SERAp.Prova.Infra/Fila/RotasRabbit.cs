@@ -20,6 +20,8 @@
         public const string ExtrairResultadosProva = "serap.estudante.prova.resultados.aluno.extrair";
         public const string ConsolidarProvaResultado = "serap.estudante.prova.resultados.consolidar";
 
+        public const string IniciarProcessoFinalizarProvasAutomaticamente = "serap.estudante.prova.finalizar.automaticamente.iniciar";
+        public const string FinalizarProvaAutomaticamente = "serap.estudante.prova.finalizar.automaticamente";
 
         public const string SincronizaEstruturaInstitucionalDreSync = "serap.sincronizacao.institucional.dre.sync";
         public const string SincronizaEstruturaInstitucionalDreTratar = "serap.sincronizacao.institucional.dre.tratar";

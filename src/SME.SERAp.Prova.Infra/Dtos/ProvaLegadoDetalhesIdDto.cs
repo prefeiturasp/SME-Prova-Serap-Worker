@@ -14,6 +14,7 @@ namespace SME.SERAp.Prova.Infra
         }
         public long Id { get; set; }
         public string Descricao { get; set; }
+        public string Disciplina { get; set; }
         public DateTime? InicioDownload { get; set; }
         public DateTime Inicio { get; set; }
         public DateTime Fim { get; set; }
@@ -21,16 +22,16 @@ namespace SME.SERAp.Prova.Infra
         public int TotalItens { get; set; }
         public int TempoExecucao { get; set; }
         public string Senha { get; set; }
-        public List<int> Anos { get; set; }
+        public List<string> Anos { get; set; }
         public bool PossuiBIB { get; set; }
         public int TotalCadernos { get; set; }
         public ModalidadeSerap Modalidade { get; set; }
         public ModeloProva ModeloProva { get; set; }
         public bool OcultarProva { get; set; }
 
-        public void AddAno(int ano)
+        public void AddAno(string ano)
         {
-            if (ano > 0)
+            if (!string.IsNullOrEmpty(ano))
                 if (!Anos.Any(a => a == ano))
                     Anos.Add(ano);
         }

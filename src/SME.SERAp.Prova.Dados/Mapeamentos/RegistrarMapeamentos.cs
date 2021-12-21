@@ -25,6 +25,8 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new ContextoProvaMap());
                 config.AddMap(new PreferenciasUsuarioMap());
                 config.AddMap(new AlternativaArquivoMap());
+                config.AddMap(new ProvaAlunoMap());
+                config.AddMap(new ExportacaoResultadoMap());
                 config.AddMap(new ParametroSistemaMap());
 
                 config.ForDommel();

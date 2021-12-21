@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                     provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
-                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.OcultarProva);
+                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina , provaLegado.OcultarProva);
 
                 if (provaAtual == null)
                 {
@@ -69,7 +69,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
 
                     await RemoverEntidadesFilhas(provaAtual);
-                    await mediator.Send(new ProvaAtualizarCommand(provaParaTratar));
+                    
                 }
 
                 foreach (var ano in provaLegado.Anos)

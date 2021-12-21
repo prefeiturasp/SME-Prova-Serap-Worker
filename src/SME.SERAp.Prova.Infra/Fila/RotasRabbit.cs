@@ -15,6 +15,10 @@
         public const string ProvaWebPushTeste = "serap.estudante.prova.webpush.teste";
         public const string IncluirRespostaAluno = "serap.estudante.resposta.aluno.incluir";
         public const string IncluirPreferenciasAluno = "serap.estudante.preferencias.aluno.incluir";
+        public const string AtualizarFrequenciaAlunoProvaSync = "serap.estudante.atualizar.frequencia.sync";
+        public const string AtualizarFrequenciaAlunoProvaTratar = "serap.estudante.atualizar.frequencia.tratar";
+        public const string ExtrairResultadosProva = "serap.estudante.prova.resultados.aluno.extrair";
+        public const string ConsolidarProvaResultado = "serap.estudante.prova.resultados.consolidar";
 
         public const string IniciarProcessoFinalizarProvasAutomaticamente = "serap.estudante.prova.finalizar.automaticamente.iniciar";
         public const string FinalizarProvaAutomaticamente = "serap.estudante.prova.finalizar.automaticamente";
@@ -27,5 +31,9 @@
         public const string SincronizaEstruturaInstitucionalTurmaTratar = "serap.sincronizacao.institucional.turma.tratar";
         public const string SincronizaEstruturaInstitucionalAlunoSync = "serap.sincronizacao.institucional.aluno.sync";
         public const string SincronizaEstruturaInstitucionalAlunoTratar = "serap.sincronizacao.institucional.aluno.tratar";
+
+        
+        public const string FilaDeadletterTratar = "serap.deadletter.tratar";        
+        public const string FilaDeadletterSync = "serap.deadletter.sync";
     }
 }

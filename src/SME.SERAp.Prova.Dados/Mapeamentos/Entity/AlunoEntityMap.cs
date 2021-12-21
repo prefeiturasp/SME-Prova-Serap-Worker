@@ -24,6 +24,19 @@ namespace SME.SERAp.Prova.Dados
                 .HasColumnName("turma_id")
                 .IsRequired();
 
+            builder.Property(c => c.DataAtualizacao)
+               .HasColumnName("data_atualizacao")
+               .IsRequired();
+
+            builder.Property(c => c.NomeSocial)
+                .HasColumnName("nome_social");
+
+            builder.Property(c => c.Sexo)
+                .HasColumnName("sexo");
+
+            builder.Property(c => c.DataNascimento)
+                .HasColumnName("data_nascimento");
+
             builder.Property(c => c.Situacao)
                 .HasColumnName("situacao")
                 .IsRequired();

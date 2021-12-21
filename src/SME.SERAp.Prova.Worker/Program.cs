@@ -6,6 +6,8 @@ using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.IoC;
 using System.Reflection;
 using RabbitMQ.Client;
+using System;
+using System.IO;
 
 namespace SME.SERAp.Prova.Aplicacao.Worker
 {
@@ -59,8 +61,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             var conexaoRabbit = factory.CreateConnection();
             IModel channel = conexaoRabbit.CreateModel();
-
+            
             services.AddSingleton(channel);
+            services.AddSingleton(conexaoRabbit);
+
 
             var fireBaseOptions = new FireBaseOptions();
             hostContext.Configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);
@@ -70,6 +74,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             {
                 options.Configuration = hostContext.Configuration.GetConnectionString("Redis");
             });
+
+            var diretorio = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"arquivos/resultados");
+            if (!Directory.Exists(diretorio))
+                Directory.CreateDirectory(diretorio);
 
         }
     }

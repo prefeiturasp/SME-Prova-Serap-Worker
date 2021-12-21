@@ -69,7 +69,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
 
                     await RemoverEntidadesFilhas(provaAtual);
-                    
+                    await mediator.Send(new ProvaAtualizarCommand(provaAtual));
+
                 }
 
                 foreach (var ano in provaLegado.Anos)

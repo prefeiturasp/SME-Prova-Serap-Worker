@@ -66,7 +66,7 @@ namespace SME.SERAp.Prova.Dados
                 mt.Id ModeloProva,
 	              case 
 	            	when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
-	            end Ano
+	            end Ano,
 	           
                 case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
             FROM

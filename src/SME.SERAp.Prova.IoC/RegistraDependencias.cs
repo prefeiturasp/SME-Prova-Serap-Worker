@@ -55,7 +55,6 @@ namespace SME.SERAp.Prova.IoC
             services.TryAddScoped<IRepositorioParametroSistema, RepositorioParametroSistema>();
 
 
-
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -81,14 +80,15 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarFrequenciaAlunoProvaUseCase, TratarFrequenciaAlunoProvaUseCase>();
             services.AddScoped<ITratarFrequenciaAlunoProvaSyncUseCase, TratarFrequenciaAlunoProvaSyncUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
-            
-
-            //Finalizar provas automaticamente
             services.AddScoped<IIniciarProcessoFinalizarProvasAutomaticamenteUseCase, IniciarProcessoFinalizarProvasAutomaticamenteUseCase>();
             services.AddScoped<IFinalizarProvaAutomaticamenteUseCase, FinalizarProvaAutomaticamenteUseCase>();
 
+
+
+
             // sincronização institucional 
             services.AddScoped<IExecutarSincronizacaoInstitucionalDreSyncUseCase, ExecutarSincronizacaoInstitucionalDreSyncUseCase>();
+            //services.AddScoped<IExecutarSincronizacaoInstitucionalDreTratarUseCase, ExecutarSincronizacaoInstitucionalDreTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeSyncUseCase, ExecutarSincronizacaoInstitucionalUeSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeTratarUseCase, ExecutarSincronizacaoInstitucionalUeTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaSyncUseCase, ExecutarSincronizacaoInstitucionalTurmaSyncUseCase>();

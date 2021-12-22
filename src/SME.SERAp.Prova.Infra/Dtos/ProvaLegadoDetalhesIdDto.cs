@@ -10,7 +10,6 @@ namespace SME.SERAp.Prova.Infra
         public ProvaLegadoDetalhesIdDto()
         {
             Anos = new List<string>();
-            OcultarProva = false;
         }
         public long Id { get; set; }
         public string Descricao { get; set; }
@@ -27,6 +26,7 @@ namespace SME.SERAp.Prova.Infra
         public int TotalCadernos { get; set; }
         public ModalidadeSerap Modalidade { get; set; }
         public ModeloProva ModeloProva { get; set; }
+
         public bool OcultarProva { get; set; }
 
         public void AddAno(string ano)

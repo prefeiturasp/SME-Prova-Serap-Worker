@@ -21,7 +21,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"
 	            select
-                    DISTINCT
+                    
 	                t.id,
 					t.UpdateDate,
 					tp.UpdateDate
@@ -72,10 +72,11 @@ namespace SME.SERAp.Prova.Dados
 	            tne.tne_id as Modalidade,
 	            tne.tne_nome as ModalidadeNome,
                 mt.Id ModeloProva,
+                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
 	              case 
 	            	when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
-	            end Ano,
-                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
+	            end Ano
+               
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

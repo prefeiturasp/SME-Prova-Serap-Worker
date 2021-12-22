@@ -69,7 +69,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
 
                     await RemoverEntidadesFilhas(provaAtual);
-                    await mediator.Send(new ProvaAtualizarCommand(provaAtual));
+                    await mediator.Send(new ProvaAtualizarCommand(provaParaTratar));
 
                 }
 

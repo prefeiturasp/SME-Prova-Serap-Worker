@@ -20,13 +20,21 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"
-                select
-	                t.id
+	            select
+                    DISTINCT
+	                t.id,
+					t.UpdateDate,
+					tp.UpdateDate
                 from
 	                test t
+					left join TestPermission tp
+					on tp.Test_Id = t.Id
+                     AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+				
                 where
 	                t.ShowOnSerapEstudantes = 1
-                    and t.UpdateDate > @ultimaAtualizacao
+                    and (t.UpdateDate >  @ultimaAtualizacao or 
+					      tp.UpdateDate >  @ultimaAtualizacao )
                     and t.State = 1
                 order by
 	                t.ApplicationStartDate desc";
@@ -66,7 +74,8 @@ namespace SME.SERAp.Prova.Dados
                 mt.Id ModeloProva,
 	              case 
 	            	when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
-	            end Ano
+	            end Ano,
+                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

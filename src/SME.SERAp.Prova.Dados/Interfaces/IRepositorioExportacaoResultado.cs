@@ -6,5 +6,6 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioExportacaoResultado : IRepositorioBase<ExportacaoResultado>
     {
+        Task<long> ObterStatusPorIdAsync(long id);
     }
 }

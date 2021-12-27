@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Sentry;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
@@ -17,15 +18,17 @@ namespace SME.SERAp.Prova.Aplicacao
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
-            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusPorIdQuery(extracao.ExtracaoResultadoId));
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));
             try
             {
-                if (extracao == null)
+                if (extracao is null)
                     throw new NegocioException("O id da prova serap precisa ser informado");
+
+                if (exportacaoResultado is null)
+                    throw new NegocioException("A exportação não foi encontrada");
 
                 var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
 
@@ -38,17 +41,17 @@ namespace SME.SERAp.Prova.Aplicacao
                     throw new NegocioException($"Os resultados da prova {extracao.ProvaSerapId} ainda não foram gerados");
 
                 await mediator.Send(new GerarCSVExtracaoProvaCommand(resultado, exportacaoResultado.NomeArquivo));
-                exportacaoResultado.AtualizarStatus(ExportacaoResultadoStatus.Finalizado);
-                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado));
+                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Finalizado));
 
             }
             catch (Exception ex)
             {
-                exportacaoResultado.AtualizarStatus(ExportacaoResultadoStatus.Erro);
-                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado));
+                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
+                SentrySdk.CaptureMessage($"Erro ao gerar CSV da prova. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
+                SentrySdk.CaptureException(ex);
                 throw ex;
             }
             return true;
-        }
+        }        
     }
 }

@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace SME.SERAp.Prova.Infra.Services
 {
@@ -28,6 +29,6 @@ namespace SME.SERAp.Prova.Infra.Services
             {
                 SentrySdk.CaptureException(ex);
             }
-        }
+        }        
     }
 }

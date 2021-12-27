@@ -24,17 +24,19 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
+            var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));
             try
             {
-                var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
-                var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusPorIdQuery(extracao.ExtracaoResultadoId));
+                if (exportacaoResultado is null)
+                    throw new NegocioException("A exportação não foi encontrada");
 
                 var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
 
                 if (!checarProvaExiste)
                     throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
 
-                await AtualizarStatusExportacao(exportacaoResultado, ExportacaoResultadoStatus.Processando);
+                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Processando));
 
                 var dres = await mediator.Send(new ObterDresSerapQuery());
                 foreach(Dre dre in dres)
@@ -43,34 +45,21 @@ namespace SME.SERAp.Prova.Aplicacao
                     var paginas = Paginar(ues.ToList());                    
                     foreach (List<Ue> pagina in paginas)
                     {
-                        var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();
-                        await mediator.Send(new ConsolidarProvaRespostaPorFiltroCommand(extracao.ProvaSerapId, dre.CodigoDre, ueIds));
+                        bool finalizar = paginas.LastOrDefault().Equals(pagina);
+                        var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();                        
+                        var filtro = new ConsolidarProvaFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, dre.CodigoDre, ueIds, finalizar);
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
                     }
-                }
-
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                }                
             }                
             catch (Exception ex)
             {
+                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
+                SentrySdk.CaptureMessage($"Erro ao consolidar os dados da prova. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
                 SentrySdk.CaptureException(ex);
                 return false;
             }
             return true;
-        }
-
-        private async Task AtualizarStatusExportacao(ExportacaoResultado exportacaoResultado, ExportacaoResultadoStatus status)
-        {
-            try
-            {
-                exportacaoResultado.AtualizarStatus(status);
-                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado));
-            }
-            catch (Exception)
-            {
-                exportacaoResultado.AtualizarStatus(ExportacaoResultadoStatus.Erro);
-                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado));
-            }
-            
         }
 
         private List<List<Ue>> Paginar(List<Ue> ues)

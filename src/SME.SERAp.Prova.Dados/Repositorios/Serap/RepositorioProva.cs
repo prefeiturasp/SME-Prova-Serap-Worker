@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -30,16 +32,13 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string[] ueIds)
+        public async Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = $@"delete from resultado_prova_consolidado 
-                                where prova_serap_id = @provaId 
-                                and dre_codigo_eol = @dreId 
-                                and ue_codigo_eol = any(@ueIds);";
-                await conn.ExecuteAsync(query, new { provaId, dreId, ueIds }, commandTimeout: 600);
+                var query = $@"call p_excluir_dados_consolidados_prova(@provaId, @dreId, @ueId);";
+                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 1000);
             }
             catch (System.Exception ex)
             {
@@ -52,13 +51,13 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task ConsolidarProvaRespostasPorFiltros(long provaId, string dreId, string[] ueIds)
+        public async Task<IEnumerable<ResultadoProvaConsolidado>> ObterDadosPorUeId(long provaId, string dreId, string ueId)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
-                var query = $@"
-                            insert into resultado_prova_consolidado  
+                
+                var query = $@"                            
                             select 
 	                        vape.prova_serap_id,
                             vape.prova_serap_estudantes_id,
@@ -91,9 +90,28 @@ namespace SME.SERAp.Prova.Dados
                         left join alternativa a on qar.alternativa_id = a.id
                         where vape.prova_serap_id = @provaId 
                         and vape.dre_codigo_eol = @dreId 
-                        and vape.ue_codigo_eol = any(@ueIds);";
+                        and vape.ue_codigo_eol = @ueId;";
 
-                await conn.ExecuteAsync(query, new { provaId, dreId, ueIds }, commandTimeout: 600);
+                return await conn.QueryAsync<ResultadoProvaConsolidado>(query, new { provaId, dreId, ueId }, commandTimeout: 600);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task ConsolidarProvaRespostasPorFiltros(long provaId, string dreId, string ueId)
+        {
+            using var conn = ObterConexao();
+            try
+            { 
+                var query = $@"call p_consolidar_dados_prova(@provaId, @dreId, @ueId);";
+                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 1000);
             }
             catch (System.Exception ex)
             {

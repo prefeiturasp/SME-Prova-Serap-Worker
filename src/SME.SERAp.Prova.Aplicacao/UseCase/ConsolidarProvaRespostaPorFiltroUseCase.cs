@@ -1,12 +1,9 @@
 ﻿using MediatR;
 using Sentry;
-using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -32,22 +29,26 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (exportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
                 {
                     await mediator.Send(new ConsolidarProvaRespostaPorFiltroCommand(filtro.ProvaId, filtro.DreEolId, filtro.UeEolIds));
-                    if (filtro.FinalizarProcesso)
-                    {
-                        var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaId };
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
-                    }
+                    await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
+                }
+
+                bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
+                if (!existeItemProcesso)
+                {
+                    var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaId };
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
                 }
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
+                await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
                 SentrySdk.CaptureMessage($"Erro ao consolidar os dados da prova por filtro. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
                 SentrySdk.CaptureException(ex);
                 return false;
             }
-            
+
         }
     }
 }

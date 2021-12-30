@@ -52,8 +52,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioFrequenciaAlunoSgp, RepositorioFrequenciaAlunoSgp>();
             services.AddScoped<IRepositorioExportacaoResultado, RepositorioExportacaoResultado>();
             services.AddScoped<IRepositorioResultadoProvaConsolidado, RepositorioResultadoProvaConsolidado>();
-            
-
+            services.AddScoped<IRepositorioResultadoProvaConsolidadoEntity, RepositorioResultadoProvaConsolidadoEntity>();
+            services.AddScoped<IRepositorioExportacaoResultadoItem, RepositorioExportacaoResultadoItem>();
 
         }
 

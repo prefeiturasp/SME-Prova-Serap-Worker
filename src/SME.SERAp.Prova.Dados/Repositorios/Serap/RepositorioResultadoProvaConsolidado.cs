@@ -13,37 +13,37 @@ namespace SME.SERAp.Prova.Dados
         {
             
         }
-        public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaResposta(long provaSerapId)
+        public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaResposta(long provaSerapId, string dreCodigoEol)
         {
             using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select 
-	                        rpc.prova_serap_id ProvaSerapId,
-                            rpc.prova_serap_estudantes_id ProvaSerapEstudantesId,
-	                        rpc.dre_codigo_eol DreCodigoEol, 
-	                        rpc.dre_sigla DreSigla,
-	                        rpc.dre_nome DreNome,
-	                        rpc.ue_codigo_eol UeCodigoEol,
-	                        rpc.ue_nome UeNome,
-	                        rpc.turma_ano_escolar TurmaAnoEscolar,
-	                        rpc.turma_ano_escolar_descricao TurmaAnoEscolarDescricao,
-	                        rpc.turma_codigo TurmaCodigo,
-	                        rpc.turma_descricao TurmaDescricao,
-	                        rpc.aluno_codigo_eol AlunoCodigoEol,
-	                        rpc.aluno_nome AlunoNome,
-	                        rpc.aluno_sexo AlunoSexo,
-	                        rpc.aluno_data_nascimento AlunoDataNascimento,
-	                        rpc.prova_componente ProvaComponente,
-	                        rpc.prova_caderno ProvaCaderno,
-                            rpc.prova_quantidade_questoes as ProvaQuantidadeQuestoes,
-	                        rpc.aluno_frequencia AlunoFrequencia,  
-	                        rpc.questao_id as QuestaoId, 
-	                        rpc.questao_ordem as QuestaoOrdem,
-	                        rpc.resposta
-                        from resultado_prova_consolidado rpc where rpc.prova_serap_id = @provaSerapId;";
+	                            ProvaSerapId,
+                                ProvaSerapEstudantesId,
+	                            DreCodigoEol, 
+	                            DreSigla,
+	                            DreNome,
+	                            UeCodigoEol,
+	                            UeNome,
+	                            TurmaAnoEscolar,
+	                            TurmaAnoEscolarDescricao,
+	                            TurmaCodigo,
+	                            TurmaDescricao,
+	                            AlunoCodigoEol,
+	                            AlunoNome,
+	                            AlunoSexo,
+	                            AlunoDataNascimento,
+	                            ProvaComponente,
+	                            ProvaCaderno,
+                                ProvaQuantidadeQuestoes,
+	                            AlunoFrequencia,  
+	                            QuestaoId, 
+	                            QuestaoOrdem,
+	                            resposta
+                           from f_extracao_prova_resposta(@provaSerapId, @dreCodigoEol);";
 
-                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaSerapId }, commandTimeout: 600);
+                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaSerapId, dreCodigoEol }, commandTimeout: 1000);
             }
             catch (System.Exception ex)
             {

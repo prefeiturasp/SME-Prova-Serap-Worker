@@ -6,8 +6,6 @@ using SME.SERAp.Prova.Infra.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using static SME.SERAp.Prova.Infra.Utils.Paginacao;
 
@@ -39,23 +37,25 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Processando));
 
                 var dres = await mediator.Send(new ObterDresSerapQuery());
-                foreach(Dre dre in dres)
+                foreach (Dre dre in dres)
                 {
                     var ues = await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.CodigoDre));
-                    var paginas = Paginar(ues.ToList());                    
+                    var paginas = Paginar(ues.ToList());
                     foreach (List<Ue> pagina in paginas)
                     {
-                        bool finalizar = paginas.LastOrDefault().Equals(pagina);
-                        var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();                        
-                        var filtro = new ConsolidarProvaFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, dre.CodigoDre, ueIds, finalizar);
+                        var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();
+                        var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
+                        exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+                        var filtro = new ConsolidarProvaFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
                         await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
                     }
                 }                
-            }                
+            }
             catch (Exception ex)
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
-                SentrySdk.CaptureMessage($"Erro ao consolidar os dados da prova. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
+                await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
+                SentrySdk.CaptureMessage($"Consolidar os dados da prova. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
                 SentrySdk.CaptureException(ex);
                 return false;
             }
@@ -64,7 +64,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private List<List<Ue>> Paginar(List<Ue> ues)
         {
-            var paginacao = new ListaPaginada<Ue>(ues.ToList(), 10);
+            var paginacao = new ListaPaginada<Ue>(ues.ToList(), 20);
             return paginacao.ObterTodasAsPaginas();
         }
 

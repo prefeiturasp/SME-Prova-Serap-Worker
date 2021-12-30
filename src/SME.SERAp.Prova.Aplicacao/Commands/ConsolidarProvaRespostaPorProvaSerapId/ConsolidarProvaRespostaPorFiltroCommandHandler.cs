@@ -18,11 +18,14 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-                await repositorioProva.LimparDadosConsolidadosPorFiltros(request.ProvaId, request.DreEolId, request.UeEolIds);
-                await repositorioProva.ConsolidarProvaRespostasPorFiltros(request.ProvaId, request.DreEolId, request.UeEolIds);
+                foreach (string ueId in request.UeEolIds)
+                {
+                    await repositorioProva.LimparDadosConsolidadosPorFiltros(request.ProvaId, request.DreEolId, ueId);
+                    await repositorioProva.ConsolidarProvaRespostasPorFiltros(request.ProvaId, request.DreEolId, ueId);
+                }
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

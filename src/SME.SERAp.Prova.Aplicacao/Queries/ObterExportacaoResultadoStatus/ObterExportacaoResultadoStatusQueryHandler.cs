@@ -21,13 +21,13 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var exportacao = new ExportacaoResultado { Id = request.Id, ProvaSerapId = request.ProvaSerapId };
-                string chaveRedis = $"exportacao-{exportacao.Id}-prova-{exportacao.ProvaSerapId}";
-                exportacao = await repositorioCache.ObterRedisAsync(chaveRedis, async () => await repositorioExportacaoResultado.ObterPorIdAsync(exportacao.Id));
+                string chaveRedis = $"exportacao-{exportacao.Id}-prova-{exportacao.ProvaSerapId}-status";
+                exportacao.Status = (ExportacaoResultadoStatus)await repositorioCache.ObterRedisAsync(chaveRedis, async () => await repositorioExportacaoResultado.ObterStatusPorIdAsync(exportacao.Id));
                 return exportacao;
             }
             catch(Exception ex)
             {
-                throw new ArgumentException($"Erro ao obter status do processo de exportação. Exportação Id:{request.Id}, ProvaSerapId:{request.ProvaSerapId}, Erro:{ex.Message}");
+                throw new ArgumentException($"Obter status do processo de exportação. Exportação Id:{request.Id}, ProvaSerapId:{request.ProvaSerapId}, Erro:{ex.Message}");
             }            
         }
     }

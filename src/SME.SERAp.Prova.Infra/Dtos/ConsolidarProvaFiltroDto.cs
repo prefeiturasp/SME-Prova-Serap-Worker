@@ -6,20 +6,19 @@ namespace SME.SERAp.Prova.Infra
 {
     public class ConsolidarProvaFiltroDto
     {
-        public ConsolidarProvaFiltroDto(long processoId, long provaId, string dreEolId, string[] ueEolIds, bool finalizarProcesso = false)
+        public ConsolidarProvaFiltroDto(long processoId, long provaId, long itemId, string dreEolId, string[] ueEolIds)
         {
             ProcessoId = processoId;
             ProvaId = provaId;
+            ItemId = itemId;
             DreEolId = dreEolId;
             UeEolIds = ueEolIds;
-            FinalizarProcesso = finalizarProcesso;
         }
 
         public long ProcessoId { get; set; }
         public long ProvaId { get; set; }
+        public long ItemId { get; set; }
         public string DreEolId { get; set; }
         public string[] UeEolIds { get; set; }
-
-        public bool FinalizarProcesso { get; private set; }
     }
 }

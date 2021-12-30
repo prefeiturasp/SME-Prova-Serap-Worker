@@ -20,20 +20,24 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         public async Task<long> Handle(ExportacaoResultadoAtualizarCommand request, CancellationToken cancellationToken)
-        {            
+        {
+            string chaveRedis = $"exportacao-{request.ExportacaoResultado.Id}-prova-{request.ExportacaoResultado.ProvaSerapId}-status";
             try
             {
-                var result = await repositorioExportacaoResultado.UpdateAsync(request.ExportacaoResultado);
-                await repositorioCache.RemoverRedisAsync($"exportacao-{request.ExportacaoResultado.Id}-prova-{request.ExportacaoResultado.ProvaSerapId}");
+                var exportacao = await repositorioExportacaoResultado.ObterPorIdAsync(request.ExportacaoResultado.Id);
+                exportacao.AtualizarStatus(request.ExportacaoResultado.Status);
+                var result = await repositorioExportacaoResultado.UpdateAsync(exportacao);
+                await repositorioCache.RemoverRedisAsync(chaveRedis);
                 return result;
             }
             catch(Exception ex)
             {
                 var exportacao = request.ExportacaoResultado;
+                exportacao.NomeArquivo = "";
                 exportacao.AtualizarStatus(ExportacaoResultadoStatus.Erro);
-                SentrySdk.CaptureMessage($"Erro ao atualizar exportação. Id Exportação:{exportacao.Id}, Id Prova:{exportacao.ProvaSerapId}, Erro: {ex.Message}", SentryLevel.Error);
+                SentrySdk.CaptureMessage($"Atualizar exportação. Id Exportação:{exportacao.Id}, Id Prova:{exportacao.ProvaSerapId}, Erro: {ex.Message}", SentryLevel.Error);
                 await repositorioExportacaoResultado.UpdateAsync(request.ExportacaoResultado);
-                await repositorioCache.RemoverRedisAsync($"exportacao-{request.ExportacaoResultado.Id}-prova-{request.ExportacaoResultado.ProvaSerapId}");
+                await repositorioCache.RemoverRedisAsync(chaveRedis);
                 throw ex;
             }
         }

@@ -29,6 +29,7 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new ExportacaoResultadoMap());
                 config.AddMap(new ResultadoProvaConsolidadoMap());
                 config.AddMap(new ExportacaoResultadoItemMap());
+                config.AddMap(new ParametroSistemaMap());
 
                 config.ForDommel();
             });

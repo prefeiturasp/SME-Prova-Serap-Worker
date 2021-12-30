@@ -44,7 +44,7 @@ namespace SME.SERAp.Prova.Dados.Cache
 
                 return default;
             }
-        }
+        }        
 
         public async Task RemoverRedisAsync(string nomeChave)
         {
@@ -54,7 +54,6 @@ namespace SME.SERAp.Prova.Dados.Cache
             }
             catch (Exception ex)
             {
-                timer.Stop();
                 servicoLog.Registrar(ex);
             }
         }
@@ -68,44 +67,6 @@ namespace SME.SERAp.Prova.Dados.Cache
 
                 timer.Stop();
             }
-        }
-
-        public async Task<T> ObterRedisAsync<T>(string nomeChave, Func<Task<T>> buscarDados, int minutosParaExpirar = 720)
-        {
-            var inicioOperacao = DateTime.UtcNow;
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-
-            try
-            {
-                var byteCache = await distributedCache.GetAsync(nomeChave);
-
-                timer.Stop();
-
-                if (byteCache != null)
-                {
-                    return MessagePackSerializer.Deserialize<T>(byteCache);
-                }
-
-                var dados = await buscarDados();
-
-                await SalvarRedisAsync(nomeChave, dados, minutosParaExpirar);
-
-                return dados;
-
-            }
-            catch (Exception ex)
-            {
-                servicoLog.Registrar(ex);
-                timer.Stop();
-                return default;
-            }
-        }
-
-        public async Task SalvarRedisAsync(string nomeChave, object valor, int minutosParaExpirar = 720)
-        {
-            await distributedCache.SetAsync(nomeChave, MessagePackSerializer.Serialize(valor), new DistributedCacheEntryOptions()
-                                                .SetAbsoluteExpiration(TimeSpan.FromMinutes(minutosParaExpirar)));
-
         }
     }
 }

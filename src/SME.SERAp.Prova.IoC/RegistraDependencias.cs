@@ -54,7 +54,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoProvaConsolidado, RepositorioResultadoProvaConsolidado>();
             services.AddScoped<IRepositorioResultadoProvaConsolidadoEntity, RepositorioResultadoProvaConsolidadoEntity>();
             services.AddScoped<IRepositorioExportacaoResultadoItem, RepositorioExportacaoResultadoItem>();
-
+            services.AddScoped<IRepositorioParametroSistema, RepositorioParametroSistema>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)

@@ -17,7 +17,6 @@ namespace SME.SERAp.Prova.Dados.Cache
 
         public RepositorioCache(IServicoLog servicoLog, IDistributedCache distributedCache)
         {
-
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
             this.distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
         }
@@ -45,7 +44,7 @@ namespace SME.SERAp.Prova.Dados.Cache
 
                 return default;
             }
-        }
+        }        
 
         public async Task RemoverRedisAsync(string nomeChave)
         {
@@ -58,12 +57,16 @@ namespace SME.SERAp.Prova.Dados.Cache
                 servicoLog.Registrar(ex);
             }
         }
-
         public async Task SalvarRedisAsync(string nomeChave, object valor, int minutosParaExpirar = 720)
         {
-            await distributedCache.SetAsync(nomeChave, MessagePackSerializer.Serialize(valor), new DistributedCacheEntryOptions()
+            var inicioOperacao = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            {
+                await distributedCache.SetAsync(nomeChave, MessagePackSerializer.Serialize(valor), new DistributedCacheEntryOptions()
                                                 .SetAbsoluteExpiration(TimeSpan.FromMinutes(minutosParaExpirar)));
 
+                timer.Stop();
+            }
         }
     }
 }

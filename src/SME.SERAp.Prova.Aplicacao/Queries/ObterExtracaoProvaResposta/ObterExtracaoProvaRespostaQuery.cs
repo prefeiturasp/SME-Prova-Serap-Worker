@@ -8,9 +8,12 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         public long ProvaSerapId { get; set; }
 
-        public ObterExtracaoProvaRespostaQuery(long provaSerapId)
+        public string DreCodigoEol { get; set; }
+
+        public ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol)
         {
             ProvaSerapId = provaSerapId;
+            DreCodigoEol = dreCodigoEol;
         }
     }
 }

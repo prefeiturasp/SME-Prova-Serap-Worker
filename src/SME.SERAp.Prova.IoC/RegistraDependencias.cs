@@ -52,10 +52,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioFrequenciaAlunoSgp, RepositorioFrequenciaAlunoSgp>();
             services.AddScoped<IRepositorioExportacaoResultado, RepositorioExportacaoResultado>();
             services.AddScoped<IRepositorioResultadoProvaConsolidado, RepositorioResultadoProvaConsolidado>();
-            services.TryAddScoped<IRepositorioParametroSistema, RepositorioParametroSistema>();
-
-
-
+            services.AddScoped<IRepositorioResultadoProvaConsolidadoEntity, RepositorioResultadoProvaConsolidadoEntity>();
+            services.AddScoped<IRepositorioExportacaoResultadoItem, RepositorioExportacaoResultadoItem>();
+            services.AddScoped<IRepositorioParametroSistema, RepositorioParametroSistema>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -81,6 +80,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarFrequenciaAlunoProvaUseCase, TratarFrequenciaAlunoProvaUseCase>();
             services.AddScoped<ITratarFrequenciaAlunoProvaSyncUseCase, TratarFrequenciaAlunoProvaSyncUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
+            services.AddScoped<IConsolidarProvaRespostaPorFiltroUseCase, ConsolidarProvaRespostaPorFiltroUseCase>();
             
 
             //Finalizar provas automaticamente

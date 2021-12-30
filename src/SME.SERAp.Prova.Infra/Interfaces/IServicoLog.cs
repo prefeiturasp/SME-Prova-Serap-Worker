@@ -7,5 +7,6 @@ namespace SME.SERAp.Prova.Infra.Interfaces
         void Registrar(Exception ex);
 
         void Registrar(string mensagem);
+
     }
 }

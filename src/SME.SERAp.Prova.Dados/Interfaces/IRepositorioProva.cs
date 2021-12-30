@@ -1,4 +1,4 @@
-﻿using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Dominio;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,7 +11,9 @@ namespace SME.SERAp.Prova.Dados
         Task<bool> VerificaSeExistePorProvaSerapId(long provaId);
         Task CriarProvaRespostasExtracao(long provaId);
         Task ConsolidarProvaRespostasPorProvaSerapId(long provaId);
-        Task<IEnumerable<ProvaAlunoDto>> ObterProvasIniciadasPorModalidadeAsync(int modalidade);
-        Task<bool> FinalizarProvaAsync(ProvaParaAtualizarDto provaParaAtualizar);
+        Task LimparDadosConsolidadosPorProvaSerapId(long provaId);
+        Task ConsolidarProvaRespostasPorFiltros(long provaId, string dreId, string ueId);
+        Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId);
+        Task<IEnumerable<ResultadoProvaConsolidado>> ObterDadosPorUeId(long provaId, string dreId, string ueId);
     }
 }

@@ -24,9 +24,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 NewLine = Environment.NewLine,
             };
 
-            var caminhoBase = AppDomain.CurrentDomain.BaseDirectory;
-            var nomeArquivo = Path.Combine(caminhoBase, "arquivos/resultados", request.NomeArquivo);
+            var pathResultados = Environment.GetEnvironmentVariable("PathResultadosExportacaoSerap");
+            string filePath = new Uri(pathResultados).AbsolutePath;
+            string physicalPath = filePath.Replace("/", "\\");
+            var nomeArquivo = Path.Combine(physicalPath, request.NomeArquivo);
             var quantidadeQuestoes = request.Resultado.FirstOrDefault();
+
             try
             {
                 using (var writer = new StreamWriter(nomeArquivo))
@@ -51,7 +54,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     csv.WriteField("prova_caderno");
                     csv.WriteField("aluno_frequencia");
 
-                    for(var c = 1; c <= quantidadeQuestoes.ProvaQuantidadeQuestoes; c++)
+                    for (var c = 1; c <= quantidadeQuestoes.ProvaQuantidadeQuestoes; c++)
                         csv.WriteField($"questao_{c}");
 
                     csv.NextRecord();
@@ -78,7 +81,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         csv.WriteField(valor.ProvaCaderno);
                         csv.WriteField(valor.AlunoFrequencia);
 
-                        foreach(var resultado in registro)
+                        foreach (var resultado in registro)
                         {
                             csv.WriteField(resultado.Resposta);
                         }

@@ -18,6 +18,7 @@ namespace SME.SERAp.Prova.Dados
             modelBuilder.ApplyConfiguration(new UeEntityMap());
             modelBuilder.ApplyConfiguration(new TurmaEntityMap());
             modelBuilder.ApplyConfiguration(new AlunoEntityMap());
+            modelBuilder.ApplyConfiguration(new ResultadoProvaConsolidadoEntityMap());            
         }
     }
 }

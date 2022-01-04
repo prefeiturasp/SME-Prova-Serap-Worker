@@ -7,6 +7,6 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioResultadoProvaConsolidado
     {
-        Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaResposta(long provaSerapId);
+        Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaResposta(long provaSerapId, string dreCodigoEol);
     }
 }

@@ -10,7 +10,6 @@ namespace SME.SERAp.Prova.Infra
         public ProvaLegadoDetalhesIdDto()
         {
             Anos = new List<string>();
-            OcultarProva = false;
         }
         public long Id { get; set; }
         public string Descricao { get; set; }

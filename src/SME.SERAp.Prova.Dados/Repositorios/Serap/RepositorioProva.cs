@@ -39,7 +39,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = $@"call p_excluir_dados_consolidados_prova(@provaId, @dreId, @ueId);";
-                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 1000);
+                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 5000);
             }
             catch (System.Exception ex)
             {
@@ -112,7 +112,7 @@ namespace SME.SERAp.Prova.Dados
             try
             { 
                 var query = $@"call p_consolidar_dados_prova(@provaId, @dreId, @ueId);";
-                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 1000);
+                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 5000);
             }
             catch (System.Exception ex)
             {

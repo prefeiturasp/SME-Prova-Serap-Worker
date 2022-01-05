@@ -74,7 +74,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 }
 
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, provaParaTratar));
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
 
                 foreach (var ano in provaLegado.Anos)
                 {

@@ -16,7 +16,7 @@ namespace SME.SERAp.Prova.Dados
             
         }
 
-        public async Task<IEnumerable<ProvaAdesao>> ObterAdesaoPorProvaId(long provaId)
+        public async Task<IEnumerable<ProvaAdesaoEntityDto>> ObterAdesaoPorProvaId(long provaId)
         {
             using var conn = ObterConexao();
             try
@@ -41,7 +41,7 @@ namespace SME.SERAp.Prova.Dados
                                 where t.AllAdhered = 0
 	                                and t.id = @provaId";
 
-                return await conn.QueryAsync<ProvaAdesao>(query, new { provaId });
+                return await conn.QueryAsync<ProvaAdesaoEntityDto>(query, new { provaId });
             }
             finally
             {

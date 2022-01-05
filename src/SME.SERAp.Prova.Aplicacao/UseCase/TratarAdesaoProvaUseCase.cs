@@ -21,16 +21,16 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-                var prova = mensagemRabbit.ObterObjetoMensagem<Dominio.Prova>();
+                var prova = mensagemRabbit.ObterObjetoMensagem<ProvaAdesaoDto>();
 
                 if (prova is null)
                     return default;
 
-                await mediator.Send(new ExcluirAdesaoPorProvaIdCommand(prova.Id));
+                await mediator.Send(new ExcluirAdesaoPorProvaIdCommand(prova.ProvaId));
 
                 if (!prova.AderirTodos)
                 {
-                    var adesaoLegado = await mediator.Send(new ObterAdesaoProvaLegadoPorIdQuery(prova.LegadoId));
+                    var adesaoLegado = await mediator.Send(new ObterAdesaoProvaLegadoPorIdQuery(prova.ProvaLegadoId));
 
                     if (adesaoLegado is null || !adesaoLegado.Any())
                         return default;
@@ -42,10 +42,17 @@ namespace SME.SERAp.Prova.Aplicacao
                         var turmasAdesaoEscolaLegado = adesaoLegado.Where(e => e.UeId == escola).Select(t => t.TurmaId).Distinct().ToList();
                         foreach (long turma in turmasAdesaoEscolaLegado)
                         {
-                            var alunosAdesaoLegado = adesaoLegado.Where(t => t.TurmaId == turma && t.UeId == escola).Select(a => a.AlunoId).Distinct().ToList();
-                            var dadosAlunos = await mediator.Send(new ObterDadosAlunosParaAdesaoPorRaQuery(alunosAdesaoLegado.ToArray()));
-                            var adesaoParaInserir = dadosAlunos.Select(a => new ProvaAdesao(prova.Id, a.UeId, a.TurmaId, a.AlunoId)).ToList();
-                            await mediator.Send(new InserirListaProvaAdesaoCommand(adesaoParaInserir));
+                            var raAlunosAdesaoLegado = adesaoLegado.Where(t => t.TurmaId == turma && t.UeId == escola).Select(a => a.AlunoRa).Distinct().ToList();
+                            var dadosAlunos = await mediator.Send(new ObterDadosAlunosParaAdesaoPorRaQuery(raAlunosAdesaoLegado.ToArray()));
+                            if (dadosAlunos.Any())
+                            {
+                                var adesaoParaInserir = dadosAlunos.Select(a => new ProvaAdesao(prova.ProvaId, a.UeId, a.TurmaId, a.AlunoId)).ToList();
+                                await mediator.Send(new InserirListaProvaAdesaoCommand(adesaoParaInserir));
+                            }
+                            else
+                            {
+                                LogarAlunosNaoSincronizados(prova.ProvaLegadoId, escola, turma, raAlunosAdesaoLegado.ToArray());
+                            }                            
                         }
                     }
                 }                
@@ -56,6 +63,13 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
             return true;
+        }
+
+        private void LogarAlunosNaoSincronizados(long provaLegadoId, long codigoUe, long codigoTurma, long[] raAlunos)
+        {
+            string msg = $"Alunos não sincronizados no serap estudantes para adesão da prova {provaLegadoId}. ";
+            msg += $"CodigoUE: {codigoUe}, CodigoTurma: {codigoTurma}, RaAlunos: {string.Join(",", raAlunos)}.";
+            SentrySdk.CaptureMessage(msg, SentryLevel.Warning);
         }
     }
 }

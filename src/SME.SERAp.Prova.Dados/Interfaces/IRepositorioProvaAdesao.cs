@@ -7,6 +7,7 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioProvaAdesao : IRepositorioBase<ProvaAdesao>
     {
-
+        Task<IEnumerable<ProvaAdesao>> ObterDadosAlunosParaAdesaoPorRa(long[] alunosRa);
+        Task ExcluirAdesaoPorProvaId(long provaId);
     }
 }

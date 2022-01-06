@@ -12,53 +12,28 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class GerarCSVExtracaoProvaCommandHandler : IRequestHandler<GerarCSVExtracaoProvaCommand, bool>
+    public class EscreverDadosCSVExtracaoProvaCommandHandler : IRequestHandler<EscreverDadosCSVExtracaoProvaCommand, bool>
     {
-        public GerarCSVExtracaoProvaCommandHandler()
-        {
-        }
-        public async Task<bool> Handle(GerarCSVExtracaoProvaCommand request, CancellationToken cancellationToken)
+        public EscreverDadosCSVExtracaoProvaCommandHandler(){}
+
+        public async Task<bool> Handle(EscreverDadosCSVExtracaoProvaCommand request, CancellationToken cancellationToken)
         {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 NewLine = Environment.NewLine,
+                HasHeaderRecord = false,
             };
-
-            var pathResultados = Environment.GetEnvironmentVariable("PathResultadosExportacaoSerap");
-            string filePath = new Uri(pathResultados).AbsolutePath;
-            string physicalPath = filePath.Replace("/", "\\");
-            var nomeArquivo = Path.Combine(physicalPath, request.NomeArquivo);
-            var quantidadeQuestoes = request.Resultado.FirstOrDefault();
 
             try
             {
-                using (var writer = new StreamWriter(nomeArquivo))
+                
+                using (var stream = File.Open(request.NomeArquivo, FileMode.Append))
+                using (var writer = new StreamWriter(stream))
                 using (var csv = new CsvWriter(writer, config))
                 {
-                    csv.WriteField("prova_serap_id");
-                    csv.WriteField("prova_serap_estudantes_id");
-                    csv.WriteField("dre_codigo_eol");
-                    csv.WriteField("dre_sigla");
-                    csv.WriteField("dre_nome");
-                    csv.WriteField("ue_codigo_eol");
-                    csv.WriteField("ue_nome");
-                    csv.WriteField("turma_ano_escolar");
-                    csv.WriteField("turma_ano_escolar_descricao");
-                    csv.WriteField("turma_codigo");
-                    csv.WriteField("turma_descricao");
-                    csv.WriteField("aluno_codigo_eol");
-                    csv.WriteField("aluno_nome");
-                    csv.WriteField("aluno_sexo");
-                    csv.WriteField("aluno_data_nascimento");
-                    csv.WriteField("prova_componente");
-                    csv.WriteField("prova_caderno");
-                    csv.WriteField("aluno_frequencia");
-
-                    for (var c = 1; c <= quantidadeQuestoes.ProvaQuantidadeQuestoes; c++)
-                        csv.WriteField($"questao_{c}");
-
                     csv.NextRecord();
                     var agrupamento = request.Resultado.OrderBy(r => r.QuestaoOrdem).GroupBy(a => a.AlunoCodigoEol);
+
                     foreach (var registro in agrupamento)
                     {
                         var valor = registro.FirstOrDefault();
@@ -85,15 +60,16 @@ namespace SME.SERAp.Prova.Aplicacao
                         {
                             csv.WriteField(resultado.Resposta);
                         }
+
                         csv.NextRecord();
                     }
+
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new ArgumentException($"Escrever dados CSV Extração prova -- Erro: {ex.Message}");
             }
-
 
             return await Task.FromResult(true);
         }

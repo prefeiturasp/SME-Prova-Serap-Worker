@@ -21,6 +21,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> Handle(ObterExtracaoProvaRespostaQuery request,
             CancellationToken cancellationToken)
-            => await repositorioResultadoProvaConsolidado.ObterExtracaoProvaResposta(request.ProvaSerapId, request.DreCodigoEol);
+            => await repositorioResultadoProvaConsolidado.ObterExtracaoProvaRespostaQuery(request.ProvaSerapId, request.DreCodigoEol, request.UeCodigoEol);
     }
 }

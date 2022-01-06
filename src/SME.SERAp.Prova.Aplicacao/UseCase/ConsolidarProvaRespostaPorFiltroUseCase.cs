@@ -30,14 +30,15 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     await mediator.Send(new ConsolidarProvaRespostaPorFiltroCommand(filtro.ProvaId, filtro.DreEolId, filtro.UeEolIds));
                     await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
-                }
 
-                bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
-                if (!existeItemProcesso)
-                {
-                    var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaId };
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                    bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
+                    if (!existeItemProcesso)
+                    {
+                        var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaId };
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                    }
                 }
+                
                 return true;
             }
             catch (Exception ex)

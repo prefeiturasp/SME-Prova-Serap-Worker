@@ -81,7 +81,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var pathResultados = Environment.GetEnvironmentVariable("PathResultadosExportacaoSerap");
             string caminhoCompleto = Path.Combine(pathResultados, nomeArquivo);
-            return caminhoCompleto.Replace("/", "\\");
+            return caminhoCompleto;
         }
 
         private void VerificarERemoverArquivoExistente(string caminhoArquivo)

@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 
-                using (var stream = File.Open(request.NomeArquivo, FileMode.Append))
+                using (var stream = TentarAbrirArquivo(request.NomeArquivo))
                 using (var writer = new StreamWriter(stream))
                 using (var csv = new CsvWriter(writer, config))
                 {
@@ -72,6 +72,33 @@ namespace SME.SERAp.Prova.Aplicacao
             }
 
             return await Task.FromResult(true);
+        }
+
+        private FileStream TentarAbrirArquivo(string nomeArquivo)
+        {
+            int tentativas = 1;
+            var fileStream = AbrirArquivo(nomeArquivo);
+            while (fileStream == null)
+            {
+                Task.Run(() => Thread.Sleep(5000)).GetAwaiter().GetResult();
+                fileStream = AbrirArquivo(nomeArquivo);
+                tentativas++;
+                if (tentativas == 10 && fileStream == null)
+                    throw new ArgumentException($"Não foi possível abrir o arquivo.");
+            }
+            return fileStream;
+        }
+
+        private FileStream AbrirArquivo(string nomeArquivo)
+        {            
+            try
+            {
+                return File.Open(nomeArquivo, FileMode.Append);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }

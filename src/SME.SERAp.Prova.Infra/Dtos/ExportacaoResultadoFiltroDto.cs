@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace SME.SERAp.Prova.Infra
 {
-    public class ConsolidarProvaFiltroDto
+    public class ExportacaoResultadoFiltroDto
     {
-        public ConsolidarProvaFiltroDto(long processoId, long provaId, long itemId, string dreEolId, string[] ueEolIds)
+        public ExportacaoResultadoFiltroDto(long processoId, long provaId, long itemId, string dreEolId, string[] ueEolIds)
         {
             ProcessoId = processoId;
             ProvaId = provaId;
@@ -15,10 +12,17 @@ namespace SME.SERAp.Prova.Infra
             UeEolIds = ueEolIds;
         }
 
+        public ExportacaoResultadoFiltroDto()
+        {
+
+        }
+
         public long ProcessoId { get; set; }
         public long ProvaId { get; set; }
         public long ItemId { get; set; }
         public string DreEolId { get; set; }
         public string[] UeEolIds { get; set; }
+        public string[] TurmaEolIds { get; set; }
+        public string CaminhoArquivo { get; set; }
     }
 }

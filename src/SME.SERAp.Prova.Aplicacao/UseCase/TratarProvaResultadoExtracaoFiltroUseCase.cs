@@ -4,21 +4,28 @@ using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ConsolidarProvaRespostaPorFiltroUseCase : IConsolidarProvaRespostaPorFiltroUseCase
+    public class TratarProvaResultadoExtracaoFiltroUseCase : ITratarProvaResultadoExtracaoFiltroUseCase
     {
+
         private readonly IMediator mediator;
-        public ConsolidarProvaRespostaPorFiltroUseCase(IMediator mediator)
+
+        public TratarProvaResultadoExtracaoFiltroUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
+
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
+            
             try
             {
                 if (filtro is null)
@@ -28,28 +35,37 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (exportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
                 {
-                    await mediator.Send(new ConsolidarProvaRespostaPorFiltroCommand(filtro.ProvaId, filtro.DreEolId, filtro.UeEolIds));
+                    if(!ExisteArquivo(filtro.CaminhoArquivo))
+                        throw new NegocioException($"Arquivo não foi encontrado: {filtro.CaminhoArquivo}");
+
+                    var resultado = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaId, filtro.DreEolId, filtro.UeEolIds[0], filtro.TurmaEolIds));
+                    if (resultado != null && resultado.Any())
+                        await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultado, filtro.CaminhoArquivo));
+                    
                     await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
 
                     bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
                     if (!existeItemProcesso)
                     {
-                        var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaId };
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                        await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Finalizado));
+                        await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
                     }
                 }
-                
-                return true;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
-                SentrySdk.CaptureMessage($"Erro ao consolidar os dados da prova por filtro. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
+                SentrySdk.CaptureMessage($"Escrever dados no arquivo CSV. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
                 SentrySdk.CaptureException(ex);
                 return false;
             }
+            return true;
+        }
 
+        private bool ExisteArquivo(string caminhoArquivo)
+        {
+            return File.Exists(caminhoArquivo);
         }
     }
 }

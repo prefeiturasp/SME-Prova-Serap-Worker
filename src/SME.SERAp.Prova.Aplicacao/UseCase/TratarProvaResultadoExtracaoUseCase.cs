@@ -55,7 +55,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
                     var dres = await mediator.Send(new ObterDresSerapQuery());
-                    foreach (Dre dre in dres.Take(1).ToList())//teste
+                    foreach (Dre dre in dres)
                     {
                         var ues = await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.CodigoDre));
                         foreach (Ue ue in ues)
@@ -78,7 +78,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         }
                     }
 
-                    foreach(ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar.Take(1).ToList())//teste
+                    foreach(ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
                     {
                         await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
                     }

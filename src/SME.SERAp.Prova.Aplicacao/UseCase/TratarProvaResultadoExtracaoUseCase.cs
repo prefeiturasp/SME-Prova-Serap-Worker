@@ -4,9 +4,11 @@ using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static SME.SERAp.Prova.Infra.Utils.Paginacao;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -39,8 +41,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (exportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
                 {
 
-                    var resultado = await mediator.Send(new VerificaResultadoExtracaoProvaExisteQuery(extracao.ProvaSerapId));
-                    if (!resultado)
+                    var resultadoExtracaoProva = await mediator.Send(new VerificaResultadoExtracaoProvaExisteQuery(extracao.ProvaSerapId));
+                    if (!resultadoExtracaoProva)
                         throw new NegocioException($"Os resultados da prova {extracao.ProvaSerapId} ainda não foram gerados");
 
                     exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoPorIdQuery(exportacaoResultado.Id));
@@ -50,16 +52,22 @@ namespace SME.SERAp.Prova.Aplicacao
                     VerificarERemoverArquivoExistente(caminhoCompletoArquivo);
 
                     await mediator.Send(new GerarCSVExtracaoProvaCommand(prova.TotalItens, caminhoCompletoArquivo));
-                    
+
                     var dres = await mediator.Send(new ObterDresSerapQuery());
                     foreach (Dre dre in dres)
                     {
                         var ues = await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.CodigoDre));
                         foreach (Ue ue in ues)
                         {
-                            var resultadoUe = await mediator.Send(new ObterExtracaoProvaRespostaQuery(extracao.ProvaSerapId, dre.CodigoDre, ue.CodigoUe));
-                            if (resultadoUe != null && resultadoUe.Any())
-                                await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultadoUe, caminhoCompletoArquivo));
+                            var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEAnoLetivoQuery(ue.CodigoUe, prova.Inicio.Year));
+                            var paginasTurmas = Paginar(turmasUe.ToList());
+                            foreach (List<Turma> turmas in paginasTurmas)
+                            {
+                                var codigosTurmas = turmas.Select(t => t.Codigo).ToArray();
+                                var resultado = await mediator.Send(new ObterExtracaoProvaRespostaQuery(extracao.ProvaSerapId, dre.CodigoDre, ue.CodigoUe, codigosTurmas));
+                                if (resultado != null && resultado.Any())
+                                    await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultado, caminhoCompletoArquivo));
+                            }
                         }
                     }
 
@@ -75,6 +83,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw ex;
             }
             return true;
+        }
+
+        private List<List<Turma>> Paginar(List<Turma> turmas)
+        {
+            var paginacao = new ListaPaginada<Turma>(turmas.ToList(), 5);
+            return paginacao.ObterTodasAsPaginas();
         }
 
         private string ObterCaminhoCompletoArquivo(string nomeArquivo)

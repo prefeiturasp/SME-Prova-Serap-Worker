@@ -36,6 +36,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Processando));
 
+                var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
                 var dres = await mediator.Send(new ObterDresSerapQuery());
                 foreach (Dre dre in dres)
                 {
@@ -46,10 +47,15 @@ namespace SME.SERAp.Prova.Aplicacao
                         var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();
                         var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
                         exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
-                        var filtro = new ConsolidarProvaFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
+                        var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
+                        filtrosParaPublicar.Add(filtro);
                     }
-                }                
+                }
+
+                foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
+                {
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
+                }
             }
             catch (Exception ex)
             {

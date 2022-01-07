@@ -18,6 +18,7 @@
         public const string AtualizarFrequenciaAlunoProvaSync = "serap.estudante.atualizar.frequencia.sync";
         public const string AtualizarFrequenciaAlunoProvaTratar = "serap.estudante.atualizar.frequencia.tratar";
         public const string ExtrairResultadosProva = "serap.estudante.prova.resultados.aluno.extrair";
+        public const string ExtrairResultadosProvaFiltro = "serap.estudante.prova.resultados.aluno.extrair.filtro";
         public const string ConsolidarProvaResultado = "serap.estudante.prova.resultados.consolidar";
         public const string ConsolidarProvaResultadoFiltro = "serap.estudante.prova.resultados.consolidar.filtro";
 

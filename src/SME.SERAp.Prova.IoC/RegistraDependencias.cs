@@ -75,10 +75,12 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IAtualizaImagensQuestoesUseCase, AtualizaImagensQuestoesUseCase>();
             services.AddScoped<IAtualizaImagensAlternativasUseCase, AtualizaImagensAlternativasUseCase>();
             services.AddScoped<IIncluirRespostaAlunoUseCase, IncluirRespostaAlunoUseCase>();
-            services.AddScoped<IIncluirPreferenciasAlunoUseCase, IncluirPreferenciasAlunoUseCase>();
-            services.AddScoped<ITratarProvaResultadoExtracaoUseCase, TratarProvaResultadoExtracaoUseCase>();
+            services.AddScoped<IIncluirPreferenciasAlunoUseCase, IncluirPreferenciasAlunoUseCase>();            
             services.AddScoped<ITratarFrequenciaAlunoProvaUseCase, TratarFrequenciaAlunoProvaUseCase>();
             services.AddScoped<ITratarFrequenciaAlunoProvaSyncUseCase, TratarFrequenciaAlunoProvaSyncUseCase>();
+
+            services.AddScoped<ITratarProvaResultadoExtracaoUseCase, TratarProvaResultadoExtracaoUseCase>();
+            services.AddScoped<ITratarProvaResultadoExtracaoFiltroUseCase, TratarProvaResultadoExtracaoFiltroUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
             services.AddScoped<IConsolidarProvaRespostaPorFiltroUseCase, ConsolidarProvaRespostaPorFiltroUseCase>();
             services.AddScoped<IIniciarProcessoFinalizarProvasAutomaticamenteUseCase, IniciarProcessoFinalizarProvasAutomaticamenteUseCase>();

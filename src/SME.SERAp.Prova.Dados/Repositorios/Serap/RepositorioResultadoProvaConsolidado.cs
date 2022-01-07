@@ -48,7 +48,7 @@ namespace SME.SERAp.Prova.Dados
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Extrair dados pra CSV. ProvaId:{provaSerapId}, CodigoDre:{dreCodigoEol}, CodigoUe:{ueCodigoEol} -- Erro: {ex.Message}");
+                throw new ArgumentException($"Extrair dados para CSV. ProvaId:{provaSerapId}, CodigoDre:{dreCodigoEol}, CodigoUe:{ueCodigoEol} -- Erro: {ex.Message}");
             }
             finally
             {
@@ -57,7 +57,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol, string ueCodigoEol)
+        public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol, string ueCodigoEol, string[] turmasCodigosEol = null)
         {
             using var conn = ObterConexaoLeitura();
             try
@@ -84,17 +84,24 @@ namespace SME.SERAp.Prova.Dados
 	                            rpc.aluno_frequencia AlunoFrequencia,  
 	                            rpc.questao_id as QuestaoId, 
 	                            rpc.questao_ordem as QuestaoOrdem,
-	                            rpc.resposta
-                              from resultado_prova_consolidado rpc 
-                                where rpc.prova_serap_id = @provaSerapId
-                                and rpc.dre_codigo_eol = @dreCodigoEol
-                                and rpc.ue_codigo_eol = @ueCodigoEol";
+	                            rpc.resposta as Resposta
+                              from resultado_prova_consolidado rpc ";
 
-                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaSerapId, dreCodigoEol, ueCodigoEol }, commandTimeout: 9000);
+                string where = "where 1=1";
+                where += @"     and rpc.prova_serap_id = @provaSerapId
+                                and rpc.dre_codigo_eol = @dreCodigoEol
+                                and rpc.ue_codigo_eol = @ueCodigoEol ";
+
+                if (turmasCodigosEol != null)
+                    where += "and rpc.turma_codigo = any(@turmasCodigosEol) ";
+
+                query += where;
+
+                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaSerapId, dreCodigoEol, ueCodigoEol, turmasCodigosEol }, commandTimeout: 9000);
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Extrair dados pra CSV. ProvaId:{provaSerapId}, CodigoDre:{dreCodigoEol}, CodigoUe:{ueCodigoEol} -- Erro: {ex.Message}");
+                throw new ArgumentException($"Extrair dados para CSV. ProvaId:{provaSerapId}, CodigoDre:{dreCodigoEol}, CodigoUe:{ueCodigoEol} -- Erro: {ex.Message}");
             }
             finally
             {

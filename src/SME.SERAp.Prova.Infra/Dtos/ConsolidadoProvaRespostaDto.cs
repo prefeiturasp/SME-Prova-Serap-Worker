@@ -25,21 +25,7 @@ namespace SME.SERAp.Prova.Infra
 		public string AlunoFrequencia {get; set; }
 		public long QuestaoId { get; set; }
 		public int QuestaoOrdem { get; set; }
-		public string Resposta { get; set; }
-
-
-		//               vape.aluno_nome,
-		//                  vape.aluno_sexo,
-		//                  vape.aluno_data_nascimento,
-		//                  vape.prova_componente,
-		//                  vape.prova_caderno,
-		//                  vape.aluno_frequencia, 
-		//                  q.id as questao_id, 
-		//                  q.ordem + 1 as questa_ordem,
-		//                  case
-		//                   when qar.alternativa_id<> null then a.numeracao
-		//                   else qar.resposta
-		//end as resposta
+		public string Resposta { get; set; }		
 
 		public ConsolidadoProvaRespostaDto()
         {

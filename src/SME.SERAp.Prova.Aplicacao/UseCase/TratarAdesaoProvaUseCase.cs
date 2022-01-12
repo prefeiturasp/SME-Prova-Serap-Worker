@@ -31,27 +31,37 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (!prova.AderirTodos)
                 {
                     var adesaoLegado = await mediator.Send(new ObterAdesaoProvaLegadoPorIdQuery(prova.ProvaLegadoId));
+                    var provaSerap = await mediator.Send(new ObterProvaDetalhesPorIdQuery(prova.ProvaLegadoId));
 
                     if (adesaoLegado is null || !adesaoLegado.Any())
                         return default;
 
-                    var escolasAdesaoLegado = adesaoLegado.Select(e => e.UeId).Distinct().ToList();
-
-                    foreach (long escola in escolasAdesaoLegado)
+                    var escolasAdesaoLegado = adesaoLegado.Select(e => e.UeCodigo).Distinct().ToList();
+                    foreach (string escola in escolasAdesaoLegado)
                     {
-                        var turmasAdesaoEscolaLegado = adesaoLegado.Where(e => e.UeId == escola).Select(t => t.TurmaId).Distinct().ToList();
+                        var ue = await mediator.Send(new ObterUePorCodigoQuery(escola));
+                        var turmasAdesaoEscolaLegado = adesaoLegado.Where(e => e.UeCodigo == escola).Select(t => t.TurmaId).Distinct().ToList();
                         foreach (long turma in turmasAdesaoEscolaLegado)
                         {
-                            var raAlunosAdesaoLegado = adesaoLegado.Where(t => t.TurmaId == turma && t.UeId == escola).Select(a => a.AlunoRa).Distinct().ToList();
-                            var dadosAlunos = await mediator.Send(new ObterDadosAlunosParaAdesaoPorRaQuery(raAlunosAdesaoLegado.ToArray()));
-                            if (dadosAlunos.Any())
+                            var turmaLegado = adesaoLegado.Where(a => a.TurmaId == turma).FirstOrDefault();
+                            var raAlunosAdesaoLegado = adesaoLegado.Where(t => t.TurmaId == turma && t.UeCodigo == escola).Select(a => a.AlunoRa).Distinct().ToList();
+                            if (raAlunosAdesaoLegado.Any())
                             {
-                                var adesaoParaInserir = dadosAlunos.Select(a => new ProvaAdesao(prova.ProvaId, a.UeId, a.TurmaId, a.AlunoId)).ToList();
+                                var adesaoParaInserir = raAlunosAdesaoLegado.Select(a => 
+                                        new ProvaAdesao(prova.ProvaId, 
+                                                        ue.Id, 
+                                                        a, 
+                                                        turmaLegado.AnoTurma.ToString(), 
+                                                        turmaLegado.TipoTurma, 
+                                                        (int)provaSerap.Modalidade,
+                                                        ObterTipoTurno((TipoTurnoSerapLegado)turmaLegado.TipoTurno)))
+                                                        .ToList();
+
                                 await mediator.Send(new InserirListaProvaAdesaoCommand(adesaoParaInserir));
                             }
                             else
                             {
-                                LogarAlunosNaoSincronizados(prova.ProvaLegadoId, escola, turma, raAlunosAdesaoLegado.ToArray());
+                                LogarAlunosNaoSincronizados(prova.ProvaLegadoId, ue.Id, turma, raAlunosAdesaoLegado.ToArray());
                             }                            
                         }
                     }
@@ -70,6 +80,27 @@ namespace SME.SERAp.Prova.Aplicacao
             string msg = $"Alunos não sincronizados no serap estudantes para adesão da prova {provaLegadoId}. ";
             msg += $"CodigoUE: {codigoUe}, CodigoTurma: {codigoTurma}, RaAlunos: {string.Join(",", raAlunos)}.";
             SentrySdk.CaptureMessage(msg, SentryLevel.Warning);
+        }
+        
+        public int ObterTipoTurno(TipoTurnoSerapLegado tipoTurnoSerapLegado)
+        {
+            switch (tipoTurnoSerapLegado)
+            {
+                case TipoTurnoSerapLegado.Integral:
+                    return (int)TipoTurno.Integral;
+                case TipoTurnoSerapLegado.Vespertino:
+                    return (int)TipoTurno.Vespertino;
+                case TipoTurnoSerapLegado.Noite:
+                    return (int)TipoTurno.Noite;
+                case TipoTurnoSerapLegado.Intermediario:
+                    return (int)TipoTurno.Intermediario;
+                case TipoTurnoSerapLegado.Tarde:
+                    return (int)TipoTurno.Tarde;
+                case TipoTurnoSerapLegado.Manha:
+                    return (int)TipoTurno.Manha;
+                default:
+                    throw new Exception($"Tipo turno não encontrado: {(int)tipoTurnoSerapLegado}");
+            }
         }
     }
 }

@@ -12,8 +12,11 @@ namespace SME.SERAp.Prova.Dados
 
             Map(c => c.ProvaId).ToColumn("prova_id");
             Map(c => c.UeId).ToColumn("ue_id");
-            Map(c => c.TurmaId).ToColumn("turma_id");
-            Map(c => c.AlunoId).ToColumn("aluno_id");
+            Map(c => c.AlunoRa).ToColumn("aluno_ra");
+            Map(c => c.AnoTurma).ToColumn("ano_turma");
+            Map(c => c.TipoTurma).ToColumn("tipo_turma");
+            Map(c => c.Modalidade).ToColumn("modalidade_codigo");
+            Map(c => c.Tipoturno).ToColumn("tipo_turno");
             Map(c => c.CriadoEm).ToColumn("criado_em");
             Map(c => c.AtualizadoEm).ToColumn("atualizado_em");
 

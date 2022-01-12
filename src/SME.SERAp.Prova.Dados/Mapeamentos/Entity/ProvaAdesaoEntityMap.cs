@@ -21,12 +21,21 @@ namespace SME.SERAp.Prova.Dados
                 .HasColumnName("ue_id")
                 .IsRequired();
 
-            builder.Property(c => c.TurmaId)
-                .HasColumnName("turma_id")
+            builder.Property(c => c.AlunoRa)
+                .HasColumnName("aluno_ra")
                 .IsRequired();
 
-            builder.Property(c => c.AlunoId)
-                .HasColumnName("aluno_id")
+            builder.Property(c => c.AnoTurma)
+                .HasColumnName("ano_turma")
+                .IsRequired();
+            builder.Property(c => c.TipoTurma)
+                .HasColumnName("tipo_turma")
+                .IsRequired();
+            builder.Property(c => c.Modalidade)
+                .HasColumnName("modalidade_codigo")
+                .IsRequired();
+            builder.Property(c => c.Tipoturno)
+                .HasColumnName("tipo_turno")
                 .IsRequired();
 
             builder.Property(c => c.CriadoEm)

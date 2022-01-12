@@ -24,6 +24,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.TotalCadernos).ToColumn("total_cadernos");
             Map(c => c.Modalidade).ToColumn("modalidade");
             Map(c => c.OcultarProva).ToColumn("ocultar_prova");
+            Map(c => c.AderirTodos).ToColumn("aderir_todos");
         }
     }
 }

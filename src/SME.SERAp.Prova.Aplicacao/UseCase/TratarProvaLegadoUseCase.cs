@@ -28,7 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
 
                 if (provaLegado == null)
-                    throw new System.Exception($"Prova {provaLegado} não localizada!");
+                    throw new Exception($"Prova {provaLegado} não localizada!");
 
                 var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(provaLegado.Id));
 
@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                     provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
-                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina , provaLegado.OcultarProva);
+                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos);
 
                 if (provaAtual == null)
                 {
@@ -56,6 +56,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 else
                 {
                     provaParaTratar.Id = provaAtual.Id;
+                    provaAtual.AderirTodos = provaParaTratar.AderirTodos;
 
                     var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
                     if (verificaSePossuiRespostas)
@@ -73,9 +74,11 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 }
 
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
+
                 foreach (var ano in provaLegado.Anos)
                 {
-                    await mediator.Send(new ProvaAnoIncluirCommand(new Dominio.ProvaAno(ano, provaAtual.Id)));
+                    await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id)));
                     if (provaLegado.PossuiBIB)
                         await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
 
@@ -98,7 +101,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
 
                 await mediator.Send(new RemoverProvasCacheCommand());
-            }                
+            }
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);

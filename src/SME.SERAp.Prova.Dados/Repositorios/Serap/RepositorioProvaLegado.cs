@@ -76,8 +76,7 @@ namespace SME.SERAp.Prova.Dados
 	              case 
 	            	when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
 	            end Ano,	           
-                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
-                t.AllAdhered AderirTodos
+                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

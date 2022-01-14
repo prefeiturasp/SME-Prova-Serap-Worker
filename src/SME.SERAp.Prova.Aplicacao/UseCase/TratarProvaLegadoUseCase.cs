@@ -30,6 +30,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (provaLegado == null)
                     throw new Exception($"Prova {provaLegado} não localizada!");
 
+                provaLegado.AderirTodos = await mediator.Send(new VerificaAderirTodosProvaLegadoQuery(provaId));
+
                 var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(provaLegado.Id));
 
                 if (provaLegado.Senha != null)

@@ -37,6 +37,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     foreach (var registro in agrupamento)
                     {
                         var valor = registro.FirstOrDefault();
+                        valor.CalcularTempoTotalProva();
                         csv.WriteField(valor.ProvaSerapId);
                         csv.WriteField(valor.ProvaSerapEstudantesId);
                         csv.WriteField(valor.DreCodigoEol);
@@ -54,7 +55,10 @@ namespace SME.SERAp.Prova.Aplicacao
                         csv.WriteField(valor.AlunoDataNascimento);
                         csv.WriteField(valor.ProvaComponente);
                         csv.WriteField(valor.ProvaCaderno);
+                        csv.WriteField(valor.TempoTotalProva > 0 ? valor.TempoTotalProva.ToString() : "");
                         csv.WriteField(valor.AlunoFrequencia);
+                        csv.WriteField(valor.DataInicio != null ? valor.DataInicio.ToString() : "");
+                        csv.WriteField(valor.DataFim != null ? valor.DataFim.ToString() : "");
 
                         foreach (var resultado in registro)
                         {

@@ -44,7 +44,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     csv.WriteField("aluno_data_nascimento");
                     csv.WriteField("prova_componente");
                     csv.WriteField("prova_caderno");
+                    csv.WriteField("tempo_total_prova");
                     csv.WriteField("aluno_frequencia");
+                    csv.WriteField("data_inicio");
+                    csv.WriteField("data_fim");
 
                     for (var c = 1; c <= quantidadeQuestoes; c++)
                         csv.WriteField($"questao_{c}");                    

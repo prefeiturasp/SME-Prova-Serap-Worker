@@ -82,6 +82,8 @@ namespace SME.SERAp.Prova.Dados
 	                            rpc.prova_caderno ProvaCaderno,
                                 rpc.prova_quantidade_questoes as ProvaQuantidadeQuestoes,
 	                            rpc.aluno_frequencia AlunoFrequencia,  
+                                rpc.prova_data_inicio DataInicio,
+                                rpc.prova_data_entregue DataFim,
 	                            rpc.questao_id as QuestaoId, 
 	                            rpc.questao_ordem as QuestaoOrdem,
 	                            rpc.resposta as Resposta

@@ -129,6 +129,68 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task<ProvaLegadoDetalhesIdDto> ObterProvaPorId(long id)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+              var query = @"
+              SELECT DISTINCT  
+	            t.Id,
+	            t.Description as descricao,
+                t.DownloadStartDate as InicioDownload,
+	            t.ApplicationStartDate as Inicio,
+	            t.ApplicationEndDate as Fim,
+	            case 
+	            	when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
+	            end TotalItens,
+	            t.NumberBlock as TotalCadernos,
+	            t.UpdateDate as UltimaAtualizacao,
+                ttime.Segundos AS TempoExecucao,
+                t.Password as Senha,
+                d.Description as Disciplina,
+                t.Bib as PossuiBIB,
+	            tne.tne_id as Modalidade,
+	            tne.tne_nome as ModalidadeNome,
+                mt.Id ModeloProva,	             	           
+                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
+				convert(bit, t.AllAdhered) as AderirTodos,
+                convert(bit, t.Multidiscipline) as Multidisciplinar
+            FROM
+	            Test t 
+	            INNER JOIN TestCurriculumGrade tcg ON
+	            t.Id = tcg.Test_Id	
+            INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
+	            tcg.TypeCurriculumGradeId = tt.tcp_id
+            INNER JOIN TESTTIME ttime on
+                t.TestTime_Id = ttime.id
+            INNER JOIN TestTypeCourse ttc ON
+	            ttc.TestType_Id = t.TestType_Id
+            LEFT JOIN Discipline d ON
+	            t.Discipline_Id = d.Id 
+	        INNER JOIN TestType on
+	        	t.TestType_Id = TestType.id
+	       	INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
+	       		TestType.TypeLevelEducationId = tne.tne_id
+            INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
+	            ttcp.crp_ordem = tt.tcp_ordem
+	            AND tt.tme_id = ttcp.tme_id
+            INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
+            LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
+			  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+            where
+	            t.id = @id";
+
+                return await conn.QueryFirstOrDefaultAsync<ProvaLegadoDetalhesIdDto>(query, new { id });
+                
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public  async Task<IEnumerable<long>> ObterAlternativasPorProvaIdEQuestaoId(long questaoId)
         {
             using var conn = ObterConexao();

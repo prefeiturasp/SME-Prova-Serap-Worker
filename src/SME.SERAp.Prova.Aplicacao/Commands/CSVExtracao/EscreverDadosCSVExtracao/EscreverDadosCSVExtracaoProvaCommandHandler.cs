@@ -62,7 +62,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                         foreach (var resultado in registro)
                         {
-                            csv.WriteField(resultado.Resposta);
+                            csv.WriteField(resultado.Resposta.Replace(")",""));
                         }
 
                         csv.NextRecord();

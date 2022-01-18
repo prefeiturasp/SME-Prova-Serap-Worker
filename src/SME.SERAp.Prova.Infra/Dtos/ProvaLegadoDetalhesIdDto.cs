@@ -28,6 +28,7 @@ namespace SME.SERAp.Prova.Infra
         public ModeloProva ModeloProva { get; set; }
         public bool OcultarProva { get; set; }
         public bool AderirTodos { get; set; }
+        public bool Multidisciplinar { get; set; }
 
         public void AddAno(string ano)
         {

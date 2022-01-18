@@ -17,7 +17,10 @@ namespace SME.SERAp.Prova.Aplicacao
         }
         public async Task<ProvaLegadoDetalhesIdDto> Handle(ObterProvaLegadoDetalhesPorIdQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioProvaLegado.ObterDetalhesPorId(request.ProvaId);
+            var provaAno = await repositorioProvaLegado.ObterDetalhesPorId(request.ProvaId);
+            var prova = await repositorioProvaLegado.ObterProvaPorId(request.ProvaId);
+            prova.Anos = provaAno.Anos;
+            return prova;
         }
     }
 }

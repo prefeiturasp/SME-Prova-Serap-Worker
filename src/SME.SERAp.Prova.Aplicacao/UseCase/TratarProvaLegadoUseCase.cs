@@ -48,7 +48,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                     provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
-                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos);
+                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos, provaLegado.Multidisciplinar);
 
                 if (provaAtual == null)
                 {
@@ -59,6 +59,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     provaParaTratar.Id = provaAtual.Id;
                     provaAtual.AderirTodos = provaParaTratar.AderirTodos;
+                    provaAtual.Multidisciplinar = provaParaTratar.Multidisciplinar;
 
                     var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
                     if (verificaSePossuiRespostas)

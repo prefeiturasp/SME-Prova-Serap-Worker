@@ -156,7 +156,8 @@ namespace SME.SERAp.Prova.Dados
                 mt.Id ModeloProva,	             	           
                 case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
 				convert(bit, t.AllAdhered) as AderirTodos,
-                convert(bit, t.Multidiscipline) as Multidisciplinar
+                convert(bit, t.Multidiscipline) as Multidisciplinar,
+                t.TestType_Id as TipoProva
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

@@ -59,6 +59,17 @@ namespace SME.SERAp.Prova.Aplicacao
                         }
                     }
 
+                    var audiosQuestao = await mediator.Send(new ObterAudiosPorQuestaoLegadoIdQuery(questaoSerap.QuestaoId));
+                    if (audiosQuestao != null && audiosQuestao.Any())
+                    {
+                        audiosQuestao = await mediator.Send(new ObterTamanhoArquivosQuery(audiosQuestao));
+                        foreach (var audioParaPersistir in audiosQuestao)
+                        {
+                            var arquivoId = await mediator.Send(new ArquivoPersistirCommand(audioParaPersistir));
+                            await mediator.Send(new QuestaoAudioPersistirCommand(questaoId, arquivoId));
+                        }
+                    }
+
                     if (questaoSerap.TipoItem == (int)QuestaoTipo.MultiplaEscolha)
                     {
                         var alternativasLegadoId = await mediator.Send(new ObterAlternativasLegadoPorIdQuery(questaoSerap.QuestaoId));

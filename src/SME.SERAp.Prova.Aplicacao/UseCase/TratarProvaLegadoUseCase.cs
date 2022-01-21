@@ -163,10 +163,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (tipoProvaLegado is null || tipoProvaLegado?.LegadoId == 0)
                     throw new Exception($"Tipo de prova {tipoProvaLegadoId} não localizado no legado.");
 
-                return await mediator.Send(new TipoProvaIncluirCommand(tipoProvaLegado));
-
+                tipoProva = new TipoProva();
+                tipoProva.Id = await mediator.Send(new TipoProvaIncluirCommand(tipoProvaLegado));
             }
 
+            //tratar tipo deficiencia
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarTipoProvaDeficiencia, tipoProva.Id));
             return tipoProva.Id;
         }
     }

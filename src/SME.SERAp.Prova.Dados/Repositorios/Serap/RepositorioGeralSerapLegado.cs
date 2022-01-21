@@ -37,5 +37,24 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<Guid>> ObterTipoProvaDeficienciaPorTipoProvaLegadoId(long tipoProvaLegadoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select DeficiencyId 
+                                from TestTypeDeficiency 
+                                    where [State] = 1
+                                    and TestType_Id = @tipoProvaLegadoId";
+
+                return await conn.QueryAsync<Guid>(query, new { tipoProvaLegadoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

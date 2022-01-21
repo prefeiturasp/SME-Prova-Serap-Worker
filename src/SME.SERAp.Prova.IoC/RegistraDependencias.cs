@@ -61,6 +61,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioQuestaoAudio, RepositorioQuestaoAudio>();
             services.AddScoped<IRepositorioTipoProva, RepositorioTipoProva>();
             services.AddScoped<IRepositorioGeralSerapLegado, RepositorioGeralSerapLegado>();
+            services.AddScoped<IRepositorioTipoDeficiencia, RepositorioTipoDeficiencia>();
+            services.AddScoped<IRepositorioTipoProvaDeficiencia, RepositorioTipoProvaDeficiencia>();
+            services.AddScoped<IRepositorioAlunoDeficiencia, RepositorioAlunoDeficiencia>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -91,7 +94,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IConsolidarProvaRespostaPorFiltroUseCase, ConsolidarProvaRespostaPorFiltroUseCase>();
             services.AddScoped<IIniciarProcessoFinalizarProvasAutomaticamenteUseCase, IniciarProcessoFinalizarProvasAutomaticamenteUseCase>();
             services.AddScoped<IFinalizarProvaAutomaticamenteUseCase, FinalizarProvaAutomaticamenteUseCase>();
-
+            services.AddScoped<ITratarTipoProvaDeficienciaUseCase, TratarTipoProvaDeficienciaUseCase>();
+            services.AddScoped<ITratarAlunoDeficienciaUseCase, TratarAlunoDeficienciaUseCase>();
 
 
 

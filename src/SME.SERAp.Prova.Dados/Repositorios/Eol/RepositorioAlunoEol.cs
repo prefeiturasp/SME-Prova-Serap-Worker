@@ -135,7 +135,7 @@ namespace SME.SERAp.Prova.Dados
                                 and tne.dt_cancelamento is null";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
-            return await conn.QueryAsync<int>(query);
+            return await conn.QueryAsync<int>(query, new { alunoRa });
         }
     }
 }

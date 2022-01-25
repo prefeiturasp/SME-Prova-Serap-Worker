@@ -167,7 +167,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 tipoProva.Id = await mediator.Send(new TipoProvaIncluirCommand(tipoProvaLegado));
             }
 
-            //tratar tipo deficiencia
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarTipoProvaDeficiencia, tipoProva.Id));
             return tipoProva.Id;
         }

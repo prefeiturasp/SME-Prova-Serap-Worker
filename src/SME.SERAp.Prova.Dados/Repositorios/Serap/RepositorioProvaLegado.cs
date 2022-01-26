@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
@@ -155,7 +156,8 @@ namespace SME.SERAp.Prova.Dados
                 mt.Id ModeloProva,	             	           
                 case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
 				convert(bit, t.AllAdhered) as AderirTodos,
-                convert(bit, t.Multidiscipline) as Multidisciplinar
+                convert(bit, t.Multidiscipline) as Multidisciplinar,
+                t.TestType_Id as TipoProva
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -286,6 +288,27 @@ namespace SME.SERAp.Prova.Dados
                                 WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId and BI.State = 1;";
 
                 return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId , questaoId});
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<Arquivo>> ObterAudiosPorQuestaoId(long questaoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" select f.[Path] Caminho, f.Id legadoId
+                                from Item i WITH (NOLOCK)
+                                    inner join ItemAudio ia WITH (NOLOCK) on i.Id = ia.Item_id and i.[State] = ia.[State]
+                                    inner join [File] f WITH (NOLOCK) on f.Id = ia.[File_Id] and f.[State] = ia.[State]
+                                where i.[State] = 1
+                                    and i.Id = @questaoId;";
+
+                return await conn.QueryAsync<Arquivo>(query, new { questaoId });
             }
             finally
             {

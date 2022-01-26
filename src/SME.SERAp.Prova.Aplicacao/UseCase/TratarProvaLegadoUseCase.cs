@@ -45,10 +45,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
 
                 var modalidadeSerap = ObterModalidade(provaLegado.Modalidade, provaLegado.ModeloProva);
+                var tipoProvaSerap = await ObterTipoProva(provaLegado.TipoProva);
 
-                var provaParaTratar = new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
-                    provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
-                    provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos, provaLegado.Multidisciplinar);
+                var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap);
 
                 if (provaAtual == null)
                 {
@@ -60,6 +59,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     provaParaTratar.Id = provaAtual.Id;
                     provaAtual.AderirTodos = provaParaTratar.AderirTodos;
                     provaAtual.Multidisciplinar = provaParaTratar.Multidisciplinar;
+                    provaAtual.TipoProvaId = provaParaTratar.TipoProvaId;
 
                     var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
                     if (verificaSePossuiRespostas)
@@ -113,6 +113,14 @@ namespace SME.SERAp.Prova.Aplicacao
             return true;
         }
 
+        private Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap)
+        {
+            return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
+                provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
+                provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap);
+        }
+
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)
         {
             switch (modalidade)
@@ -144,6 +152,23 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAlternativasPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverQuestoesPorIdCommand(provaAtual.Id));
+        }
+
+        private async Task<long> ObterTipoProva(long tipoProvaLegadoId)
+        {
+            var tipoProva = await mediator.Send(new ObterTipoProvaPorLegadoIdQuery(tipoProvaLegadoId));
+            if (tipoProva is null || tipoProva?.Id == 0)
+            {
+                var tipoProvaLegado = await mediator.Send(new ObterTipoProvaLegadoPorIdQuery(tipoProvaLegadoId));
+                if (tipoProvaLegado is null || tipoProvaLegado?.LegadoId == 0)
+                    throw new Exception($"Tipo de prova {tipoProvaLegadoId} não localizado no legado.");
+
+                tipoProva = new TipoProva();
+                tipoProva.Id = await mediator.Send(new TipoProvaIncluirCommand(tipoProvaLegado));
+            }
+
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarTipoProvaDeficiencia, tipoProva.Id));
+            return tipoProva.Id;
         }
     }
 }

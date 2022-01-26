@@ -1,4 +1,5 @@
-﻿using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,5 +17,6 @@ namespace SME.SERAp.Prova.Dados
         Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long questaoId,
             long alternativaId);
         Task<IEnumerable<ContextoProvaLegadoDto>> ObterContextosProvaPorProvaId(long provaId);
+        Task<IEnumerable<Arquivo>> ObterAudiosPorQuestaoId(long questaoId);
     }
 }

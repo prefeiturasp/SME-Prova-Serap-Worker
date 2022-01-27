@@ -157,14 +157,22 @@ namespace SME.SERAp.Prova.Aplicacao
         private async Task<long> ObterTipoProva(long tipoProvaLegadoId)
         {
             var tipoProva = await mediator.Send(new ObterTipoProvaPorLegadoIdQuery(tipoProvaLegadoId));
+            var tipoProvaLegado = await mediator.Send(new ObterTipoProvaLegadoPorIdQuery(tipoProvaLegadoId));
+
+            if (tipoProvaLegado is null || tipoProvaLegado?.LegadoId == 0)
+                throw new Exception($"Tipo de prova {tipoProvaLegadoId} não localizado no legado.");
+
             if (tipoProva is null || tipoProva?.Id == 0)
             {
-                var tipoProvaLegado = await mediator.Send(new ObterTipoProvaLegadoPorIdQuery(tipoProvaLegadoId));
-                if (tipoProvaLegado is null || tipoProvaLegado?.LegadoId == 0)
-                    throw new Exception($"Tipo de prova {tipoProvaLegadoId} não localizado no legado.");
-
                 tipoProva = new TipoProva();
                 tipoProva.Id = await mediator.Send(new TipoProvaIncluirCommand(tipoProvaLegado));
+            }
+            else
+            {
+                tipoProvaLegado.Id = tipoProva.Id;
+                tipoProvaLegado.CriadoEm = tipoProva.CriadoEm;
+                tipoProvaLegado.AtualizadoEm = tipoProva.AtualizadoEm;
+                await mediator.Send(new TipoProvaAtualizarCommand(tipoProvaLegado));
             }
 
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarTipoProvaDeficiencia, tipoProva.Id));

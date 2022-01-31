@@ -55,6 +55,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoProvaConsolidadoEntity, RepositorioResultadoProvaConsolidadoEntity>();
             services.AddScoped<IRepositorioExportacaoResultadoItem, RepositorioExportacaoResultadoItem>();
             services.AddScoped<IRepositorioParametroSistema, RepositorioParametroSistema>();
+            services.AddScoped<IRepositorioProvaAdesao, RepositorioProvaAdesao>();
+            services.AddScoped<IRepositorioProvaAdesaoEntity, RepositorioProvaAdesaoEntity>();
+            services.AddScoped<IRepositorioProvaAdesaoLegado, RepositorioProvaAdesaoLegado>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -98,6 +101,9 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<IRabbitDeadletterSerapSyncUseCase, RabbitDeadletterSerapSyncUseCase>();
             services.AddScoped<IRabbitDeadletterSerapTratarUseCase, RabbitDeadletterSerapTratarUseCase>();
+
+            //sincronizar adesão das provas 
+            services.AddScoped<ITratarAdesaoProvaUseCase, TratarAdesaoProvaUseCase>();
         }
     }
 }

@@ -8,5 +8,6 @@ namespace SME.SERAp.Prova.Dados
     public interface IRepositorioProvaAdesaoLegado
     {
         Task<IEnumerable<ProvaAdesaoEntityDto>> ObterAdesaoPorProvaId(long provaId);
+        Task<int> ObterAderirPorProvaId(long provaId);
     }
 }

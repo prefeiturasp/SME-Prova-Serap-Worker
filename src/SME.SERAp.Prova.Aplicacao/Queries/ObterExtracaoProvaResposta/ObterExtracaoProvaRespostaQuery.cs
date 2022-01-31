@@ -10,10 +10,16 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public string DreCodigoEol { get; set; }
 
-        public ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol)
+        public string UeCodigoEol { get; set; }
+
+        public string[] TurmasCodigosEol { get; set; }
+
+        public ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol, string ueCodigoEol, string[] turmasCodigosEol = null)
         {
             ProvaSerapId = provaSerapId;
             DreCodigoEol = dreCodigoEol;
+            UeCodigoEol = ueCodigoEol;
+            TurmasCodigosEol = turmasCodigosEol;
         }
     }
 }

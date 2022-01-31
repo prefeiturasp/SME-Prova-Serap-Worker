@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = $@"delete from exportacao_resultado_item where id = @id;";
-                await conn.ExecuteAsync(query, new { Id }, commandTimeout: 600);
+                await conn.ExecuteAsync(query, new { Id }, commandTimeout: 5000);
             }
             catch (Exception ex)
             {
@@ -38,7 +38,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = $@"delete from exportacao_resultado_item where exportacao_resultado_id = @ProcessoId;";
-                await conn.ExecuteAsync(query, new { ProcessoId }, commandTimeout: 600);
+                await conn.ExecuteAsync(query, new { ProcessoId }, commandTimeout: 5000);
             }
             catch (Exception ex)
             {

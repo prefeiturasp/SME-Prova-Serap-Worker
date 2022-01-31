@@ -73,5 +73,21 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-    }
+		public async Task<int> ObterAderirPorProvaId(long provaId)
+		{
+			using var conn = ObterConexao();
+			try
+			{
+				var query = @"select AllAdhered from Test where Id = @provaId";
+
+				return await conn.QueryFirstOrDefaultAsync<int>(query, new { provaId });
+			}
+			finally
+			{
+				conn.Close();
+				conn.Dispose();
+			}
+		}
+
+	}
 }

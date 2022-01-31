@@ -58,6 +58,12 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioProvaAdesao, RepositorioProvaAdesao>();
             services.AddScoped<IRepositorioProvaAdesaoEntity, RepositorioProvaAdesaoEntity>();
             services.AddScoped<IRepositorioProvaAdesaoLegado, RepositorioProvaAdesaoLegado>();
+            services.AddScoped<IRepositorioQuestaoAudio, RepositorioQuestaoAudio>();
+            services.AddScoped<IRepositorioTipoProva, RepositorioTipoProva>();
+            services.AddScoped<IRepositorioGeralSerapLegado, RepositorioGeralSerapLegado>();
+            services.AddScoped<IRepositorioTipoDeficiencia, RepositorioTipoDeficiencia>();
+            services.AddScoped<IRepositorioTipoProvaDeficiencia, RepositorioTipoProvaDeficiencia>();
+            services.AddScoped<IRepositorioAlunoDeficiencia, RepositorioAlunoDeficiencia>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -86,14 +92,16 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProvaResultadoExtracaoFiltroUseCase, TratarProvaResultadoExtracaoFiltroUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
             services.AddScoped<IConsolidarProvaRespostaPorFiltroUseCase, ConsolidarProvaRespostaPorFiltroUseCase>();
-            
-
-            //Finalizar provas automaticamente
             services.AddScoped<IIniciarProcessoFinalizarProvasAutomaticamenteUseCase, IniciarProcessoFinalizarProvasAutomaticamenteUseCase>();
             services.AddScoped<IFinalizarProvaAutomaticamenteUseCase, FinalizarProvaAutomaticamenteUseCase>();
+            services.AddScoped<ITratarTipoProvaDeficienciaUseCase, TratarTipoProvaDeficienciaUseCase>();
+            services.AddScoped<ITratarAlunoDeficienciaUseCase, TratarAlunoDeficienciaUseCase>();
+
+
 
             // sincronização institucional 
             services.AddScoped<IExecutarSincronizacaoInstitucionalDreSyncUseCase, ExecutarSincronizacaoInstitucionalDreSyncUseCase>();
+            //services.AddScoped<IExecutarSincronizacaoInstitucionalDreTratarUseCase, ExecutarSincronizacaoInstitucionalDreTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeSyncUseCase, ExecutarSincronizacaoInstitucionalUeSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeTratarUseCase, ExecutarSincronizacaoInstitucionalUeTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaSyncUseCase, ExecutarSincronizacaoInstitucionalTurmaSyncUseCase>();

@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
@@ -20,13 +21,21 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"
-                select
-	                t.id
+	            select
+                    
+	                t.id,
+					t.UpdateDate,
+					tp.UpdateDate
                 from
 	                test t
+					left join TestPermission tp
+					on tp.Test_Id = t.Id
+                     AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+				
                 where
 	                t.ShowOnSerapEstudantes = 1
-                    and t.UpdateDate > @ultimaAtualizacao
+                    and (t.UpdateDate >  @ultimaAtualizacao or 
+					      tp.UpdateDate >  @ultimaAtualizacao )
                     and t.State = 1
                 order by
 	                t.ApplicationStartDate desc";
@@ -64,11 +73,11 @@ namespace SME.SERAp.Prova.Dados
 	            tne.tne_id as Modalidade,
 	            tne.tne_nome as ModalidadeNome,
                 mt.Id ModeloProva,
+                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
 	              case 
 	            	when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
 	            end Ano,	           
-                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
-                t.AllAdhered AderirTodos
+                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -89,8 +98,8 @@ namespace SME.SERAp.Prova.Dados
 	            ttcp.crp_ordem = tt.tcp_ordem
 	            AND tt.tme_id = ttcp.tme_id
             INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
-	          LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
-			   AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E' -- grupo aluno coresso 
+            LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
+			  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
             where
 	            t.id = @id";
 
@@ -113,6 +122,69 @@ namespace SME.SERAp.Prova.Dados
                     }, param: new { id }, splitOn: "ano");
 
                 return lookup.Values.FirstOrDefault();
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<ProvaLegadoDetalhesIdDto> ObterProvaPorId(long id)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+              var query = @"
+              SELECT DISTINCT  
+	            t.Id,
+	            t.Description as descricao,
+                t.DownloadStartDate as InicioDownload,
+	            t.ApplicationStartDate as Inicio,
+	            t.ApplicationEndDate as Fim,
+	            case 
+	            	when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
+	            end TotalItens,
+	            t.NumberBlock as TotalCadernos,
+	            t.UpdateDate as UltimaAtualizacao,
+                ttime.Segundos AS TempoExecucao,
+                t.Password as Senha,
+                d.Description as Disciplina,
+                t.Bib as PossuiBIB,
+	            tne.tne_id as Modalidade,
+	            tne.tne_nome as ModalidadeNome,
+                mt.Id ModeloProva,	             	           
+                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
+				convert(bit, t.AllAdhered) as AderirTodos,
+                convert(bit, t.Multidiscipline) as Multidisciplinar,
+                t.TestType_Id as TipoProva
+            FROM
+	            Test t 
+	            INNER JOIN TestCurriculumGrade tcg ON
+	            t.Id = tcg.Test_Id	
+            INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
+	            tcg.TypeCurriculumGradeId = tt.tcp_id
+            INNER JOIN TESTTIME ttime on
+                t.TestTime_Id = ttime.id
+            INNER JOIN TestTypeCourse ttc ON
+	            ttc.TestType_Id = t.TestType_Id
+            LEFT JOIN Discipline d ON
+	            t.Discipline_Id = d.Id 
+	        INNER JOIN TestType on
+	        	t.TestType_Id = TestType.id
+	       	INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
+	       		TestType.TypeLevelEducationId = tne.tne_id
+            INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
+	            ttcp.crp_ordem = tt.tcp_ordem
+	            AND tt.tme_id = ttcp.tme_id
+            INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
+            LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
+			  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+            where
+	            t.id = @id";
+
+                return await conn.QueryFirstOrDefaultAsync<ProvaLegadoDetalhesIdDto>(query, new { id });
+                
             }
             finally
             {
@@ -216,6 +288,27 @@ namespace SME.SERAp.Prova.Dados
                                 WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId and BI.State = 1;";
 
                 return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId , questaoId});
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<Arquivo>> ObterAudiosPorQuestaoId(long questaoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" select f.[Path] Caminho, f.Id legadoId
+                                from Item i WITH (NOLOCK)
+                                    inner join ItemAudio ia WITH (NOLOCK) on i.Id = ia.Item_id and i.[State] = ia.[State]
+                                    inner join [File] f WITH (NOLOCK) on f.Id = ia.[File_Id] and f.[State] = ia.[State]
+                                where i.[State] = 1
+                                    and i.Id = @questaoId;";
+
+                return await conn.QueryAsync<Arquivo>(query, new { questaoId });
             }
             finally
             {

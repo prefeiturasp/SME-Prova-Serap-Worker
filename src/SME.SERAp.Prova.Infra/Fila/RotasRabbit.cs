@@ -18,8 +18,12 @@
         public const string AtualizarFrequenciaAlunoProvaSync = "serap.estudante.atualizar.frequencia.sync";
         public const string AtualizarFrequenciaAlunoProvaTratar = "serap.estudante.atualizar.frequencia.tratar";
         public const string ExtrairResultadosProva = "serap.estudante.prova.resultados.aluno.extrair";
+        public const string ExtrairResultadosProvaFiltro = "serap.estudante.prova.resultados.aluno.extrair.filtro";
         public const string ConsolidarProvaResultado = "serap.estudante.prova.resultados.consolidar";
+        public const string ConsolidarProvaResultadoFiltro = "serap.estudante.prova.resultados.consolidar.filtro";
 
+        public const string IniciarProcessoFinalizarProvasAutomaticamente = "serap.estudante.prova.finalizar.automaticamente.iniciar";
+        public const string FinalizarProvaAutomaticamente = "serap.estudante.prova.finalizar.automaticamente";
 
         public const string SincronizaEstruturaInstitucionalDreSync = "serap.sincronizacao.institucional.dre.sync";
         public const string SincronizaEstruturaInstitucionalDreTratar = "serap.sincronizacao.institucional.dre.tratar";

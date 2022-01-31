@@ -1,5 +1,4 @@
-﻿using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Infra;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,6 +6,8 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioResultadoProvaConsolidado
     {
-        Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaResposta(long provaSerapId);
+        Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaRespostaFuncao(long provaSerapId, string dreCodigoEol, string ueCodigoEol);
+        Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol, string ueCodigoEol, string[] turmasCodigosEol = null);
+        Task<bool> VerificaResultadoExtracaoProvaExiste(long provaLegadoId);
     }
 }

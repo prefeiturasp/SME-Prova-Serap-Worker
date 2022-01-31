@@ -7,9 +7,10 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         public ExportacaoResultado ExportacaoResultado { get; set; }
 
-        public ExportacaoResultadoAtualizarCommand(ExportacaoResultado exportacaoResultado)
+        public ExportacaoResultadoAtualizarCommand(ExportacaoResultado exportacaoResultado, ExportacaoResultadoStatus status)
         {
             ExportacaoResultado = exportacaoResultado;
+            ExportacaoResultado.AtualizarStatus(status);
         }
     }
 }

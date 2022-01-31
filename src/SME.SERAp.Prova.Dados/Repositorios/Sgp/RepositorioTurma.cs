@@ -235,5 +235,25 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<Turma>> ObterTurmasPorCodigoUeEAnoLetivo(string codigoUe, int anoLetivo)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
+                                from turma t
+                                inner join ue on t.ue_id = ue.id
+                                where t.ano_letivo = @anoLetivo
+                                and ue.ue_id = @codigoUe;";
+
+                return await conn.QueryAsync<Turma>(query, new { codigoUe, anoLetivo });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class GerarCSVExtracaoProvaCommand : IRequest<bool>
+    public class EscreverDadosCSVExtracaoProvaCommand : IRequest<bool>
     {
-        public GerarCSVExtracaoProvaCommand(IEnumerable<ConsolidadoProvaRespostaDto> resultado, string nomeArquivo)
+        public EscreverDadosCSVExtracaoProvaCommand(IEnumerable<ConsolidadoProvaRespostaDto> resultado, string nomeArquivo)
         {
             Resultado = resultado;
             NomeArquivo = nomeArquivo;

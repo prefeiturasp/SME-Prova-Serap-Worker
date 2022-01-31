@@ -1,5 +1,8 @@
 ﻿using Dapper;
+using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -11,13 +14,124 @@ namespace SME.SERAp.Prova.Dados
 
         }
 
+        public async Task LimparDadosConsolidadosPorProvaSerapId(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = $@"delete from resultado_prova_consolidado where prova_serap_id = @provaId;";
+                await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 600);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = $@"call p_excluir_dados_consolidados_prova(@provaId, @dreId, @ueId);";
+                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 5000);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<ResultadoProvaConsolidado>> ObterDadosPorUeId(long provaId, string dreId, string ueId)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                
+                var query = $@"                            
+                            select 
+	                        vape.prova_serap_id,
+                            vape.prova_serap_estudantes_id,
+	                        vape.dre_codigo_eol, 
+	                        vape.dre_sigla,
+	                        vape.dre_nome,
+	                        vape.ue_codigo_eol,
+	                        vape.ue_nome,
+	                        vape.turma_ano_escolar,
+	                        vape.turma_ano_escolar_descricao,
+	                        vape.turma_codigo,
+	                        vape.turma_descricao,
+	                        vape.aluno_codigo_eol,
+	                        vape.aluno_nome,
+	                        vape.aluno_sexo,
+	                        vape.aluno_data_nascimento,
+	                        vape.prova_componente,
+	                        vape.prova_caderno,
+                            vape.prova_quantidade_questoes,
+	                        vape.aluno_frequencia,  
+	                        q.id as questao_id, 
+	                        q.ordem + 1 as questao_ordem,
+	                        case
+		                        when qar.alternativa_id is not null then a.numeracao
+		                        else qar.resposta
+	                        end as resposta
+                        from v_aluno_prova_extracao vape 
+                        inner join questao q on vape.prova_serap_estudantes_id = q.prova_id and vape.prova_caderno = q.caderno 
+                        left join questao_aluno_resposta qar on q.id = qar.questao_id and vape.aluno_codigo_eol = qar.aluno_ra
+                        left join alternativa a on qar.alternativa_id = a.id
+                        where vape.prova_serap_id = @provaId 
+                        and vape.dre_codigo_eol = @dreId 
+                        and vape.ue_codigo_eol = @ueId;";
+
+                return await conn.QueryAsync<ResultadoProvaConsolidado>(query, new { provaId, dreId, ueId }, commandTimeout: 600);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task ConsolidarProvaRespostasPorFiltros(long provaId, string dreId, string ueId)
+        {
+            using var conn = ObterConexao();
+            try
+            { 
+                var query = $@"call p_consolidar_dados_prova(@provaId, @dreId, @ueId);";
+                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 5000);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task ConsolidarProvaRespostasPorProvaSerapId(long provaId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = $@"delete from resultado_prova_consolidado where prova_serap_id = @provaId;
-                               insert into resultado_prova_consolidado  
+                var query = $@"
+                            insert into resultado_prova_consolidado  
                             select 
 	                        vape.prova_serap_id,
                             vape.prova_serap_estudantes_id,
@@ -146,6 +260,74 @@ namespace SME.SERAp.Prova.Dados
                 var query = @"select 1 from prova_aluno pa where prova_id = @id and finalizado_em is not null limit 1";
 
                 return await conn.QueryFirstOrDefaultAsync<bool>(query, new { id });
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<ProvaAlunoDto>> ObterProvasIniciadasPorModalidadeAsync(int modalidade)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                int status = (int)ProvaStatus.Iniciado;
+                var query = @"select
+                                pa.id provaAlunoId,
+                                pa.prova_id provaId,
+                                pa.criado_em provaIniciadaEm,
+                                pa.status,
+                                p.modalidade,
+                                p.inicio inicioProva,
+                                p.fim fimProva,
+                                p.tempo_execucao tempoExecucao
+                            from 
+                                prova p
+                                inner join prova_aluno pa on p.id = pa.prova_id
+                            where pa.status = @status
+                            and p.modalidade = @modalidade
+                            and (p.tempo_execucao > 0 or (p.tempo_execucao = 0 and NOW()::timestamp > p.fim))
+                                order by p.id,pa.aluno_ra";
+
+                return await conn.QueryAsync<ProvaAlunoDto>(query, new { modalidade, status });
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<bool> FinalizarProvaAsync(ProvaParaAtualizarDto provaParaAtualizar)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"update prova_aluno 
+                                     set status = @status, 
+                                     finalizado_em = @finalizadoEm
+                                where prova_id = @provaId
+                                and id = any(@ids)";
+
+                await conn.ExecuteAsync(query, 
+                    new { 
+                            provaParaAtualizar.ProvaId, 
+                            provaParaAtualizar.Status, 
+                            provaParaAtualizar.FinalizadoEm,
+                            ids = provaParaAtualizar.IdsProvasAlunos
+                        });
+
+                return true;
             }
             catch (System.Exception)
             {

@@ -1,0 +1,28 @@
+﻿
+namespace SME.SERAp.Prova.Infra
+{
+    public class ExportacaoResultadoFiltroDto
+    {
+        public ExportacaoResultadoFiltroDto(long processoId, long provaId, long itemId, string dreEolId, string[] ueEolIds)
+        {
+            ProcessoId = processoId;
+            ProvaId = provaId;
+            ItemId = itemId;
+            DreEolId = dreEolId;
+            UeEolIds = ueEolIds;
+        }
+
+        public ExportacaoResultadoFiltroDto()
+        {
+
+        }
+
+        public long ProcessoId { get; set; }
+        public long ProvaId { get; set; }
+        public long ItemId { get; set; }
+        public string DreEolId { get; set; }
+        public string[] UeEolIds { get; set; }
+        public string[] TurmaEolIds { get; set; }
+        public string CaminhoArquivo { get; set; }
+    }
+}

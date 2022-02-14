@@ -9,6 +9,7 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<Dominio.Prova> ObterPorIdLegadoAsync(long id);
         Task<bool> VerificaSeExisteRespostasPorId(long id);
+        Task<bool> VerificaSeExisteProvaFinalizadaPorId(long id);
         Task<bool> VerificaSeExistePorProvaSerapId(long provaId);
         Task CriarProvaRespostasExtracao(long provaId);
         Task ConsolidarProvaRespostasPorProvaSerapId(long provaId);

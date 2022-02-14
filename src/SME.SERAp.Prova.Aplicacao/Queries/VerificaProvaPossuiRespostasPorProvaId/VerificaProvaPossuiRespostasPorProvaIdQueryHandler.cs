@@ -16,7 +16,12 @@ namespace SME.SERAp.Prova.Aplicacao
         }
         public async Task<bool> Handle(VerificaProvaPossuiRespostasPorProvaIdQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioProva.VerificaSeExisteRespostasPorId(request.ProvaId);
+            var existeProvaFinalizada = await repositorioProva.VerificaSeExisteProvaFinalizadaPorId(request.ProvaId);
+            if (existeProvaFinalizada)
+                return true;
+
+            var existeRespostas = await repositorioProva.VerificaSeExisteRespostasPorId(request.ProvaId);
+            return existeRespostas;
         }
     }
 }

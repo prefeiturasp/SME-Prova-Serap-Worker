@@ -23,6 +23,8 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
+            SentrySdk.CaptureMessage($"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}", SentryLevel.Info);
+
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));
             try
             {

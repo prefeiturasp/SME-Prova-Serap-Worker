@@ -168,11 +168,11 @@ namespace SME.SERAp.Prova.Aplicacao
                     
                     long? arquivoThumbnailId = null;
                     if(video.ThumbnailVideoId > 0)
-                        arquivoThumbnailId = await mediator.Send(new ArquivoPersistirCommand(videos.FirstOrDefault(v => v.LegadoId == video.ThumbnailVideoId)));
+                        arquivoThumbnailId = await mediator.Send(new ArquivoPersistirCommand(thumbnails.FirstOrDefault(t => t.LegadoId == video.ThumbnailVideoId)));
 
                     long? arquivoVideoConvertidoId = null;
                     if (video.VideoConvertidoId > 0)
-                        arquivoVideoConvertidoId = await mediator.Send(new ArquivoPersistirCommand(videos.FirstOrDefault(v => v.LegadoId == video.VideoConvertidoId)));
+                        arquivoVideoConvertidoId = await mediator.Send(new ArquivoPersistirCommand(videosConvertido.FirstOrDefault(vc => vc.LegadoId == video.VideoConvertidoId)));
 
                     var questaoVideoInserir = new QuestaoVideo(questaoId, arquivoVideoId, arquivoThumbnailId, arquivoVideoConvertidoId);
 

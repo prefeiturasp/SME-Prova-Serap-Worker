@@ -13,14 +13,17 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioArquivo repositorioArquivo;
         private readonly IRepositorioQuestaoArquivo repositorioQuestaoArquivo;
         private readonly IRepositorioQuestaoAudio repositorioQuestaoAudio;
+        private readonly IRepositorioQuestaoVideo repositorioQuestaoVideo;
 
         public ProvaRemoverQuestoesPorIdCommandHandler(IRepositorioQuestao repositorioQuestao, IRepositorioArquivo repositorioArquivo,
-            IRepositorioQuestaoArquivo repositorioQuestaoArquivo, IRepositorioQuestaoAudio repositorioQuestaoAudio)
+            IRepositorioQuestaoArquivo repositorioQuestaoArquivo, IRepositorioQuestaoAudio repositorioQuestaoAudio,
+            IRepositorioQuestaoVideo repositorioQuestaoVideo)
         {
             this.repositorioQuestao = repositorioQuestao ?? throw new ArgumentNullException(nameof(repositorioQuestao));
             this.repositorioArquivo = repositorioArquivo ?? throw new ArgumentNullException(nameof(repositorioArquivo));
             this.repositorioQuestaoArquivo = repositorioQuestaoArquivo ?? throw new ArgumentNullException(nameof(repositorioQuestaoArquivo));
             this.repositorioQuestaoAudio = repositorioQuestaoAudio ?? throw new ArgumentNullException(nameof(repositorioQuestaoAudio));
+            this.repositorioQuestaoVideo = repositorioQuestaoVideo ?? throw new ArgumentNullException(nameof(repositorioQuestaoVideo));
         }
         public async Task<bool> Handle(ProvaRemoverQuestoesPorIdCommand request, CancellationToken cancellationToken)
         {
@@ -42,6 +45,23 @@ namespace SME.SERAp.Prova.Aplicacao
                 await repositorioQuestaoAudio.RemoverPorIdsAsync(idsQuestoesAudios);
                 var idsArquivos = questoesAudios.Select(a => a.ArquivoId).ToArray();
                 await repositorioArquivo.RemoverPorIdsAsync(idsArquivos);
+            }
+
+            var questaoVideos = await repositorioQuestaoVideo.ObterPorProvaId(request.Id);
+            if(questaoVideos != null && questaoVideos.Any())
+            {
+                var idsVideos = questaoVideos.Select(v => v.Id).ToArray();
+                await repositorioQuestaoVideo.RemoverPorIdsAsync(idsVideos);
+
+                var idsArquivosExcluir = questaoVideos.Select(a => a.ArquivoVideoId).ToList();
+
+                var idsArquivosThumbnail = questaoVideos.Where(a => a.ArquivoThumbnailId != null).Select(a => (long)a.ArquivoThumbnailId).ToList();
+                idsArquivosExcluir.AddRange(idsArquivosThumbnail);
+
+                var idsArquivosVideoConvertidoId = questaoVideos.Where(a => a.ArquivoVideoConvertidoId != null).Select(a => (long)a.ArquivoVideoConvertidoId).ToList();
+                idsArquivosExcluir.AddRange(idsArquivosVideoConvertidoId);
+
+                await repositorioArquivo.RemoverPorIdsAsync(idsArquivosExcluir.ToArray());
             }
 
             await repositorioQuestao.RemoverPorProvaIdAsync(request.Id);

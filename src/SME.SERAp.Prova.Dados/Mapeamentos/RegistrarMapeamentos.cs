@@ -36,6 +36,7 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new TipoDeficienciaMap());
                 config.AddMap(new TipoProvaDeficienciaMap());
                 config.AddMap(new AlunoDeficienciaMap());
+                config.AddMap(new QuestaoVideoMap());
 
                 config.ForDommel();
             });

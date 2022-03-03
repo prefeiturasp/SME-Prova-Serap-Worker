@@ -317,6 +317,34 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task<IEnumerable<QuestaoVideoDto>> ObterVideosPorQuestaoId(long questaoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" SELECT  
+                                    F.Id AS VideoId, 
+                                    F.[Path] CaminhoVideo,  
+                                    isnull(FT.Id,0) AS ThumbnailVideoId, 
+                                    FT.[Path] AS CaminhoThumbnailVideo, 
+                                    isnull(FC.Id, 0) AS VideoConvertidoId,
+                                    FC.[Path] AS CaminhoVideoConvertido
+                                FROM ItemFile IFI WITH (NOLOCK)
+                                    INNER JOIN [File] F WITH (NOLOCK) ON F.Id = IFI.File_Id
+                                    INNER JOIN [File] FT WITH (NOLOCK) ON FT.Id = IFI.Thumbnail_Id
+                                    LEFT JOIN [File] FC (NOLOCK) ON IFI.ConvertedFile_Id = FC.Id
+                                WHERE IFI.State = 1 
+                                AND IFI.Item_Id = @questaoId;";
+
+                return await conn.QueryAsync<QuestaoVideoDto>(query, new { questaoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<IEnumerable<ContextoProvaLegadoDto>> ObterContextosProvaPorProvaId(long provaId)
         {
             using var conn = ObterConexao();

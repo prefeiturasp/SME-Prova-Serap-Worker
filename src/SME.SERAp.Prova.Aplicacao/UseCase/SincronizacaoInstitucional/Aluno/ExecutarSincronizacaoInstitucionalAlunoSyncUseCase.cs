@@ -50,6 +50,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     await TratarAlteracao(alunosEolAgrupadosParaTratar, alunosEolAgrupadosParaTratarCodigos, alunosSerap, alunosSerapCodigo, turmasDaDre);
 
+                    await PublicarSincronizacaoAlunoDeficiencia(alunosEolAgrupadosParaTratarCodigos);
                 }
             }
             else throw new NegocioException($"Não foi possível localizar as turmas da Dre {dre.DreCodigo} para fazer sync dos alunos.");
@@ -143,6 +144,13 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (listaParaAlterar.Any())
                     await mediator.Send(new AlterarAlunosCommand(listaParaAlterar));
+            }
+        }
+        private async Task PublicarSincronizacaoAlunoDeficiencia(List<long> alunosRa)
+        {
+            foreach (long alunoRa in alunosRa)
+            {
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAlunoDeficiencia, alunoRa));
             }
         }
     }

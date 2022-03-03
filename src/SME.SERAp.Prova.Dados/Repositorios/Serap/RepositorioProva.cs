@@ -252,12 +252,37 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<bool> VerificaSeExisteRespostasPorId(long id)
+        public async Task<bool> VerificaSeExisteProvaFinalizadaPorId(long id)
         {
             using var conn = ObterConexao();
             try
             {
                 var query = @"select 1 from prova_aluno pa where prova_id = @id and finalizado_em is not null limit 1";
+
+                return await conn.QueryFirstOrDefaultAsync<bool>(query, new { id });
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<bool> VerificaSeExisteRespostasPorId(long id)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select 1 
+                                from prova p 
+                                    inner join questao q on p.id = q.prova_id
+                                    inner join questao_aluno_resposta qar on qar.questao_id = q.id
+                                where p.id = @id
+                                limit 1;";
 
                 return await conn.QueryFirstOrDefaultAsync<bool>(query, new { id });
             }

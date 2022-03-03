@@ -1,9 +1,13 @@
-﻿using System;
-
+﻿
 namespace SME.SERAp.Prova.Dominio
 {
     public class Arquivo : EntidadeBase
     {
+        public Arquivo()
+        {
+
+        }
+
         public Arquivo(string caminho, long tamanhoBytes, long legadoId)
         {
             Caminho = caminho;

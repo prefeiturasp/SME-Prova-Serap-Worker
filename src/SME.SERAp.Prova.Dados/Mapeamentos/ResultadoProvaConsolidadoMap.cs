@@ -29,6 +29,8 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.ProvaCaderno).ToColumn("prova_caderno").IsKey();
             Map(c => c.ProvaQuantidadeQuestoes).ToColumn("prova_quantidade_questoes").IsKey();
             Map(c => c.AlunoFrequencia).ToColumn("aluno_frequencia").IsKey();
+            Map(c => c.DataInicio).ToColumn("prova_data_inicio").IsKey();
+            Map(c => c.DataFim).ToColumn("prova_data_entregue").IsKey();
             Map(c => c.QuestaoId).ToColumn("questao_id").IsKey();
             Map(c => c.QuestaoOrdem).ToColumn("questao_ordem").IsKey();
             Map(c => c.Resposta).ToColumn("resposta").IsKey();

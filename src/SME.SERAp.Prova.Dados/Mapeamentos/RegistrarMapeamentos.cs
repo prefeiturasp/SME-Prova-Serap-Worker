@@ -31,6 +31,12 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new ExportacaoResultadoItemMap());
                 config.AddMap(new ParametroSistemaMap());
                 config.AddMap(new ProvaAdesaoMap());
+                config.AddMap(new QuestaoAudioMap());
+                config.AddMap(new TipoProvaMap());
+                config.AddMap(new TipoDeficienciaMap());
+                config.AddMap(new TipoProvaDeficienciaMap());
+                config.AddMap(new AlunoDeficienciaMap());
+                config.AddMap(new QuestaoVideoMap());
 
                 config.ForDommel();
             });

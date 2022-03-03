@@ -22,6 +22,8 @@ namespace SME.SERAp.Prova.Dominio
 		public DateTime AlunoDataNascimento { get; set; }
 		public string ProvaComponente { get; set; }
 		public string ProvaCaderno { get; set; }
+		public DateTime? DataInicio { get; set; }
+		public DateTime? DataFim { get; set; }
 		public string AlunoFrequencia { get; set; }
 		public long QuestaoId { get; set; }
 		public int QuestaoOrdem { get; set; }

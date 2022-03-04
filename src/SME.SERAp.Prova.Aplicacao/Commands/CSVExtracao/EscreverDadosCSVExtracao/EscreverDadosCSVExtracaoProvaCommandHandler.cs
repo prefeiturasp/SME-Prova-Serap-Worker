@@ -14,7 +14,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class EscreverDadosCSVExtracaoProvaCommandHandler : IRequestHandler<EscreverDadosCSVExtracaoProvaCommand, bool>
     {
-        public EscreverDadosCSVExtracaoProvaCommandHandler(){}
+        public EscreverDadosCSVExtracaoProvaCommandHandler() { }
 
         public async Task<bool> Handle(EscreverDadosCSVExtracaoProvaCommand request, CancellationToken cancellationToken)
         {
@@ -26,16 +26,17 @@ namespace SME.SERAp.Prova.Aplicacao
 
             try
             {
-                
+
                 using (var stream = TentarAbrirArquivo(request.NomeArquivo))
                 using (var writer = new StreamWriter(stream))
                 using (var csv = new CsvWriter(writer, config))
                 {
-                    csv.NextRecord();
+                    
                     var agrupamento = request.Resultado.OrderBy(r => r.QuestaoOrdem).GroupBy(a => a.AlunoCodigoEol);
 
                     foreach (var registro in agrupamento)
                     {
+                        csv.NextRecord();
                         var valor = registro.FirstOrDefault();
                         valor.CalcularTempoTotalProva();
                         csv.WriteField(valor.ProvaSerapId);
@@ -62,10 +63,11 @@ namespace SME.SERAp.Prova.Aplicacao
 
                         foreach (var resultado in registro)
                         {
-                            csv.WriteField(resultado.Resposta.Replace(")",""));
-                        }
-
-                        csv.NextRecord();
+                            if (resultado?.Resposta != null)
+                                csv.WriteField(resultado.Resposta.Replace(")", ""));
+                            else
+                                csv.WriteField("");
+                        }                        
                     }
 
                 }
@@ -94,7 +96,7 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         private FileStream AbrirArquivo(string nomeArquivo)
-        {            
+        {
             try
             {
                 return File.Open(nomeArquivo, FileMode.Append);

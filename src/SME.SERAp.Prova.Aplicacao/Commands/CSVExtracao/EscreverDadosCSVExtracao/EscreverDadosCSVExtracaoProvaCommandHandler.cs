@@ -31,11 +31,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 using (var writer = new StreamWriter(stream))
                 using (var csv = new CsvWriter(writer, config))
                 {
-                    csv.NextRecord();
+                    
                     var agrupamento = request.Resultado.OrderBy(r => r.QuestaoOrdem).GroupBy(a => a.AlunoCodigoEol);
 
                     foreach (var registro in agrupamento)
                     {
+                        csv.NextRecord();
                         var valor = registro.FirstOrDefault();
                         valor.CalcularTempoTotalProva();
                         csv.WriteField(valor.ProvaSerapId);
@@ -66,9 +67,7 @@ namespace SME.SERAp.Prova.Aplicacao
                                 csv.WriteField(resultado.Resposta.Replace(")", ""));
                             else
                                 csv.WriteField("");
-                        }
-
-                        csv.NextRecord();
+                        }                        
                     }
 
                 }

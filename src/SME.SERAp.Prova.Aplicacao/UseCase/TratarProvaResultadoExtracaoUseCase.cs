@@ -57,10 +57,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     var dres = await mediator.Send(new ObterDresSerapQuery());
                     foreach (Dre dre in dres)
                     {
-                        var ues = await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.CodigoDre));
+                        var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
                         foreach (Ue ue in ues)
                         {
-                            var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEAnoLetivoQuery(ue.CodigoUe, prova.Inicio.Year));
+                            var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ue.CodigoUe, prova.LegadoId));
                             var paginasTurmas = Paginar(turmasUe.ToList());
                             foreach (List<Turma> turmas in paginasTurmas)
                             {

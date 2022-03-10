@@ -255,5 +255,23 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<Turma>> ObterTurmasPorCodigos(string[] codigos)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select t.id, t.codigo
+                                from turma t
+                                where t.codigo = ANY(@codigos)";
+
+                return await conn.QueryAsync<Turma>(query, new { codigos });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

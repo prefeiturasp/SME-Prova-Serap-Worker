@@ -66,6 +66,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioAlunoDeficiencia, RepositorioAlunoDeficiencia>();
             services.AddScoped<IRepositorioQuestaoVideo, RepositorioQuestaoVideo>();
             services.AddScoped<IRepositorioTurmaEol, RepositorioTurmaEol>();
+            services.AddScoped<IRepositorioTurmaAlunoHistorico, RepositorioTurmaAlunoHistorico>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -109,7 +110,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaSyncUseCase, ExecutarSincronizacaoInstitucionalTurmaSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalAlunoSyncUseCase, ExecutarSincronizacaoInstitucionalAlunoSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase>();
-            services.AddScoped<ISincronizacaoTurmaAlunoHistoricoTratarUseCase, SincronizacaoTurmaAlunoHistoricoTratarUseCase>();
+            services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase>();
 
             services.AddScoped<IRabbitDeadletterSerapSyncUseCase, RabbitDeadletterSerapSyncUseCase>();
             services.AddScoped<IRabbitDeadletterSerapTratarUseCase, RabbitDeadletterSerapTratarUseCase>();

@@ -18,25 +18,35 @@ namespace SME.SERAp.Prova.Dados
             this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
         }
 
-        public async Task<IEnumerable<TurmaEolDto>> ObterTurmasAlunoHistoricoPorAlunoRa(long alunoRa)
+        public async Task<IEnumerable<TurmaEolDto>> ObterTurmasAlunoHistoricoPorAlunosRa(long[] alunosRa)
         {
-            var query = $@"select 
-                                turesc.cd_turma_escola CodigoTurma, 
-                                turesc.an_letivo AnoLetivo,
-                                MAX(matrTurma.dt_situacao_aluno) dt_situacao_aluno
-                            FROM v_historico_matricula_cotic matricula
-                                    INNER JOIN v_aluno_cotic aluno ON
-	                            matricula.cd_aluno = aluno.cd_aluno
-                                    INNER JOIN historico_matricula_turma_escola matrTurma ON
-	                            matricula.cd_matricula = matrTurma.cd_matricula
-                                    INNER JOIN turma_escola turesc ON
-	                            matrTurma.cd_turma_escola = turesc.cd_turma_escola
-                            where matricula.cd_aluno = @alunoRa
-                            group by turesc.cd_turma_escola, turesc.an_letivo
-                            order by turesc.an_letivo";
+            var query = $@"select
+							matricula.cd_aluno as alunoRa,
+							turesc.cd_turma_escola CodigoTurma,
+							turesc.an_letivo AnoLetivo,
+							se.sg_resumida_serie as ano_turma,
+							case when se.cd_etapa_ensino in (1, 10) or (turesc.cd_tipo_turma <> 1 and e.tp_escola in (10, 11, 12, 14, 15, 18, 26)) or (turesc.cd_tipo_turma <> 1 and e.tp_escola in (2, 17, 28, 30, 31)) then 1 --Infantil
+								 when se.cd_etapa_ensino in ( 2, 3, 7, 11 ) then 3 --eja
+								 when se.cd_etapa_ensino in ( 4, 5, 12, 13 ) then 5 --fundamental
+								 when se.cd_etapa_ensino in ( 6, 7, 8, 17, 14 ) then 6 --médio
+							else 0 end as Modalidade,
+							MAX(matricula.dt_status_matricula) DataMatricula,
+							MAX(matrTurma.dt_situacao_aluno) DataSituacao
+						from v_historico_matricula_cotic matricula
+						inner join v_aluno_cotic aluno on matricula.cd_aluno = aluno.cd_aluno
+						inner join historico_matricula_turma_escola matrTurma on matricula.cd_matricula = matrTurma.cd_matricula
+						inner join turma_escola turesc on matrTurma.cd_turma_escola = turesc.cd_turma_escola
+						inner join serie_turma_escola ste on ste.cd_turma_escola = turesc.cd_turma_escola
+						inner join escola e on turesc.cd_escola = e.cd_escola
+						inner join serie_ensino se on se.cd_serie_ensino = ste.cd_serie_ensino
+						where
+							matrTurma.cd_situacao_aluno in (1, 5, 6, 10, 13)
+							and matricula.cd_aluno in @alunosRa
+						group by matricula.cd_aluno, turesc.cd_turma_escola, turesc.an_letivo, se.sg_resumida_serie, se.cd_etapa_ensino, turesc.cd_tipo_turma, e.tp_escola
+						order by matricula.cd_aluno, turesc.an_letivo";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
-            return await conn.QueryAsync<TurmaEolDto>(query, new { alunoRa });
+            return await conn.QueryAsync<TurmaEolDto>(query, new { alunosRa });
         }
 
     }

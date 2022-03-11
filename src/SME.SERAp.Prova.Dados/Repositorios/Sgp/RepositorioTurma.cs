@@ -270,7 +270,7 @@ namespace SME.SERAp.Prova.Dados
                                     and ue.ue_id = @codigoUe
                                 order by t.codigo;";
 
-                return await conn.QueryAsync<Turma>(query, new { provaSerap, codigoUe });
+                return await conn.QueryAsync<Turma>(query, new { provaSerap, codigoUe }, commandTimeout: 90000 );
             }
             finally
             {

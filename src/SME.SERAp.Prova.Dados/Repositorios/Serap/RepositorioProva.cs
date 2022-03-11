@@ -20,7 +20,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = $@"delete from resultado_prova_consolidado where prova_serap_id = @provaId;";
-                await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 600);
+                await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 50000);
             }
             catch (System.Exception ex)
             {
@@ -39,7 +39,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = $@"call p_excluir_dados_consolidados_prova(@provaId, @dreId, @ueId);";
-                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 5000);
+                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 50000);
             }
             catch (System.Exception ex)
             {
@@ -93,7 +93,7 @@ namespace SME.SERAp.Prova.Dados
                         and vape.dre_codigo_eol = @dreId 
                         and vape.ue_codigo_eol = @ueId;";
 
-                return await conn.QueryAsync<ResultadoProvaConsolidado>(query, new { provaId, dreId, ueId }, commandTimeout: 600);
+                return await conn.QueryAsync<ResultadoProvaConsolidado>(query, new { provaId, dreId, ueId }, commandTimeout: 50000);
             }
             catch (System.Exception ex)
             {
@@ -112,7 +112,7 @@ namespace SME.SERAp.Prova.Dados
             try
             { 
                 var query = $@"call p_consolidar_dados_prova(@provaId, @dreId, @ueId);";
-                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 5000);
+                await conn.ExecuteAsync(query, new { provaId, dreId, ueId }, commandTimeout: 50000);
             }
             catch (System.Exception ex)
             {
@@ -164,7 +164,7 @@ namespace SME.SERAp.Prova.Dados
                         left join alternativa a on qar.alternativa_id = a.id
                         where vape.prova_serap_id = @provaId;";
 
-                await conn.ExecuteAsync(query, new { provaId },commandTimeout: 600);
+                await conn.ExecuteAsync(query, new { provaId },commandTimeout: 50000);
             }
             catch (System.Exception ex)
             {

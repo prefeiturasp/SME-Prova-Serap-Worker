@@ -255,5 +255,51 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<Turma>> ObterTurmasPorCodigoUeEProvaSerap(string codigoUe, long provaSerap)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
+                                    from prova p
+                                    inner join prova_ano pa 
+                                        on p.id = pa.prova_id
+                                    inner join turma t 
+                                        on t.ano_letivo = EXTRACT(YEAR FROM p.inicio)
+                                        and t.ano = pa.ano
+                                        and t.modalidade_codigo = p.modalidade
+                                    inner join ue 
+                                        on ue.id = t.ue_id
+                                    where 
+                                        ue.ue_id = @codigoUe
+                                        and p.prova_legado_id = @provaSerap;";
+
+                return await conn.QueryAsync<Turma>(query, new { codigoUe, provaSerap });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<Turma>> ObterTurmasPorCodigos(string[] codigos)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select t.id, t.codigo
+                                from turma t
+                                where t.codigo = ANY(@codigos)";
+
+                return await conn.QueryAsync<Turma>(query, new { codigos });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

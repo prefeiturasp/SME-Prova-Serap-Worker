@@ -125,6 +125,7 @@ namespace SME.SERAp.Prova.Aplicacao
                             }
                                 
                             turmaId = turmaNova.Id;
+                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, new long[] { alunoQuePodeAlterar.CodigoAluno }));
                         }
 
                         listaParaAlterar.Add(new Aluno()

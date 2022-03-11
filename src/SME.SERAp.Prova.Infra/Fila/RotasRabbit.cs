@@ -35,6 +35,8 @@
         public const string SincronizaEstruturaInstitucionalTurmasSync = "serap.sincronizacao.institucional.turma.sync";
         public const string SincronizaEstruturaInstitucionalTurmaTratar = "serap.sincronizacao.institucional.turma.tratar";
         public const string SincronizaEstruturaInstitucionalAlunoSync = "serap.sincronizacao.institucional.aluno.sync";
+        public const string SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync = "serap.sincronizacao.institucional.turma.aluno.historico.sync";
+        public const string SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar = "serap.sincronizacao.institucional.turma.aluno.historico.tratar";
         public const string SincronizaEstruturaInstitucionalAlunoTratar = "serap.sincronizacao.institucional.aluno.tratar";        
 
 

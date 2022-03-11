@@ -40,22 +40,33 @@ namespace SME.SERAp.Prova.Aplicacao
                 var dres = await mediator.Send(new ObterDresSerapQuery());
                 foreach (Dre dre in dres)
                 {
-                    var ues = await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.CodigoDre));
-                    var paginas = Paginar(ues.ToList());
-                    foreach (List<Ue> pagina in paginas)
+                    var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
+                    if(ues != null && ues.Any())
                     {
-                        var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();
-                        var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
-                        exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
-                        var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
-                        filtrosParaPublicar.Add(filtro);
-                    }
+                        var paginas = Paginar(ues.ToList());
+                        foreach (List<Ue> pagina in paginas)
+                        {
+                            var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();
+                            var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
+                            exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+                            var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
+                            filtrosParaPublicar.Add(filtro);
+                        }
+                    }                    
+                }
+
+                if (!filtrosParaPublicar.Any())
+                {
+                    await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
+                    SentrySdk.CaptureMessage($"Não foi possível localizar escolas para consolidar os dados da prova: {extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
+                    return false;
                 }
 
                 foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
                 {
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
                 }
+
             }
             catch (Exception ex)
             {

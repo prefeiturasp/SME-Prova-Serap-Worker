@@ -61,20 +61,23 @@ namespace SME.SERAp.Prova.Aplicacao
                         foreach (Ue ue in ues)
                         {
                             var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ue.CodigoUe, prova.LegadoId));
-                            var paginasTurmas = Paginar(turmasUe.ToList());
-                            foreach (List<Turma> turmas in paginasTurmas)
+                            if (turmasUe != null && turmasUe.Any())
                             {
-                                var codigosTurmas = turmas.Select(t => t.Codigo).ToArray();
+                                var paginasTurmas = Paginar(turmasUe.ToList());
+                                foreach (List<Turma> turmas in paginasTurmas)
+                                {
+                                    var codigosTurmas = turmas.Select(t => t.Codigo).ToArray();
 
-                                var ueIds = new string[] { ue.CodigoUe };
-                                var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
-                                exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+                                    var ueIds = new string[] { ue.CodigoUe };
+                                    var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
+                                    exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
 
-                                var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
-                                filtro.TurmaEolIds = codigosTurmas;
-                                filtro.CaminhoArquivo = caminhoCompletoArquivo;
-                                filtrosParaPublicar.Add(filtro);
-                            }
+                                    var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
+                                    filtro.TurmaEolIds = codigosTurmas;
+                                    filtro.CaminhoArquivo = caminhoCompletoArquivo;
+                                    filtrosParaPublicar.Add(filtro);
+                                }
+                            }                            
                         }
                     }
 

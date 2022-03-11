@@ -1,5 +1,4 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<TurmaEolDto>> ObterTurmasAlunoHistoricoPorAlunosRa(long[] alunosRa)
         {
-            var query = $@"select
+            var query = $@"select distinct
 							matricula.cd_aluno as alunoRa,
 							turesc.cd_turma_escola CodigoTurma,
 							turesc.an_letivo AnoLetivo,
@@ -30,8 +29,8 @@ namespace SME.SERAp.Prova.Dados
 								 when se.cd_etapa_ensino in ( 4, 5, 12, 13 ) then 5 --fundamental
 								 when se.cd_etapa_ensino in ( 6, 7, 8, 17, 14 ) then 6 --médio
 							else 0 end as Modalidade,
-							MAX(matricula.dt_status_matricula) DataMatricula,
-							MAX(matrTurma.dt_situacao_aluno) DataSituacao
+							matricula.dt_status_matricula DataMatricula,
+							matrTurma.dt_situacao_aluno DataSituacao
 						from v_historico_matricula_cotic matricula
 						inner join v_aluno_cotic aluno on matricula.cd_aluno = aluno.cd_aluno
 						inner join historico_matricula_turma_escola matrTurma on matricula.cd_matricula = matrTurma.cd_matricula
@@ -42,12 +41,10 @@ namespace SME.SERAp.Prova.Dados
 						where
 							matrTurma.cd_situacao_aluno in (1, 5, 6, 10, 13)
 							and matricula.cd_aluno in @alunosRa
-						group by matricula.cd_aluno, turesc.cd_turma_escola, turesc.an_letivo, se.sg_resumida_serie, se.cd_etapa_ensino, turesc.cd_tipo_turma, e.tp_escola
 						order by matricula.cd_aluno, turesc.an_letivo";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
             return await conn.QueryAsync<TurmaEolDto>(query, new { alunosRa });
         }
-
     }
 }

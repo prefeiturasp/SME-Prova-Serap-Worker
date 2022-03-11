@@ -264,9 +264,14 @@ namespace SME.SERAp.Prova.Dados
                 var query = @"select distinct 
                                     t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
                                 from turma t
-                                    inner join ue on t.ue_id = ue.id
-                                    inner join resultado_prova_consolidado rpc on t.codigo = rpc.turma_codigo
-                                where rpc.prova_serap_id = @provaSerap
+                                    inner join ue 
+                                        on t.ue_id = ue.id
+                                    inner join prova p
+                                        on p.modalidade = t.modalidade_codigo
+                                    inner join prova_ano pa 
+                                        on p.id = pa.prova_id
+                                        and pa.ano = t.ano
+                                where p.prova_legado_id = @provaSerap
                                     and ue.ue_id = @codigoUe
                                 order by t.codigo;";
 

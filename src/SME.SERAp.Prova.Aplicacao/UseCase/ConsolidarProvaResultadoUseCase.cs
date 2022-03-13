@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static SME.SERAp.Prova.Infra.Utils.Paginacao;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -43,10 +42,9 @@ namespace SME.SERAp.Prova.Aplicacao
                     var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
                     if(ues != null && ues.Any())
                     {
-                        var paginas = Paginar(ues.ToList());
-                        foreach (List<Ue> pagina in paginas)
+                        foreach (Ue ue in ues)
                         {
-                            var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();
+                            var ueIds = new string[] { ue.CodigoUe };
                             var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
                             exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
                             var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
@@ -77,13 +75,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
             return true;
-        }
-
-        private List<List<Ue>> Paginar(List<Ue> ues)
-        {
-            var paginacao = new ListaPaginada<Ue>(ues.ToList(), 20);
-            return paginacao.ObterTodasAsPaginas();
-        }
+        }        
 
     }
 }

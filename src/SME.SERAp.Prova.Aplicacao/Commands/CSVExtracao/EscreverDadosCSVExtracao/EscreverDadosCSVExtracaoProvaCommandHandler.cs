@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         csv.WriteField(valor.UeCodigoEol);
                         csv.WriteField(valor.UeNome);
                         csv.WriteField(valor.TurmaAnoEscolar);
-                        csv.WriteField(valor.TurmaAnoEscolarDescricao);
+                        csv.WriteField($"{valor.TurmaAnoEscolar}º ano");
                         csv.WriteField(valor.TurmaCodigo);
                         csv.WriteField(valor.TurmaDescricao);
                         csv.WriteField(valor.AlunoCodigoEol);

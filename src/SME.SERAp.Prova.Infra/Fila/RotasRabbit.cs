@@ -21,6 +21,7 @@
         public const string ExtrairResultadosProvaFiltro = "serap.estudante.prova.resultados.aluno.extrair.filtro";
         public const string ConsolidarProvaResultado = "serap.estudante.prova.resultados.consolidar";
         public const string ConsolidarProvaResultadoFiltro = "serap.estudante.prova.resultados.consolidar.filtro";
+        public const string ConsolidarProvaResultadoFiltroTurma = "serap.estudante.prova.resultados.consolidar.filtro.turma";
         public const string TratarAdesaoProva = "serap.estudante.prova.adesao.tratar";
         public const string TratarTipoProvaDeficiencia = "serap.estudante.prova.tipo.prova.deficiencia.tratar";
         public const string TratarAlunoDeficiencia = "serap.estudante.aluno.deficiencia.tratar";

@@ -4,17 +4,22 @@ using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class ConsolidarProvaRespostaPorFiltroUseCase : IConsolidarProvaRespostaPorFiltroUseCase
     {
+        
         private readonly IMediator mediator;
+
         public ConsolidarProvaRespostaPorFiltroUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
+
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
@@ -28,17 +33,38 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (exportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
                 {
-                    await mediator.Send(new ConsolidarProvaRespostaPorFiltroCommand(filtro.ProvaId, filtro.DreEolId, filtro.UeEolIds));
-                    await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
-
-                    bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
-                    if (!existeItemProcesso)
+                    foreach (string ueCodigo in filtro.UeEolIds)
                     {
-                        var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaId };
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                        var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
+                        var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ueCodigo, filtro.ProvaId));
+                        if (turmasUe != null && turmasUe.Any())
+                        {
+                            foreach (Turma turma in turmasUe)
+                            {
+                                var turmaEolIds = new string[] { turma.Codigo };
+                                var ueEolIds = new string[] { ueCodigo };
+
+                                var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, filtro.DreEolId, ueEolIds);
+                                exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+
+                                var filtroDto = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, filtro.DreEolId, ueEolIds);
+                                filtroDto.TurmaEolIds = turmaEolIds;
+                                filtrosParaPublicar.Add(filtroDto);
+                            }
+                        }
+
+                        if (filtrosParaPublicar.Any())
+                        {
+                            foreach (ExportacaoResultadoFiltroDto filtroPublicar in filtrosParaPublicar)
+                            {
+                                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, filtroPublicar));
+                            }
+                        }                        
                     }
+
+                    await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
                 }
-                
+
                 return true;
             }
             catch (Exception ex)

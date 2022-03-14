@@ -95,6 +95,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProvaResultadoExtracaoFiltroUseCase, TratarProvaResultadoExtracaoFiltroUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
             services.AddScoped<IConsolidarProvaRespostaPorFiltroUseCase, ConsolidarProvaRespostaPorFiltroUseCase>();
+            services.AddScoped<IConsolidarProvaRespostaPorFiltroTurmaUseCase, ConsolidarProvaRespostaPorFiltroTurmaUseCase>();
+
             services.AddScoped<IIniciarProcessoFinalizarProvasAutomaticamenteUseCase, IniciarProcessoFinalizarProvasAutomaticamenteUseCase>();
             services.AddScoped<IFinalizarProvaAutomaticamenteUseCase, FinalizarProvaAutomaticamenteUseCase>();
             services.AddScoped<ITratarTipoProvaDeficienciaUseCase, TratarTipoProvaDeficienciaUseCase>();

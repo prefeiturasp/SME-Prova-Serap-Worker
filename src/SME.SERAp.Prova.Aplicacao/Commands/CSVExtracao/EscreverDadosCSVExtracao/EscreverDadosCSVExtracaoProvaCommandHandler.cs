@@ -30,12 +30,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 using (var stream = TentarAbrirArquivo(request.NomeArquivo))
                 using (var writer = new StreamWriter(stream))
                 using (var csv = new CsvWriter(writer, config))
-                {
-                    csv.NextRecord();
+                {                    
                     var agrupamento = request.Resultado.OrderBy(r => r.QuestaoOrdem).GroupBy(a => a.AlunoCodigoEol);
 
                     foreach (var registro in agrupamento)
                     {
+                        csv.NextRecord();
                         var valor = registro.FirstOrDefault();
                         valor.CalcularTempoTotalProva();
                         csv.WriteField(valor.ProvaSerapId);
@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         csv.WriteField(valor.UeCodigoEol);
                         csv.WriteField(valor.UeNome);
                         csv.WriteField(valor.TurmaAnoEscolar);
-                        csv.WriteField($"{valor.TurmaAnoEscolar}º ano");
+                        csv.WriteField($"{valor.TurmaAnoEscolar} ano");
                         csv.WriteField(valor.TurmaCodigo);
                         csv.WriteField(valor.TurmaDescricao);
                         csv.WriteField(valor.AlunoCodigoEol);
@@ -67,8 +67,6 @@ namespace SME.SERAp.Prova.Aplicacao
                             else
                                 csv.WriteField("");
                         }
-
-                        csv.NextRecord();
                     }
 
                 }

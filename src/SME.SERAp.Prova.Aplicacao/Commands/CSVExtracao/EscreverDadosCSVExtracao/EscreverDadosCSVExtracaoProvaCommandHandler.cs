@@ -14,7 +14,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class EscreverDadosCSVExtracaoProvaCommandHandler : IRequestHandler<EscreverDadosCSVExtracaoProvaCommand, bool>
     {
-        public EscreverDadosCSVExtracaoProvaCommandHandler(){}
+        public EscreverDadosCSVExtracaoProvaCommandHandler() { }
 
         public async Task<bool> Handle(EscreverDadosCSVExtracaoProvaCommand request, CancellationToken cancellationToken)
         {
@@ -26,7 +26,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             try
             {
-                
+
                 using (var stream = TentarAbrirArquivo(request.NomeArquivo))
                 using (var writer = new StreamWriter(stream))
                 using (var csv = new CsvWriter(writer, config))
@@ -62,7 +62,10 @@ namespace SME.SERAp.Prova.Aplicacao
 
                         foreach (var resultado in registro)
                         {
-                            csv.WriteField(resultado.Resposta.Replace(")",""));
+                            if (resultado.Resposta != null)
+                                csv.WriteField(resultado.Resposta.Replace(")", ""));
+                            else
+                                csv.WriteField("");
                         }
 
                         csv.NextRecord();
@@ -94,7 +97,7 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         private FileStream AbrirArquivo(string nomeArquivo)
-        {            
+        {
             try
             {
                 return File.Open(nomeArquivo, FileMode.Append);

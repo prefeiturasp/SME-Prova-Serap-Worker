@@ -268,7 +268,7 @@ namespace SME.SERAp.Prova.Dados
                                     inner join turma t 
                                         on t.ano_letivo = EXTRACT(YEAR FROM p.inicio)
                                         and t.ano = pa.ano
-                                        and t.modalidade_codigo = p.modalidade
+                                        and (case when t.modalidade_codigo::text in('3','4') then '3'::text else t.modalidade_codigo::text end) = p.modalidade::text
                                     inner join ue 
                                         on ue.id = t.ue_id
                                     where 

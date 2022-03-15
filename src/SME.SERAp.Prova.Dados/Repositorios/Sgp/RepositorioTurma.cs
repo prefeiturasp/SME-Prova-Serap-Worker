@@ -256,26 +256,44 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<Turma>> ObterTurmasConsolidacaoExportacaoPorProvaSerapECodigoUe(long provaSerap, string codigoUe)
+        public async Task<IEnumerable<Turma>> ObterTurmasPorCodigoUeEProvaSerap(string codigoUe, long provaSerap)
         {
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select distinct 
-                                    t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
-                                from turma t
-                                    inner join ue 
-                                        on t.ue_id = ue.id
-                                    inner join prova p
-                                        on p.modalidade = t.modalidade_codigo
+                var query = @"select t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
+                                    from prova p
                                     inner join prova_ano pa 
                                         on p.id = pa.prova_id
-                                        and pa.ano = t.ano
-                                where p.prova_legado_id = @provaSerap
-                                    and ue.ue_id = @codigoUe
-                                order by t.codigo;";
+                                    inner join turma t 
+                                        on t.ano_letivo = EXTRACT(YEAR FROM p.inicio)
+                                        and t.ano = pa.ano
+                                        and (case when t.modalidade_codigo::text in('3','4') then '3'::text else t.modalidade_codigo::text end) = p.modalidade::text
+                                    inner join ue 
+                                        on ue.id = t.ue_id
+                                    where 
+                                        ue.ue_id = @codigoUe
+                                        and p.prova_legado_id = @provaSerap;";
 
-                return await conn.QueryAsync<Turma>(query, new { provaSerap, codigoUe }, commandTimeout: 90000 );
+                return await conn.QueryAsync<Turma>(query, new { codigoUe, provaSerap });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<Turma>> ObterTurmasPorCodigos(string[] codigos)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select t.id, t.codigo
+                                from turma t
+                                where t.codigo = ANY(@codigos)";
+
+                return await conn.QueryAsync<Turma>(query, new { codigos });
             }
             finally
             {

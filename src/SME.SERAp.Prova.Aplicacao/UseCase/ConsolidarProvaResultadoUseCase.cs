@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static SME.SERAp.Prova.Infra.Utils.Paginacao;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -42,22 +41,32 @@ namespace SME.SERAp.Prova.Aplicacao
                 var dres = await mediator.Send(new ObterDresSerapQuery());
                 foreach (Dre dre in dres)
                 {
-                    var ues = await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.CodigoDre));
-                    var paginas = Paginar(ues.ToList());
-                    foreach (List<Ue> pagina in paginas)
+                    var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
+                    if(ues != null && ues.Any())
                     {
-                        var ueIds = pagina.Select(ue => ue.CodigoUe).ToArray();
-                        var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
-                        exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
-                        var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
-                        filtrosParaPublicar.Add(filtro);
-                    }
+                        foreach (Ue ue in ues)
+                        {
+                            var ueIds = new string[] { ue.CodigoUe };
+                            var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
+                            exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+                            var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
+                            filtrosParaPublicar.Add(filtro);
+                        }
+                    }                    
+                }
+
+                if (!filtrosParaPublicar.Any())
+                {
+                    await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
+                    SentrySdk.CaptureMessage($"Não foi possível localizar escolas para consolidar os dados da prova: {extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
+                    return false;
                 }
 
                 foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
                 {
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
                 }
+
             }
             catch (Exception ex)
             {
@@ -68,13 +77,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
             return true;
-        }
-
-        private List<List<Ue>> Paginar(List<Ue> ues)
-        {
-            var paginacao = new ListaPaginada<Ue>(ues.ToList(), 20);
-            return paginacao.ObterTodasAsPaginas();
-        }
+        }        
 
     }
 }

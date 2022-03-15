@@ -63,5 +63,39 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<Ue>> ObterUesSerapPorProvaSerapEDreCodigoAsync(long provaSerap, string dreCodigo)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select distinct
+                                    ue.ue_id CodigoUe, 
+                                    ue.data_atualizacao DataAtualizacao, 
+                                    ue.dre_id DreId, 
+                                    ue.nome Nome, 
+                                    ue.tipo_escola TipoEscola
+                                from prova p
+                                inner join prova_ano pa 
+                                    on p.id = pa.prova_id
+                                inner join turma t 
+                                    on t.ano_letivo = EXTRACT(YEAR FROM p.inicio)
+                                    and t.ano = pa.ano
+                                    and (case when t.modalidade_codigo::text in('3','4') then '3'::text else t.modalidade_codigo::text end) = p.modalidade::text
+                                inner join ue 
+                                    on ue.id = t.ue_id
+                                inner join dre on dre.id = ue.dre_id 
+                                where p.prova_legado_id = @provaSerap
+                                    and dre.dre_id = @dreCodigo
+                                order by ue.ue_id;";
+
+                return await conn.QueryAsync<Ue>(query, new { provaSerap, dreCodigo });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

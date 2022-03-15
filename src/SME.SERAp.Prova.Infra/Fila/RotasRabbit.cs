@@ -21,6 +21,7 @@
         public const string ExtrairResultadosProvaFiltro = "serap.estudante.prova.resultados.aluno.extrair.filtro";
         public const string ConsolidarProvaResultado = "serap.estudante.prova.resultados.consolidar";
         public const string ConsolidarProvaResultadoFiltro = "serap.estudante.prova.resultados.consolidar.filtro";
+        public const string ConsolidarProvaResultadoFiltroTurma = "serap.estudante.prova.resultados.consolidar.filtro.turma";
         public const string TratarAdesaoProva = "serap.estudante.prova.adesao.tratar";
         public const string TratarTipoProvaDeficiencia = "serap.estudante.prova.tipo.prova.deficiencia.tratar";
         public const string TratarAlunoDeficiencia = "serap.estudante.aluno.deficiencia.tratar";
@@ -35,6 +36,8 @@
         public const string SincronizaEstruturaInstitucionalTurmasSync = "serap.sincronizacao.institucional.turma.sync";
         public const string SincronizaEstruturaInstitucionalTurmaTratar = "serap.sincronizacao.institucional.turma.tratar";
         public const string SincronizaEstruturaInstitucionalAlunoSync = "serap.sincronizacao.institucional.aluno.sync";
+        public const string SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync = "serap.sincronizacao.institucional.turma.aluno.historico.sync";
+        public const string SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar = "serap.sincronizacao.institucional.turma.aluno.historico.tratar";
         public const string SincronizaEstruturaInstitucionalAlunoTratar = "serap.sincronizacao.institucional.aluno.tratar";        
 
 

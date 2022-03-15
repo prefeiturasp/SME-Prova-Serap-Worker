@@ -15,6 +15,7 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<TurmaSgpDto>> ObterTurmasSerapPorDreCodigoAsync(string dreCodigo);
         Task<IEnumerable<Turma>> ObterTodasPorAnoAsync(int year);
         Task<IEnumerable<Turma>> ObterTurmasPorCodigoUeEAnoLetivo(string codigoUe, int anoLetivo);
-        Task<IEnumerable<Turma>> ObterTurmasConsolidacaoExportacaoPorProvaSerapECodigoUe(long provaSerap, string codigoUe);
+        Task<IEnumerable<Turma>> ObterTurmasPorCodigos(string[] codigos);
+        Task<IEnumerable<Turma>> ObterTurmasPorCodigoUeEProvaSerap(string codigoUe, long provaSerap);
     }
 }

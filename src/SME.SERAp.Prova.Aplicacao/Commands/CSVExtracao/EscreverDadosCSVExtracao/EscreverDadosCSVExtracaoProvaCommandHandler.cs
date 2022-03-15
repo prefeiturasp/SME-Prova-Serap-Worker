@@ -30,8 +30,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 using (var stream = TentarAbrirArquivo(request.NomeArquivo))
                 using (var writer = new StreamWriter(stream))
                 using (var csv = new CsvWriter(writer, config))
-                {
-                    
+                {                    
                     var agrupamento = request.Resultado.OrderBy(r => r.QuestaoOrdem).GroupBy(a => a.AlunoCodigoEol);
 
                     foreach (var registro in agrupamento)
@@ -47,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         csv.WriteField(valor.UeCodigoEol);
                         csv.WriteField(valor.UeNome);
                         csv.WriteField(valor.TurmaAnoEscolar);
-                        csv.WriteField(valor.TurmaAnoEscolarDescricao);
+                        csv.WriteField($"{valor.TurmaAnoEscolar} ano");
                         csv.WriteField(valor.TurmaCodigo);
                         csv.WriteField(valor.TurmaDescricao);
                         csv.WriteField(valor.AlunoCodigoEol);

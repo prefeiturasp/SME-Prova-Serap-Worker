@@ -137,6 +137,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.ExtrairResultadosProvaFiltro, new ComandoRabbit("Realizar a extração de uma prova por filtro", typeof(ITratarProvaResultadoExtracaoFiltroUseCase)));
             comandos.Add(RotasRabbit.ConsolidarProvaResultado, new ComandoRabbit("Inicia consolidação dos dados da prova para exportação", typeof(IConsolidarProvaResultadoUseCase)));
             comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltro, new ComandoRabbit("Faz a consolidação dos dados da prova por filtro", typeof(IConsolidarProvaRespostaPorFiltroUseCase)));
+            comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, new ComandoRabbit("Faz a consolidação dos dados da prova por turma", typeof(IConsolidarProvaRespostaPorFiltroTurmaUseCase)));
             comandos.Add(RotasRabbit.TratarAdesaoProva, new ComandoRabbit("Faz a sincronização da adesão da prova do legado para o serap estudantes", typeof(ITratarAdesaoProvaUseCase)));
             comandos.Add(RotasRabbit.TratarTipoProvaDeficiencia, new ComandoRabbit("Faz a sincronização dos tipos de deficiência do tipo de prova", typeof(ITratarTipoProvaDeficienciaUseCase)));
             comandos.Add(RotasRabbit.TratarAlunoDeficiencia, new ComandoRabbit("Faz a sincronização dos tipos de deficiência do aluno", typeof(ITratarAlunoDeficienciaUseCase)));
@@ -150,7 +151,9 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Turmas/Alunos", typeof(IExecutarSincronizacaoInstitucionalTurmaSyncUseCase)));
 
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new ComandoRabbit("Estrutura Institucional - Sincronizar alunos", typeof(IExecutarSincronizacaoInstitucionalAlunoSyncUseCase)));
-            
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync, new ComandoRabbit("Estrutura Institucional - Sincronizar turmas histórico alunos", typeof(IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, new ComandoRabbit("Estrutura Institucional - Tratar turmas histórico alunos", typeof(IExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase)));
+
             //Finalizar provas automaticamente
             comandos.Add(RotasRabbit.IniciarProcessoFinalizarProvasAutomaticamente, new ComandoRabbit("Finalizar provas automaticamente - Iniciar novo processo", typeof(IIniciarProcessoFinalizarProvasAutomaticamenteUseCase)));
             comandos.Add(RotasRabbit.FinalizarProvaAutomaticamente, new ComandoRabbit("Finalizar provas automaticamente - Finalizar provas dos alunos", typeof(IFinalizarProvaAutomaticamenteUseCase)));

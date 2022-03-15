@@ -21,6 +21,6 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         public async Task<IEnumerable<Turma>> Handle(ObterTurmasConsolidacaoExportacaoPorProvaSerapECodigoUeQuery request, CancellationToken cancellationToken)
-            => await repositorioTurma.ObterTurmasConsolidacaoExportacaoPorProvaSerapECodigoUe(request.ProvaSerap, request.CodigoUe);
+            => await repositorioTurma.ObterTurmasPorCodigoUeEProvaSerap(request.CodigoUe, request.ProvaSerap);
     }
 }

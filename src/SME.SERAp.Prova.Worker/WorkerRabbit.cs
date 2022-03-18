@@ -157,7 +157,12 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             //Finalizar provas automaticamente
             comandos.Add(RotasRabbit.IniciarProcessoFinalizarProvasAutomaticamente, new ComandoRabbit("Finalizar provas automaticamente - Iniciar novo processo", typeof(IIniciarProcessoFinalizarProvasAutomaticamenteUseCase)));
             comandos.Add(RotasRabbit.FinalizarProvaAutomaticamente, new ComandoRabbit("Finalizar provas automaticamente - Finalizar provas dos alunos", typeof(IFinalizarProvaAutomaticamenteUseCase)));
-            
+
+            comandos.Add(RotasRabbit.UsuarioCoreSsoSync, new ComandoRabbit("Inicia a sincronização de usuarios do CoreSSO por grupos", typeof(IExecutarSincronizacaoUsuarioCoreSsoUseCase)));
+            comandos.Add(RotasRabbit.UsuarioPorGrupoCoreSsoTratar, new ComandoRabbit("Trata usuarios do CoreSSO por grupo para sincronizar", typeof(ITratarUsuarioPorGrupoCoreSsoUseCase)));
+            comandos.Add(RotasRabbit.UsuarioCoreSsoTratar, new ComandoRabbit("Sincroniza usuarios do CoreSSO para a base do serap estudantes", typeof(ITratarUsuarioCoreSsoUseCase)));
+            comandos.Add(RotasRabbit.UsuarioGrupoCoreSsoExcluirTratar, new ComandoRabbit("Trata usuarios do CoreSSO por grupo para sincronizar", typeof(ITratarUsuarioGrupoCoreSsoExcluirUseCase)));
+
             comandos.Add(RotasRabbit.FilaDeadletterTratar, new ComandoRabbit("Tratamento de fila Deadletter", typeof(IRabbitDeadletterSerapTratarUseCase)));
             comandos.Add(RotasRabbit.FilaDeadletterSync, new ComandoRabbit("Sync de fila Deadletter", typeof(IRabbitDeadletterSerapSyncUseCase)));
         }

@@ -67,6 +67,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioQuestaoVideo, RepositorioQuestaoVideo>();
             services.AddScoped<IRepositorioTurmaEol, RepositorioTurmaEol>();
             services.AddScoped<IRepositorioTurmaAlunoHistorico, RepositorioTurmaAlunoHistorico>();
+            services.AddScoped<IRepositorioGrupoSerapCoreSso, RepositorioGrupoSerapCoreSso>();
+            services.AddScoped<IRepositorioUsuarioSerapCoreSso, RepositorioUsuarioSerapCoreSso>();
+            services.AddScoped<IRepositorioUsuarioGrupoSerapCoreSso, RepositorioUsuarioGrupoSerapCoreSso>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -119,6 +122,13 @@ namespace SME.SERAp.Prova.IoC
 
             //sincronizar adesão das provas 
             services.AddScoped<ITratarAdesaoProvaUseCase, TratarAdesaoProvaUseCase>();
+
+            //sincronizar usuarios e grupos de usuarios coresso
+            services.AddScoped<IExecutarSincronizacaoUsuarioCoreSsoUseCase, ExecutarSincronizacaoUsuarioCoreSsoUseCase>();
+            services.AddScoped<ITratarUsuarioPorGrupoCoreSsoUseCase, TratarUsuarioPorGrupoCoreSsoUseCase>();
+            services.AddScoped<ITratarUsuarioCoreSsoUseCase, TratarUsuarioCoreSsoUseCase>();
+            services.AddScoped<ITratarUsuarioGrupoCoreSsoExcluirUseCase, TratarUsuarioGrupoCoreSsoExcluirUseCase>();
+
         }
     }
 }

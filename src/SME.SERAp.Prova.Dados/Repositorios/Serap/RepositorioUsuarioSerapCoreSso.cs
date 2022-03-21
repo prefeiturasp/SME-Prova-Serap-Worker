@@ -52,7 +52,7 @@ namespace SME.SERAp.Prova.Dados
                                         inner join usuario_grupo_serap_coresso b on a.id = b.id_usuario_serap
                                         where b.id_grupo_serap = @idGrupo";
 
-                return await conn.QueryFirstOrDefaultAsync<IEnumerable<UsuarioSerapCoreSso>>(query, new { idGrupo });
+                return await conn.QueryAsync<UsuarioSerapCoreSso>(query, new { idGrupo });
             }
             finally
             {

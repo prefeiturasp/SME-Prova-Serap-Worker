@@ -8,16 +8,16 @@ namespace SME.SERAp.Prova.Aplicacao
     public class InserirUsuarioGrupoSerapCoreSsoCommandHandler : IRequestHandler<InserirUsuarioGrupoSerapCoreSsoCommand, long>
     {
 
-        private readonly IRepositorioUsuarioGrupoSerapCoreSso usuarioGrupoSerapCoreSso;
+        private readonly IRepositorioUsuarioGrupoSerapCoreSso repositorioUsuarioGrupoSerapCoreSso;
 
-        public InserirUsuarioGrupoSerapCoreSsoCommandHandler(IRepositorioUsuarioGrupoSerapCoreSso usuarioGrupoSerapCoreSso)
+        public InserirUsuarioGrupoSerapCoreSsoCommandHandler(IRepositorioUsuarioGrupoSerapCoreSso repositorioUsuarioGrupoSerapCoreSso)
         {
-            this.usuarioGrupoSerapCoreSso = usuarioGrupoSerapCoreSso ?? throw new System.ArgumentNullException(nameof(usuarioGrupoSerapCoreSso));
+            this.repositorioUsuarioGrupoSerapCoreSso = repositorioUsuarioGrupoSerapCoreSso ?? throw new System.ArgumentNullException(nameof(repositorioUsuarioGrupoSerapCoreSso));
         }
 
         public async Task<long> Handle(InserirUsuarioGrupoSerapCoreSsoCommand request, CancellationToken cancellationToken)
         {
-            return await usuarioGrupoSerapCoreSso.IncluirAsync(request.UsuarioGrupo);
+            return await repositorioUsuarioGrupoSerapCoreSso.IncluirAsync(request.UsuarioGrupo);
         }
     }
 }

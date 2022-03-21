@@ -20,6 +20,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 foreach (GrupoSerapCoreSso grupo in grupos)
                 {
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioPorGrupoCoreSsoTratar, grupo));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoCoreSsoExcluirTratar, grupo));
                 }
                 return true;
             }

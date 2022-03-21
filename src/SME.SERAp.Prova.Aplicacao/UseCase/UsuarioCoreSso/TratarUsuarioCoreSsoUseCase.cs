@@ -39,8 +39,7 @@ namespace SME.SERAp.Prova.Aplicacao
             var usuarioCoreSso = usuarioGrupo.UsuarioCoreSso;
             var usuarioSerap = await mediator.Send(new ObterUsuarioSerapCoreSsoPorIdCoreSsoQuery(usuarioCoreSso.IdCoreSso));
 
-            var usuarioGrupoSerap = new UsuarioGrupoSerapCoreSso();
-            usuarioGrupoSerap.IdGrupoSerapCoreSso = usuarioGrupo.IdGrupo;
+            var usuarioGrupoSerap = new UsuarioGrupoSerapCoreSso(usuarioGrupo.IdGrupo);
 
             if (usuarioSerap == null)
             {

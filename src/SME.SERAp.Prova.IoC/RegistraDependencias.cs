@@ -70,6 +70,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioGrupoSerapCoreSso, RepositorioGrupoSerapCoreSso>();
             services.AddScoped<IRepositorioUsuarioSerapCoreSso, RepositorioUsuarioSerapCoreSso>();
             services.AddScoped<IRepositorioUsuarioGrupoSerapCoreSso, RepositorioUsuarioGrupoSerapCoreSso>();
+            services.AddScoped<IRepositorioUsuarioCoreSso, RepositorioUsuarioCoreSso>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)

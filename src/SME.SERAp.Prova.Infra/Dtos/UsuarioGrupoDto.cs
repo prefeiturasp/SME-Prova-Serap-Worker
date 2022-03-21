@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace SME.SERAp.Prova.Infra
 {
     public class UsuarioGrupoDto

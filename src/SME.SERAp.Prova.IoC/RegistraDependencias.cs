@@ -130,6 +130,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarUsuarioCoreSsoUseCase, TratarUsuarioCoreSsoUseCase>();
             services.AddScoped<ITratarUsuarioGrupoCoreSsoExcluirUseCase, TratarUsuarioGrupoCoreSsoExcluirUseCase>();
 
+            //tratar abrangência usuário por grupo
+            services.AddScoped<ITratarAbrangenciaUsuarioGrupoSerapUseCase, TratarAbrangenciaUsuarioGrupoSerapUseCase>();
+
         }
     }
 }

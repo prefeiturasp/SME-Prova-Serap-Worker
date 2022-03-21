@@ -22,7 +22,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (usuarioGrupo == null)
                     throw new NegocioException("Usuário e Grupo não informado.");
 
-                await TratarUsuario(usuarioGrupo);
+                var usuarioGrupoSerap = await TratarUsuario(usuarioGrupo);
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoAbrangenciaTratar, usuarioGrupoSerap));
 
                 return true;
             }
@@ -34,7 +35,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task TratarUsuario(UsuarioGrupoDto usuarioGrupo)
+        private async Task<UsuarioGrupoSerapCoreSso> TratarUsuario(UsuarioGrupoDto usuarioGrupo)
         {
             var usuarioCoreSso = usuarioGrupo.UsuarioCoreSso;
             var usuarioSerap = await mediator.Send(new ObterUsuarioSerapCoreSsoPorIdCoreSsoQuery(usuarioCoreSso.IdCoreSso));
@@ -66,6 +67,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     await mediator.Send(new InserirUsuarioGrupoSerapCoreSsoCommand(usuarioGrupoSerap));
                 }
             }
+            return usuarioGrupoSerap;
         }
     }
 }

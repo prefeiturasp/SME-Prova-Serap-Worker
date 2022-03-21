@@ -37,6 +37,29 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task<UsuarioSerapCoreSso> ObterPorId(long id)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                const string query = @"select id,
+                                                id_coresso IdCoreSso,
+                                                login Login,
+                                                nome Nome,
+                                                criado_em CriadoEm,
+                                                atualizado_em AtualizadoEm
+                                        from usuario_serap_coresso
+                                        where id = @id";
+
+                return await conn.QueryFirstOrDefaultAsync<UsuarioSerapCoreSso>(query, new { id });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<IEnumerable<UsuarioSerapCoreSso>> ObterPorIdGrupoSerap(long idGrupo)
         {
             using var conn = ObterConexaoLeitura();

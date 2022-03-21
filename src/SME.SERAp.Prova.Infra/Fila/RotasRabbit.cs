@@ -45,6 +45,8 @@
         public const string UsuarioCoreSsoTratar = "serap.estudante.usuario.coresso.tratar";
         public const string UsuarioGrupoCoreSsoExcluirTratar = "serap.estudante.usuario.grupo.coresso.excluir.tratar";
 
+        public const string UsuarioGrupoAbrangenciaTratar = "serap.estudante.usuario.grupo.abrangencia.tratar";
+
         public const string FilaDeadletterTratar = "serap.deadletter.tratar";        
         public const string FilaDeadletterSync = "serap.deadletter.sync";
     }

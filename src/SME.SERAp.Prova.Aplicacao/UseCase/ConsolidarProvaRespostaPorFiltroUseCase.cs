@@ -23,6 +23,8 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
+            SentrySdk.CaptureMessage($"Consolidar dados prova por filtro. msg: {mensagemRabbit.Mensagem}", SentryLevel.Info);
+
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
             try
             {

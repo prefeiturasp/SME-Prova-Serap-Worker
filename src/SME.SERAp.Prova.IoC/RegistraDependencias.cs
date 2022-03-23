@@ -67,6 +67,13 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioQuestaoVideo, RepositorioQuestaoVideo>();
             services.AddScoped<IRepositorioTurmaEol, RepositorioTurmaEol>();
             services.AddScoped<IRepositorioTurmaAlunoHistorico, RepositorioTurmaAlunoHistorico>();
+            services.AddScoped<IRepositorioGrupoSerapCoreSso, RepositorioGrupoSerapCoreSso>();
+            services.AddScoped<IRepositorioUsuarioSerapCoreSso, RepositorioUsuarioSerapCoreSso>();
+            services.AddScoped<IRepositorioUsuarioGrupoSerapCoreSso, RepositorioUsuarioGrupoSerapCoreSso>();
+            services.AddScoped<IRepositorioUsuarioCoreSso, RepositorioUsuarioCoreSso>();
+            services.AddScoped<IRepositorioGeralCoreSso, RepositorioGeralCoreSso>();
+            services.AddScoped<IRepositorioGeralEol, RepositorioGeralEol>();
+            services.AddScoped<IRepositorioAbrangencia, RepositorioAbrangencia>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -119,6 +126,18 @@ namespace SME.SERAp.Prova.IoC
 
             //sincronizar adesão das provas 
             services.AddScoped<ITratarAdesaoProvaUseCase, TratarAdesaoProvaUseCase>();
+
+            //sincronizar usuarios e grupos de usuarios coresso
+            services.AddScoped<IExecutarSincronizacaoUsuarioCoreSsoUseCase, ExecutarSincronizacaoUsuarioCoreSsoUseCase>();
+            services.AddScoped<ITratarUsuarioPorGrupoCoreSsoUseCase, TratarUsuarioPorGrupoCoreSsoUseCase>();
+            services.AddScoped<ITratarUsuarioCoreSsoUseCase, TratarUsuarioCoreSsoUseCase>();
+            services.AddScoped<ITratarUsuarioGrupoCoreSsoExcluirUseCase, TratarUsuarioGrupoCoreSsoExcluirUseCase>();
+
+            //tratar abrangência usuário por grupo
+            services.AddScoped<ITratarAbrangenciaUsuarioGrupoSerapUseCase, TratarAbrangenciaUsuarioGrupoSerapUseCase>();
+            services.AddScoped<ITratarAbrangenciaGrupoExcluirUseCase, TratarAbrangenciaGrupoExcluirUseCase>();
+            services.AddScoped<ITratarAbrangenciaUsuarioGrupoExcluirUseCase, TratarAbrangenciaUsuarioGrupoExcluirUseCase>();
+
         }
     }
 }

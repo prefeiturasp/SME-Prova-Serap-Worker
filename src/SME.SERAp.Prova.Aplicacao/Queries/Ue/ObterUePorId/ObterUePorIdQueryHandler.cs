@@ -1,0 +1,23 @@
+﻿using MediatR;
+using SME.SERAp.Prova.Dados;
+using SME.SERAp.Prova.Dominio;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace SME.SERAp.Prova.Aplicacao
+{
+    public class ObterUePorIdQueryHandler : IRequestHandler<ObterUePorIdQuery, Ue>
+    {
+        
+        private readonly IRepositorioUe repositorioUe;
+
+        public ObterUePorIdQueryHandler(IRepositorioUe repositorioUe)
+        {
+            this.repositorioUe = repositorioUe ?? throw new ArgumentNullException(nameof(repositorioUe));
+        }
+
+        public async Task<Ue> Handle(ObterUePorIdQuery request, CancellationToken cancellationToken)
+            => await repositorioUe.ObterPorIdAsync(request.UeId);
+    }
+}

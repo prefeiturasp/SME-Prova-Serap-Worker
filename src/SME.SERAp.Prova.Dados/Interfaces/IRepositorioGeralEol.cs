@@ -5,6 +5,6 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioGeralEol
     {
-        Task<IEnumerable<string>> ObterUeDreAtribuidasEolAsync(string codigoRf, string tiposEscola);
+        Task<IEnumerable<string>> ObterUeDreAtribuidasEolAsync(string codigoRf, int[] tiposEscola);
     }
 }

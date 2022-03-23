@@ -164,6 +164,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.UsuarioGrupoCoreSsoExcluirTratar, new ComandoRabbit("Trata usuarios do CoreSSO por grupo para sincronizar", typeof(ITratarUsuarioGrupoCoreSsoExcluirUseCase)));
 
             comandos.Add(RotasRabbit.UsuarioGrupoAbrangenciaTratar, new ComandoRabbit("Trata abrangência dos usuarios do CoreSSO por grupo", typeof(ITratarAbrangenciaUsuarioGrupoSerapUseCase)));
+            comandos.Add(RotasRabbit.GrupoAbrangenciaExcluir, new ComandoRabbit("Busca abrangências por grupo para fila excluir", typeof(ITratarAbrangenciaGrupoExcluirUseCase)));
+            comandos.Add(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, new ComandoRabbit("", typeof(ITratarAbrangenciaUsuarioGrupoExcluirUseCase)));
 
             comandos.Add(RotasRabbit.FilaDeadletterTratar, new ComandoRabbit("Tratamento de fila Deadletter", typeof(IRabbitDeadletterSerapTratarUseCase)));
             comandos.Add(RotasRabbit.FilaDeadletterSync, new ComandoRabbit("Sync de fila Deadletter", typeof(IRabbitDeadletterSerapSyncUseCase)));

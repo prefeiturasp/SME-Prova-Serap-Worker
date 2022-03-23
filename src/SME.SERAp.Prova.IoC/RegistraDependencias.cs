@@ -73,6 +73,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioUsuarioCoreSso, RepositorioUsuarioCoreSso>();
             services.AddScoped<IRepositorioGeralCoreSso, RepositorioGeralCoreSso>();
             services.AddScoped<IRepositorioGeralEol, RepositorioGeralEol>();
+            services.AddScoped<IRepositorioAbrangencia, RepositorioAbrangencia>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -134,6 +135,8 @@ namespace SME.SERAp.Prova.IoC
 
             //tratar abrangência usuário por grupo
             services.AddScoped<ITratarAbrangenciaUsuarioGrupoSerapUseCase, TratarAbrangenciaUsuarioGrupoSerapUseCase>();
+            services.AddScoped<ITratarAbrangenciaGrupoExcluirUseCase, TratarAbrangenciaGrupoExcluirUseCase>();
+            services.AddScoped<ITratarAbrangenciaUsuarioGrupoExcluirUseCase, TratarAbrangenciaUsuarioGrupoExcluirUseCase>();
 
         }
     }

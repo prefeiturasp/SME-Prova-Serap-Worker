@@ -17,7 +17,9 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Handle(InserirAbrangenciaCommand request, CancellationToken cancellationToken)
         {
-            await repositorioAbrangencia.SalvarAsync(request.Abrangencia);
+            var abrangenciaVerificada = await repositorioAbrangencia.ObterPorObjetoAbrangencia(request.Abrangencia);
+            if (abrangenciaVerificada == null)
+                await repositorioAbrangencia.SalvarAsync(request.Abrangencia);
             return true;
         }
     }

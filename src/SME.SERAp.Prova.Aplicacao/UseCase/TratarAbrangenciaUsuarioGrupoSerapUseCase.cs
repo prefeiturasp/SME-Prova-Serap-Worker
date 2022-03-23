@@ -19,12 +19,20 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-                var usuarioGrupoSerap = mensagemRabbit.ObterObjetoMensagem<UsuarioGrupoSerapCoreSso>();
+                var usuarioGrupoSerap = mensagemRabbit.ObterObjetoMensagem<UsuarioGrupoSerapDto>();
                 if (usuarioGrupoSerap == null)
-                    throw new NegocioException("Usuário e Grupo não informado.");
+                    throw new NegocioException("Sync abrangência - Usuário e Grupo não informado.");
 
-                var usuarioSerap = await mediator.Send(new ObterUsuarioSerapPorIdQuery(usuarioGrupoSerap.IdUsuarioSerapCoreSso));
-                var grupoSerap = await mediator.Send(new ObterGrupoSerapPorIdQuery(usuarioGrupoSerap.IdGrupoSerapCoreSso));
+                var usuarioSerap = await mediator.Send(new ObterUsuarioSerapPorIdQuery(usuarioGrupoSerap.IdUsuarioSerap));
+                if (usuarioSerap == null)
+                    throw new NegocioException($"Sync abrangência - Usuário não encontrado, IdUsuario:{usuarioGrupoSerap.IdUsuarioSerap}.");
+
+                var grupoSerap = await mediator.Send(new ObterGrupoSerapPorIdQuery(usuarioGrupoSerap.IdGrupoSerap));
+                if (grupoSerap == null)
+                    throw new NegocioException($"Sync abrangência - Grupo não encontrado, IdGrupo:{usuarioGrupoSerap.IdGrupoSerap}.");
+
+                if (grupoSerap.IdCoreSso == GruposCoreSso.Professor || grupoSerap.IdCoreSso == GruposCoreSso.Professor_old)
+                    throw new NegocioException("Abrangência de professor ainda não está sendo tratada.");
 
                 string parametrosMsgLog = ObterParametrosMsgLog(usuarioSerap, grupoSerap);
 
@@ -63,7 +71,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
                 }
 
-                //InserirAbrangenciaCommand
+                foreach (Abrangencia abrangenciaInserir in novaAbrangencia)
+                {
+                    await mediator.Send(new InserirAbrangenciaCommand(abrangenciaInserir));
+                }
 
                 return true;
             }

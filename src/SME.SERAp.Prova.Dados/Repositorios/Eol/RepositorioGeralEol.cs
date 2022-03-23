@@ -16,7 +16,7 @@ namespace SME.SERAp.Prova.Dados
             this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
         }
 
-        public async Task<IEnumerable<string>> ObterUeDreAtribuidasEolAsync(string codigoRf, string tiposEscola)
+        public async Task<IEnumerable<string>> ObterUeDreAtribuidasEolAsync(string codigoRf, int[] tiposEscola)
         {
             var query = @"
 				select coalesce(CdUnidadeEducacaoSobre, CdUnidadeEducacaoBase) as Codigo

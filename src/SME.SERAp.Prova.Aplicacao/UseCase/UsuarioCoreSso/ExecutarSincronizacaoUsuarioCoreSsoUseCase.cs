@@ -21,6 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioPorGrupoCoreSsoTratar, grupo));
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoCoreSsoExcluirTratar, grupo));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.GrupoAbrangenciaExcluir, grupo));
                 }
                 return true;
             }

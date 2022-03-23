@@ -26,13 +26,15 @@ namespace SME.SERAp.Prova.Aplicacao
                 var usuarioSerap = await mediator.Send(new ObterUsuarioSerapPorIdQuery(usuarioGrupoSerap.IdUsuarioSerapCoreSso));
                 var grupoSerap = await mediator.Send(new ObterGrupoSerapPorIdQuery(usuarioGrupoSerap.IdGrupoSerapCoreSso));
 
+                string parametrosMsgLog = ObterParametrosMsgLog(usuarioSerap, grupoSerap);
+
                 var abrangencia = await mediator.Send(new ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(usuarioSerap.IdCoreSso, grupoSerap.IdCoreSso));
                 if (abrangencia == null || !abrangencia.Any())
                     abrangencia = await mediator.Send(new ObterUeDreAtribuidasEolPorUsuarioQuery(usuarioSerap.Login));
 
                 if (abrangencia == null || !abrangencia.Any())
                 {
-                    SentrySdk.CaptureMessage($"Abrangência do usuário não encontrada. UsuarioId: {usuarioSerap.Id}, UsuarioIdCoreSSO: {usuarioSerap.IdCoreSso}, UsuarioLogin: {usuarioSerap.Login}", SentryLevel.Warning);
+                    SentrySdk.CaptureMessage($"Abrangência do usuário não encontrada. {parametrosMsgLog}", SentryLevel.Warning);
                     return true;
                 }
 
@@ -57,7 +59,7 @@ namespace SME.SERAp.Prova.Aplicacao
                             novaAbrangencia.Add(abrangenciaItem);
                         }
                         else
-                            SentrySdk.CaptureMessage($"Sync abrangência - Ue não encontrada: {codigo}. UsuarioId: {usuarioSerap.Id}, UsuarioIdCoreSSO: {usuarioSerap.IdCoreSso}, UsuarioLogin: {usuarioSerap.Login}", SentryLevel.Warning);
+                            SentrySdk.CaptureMessage($"Sync abrangência - Ue não encontrada: {codigo}. {parametrosMsgLog}", SentryLevel.Warning);
                     }
                 }
 
@@ -71,6 +73,11 @@ namespace SME.SERAp.Prova.Aplicacao
                 SentrySdk.CaptureException(ex);
                 return false;
             }
+        }
+
+        private string ObterParametrosMsgLog(UsuarioSerapCoreSso usuario, GrupoSerapCoreSso grupo)
+        {
+            return $"UsuarioId: {usuario.Id}, UsuarioIdCoreSSO: {usuario.IdCoreSso}, UsuarioLogin: {usuario.Login}, GrupoId: {grupo.Id}, GrupoIdCoreSSO: {grupo.IdCoreSso}";
         }
     }
 }

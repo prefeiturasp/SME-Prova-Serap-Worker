@@ -157,7 +157,8 @@ namespace SME.SERAp.Prova.Dados
                 case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
 				convert(bit, t.AllAdhered) as AderirTodos,
                 convert(bit, t.Multidiscipline) as Multidisciplinar,
-                t.TestType_Id as TipoProva
+                t.TestType_Id as TipoProva,
+                case when tp.TestTai  is null then 0 else tp.TestTai end FormatoTai
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -355,6 +356,25 @@ namespace SME.SERAp.Prova.Dados
                             where Test_id = @provaId and State = 1;";
 
                 return await conn.QueryAsync<ContextoProvaLegadoDto>(query, new { provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<ProvaFormatoTaiItem> ObterFormatoTaiItemPorId(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select top 1 niat.Value 
+                              from NumberItemTestTai nit
+                              left join NumberItemsAplicationTai niat on niat.Id = nit.ItemAplicationTaiId
+                              where nit.TestId = @provaId;";
+
+                return await conn.QueryFirstOrDefaultAsync<ProvaFormatoTaiItem>(query, new { provaId });
             }
             finally
             {

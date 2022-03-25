@@ -47,7 +47,11 @@ namespace SME.SERAp.Prova.Aplicacao
                 var modalidadeSerap = ObterModalidade(provaLegado.Modalidade, provaLegado.ModeloProva);
                 var tipoProvaSerap = await ObterTipoProva(provaLegado.TipoProva);
 
-                var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap);
+                ProvaFormatoTaiItem? provaFormatoTaiItem = null;
+                if (provaLegado.FormatoTai)
+                    provaFormatoTaiItem = await mediator.Send(new ObterProvaLegadoItemFormatoTaiQuery(provaId));
+
+                var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap, provaFormatoTaiItem);
 
                 if (provaAtual == null)
                 {
@@ -72,38 +76,42 @@ namespace SME.SERAp.Prova.Aplicacao
                         return true;
                     }
 
-                    await RemoverEntidadesFilhas(provaAtual);
+                    if(!provaParaTratar.FormatoTai)
+                        await RemoverEntidadesFilhas(provaAtual);
+
                     await mediator.Send(new ProvaAtualizarCommand(provaParaTratar));
-
                 }
 
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
-
-                foreach (var ano in provaLegado.Anos)
+                if (!provaParaTratar.FormatoTai)
                 {
-                    await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id)));
-                    if (provaLegado.PossuiBIB)
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
 
-                }
-
-                var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
-
-                if (contextosProva.Any())
-                {
-                    var ordem = 0;
-                    foreach (var contextoProvaDto in contextosProva.OrderBy(a => a.Id).ToList())
+                    foreach (var ano in provaLegado.Anos)
                     {
-                        var contextoProva = new ContextoProva(provaAtual.Id, ordem, contextoProvaDto.Titulo, contextoProvaDto.ImagemCaminho, contextoProvaDto.Texto, contextoProvaDto.ImagemPosicao);
-                        await mediator.Send(new ContextoProvaIncluirCommand(contextoProva));
-                        ordem += 1;
+                        await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id)));
+                        if (provaLegado.PossuiBIB)
+                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
+
                     }
+
+                    var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
+
+                    if (contextosProva.Any())
+                    {
+                        var ordem = 0;
+                        foreach (var contextoProvaDto in contextosProva.OrderBy(a => a.Id).ToList())
+                        {
+                            var contextoProva = new ContextoProva(provaAtual.Id, ordem, contextoProvaDto.Titulo, contextoProvaDto.ImagemCaminho, contextoProvaDto.Texto, contextoProvaDto.ImagemPosicao);
+                            await mediator.Send(new ContextoProvaIncluirCommand(contextoProva));
+                            ordem += 1;
+                        }
+                    }
+
+                    await mediator.Send(
+                        new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
+
+                    await mediator.Send(new RemoverProvasCacheCommand());
                 }
-
-                await mediator.Send(
-                    new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-
-                await mediator.Send(new RemoverProvasCacheCommand());
             }
             catch (Exception ex)
             {
@@ -113,12 +121,12 @@ namespace SME.SERAp.Prova.Aplicacao
             return true;
         }
 
-        private Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap)
+        private Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap, ProvaFormatoTaiItem? provaFormatoTaiItem)
         {
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
-                provaLegado.Multidisciplinar, (int)tipoProvaSerap);
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaFormatoTaiItem);
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

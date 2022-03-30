@@ -3,7 +3,7 @@ using SME.SERAp.Prova.Dominio;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterProvaLegadoItemFormatoTaiQuery : IRequest<ProvaFormatoTaiItem>
+    public class ObterProvaLegadoItemFormatoTaiQuery : IRequest<ProvaFormatoTaiItem?>
     {
         public ObterProvaLegadoItemFormatoTaiQuery(long provaLegadoId)
         {

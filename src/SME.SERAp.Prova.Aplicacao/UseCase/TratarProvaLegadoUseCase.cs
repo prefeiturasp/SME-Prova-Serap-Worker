@@ -49,7 +49,12 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 ProvaFormatoTaiItem? provaFormatoTaiItem = null;
                 if (provaLegado.FormatoTai)
+                {
                     provaFormatoTaiItem = await mediator.Send(new ObterProvaLegadoItemFormatoTaiQuery(provaId));
+
+                    if (provaFormatoTaiItem == null)
+                        throw new Exception($"Formato Tai Item da prova {provaId} não localizado no legado.");
+                }
 
                 var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap, provaFormatoTaiItem);
 
@@ -76,42 +81,37 @@ namespace SME.SERAp.Prova.Aplicacao
                         return true;
                     }
 
-                    if(!provaParaTratar.FormatoTai)
-                        await RemoverEntidadesFilhas(provaAtual);
+                    await RemoverEntidadesFilhas(provaAtual);
 
                     await mediator.Send(new ProvaAtualizarCommand(provaParaTratar));
                 }
 
-                if (!provaParaTratar.FormatoTai)
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
+
+                foreach (var ano in provaLegado.Anos)
                 {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
-
-                    foreach (var ano in provaLegado.Anos)
-                    {
-                        await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id)));
-                        if (provaLegado.PossuiBIB)
-                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
-
-                    }
-
-                    var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
-
-                    if (contextosProva.Any())
-                    {
-                        var ordem = 0;
-                        foreach (var contextoProvaDto in contextosProva.OrderBy(a => a.Id).ToList())
-                        {
-                            var contextoProva = new ContextoProva(provaAtual.Id, ordem, contextoProvaDto.Titulo, contextoProvaDto.ImagemCaminho, contextoProvaDto.Texto, contextoProvaDto.ImagemPosicao);
-                            await mediator.Send(new ContextoProvaIncluirCommand(contextoProva));
-                            ordem += 1;
-                        }
-                    }
-
-                    await mediator.Send(
-                        new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-
-                    await mediator.Send(new RemoverProvasCacheCommand());
+                    await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id)));
+                    if (provaLegado.PossuiBIB)
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
                 }
+
+                var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
+
+                if (contextosProva.Any())
+                {
+                    var ordem = 0;
+                    foreach (var contextoProvaDto in contextosProva.OrderBy(a => a.Id).ToList())
+                    {
+                        var contextoProva = new ContextoProva(provaAtual.Id, ordem, contextoProvaDto.Titulo, contextoProvaDto.ImagemCaminho, contextoProvaDto.Texto, contextoProvaDto.ImagemPosicao);
+                        await mediator.Send(new ContextoProvaIncluirCommand(contextoProva));
+                        ordem += 1;
+                    }
+                }
+
+                if (!provaLegado.FormatoTai)
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
+
+                await mediator.Send(new RemoverProvasCacheCommand());
             }
             catch (Exception ex)
             {

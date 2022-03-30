@@ -38,8 +38,16 @@
         public const string SincronizaEstruturaInstitucionalAlunoSync = "serap.sincronizacao.institucional.aluno.sync";
         public const string SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync = "serap.sincronizacao.institucional.turma.aluno.historico.sync";
         public const string SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar = "serap.sincronizacao.institucional.turma.aluno.historico.tratar";
-        public const string SincronizaEstruturaInstitucionalAlunoTratar = "serap.sincronizacao.institucional.aluno.tratar";        
+        public const string SincronizaEstruturaInstitucionalAlunoTratar = "serap.sincronizacao.institucional.aluno.tratar";
 
+        public const string UsuarioCoreSsoSync = "serap.estudante.usuario.coresso.sync";
+        public const string UsuarioPorGrupoCoreSsoTratar = "serap.estudante.usuario.grupo.coresso.tratar";
+        public const string UsuarioCoreSsoTratar = "serap.estudante.usuario.coresso.tratar";
+        public const string UsuarioGrupoCoreSsoExcluirTratar = "serap.estudante.usuario.grupo.coresso.excluir.tratar";
+
+        public const string UsuarioGrupoAbrangenciaTratar = "serap.estudante.usuario.grupo.abrangencia.tratar";
+        public const string GrupoAbrangenciaExcluir = "serap.estudante.grupo.abrangencia.excluir";
+        public const string UsuarioGrupoAbrangenciaExcluirTratar = "serap.estudante.usuario.grupo.abrangencia.excluir.tratar";
 
         public const string FilaDeadletterTratar = "serap.deadletter.tratar";        
         public const string FilaDeadletterSync = "serap.deadletter.sync";

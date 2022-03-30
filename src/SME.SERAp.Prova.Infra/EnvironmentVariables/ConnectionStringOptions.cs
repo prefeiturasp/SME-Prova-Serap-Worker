@@ -7,6 +7,7 @@
         public string ApiSerapLeitura { get; set; }
         public string ApiSgp { get; set; }
         public string Eol { get; set; }
+        public string CoreSSO { get; set; }
 
     }
 }

@@ -135,7 +135,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-              var query = @"
+                var query = @"
               SELECT DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
@@ -157,7 +157,8 @@ namespace SME.SERAp.Prova.Dados
                 case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
 				convert(bit, t.AllAdhered) as AderirTodos,
                 convert(bit, t.Multidiscipline) as Multidisciplinar,
-                t.TestType_Id as TipoProva
+                t.TestType_Id as TipoProva,
+                case when t.TestTai  is null then 0 else t.TestTai end FormatoTai
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -184,7 +185,7 @@ namespace SME.SERAp.Prova.Dados
 	            t.id = @id";
 
                 return await conn.QueryFirstOrDefaultAsync<ProvaLegadoDetalhesIdDto>(query, new { id });
-                
+
             }
             finally
             {
@@ -193,7 +194,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public  async Task<IEnumerable<long>> ObterAlternativasPorProvaIdEQuestaoId(long questaoId)
+        public async Task<IEnumerable<long>> ObterAlternativasPorProvaIdEQuestaoId(long questaoId)
         {
             using var conn = ObterConexao();
             try
@@ -203,7 +204,7 @@ namespace SME.SERAp.Prova.Dados
                                 FROM  Alternative A (NOLOCK)                             
                                 WHERE A.Item_Id = @questaoId;";
 
-                return await conn.QueryAsync<long>(query, new {  questaoId });
+                return await conn.QueryAsync<long>(query, new { questaoId });
             }
             finally
             {
@@ -211,8 +212,8 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-        
-        public  async Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long questaoId, long alternativaId)
+
+        public async Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long questaoId, long alternativaId)
         {
             using var conn = ObterConexao();
             try
@@ -224,7 +225,7 @@ namespace SME.SERAp.Prova.Dados
                                     A.[Order] as Ordem
                                 FROM  Alternative A (NOLOCK)                             
                                 WHERE A.Item_Id = @questaoId and A.id = @alternativaId;";
-                
+
 
                 return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
             }
@@ -264,8 +265,8 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-        
-        
+
+
         public async Task<QuestoesPorProvaIdDto> ObterDetalheQuestoesPorProvaId(long provaId, long questaoId)
         {
             using var conn = ObterConexao();
@@ -287,7 +288,7 @@ namespace SME.SERAp.Prova.Dados
                                      LEFT JOIN BlockKnowledgeArea Bka WITH (NOLOCK) ON Bka.KnowledgeArea_Id = I.KnowledgeArea_Id AND B.Id = Bka.Block_Id
                                 WHERE T.Id = @provaId  and T.ShowOnSerapEstudantes  = 1 and  I.id = @questaoId and BI.State = 1;";
 
-                return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId , questaoId});
+                return await conn.QueryFirstOrDefaultAsync<QuestoesPorProvaIdDto>(query, new { provaId, questaoId });
             }
             finally
             {
@@ -355,6 +356,29 @@ namespace SME.SERAp.Prova.Dados
                             where Test_id = @provaId and State = 1;";
 
                 return await conn.QueryAsync<ContextoProvaLegadoDto>(query, new { provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select case when niat.Value = '' then 0 else niat.Value end as value
+                              from NumberItemTestTai nit
+                              left join NumberItemsAplicationTai niat on niat.Id = nit.ItemAplicationTaiId
+                              where nit.TestId = @provaId;";
+                var formatos = await conn.QueryAsync<long>(query, new { provaId });
+
+                if (formatos.Any())
+                    return (ProvaFormatoTaiItem)formatos.FirstOrDefault();
+
+                return null;
             }
             finally
             {

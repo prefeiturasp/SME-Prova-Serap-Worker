@@ -27,6 +27,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.AderirTodos).ToColumn("aderir_todos");
             Map(c => c.Multidisciplinar).ToColumn("multidisciplinar");
             Map(c => c.TipoProvaId).ToColumn("tipo_prova_id");
+            Map(c => c.FormatoTai).ToColumn("formato_tai");
         }
     }
 }

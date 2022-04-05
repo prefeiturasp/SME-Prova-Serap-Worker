@@ -66,7 +66,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     NomeTurma = a.NomeTurma,
                     TipoTurma = a.TipoTurma,
                     TipoTurno = a.TipoTurno,
-                    UeId = uesSerap.FirstOrDefault(a => a.CodigoUe == a.CodigoUe).Id
+                    UeId = uesSerap.FirstOrDefault(a => a.CodigoUe == a.CodigoUe).Id,
+                    Semestre = a.Semestre,
+                    EtapaEja = a.EtapaEja,
+                    SerieEnsino = a.SerieEnsino
                 }).ToList();
 
                 await mediator.Send(new InserirTurmasCommand(turmasNovasParaIncluirNormalizada));
@@ -96,7 +99,10 @@ namespace SME.SERAp.Prova.Aplicacao
                             TipoTurma = turmaQuePodeAlterar.TipoTurma,
                             TipoTurno = turmaQuePodeAlterar.TipoTurno,
                             UeId = turmaAntiga.UeId,
-                            Id = turmaAntiga.Id
+                            Id = turmaAntiga.Id,
+                            Semestre = turmaQuePodeAlterar.Semestre,
+                            EtapaEja = turmaQuePodeAlterar.EtapaEja,
+                            SerieEnsino = turmaQuePodeAlterar.SerieEnsino
                         });
                     }
                 }

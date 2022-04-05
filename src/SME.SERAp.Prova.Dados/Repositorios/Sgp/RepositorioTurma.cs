@@ -59,7 +59,10 @@ namespace SME.SERAp.Prova.Dados
                                      t.tipo_turma as tipoturma,
                                      t.modalidade_codigo as modalidadeCodigo,
                                      t.nome as nomeTurma,
-                                     t.tipo_turno as tipoturno                                      
+                                     t.tipo_turno as tipoturno,
+                                     t.semestre as semestre,
+                                     t.etapa_eja as etapaEja,
+                                     t.serie_ensino as serieEnsino
                                 from turma t
                                inner join ue u on t.ue_id = u.id
                                inner join dre d on u.dre_id  = d.id

@@ -16,6 +16,9 @@ namespace SME.SERAp.Prova.Dominio
         public int ModalidadeCodigo { get; set; }
         public string NomeTurma { get; set; }
         public int TipoTurno { get; set; }
+        public int Semestre { get; set; }
+        public int EtapaEja { get; set; }
+        public string SerieEnsino { get; set; }
         public DateTime DataAtualizacao { get; set; }
     }
 }

@@ -270,8 +270,15 @@ namespace SME.SERAp.Prova.Dados
                                         on p.id = pa.prova_id
                                     inner join turma t 
                                         on t.ano_letivo = EXTRACT(YEAR FROM p.inicio)
-                                        and t.ano = pa.ano
                                         and (case when t.modalidade_codigo::text in('3','4') then '3'::text else t.modalidade_codigo::text end) = p.modalidade::text
+                                        and (
+                                                  (t.modalidade_codigo != 3 and t.ano = pa.ano)
+                                               or (p.modalidade = 3 and pa.ano = '3' and t.modalidade_codigo = p.modalidade and t.ano = '2' and t.etapa_eja = 1) -- EJA básica 1
+                                               or (p.modalidade = 3 and pa.ano = '4' and t.modalidade_codigo = p.modalidade and t.ano = '2' and t.etapa_eja = 2) -- EJA básica 2
+                                               or (p.modalidade = 3 and pa.ano = '7' and t.modalidade_codigo = p.modalidade and t.ano = '4' and t.etapa_eja = 1) -- EJA final 1
+                                               or (p.modalidade = 3 and pa.ano = '8' and t.modalidade_codigo = p.modalidade and t.ano = '4' and t.etapa_eja = 2) -- EJA final 2
+                                               or (p.modalidade = 3 and pa.ano not in ('3','4','7','8') and t.ano = pa.ano)
+                                            ) 
                                     inner join ue 
                                         on ue.id = t.ue_id
                                     where 

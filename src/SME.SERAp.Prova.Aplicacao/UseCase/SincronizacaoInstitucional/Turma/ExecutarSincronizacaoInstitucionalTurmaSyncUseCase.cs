@@ -5,6 +5,7 @@ using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,31 +22,39 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var dre = mensagemRabbit.ObterObjetoMensagem<DreParaSincronizacaoInstitucionalDto>();
 
-            if (dre == null)
+            try
             {
-                var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
-                SentrySdk.CaptureMessage(mensagem);
-                throw new NegocioException(mensagem);
+                if (dre == null)
+                {
+                    var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
+                    SentrySdk.CaptureMessage(mensagem);
+                    throw new NegocioException(mensagem);
+                }
+
+                var turmasSgp = await mediator.Send(new ObterTurmasSgpPorDreCodigoQuery(dre.DreCodigo));
+
+                if (turmasSgp == null || !turmasSgp.Any())
+                    throw new NegocioException("Não foi possível localizar as Turmas no Sgp para a sincronização instituicional");
+
+
+                var turmasSgpCodigo = turmasSgp.Select(a => a.Codigo).Distinct().ToList();
+
+                var turmasSerap = await mediator.Send(new ObterTurmasSerapPorDreCodigoQuery(dre.DreCodigo));
+                var turmasSerapCodigo = turmasSerap.Select(a => a.Codigo).Distinct().ToList();
+
+                await TratarInclusao(turmasSgp, turmasSgpCodigo, turmasSerapCodigo, dre.DreCodigo);
+
+                await TratarAlteracao(turmasSgp, turmasSgpCodigo, turmasSerap, turmasSerapCodigo);
+
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new DreParaSincronizacaoInstitucionalDto(dre.Id, dre.DreCodigo)));
+
+                return true;
             }
-
-            var turmasSgp = await mediator.Send(new ObterTurmasSgpPorDreCodigoQuery(dre.DreCodigo));
-
-            if (turmasSgp == null || !turmasSgp.Any())
-                throw new NegocioException("Não foi possível localizar as Turmas no Sgp para a sincronização instituicional");
-
-
-            var turmasSgpCodigo = turmasSgp.Select(a => a.Codigo).Distinct().ToList();
-
-            var turmasSerap = await mediator.Send(new ObterTurmasSerapPorDreCodigoQuery(dre.DreCodigo));
-            var turmasSerapCodigo = turmasSerap.Select(a => a.Codigo).Distinct().ToList();
-
-            await TratarInclusao(turmasSgp, turmasSgpCodigo, turmasSerapCodigo, dre.DreCodigo);
-
-            await TratarAlteracao(turmasSgp, turmasSgpCodigo, turmasSerap, turmasSerapCodigo);
-
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new DreParaSincronizacaoInstitucionalDto(dre.Id, dre.DreCodigo)));
-
-            return true;
+            catch(Exception e)
+            {
+                throw e;
+            }
+            
         }
         private async Task TratarInclusao(IEnumerable<TurmaSgpDto> todasTurmasSgp, List<string> todasTurmasSgpCodigo, List<string> todasTurmasSerapCodigo, string dreCodigo)
         {

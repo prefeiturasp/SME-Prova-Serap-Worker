@@ -31,20 +31,39 @@ namespace SME.SERAp.Prova.Aplicacao
                     throw new NegocioException(mensagem);
                 }
 
-                var turmasSgp = await mediator.Send(new ObterTurmasSgpPorDreCodigoQuery(dre.DreCodigo));
+                long anoAtual = DateTime.Now.Year;
 
-                if (turmasSgp == null || !turmasSgp.Any())
-                    throw new NegocioException("Não foi possível localizar as Turmas no Sgp para a sincronização instituicional");
+                for (long anoLetivo = (long)ParametrosSistema.AnoInicioSerapEstudantes; anoLetivo <= anoAtual; anoLetivo++)
+                {
+                    var todasTurmasSgp = new List<TurmaSgpDto>();
 
+                    if (anoLetivo < anoAtual)
+                    {
+                        var turmasSgpHistoricas = await mediator.Send(new ObterTurmasSgpPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo, true));
+                        if (turmasSgpHistoricas != null && turmasSgpHistoricas.Any())
+                            todasTurmasSgp.AddRange(turmasSgpHistoricas);
+                    }                    
 
-                var turmasSgpCodigo = turmasSgp.Select(a => a.Codigo).Distinct().ToList();
+                    var turmasSgpNaoHistoricas = await mediator.Send(new ObterTurmasSgpPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo, false));
+                    if (turmasSgpNaoHistoricas != null && turmasSgpNaoHistoricas.Any())
+                        todasTurmasSgp.AddRange(turmasSgpNaoHistoricas);
 
-                var turmasSerap = await mediator.Send(new ObterTurmasSerapPorDreCodigoQuery(dre.DreCodigo));
-                var turmasSerapCodigo = turmasSerap.Select(a => a.Codigo).Distinct().ToList();
+                    var turmasSgp = todasTurmasSgp.AsEnumerable();
+                    if (turmasSgp == null || !turmasSgp.Any())
+                    {
+                        SentrySdk.CaptureMessage($"Dre: {dre.DreCodigo}, AnoLetivo: {anoLetivo} -- Não foi possível localizar as Turmas no Sgp para a sincronização instituicional.", SentryLevel.Error);
+                        continue;
+                    }                        
 
-                await TratarInclusao(turmasSgp, turmasSgpCodigo, turmasSerapCodigo, dre.DreCodigo);
+                    var turmasSgpCodigo = turmasSgp.Select(a => a.Codigo).Distinct().ToList();
 
-                await TratarAlteracao(turmasSgp, turmasSgpCodigo, turmasSerap, turmasSerapCodigo);
+                    var turmasSerap = await mediator.Send(new ObterTurmasSerapPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo));
+                    var turmasSerapCodigo = turmasSerap.Select(a => a.Codigo).Distinct().ToList();
+
+                    await TratarInclusao(turmasSgp, turmasSgpCodigo, turmasSerapCodigo, dre.DreCodigo);
+
+                    await TratarAlteracao(turmasSgp, turmasSgpCodigo, turmasSerap, turmasSerapCodigo);
+                }
 
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new DreParaSincronizacaoInstitucionalDto(dre.Id, dre.DreCodigo)));
 

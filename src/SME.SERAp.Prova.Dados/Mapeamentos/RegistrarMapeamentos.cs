@@ -38,6 +38,10 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new AlunoDeficienciaMap());
                 config.AddMap(new QuestaoVideoMap());
                 config.AddMap(new TurmaAlunoHistoricoMap());
+                config.AddMap(new UsuarioSerapCoreSsoMap());
+                config.AddMap(new GrupoSerapCoreSsoMap());
+                config.AddMap(new UsuarioGrupoSerapCoreSsoMap());
+                config.AddMap(new AbrangenciaMap());
 
                 config.ForDommel();
             });

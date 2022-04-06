@@ -19,6 +19,7 @@ namespace SME.SERAp.Prova.Dominio
         FimProvaTurnoVespertino = 12,
         FimProvaTurnoNoite = 13,
         FimProvaTurnoIntegral = 14,
+        TipoEscolaSerap = 15,
     }
 
     public static class TipoParametroSistemaExtension

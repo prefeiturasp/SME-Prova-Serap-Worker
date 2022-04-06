@@ -15,6 +15,7 @@ namespace SME.SERAp.Prova.IoC
         {
             services.AdicionarMediatr();
             services.AdicionarValidadoresFluentValidation();
+            services.AddPolicies();
             RegistrarRepositorios(services);
             RegistrarServicos(services);
             RegistrarCasosDeUso(services);

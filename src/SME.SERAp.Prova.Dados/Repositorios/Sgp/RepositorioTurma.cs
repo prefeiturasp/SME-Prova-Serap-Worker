@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -79,6 +80,49 @@ namespace SME.SERAp.Prova.Dados
                 };
 
                 return await conn.QueryAsync<TurmaSgpDto>(query, parametros);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+        public async Task<IEnumerable<TurmaSgpDto>> ObterTurmasSgpPorDreCodigoEAnoLetivoAsync(string dreCodigo, long anoLetivo, bool historica)
+        {
+            using var conn = ObterConexaoSgp();
+            try
+            {
+                var query = new StringBuilder();
+                query.AppendLine(@"select t.ano, 
+                                     t.ano_letivo as anoLetivo,
+                                     t.turma_id as Codigo,
+                                     t.tipo_turma as tipoturma,
+                                     t.modalidade_codigo as modalidadeCodigo,
+                                     t.nome as nomeTurma,
+                                     t.tipo_turno as tipoturno,
+                                     t.semestre as semestre,
+                                     t.etapa_eja as etapaEja,
+                                     t.serie_ensino as serieEnsino
+                                from turma t
+                               inner join ue u on t.ue_id = u.id
+                               inner join dre d on u.dre_id  = d.id
+                               where t.tipo_turma = 1
+                                 and t.modalidade_codigo in (3,4,5,6)
+                                 and t.ano_letivo = @anoLetivo 
+                                 and d.dre_id = @dreCodigo");
+
+                if (historica)
+                    query.AppendLine(" and t.historica");
+                else
+                    query.AppendLine(" and not t.historica");
+
+                var parametros = new
+                {
+                    dreCodigo,
+                    anoLetivo
+                };
+
+                return await conn.QueryAsync<TurmaSgpDto>(query.ToString(), parametros);
             }
             finally
             {
@@ -205,6 +249,43 @@ namespace SME.SERAp.Prova.Dados
                 {
                     dreCodigo,
                     anoLetivo = DateTime.Now.Year
+                };
+
+                return await conn.QueryAsync<TurmaSgpDto>(query, parametros);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<TurmaSgpDto>> ObterTurmasSerapPorDreCodigoEAnoLetivoAsync(string dreCodigo, long anoLetivo)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select t.id,
+                                     t.ano, 
+                                     t.ano_letivo as anoLetivo,
+                                     t.Codigo as Codigo,
+                                     t.tipo_turma as tipoturma,
+                                     t.modalidade_codigo as modalidadeCodigo,
+                                     t.nome as nomeTurma,
+                                     t.tipo_turno as tipoturno,
+                                     t.ue_id as UeId                                     
+                                from turma t
+                               inner join ue u on t.ue_id = u.id
+                               inner join dre d on u.dre_id  = d.id
+                               where t.tipo_turma = 1
+                                 and t.modalidade_codigo in (3,4,5,6)
+                                 and t.ano_letivo = @anoLetivo 
+                                 and d.dre_id = @dreCodigo";
+
+                var parametros = new
+                {
+                    dreCodigo,
+                    anoLetivo
                 };
 
                 return await conn.QueryAsync<TurmaSgpDto>(query, parametros);

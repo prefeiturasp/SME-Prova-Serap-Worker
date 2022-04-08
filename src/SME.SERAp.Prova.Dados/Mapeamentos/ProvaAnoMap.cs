@@ -13,7 +13,8 @@ namespace SME.SERAp.Prova.Dados
             
             Map(c => c.ProvaId).ToColumn("prova_id");
             Map(c => c.Ano).ToColumn("ano");
-
+            Map(c => c.Modalidade).ToColumn("modalidade");
+            Map(c => c.EtapaEja).ToColumn("etapa_eja");
         }
     }
 }

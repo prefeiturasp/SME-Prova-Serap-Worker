@@ -6,6 +6,7 @@ using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.IoC;
 using System.Reflection;
 using RabbitMQ.Client;
+using StackExchange.Redis;
 
 namespace SME.SERAp.Prova.Aplicacao.Worker
 {
@@ -67,15 +68,17 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             services.AddSingleton(channel);
             services.AddSingleton(conexaoRabbit);
 
-
             var fireBaseOptions = new FireBaseOptions();
             hostContext.Configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(fireBaseOptions);
 
-            services.AddStackExchangeRedisCache(options =>
+            var redisConfigurationOptions = new ConfigurationOptions()
             {
-                options.Configuration = hostContext.Configuration.GetConnectionString("Redis");
-            });
+                EndPoints = { hostContext.Configuration.GetConnectionString("Redis") },
+                Proxy = Proxy.Twemproxy
+            };
+            var muxer = ConnectionMultiplexer.Connect(redisConfigurationOptions);
+            services.AddSingleton<IConnectionMultiplexer>(muxer);
         }
     }
 }

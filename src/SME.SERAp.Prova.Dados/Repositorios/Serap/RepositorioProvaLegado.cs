@@ -86,23 +86,19 @@ namespace SME.SERAp.Prova.Dados
 	            tcg.TypeCurriculumGradeId = tt.tcp_id
             INNER JOIN TESTTIME ttime on
                 t.TestTime_Id = ttime.id
-            INNER JOIN TestTypeCourse ttc ON
-	            ttc.TestType_Id = t.TestType_Id
             LEFT JOIN Discipline d ON
 	            t.Discipline_Id = d.Id 
 	        INNER JOIN TestType on
 	        	t.TestType_Id = TestType.id
 	       	INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
 	       		TestType.TypeLevelEducationId = tne.tne_id
-            INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
-	            ttcp.crp_ordem = tt.tcp_ordem
-	            AND tt.tme_id = ttcp.tme_id
             INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
             LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
 			  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
-            where
-	            t.id = @id";
-
+            where 
+                exists(select top 1 1 from TestTypeCourse ttc where ttc.TestType_Id = t.TestType_Id)
+				and exists(select top 1 1 from SGP_TUR_TurmaTipoCurriculoPeriodo ttcp where ttcp.crp_ordem = tt.tcp_ordem and tt.tme_id = ttcp.tme_id) 
+	            and t.id = @id";
 
                 var lookup = new Dictionary<long, ProvaLegadoDetalhesIdDto>();
 
@@ -167,22 +163,19 @@ namespace SME.SERAp.Prova.Dados
 	            tcg.TypeCurriculumGradeId = tt.tcp_id
             INNER JOIN TESTTIME ttime on
                 t.TestTime_Id = ttime.id
-            INNER JOIN TestTypeCourse ttc ON
-	            ttc.TestType_Id = t.TestType_Id
             LEFT JOIN Discipline d ON
 	            t.Discipline_Id = d.Id 
 	        INNER JOIN TestType on
 	        	t.TestType_Id = TestType.id
 	       	INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
 	       		TestType.TypeLevelEducationId = tne.tne_id
-            INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
-	            ttcp.crp_ordem = tt.tcp_ordem
-	            AND tt.tme_id = ttcp.tme_id
             INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
             LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
 			  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
             where
-	            t.id = @id";
+                exists(select top 1 1 from TestTypeCourse ttc where ttc.TestType_Id = t.TestType_Id)
+				and exists(select top 1 1 from SGP_TUR_TurmaTipoCurriculoPeriodo ttcp where ttcp.crp_ordem = tt.tcp_ordem and tt.tme_id = ttcp.tme_id) 
+	            and t.id = @id";
 
                 return await conn.QueryFirstOrDefaultAsync<ProvaLegadoDetalhesIdDto>(query, new { id });
 

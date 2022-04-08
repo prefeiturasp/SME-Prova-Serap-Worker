@@ -4,6 +4,7 @@
     {
         public const string ProvaSync = "serap.estudante.prova.legado.sync";       
         public const string ProvaTratar = "serap.estudante.prova.legado.tratar";
+        public const string ProvaAnoTratar = "serap.estudante.prova.ano.legado.tratar";
         public const string QuestaoSync = "serap.estudante.questao.legado.sync";       
         public const string QuestaoTratar = "serap.estudante.questao.legado.tratar";
         public const string QuestaoImagemIncorretaTratar = "serap.estudante.questoes.imagens.tratar";

@@ -215,7 +215,8 @@ namespace SME.SERAp.Prova.Dados
 				convert(bit, t.AllAdhered) as AderirTodos,
                 convert(bit, t.Multidiscipline) as Multidisciplinar,
                 t.TestType_Id as TipoProva,
-                case when t.TestTai  is null then 0 else t.TestTai end FormatoTai
+                case when t.TestTai  is null then 0 else t.TestTai end FormatoTai,
+                t.NumberSynchronizedResponseItems as  QtdItensSincronizacaoRespostas
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

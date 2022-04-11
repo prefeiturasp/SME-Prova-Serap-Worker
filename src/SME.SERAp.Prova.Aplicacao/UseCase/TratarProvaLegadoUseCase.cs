@@ -78,6 +78,13 @@ namespace SME.SERAp.Prova.Aplicacao
                         provaAtual.Fim = provaLegado.Fim;
 
                         await mediator.Send(new ProvaAtualizarCommand(provaAtual));
+                        //TO DO ==> para atualizar os anos de aplicação da prova após ajuste nas configurações de EJA - Avaliar a remoção futuramente.
+                        if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
+                        {
+                            await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
+                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
+                        }
+                        //--------------------------------------------------------
                         return true;
                     }
 
@@ -88,12 +95,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
 
-                foreach (var ano in provaLegado.Anos)
-                {
-                    await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id)));
-                    if (provaLegado.PossuiBIB)
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
-                }
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
 
                 var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
 

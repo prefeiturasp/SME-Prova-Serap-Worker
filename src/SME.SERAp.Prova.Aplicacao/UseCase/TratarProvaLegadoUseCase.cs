@@ -76,6 +76,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         provaAtual.InicioDownload = provaLegado.InicioDownload;
                         provaAtual.Inicio = provaLegado.Inicio;
                         provaAtual.Fim = provaLegado.Fim;
+                        provaAtual.QtdItensSincronizacaoRespostas = provaLegado.QtdItensSincronizacaoRespostas;
 
                         await mediator.Send(new ProvaAtualizarCommand(provaAtual));
                         //TO DO ==> para atualizar os anos de aplicação da prova após ajuste nas configurações de EJA - Avaliar a remoção futuramente.
@@ -128,7 +129,7 @@ namespace SME.SERAp.Prova.Aplicacao
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
-                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaFormatoTaiItem);
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaFormatoTaiItem, provaLegado.QtdItensSincronizacaoRespostas);
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

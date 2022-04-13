@@ -67,16 +67,24 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.Multidisciplinar = provaParaTratar.Multidisciplinar;
                 provaAtual.TipoProvaId = provaParaTratar.TipoProvaId;
 
-                var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
-                if (verificaSePossuiRespostas)
-                {
-                    provaAtual.InicioDownload = provaLegado.InicioDownload;
-                    provaAtual.Inicio = provaLegado.Inicio;
-                    provaAtual.Fim = provaLegado.Fim;
+                    var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
+                    if (verificaSePossuiRespostas)
+                    {
+                        provaAtual.InicioDownload = provaLegado.InicioDownload;
+                        provaAtual.Inicio = provaLegado.Inicio;
+                        provaAtual.Fim = provaLegado.Fim;
+                        provaAtual.QtdItensSincronizacaoRespostas = provaLegado.QtdItensSincronizacaoRespostas;
 
-                    await mediator.Send(new ProvaAtualizarCommand(provaAtual));
-                    return true;
-                }
+                        await mediator.Send(new ProvaAtualizarCommand(provaAtual));
+                        //TO DO ==> para atualizar os anos de aplicação da prova após ajuste nas configurações de EJA - Avaliar a remoção futuramente.
+                        if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
+                        {
+                            await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
+                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
+                        }
+                        //--------------------------------------------------------
+                        return true;
+                    }
 
                 await RemoverEntidadesFilhas(provaAtual);
 
@@ -85,12 +93,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
 
-            foreach (var ano in provaLegado.Anos)
-            {
-                await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id)));
-                if (provaLegado.PossuiBIB)
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
-            }
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
 
             var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
 
@@ -118,7 +121,7 @@ namespace SME.SERAp.Prova.Aplicacao
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
-                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaFormatoTaiItem);
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaFormatoTaiItem, provaLegado.QtdItensSincronizacaoRespostas);
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

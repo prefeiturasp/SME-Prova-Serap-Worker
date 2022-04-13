@@ -62,11 +62,11 @@ namespace SME.SERAp.Prova.Aplicacao
 
                         foreach (var resultado in registro)
                         {
-                            if (resultado.Resposta != null)
+                            if (resultado?.Resposta != null)
                                 csv.WriteField(resultado.Resposta.Replace(")", ""));
                             else
                                 csv.WriteField("");
-                        }
+                        }                        
                     }
 
                 }

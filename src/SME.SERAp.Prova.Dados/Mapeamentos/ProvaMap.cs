@@ -29,6 +29,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.TipoProvaId).ToColumn("tipo_prova_id");
             Map(c => c.FormatoTai).ToColumn("formato_tai");
             Map(c => c.ProvaFormatoTaiItem).ToColumn("formato_tai_item");
+            Map(c => c.QtdItensSincronizacaoRespostas).ToColumn("qtd_itens_sincronizacao_respostas");
         }
     }
 }

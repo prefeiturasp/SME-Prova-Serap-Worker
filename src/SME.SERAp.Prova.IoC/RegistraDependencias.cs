@@ -86,6 +86,7 @@ namespace SME.SERAp.Prova.IoC
         {
             services.AddScoped<ITratarProvasLegadoSyncUseCase, TratarProvasLegadoSyncUseCase>();
             services.AddScoped<ITratarProvaLegadoUseCase, TratarProvaLegadoUseCase>();
+            services.AddScoped<ITratarProvaAnoLegadoUseCase, TratarProvaAnoLegadoUseCase>();
             services.AddScoped<ITratarAlternativaLegadoSyncUseCase, TratarAlternativaLegadoSyncUseCase>();
             services.AddScoped<ITratarAlternativaLegadoUseCase, TratarAlternativaLegadoLegadoUseCase>();
             services.AddScoped<ITratarQuestoesLegadoSyncUseCase, TratarQuestoesLegadoSyncUseCase>();

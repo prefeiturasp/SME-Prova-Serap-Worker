@@ -16,23 +16,14 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            try
-            {
-                var usuarioGrupo = mensagemRabbit.ObterObjetoMensagem<UsuarioGrupoDto>();
-                if (usuarioGrupo == null)
-                    throw new NegocioException("Usuário e Grupo não informado.");
+            var usuarioGrupo = mensagemRabbit.ObterObjetoMensagem<UsuarioGrupoDto>();
+            if (usuarioGrupo == null)
+                throw new NegocioException("Usuário e Grupo não informado.");
 
-                var usuarioGrupoSerap = await TratarUsuario(usuarioGrupo);
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoAbrangenciaTratar, new UsuarioGrupoSerapDto(usuarioGrupoSerap.IdUsuarioSerapCoreSso, usuarioGrupoSerap.IdGrupoSerapCoreSso)));
+            var usuarioGrupoSerap = await TratarUsuario(usuarioGrupo);
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoAbrangenciaTratar, new UsuarioGrupoSerapDto(usuarioGrupoSerap.IdUsuarioSerapCoreSso, usuarioGrupoSerap.IdGrupoSerapCoreSso)));
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureMessage($"Tratar usuário. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
-                return false;
-            }
+            return true;
         }
 
         private async Task<UsuarioGrupoSerapCoreSso> TratarUsuario(UsuarioGrupoDto usuarioGrupo)

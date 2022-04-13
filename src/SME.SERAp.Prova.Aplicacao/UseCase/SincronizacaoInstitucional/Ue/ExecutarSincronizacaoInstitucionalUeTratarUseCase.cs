@@ -26,28 +26,21 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var ueSerap = await mediator.Send(new ObterUePorCodigoQuery(ueSgp.CodigoUe));
 
-            try
+            var ueNovoId = await mediator.Send(new TrataSincronizacaoInstitucionalUeCommand(ueSgp, ueSerap));
+            if (ueNovoId > 0)
             {
-                var ueNovoId = await mediator.Send(new TrataSincronizacaoInstitucionalUeCommand(ueSgp, ueSerap));
-                if (ueNovoId > 0)
+                var ueParaPublicar = new UeParaSincronizacaoInstitucionalDto()
                 {
-                    var ueParaPublicar = new UeParaSincronizacaoInstitucionalDto()
-                    {
-                        Id = ueNovoId,
-                        UeCodigo = ueSgp.CodigoUe
-                    };
-                    var mensagemParaPublicar = JsonConvert.SerializeObject(ueParaPublicar);
-                    var publicarTratamentoUe = await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, mensagemParaPublicar));
-                    if (!publicarTratamentoUe)
-                    {
-                        var mensagem = $"Não foi possível inserir a Ue : {publicarTratamentoUe} na fila de sync.";
-                        SentrySdk.CaptureMessage(mensagem);
-                    }
+                    Id = ueNovoId,
+                    UeCodigo = ueSgp.CodigoUe
+                };
+                var mensagemParaPublicar = JsonConvert.SerializeObject(ueParaPublicar);
+                var publicarTratamentoUe = await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, mensagemParaPublicar));
+                if (!publicarTratamentoUe)
+                {
+                    var mensagem = $"Não foi possível inserir a Ue : {publicarTratamentoUe} na fila de sync.";
+                    SentrySdk.CaptureMessage(mensagem);
                 }
-            }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
             }
 
             return true;

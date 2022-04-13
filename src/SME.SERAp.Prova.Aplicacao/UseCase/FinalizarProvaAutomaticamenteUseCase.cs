@@ -19,18 +19,10 @@ namespace SME.SERAp.Prova.Aplicacao
         }
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var provaParaFinalizar = mensagemRabbit.ObterObjetoMensagem<ProvaParaAtualizarDto>();            
-            try
-            {
-                await mediator.Send(new FinalizarProvaAutomaticamenteCommand(provaParaFinalizar));
-                return true;
-            }
-            catch(Exception ex)
-            {
-                SentrySdk.AddBreadcrumb($"Erro ao finalizar as provas dos alunos - Erro:{ex.Message}, mensagemRabbit:{mensagemRabbit.Mensagem}", "erro", null, null, BreadcrumbLevel.Error);
-                SentrySdk.CaptureException(ex);
-                return false;
-            }
+            var provaParaFinalizar = mensagemRabbit.ObterObjetoMensagem<ProvaParaAtualizarDto>();
+
+            await mediator.Send(new FinalizarProvaAutomaticamenteCommand(provaParaFinalizar));
+            return true;
         }
     }
 }

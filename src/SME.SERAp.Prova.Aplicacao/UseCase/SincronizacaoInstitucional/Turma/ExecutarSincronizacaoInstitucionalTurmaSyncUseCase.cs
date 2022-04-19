@@ -22,58 +22,50 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var dre = mensagemRabbit.ObterObjetoMensagem<DreParaSincronizacaoInstitucionalDto>();
 
-            try
+            if (dre == null)
             {
-                if (dre == null)
+                var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
+                SentrySdk.CaptureMessage(mensagem);
+                throw new NegocioException(mensagem);
+            }
+
+            long anoAtual = DateTime.Now.Year;
+
+            for (long anoLetivo = (long)ParametrosSistema.AnoInicioSerapEstudantes; anoLetivo <= anoAtual; anoLetivo++)
+            {
+                var todasTurmasSgp = new List<TurmaSgpDto>();
+
+                if (anoLetivo < anoAtual)
                 {
-                    var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
-                    SentrySdk.CaptureMessage(mensagem);
-                    throw new NegocioException(mensagem);
+                    var turmasSgpHistoricas = await mediator.Send(new ObterTurmasSgpPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo, true));
+                    if (turmasSgpHistoricas != null && turmasSgpHistoricas.Any())
+                        todasTurmasSgp.AddRange(turmasSgpHistoricas);
                 }
 
-                long anoAtual = DateTime.Now.Year;
+                var turmasSgpNaoHistoricas = await mediator.Send(new ObterTurmasSgpPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo, false));
+                if (turmasSgpNaoHistoricas != null && turmasSgpNaoHistoricas.Any())
+                    todasTurmasSgp.AddRange(turmasSgpNaoHistoricas);
 
-                for (long anoLetivo = (long)ParametrosSistema.AnoInicioSerapEstudantes; anoLetivo <= anoAtual; anoLetivo++)
+                var turmasSgp = todasTurmasSgp.AsEnumerable();
+                if (turmasSgp == null || !turmasSgp.Any())
                 {
-                    var todasTurmasSgp = new List<TurmaSgpDto>();
-
-                    if (anoLetivo < anoAtual)
-                    {
-                        var turmasSgpHistoricas = await mediator.Send(new ObterTurmasSgpPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo, true));
-                        if (turmasSgpHistoricas != null && turmasSgpHistoricas.Any())
-                            todasTurmasSgp.AddRange(turmasSgpHistoricas);
-                    }                    
-
-                    var turmasSgpNaoHistoricas = await mediator.Send(new ObterTurmasSgpPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo, false));
-                    if (turmasSgpNaoHistoricas != null && turmasSgpNaoHistoricas.Any())
-                        todasTurmasSgp.AddRange(turmasSgpNaoHistoricas);
-
-                    var turmasSgp = todasTurmasSgp.AsEnumerable();
-                    if (turmasSgp == null || !turmasSgp.Any())
-                    {
-                        SentrySdk.CaptureMessage($"Dre: {dre.DreCodigo}, AnoLetivo: {anoLetivo} -- Não foi possível localizar as Turmas no Sgp para a sincronização instituicional.", SentryLevel.Error);
-                        continue;
-                    }                        
-
-                    var turmasSgpCodigo = turmasSgp.Select(a => a.Codigo).Distinct().ToList();
-
-                    var turmasSerap = await mediator.Send(new ObterTurmasSerapPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo));
-                    var turmasSerapCodigo = turmasSerap.Select(a => a.Codigo).Distinct().ToList();
-
-                    await TratarInclusao(turmasSgp, turmasSgpCodigo, turmasSerapCodigo, dre.DreCodigo);
-
-                    await TratarAlteracao(turmasSgp, turmasSgpCodigo, turmasSerap, turmasSerapCodigo);
+                    SentrySdk.CaptureMessage($"Dre: {dre.DreCodigo}, AnoLetivo: {anoLetivo} -- Não foi possível localizar as Turmas no Sgp para a sincronização instituicional.", SentryLevel.Error);
+                    continue;
                 }
 
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new DreParaSincronizacaoInstitucionalDto(dre.Id, dre.DreCodigo)));
+                var turmasSgpCodigo = turmasSgp.Select(a => a.Codigo).Distinct().ToList();
 
-                return true;
+                var turmasSerap = await mediator.Send(new ObterTurmasSerapPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo));
+                var turmasSerapCodigo = turmasSerap.Select(a => a.Codigo).Distinct().ToList();
+
+                await TratarInclusao(turmasSgp, turmasSgpCodigo, turmasSerapCodigo, dre.DreCodigo);
+
+                await TratarAlteracao(turmasSgp, turmasSgpCodigo, turmasSerap, turmasSerapCodigo);
             }
-            catch(Exception e)
-            {
-                throw e;
-            }
-            
+
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new DreParaSincronizacaoInstitucionalDto(dre.Id, dre.DreCodigo)));
+
+            return true;
         }
         private async Task TratarInclusao(IEnumerable<TurmaSgpDto> todasTurmasSgp, List<string> todasTurmasSgpCodigo, List<string> todasTurmasSerapCodigo, string dreCodigo)
         {

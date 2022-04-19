@@ -7,7 +7,7 @@ namespace SME.SERAp.Prova.Dados
     {
         public ProvaAnoMap()
         {
-            ToTable("prova_ano_original");
+            ToTable("prova_ano");
             
             Map(c => c.Id).ToColumn("id").IsKey();
             

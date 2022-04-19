@@ -14,28 +14,19 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            try
-            {                
-                var grupo = mensagemRabbit.ObterObjetoMensagem<GrupoSerapCoreSso>();
+            var grupo = mensagemRabbit.ObterObjetoMensagem<GrupoSerapCoreSso>();
 
-                var usuariosGrupoCoreSso = await mediator.Send(new ObterUsuariosPorGrupoCoreSsoQuery(grupo.IdCoreSso));
-                var usuariosGrupoSerap = await mediator.Send(new ObterUsuariosSerapPorGrupoSerapIdQuery(grupo.Id));
+            var usuariosGrupoCoreSso = await mediator.Send(new ObterUsuariosPorGrupoCoreSsoQuery(grupo.IdCoreSso));
+            var usuariosGrupoSerap = await mediator.Send(new ObterUsuariosSerapPorGrupoSerapIdQuery(grupo.Id));
 
-                var usuarioParaExcluir = usuariosGrupoSerap.Where(u => !usuariosGrupoCoreSso.Any(ugc => ugc.IdCoreSso == u.IdCoreSso));
+            var usuarioParaExcluir = usuariosGrupoSerap.Where(u => !usuariosGrupoCoreSso.Any(ugc => ugc.IdCoreSso == u.IdCoreSso));
 
-                foreach (UsuarioSerapCoreSso usuario in usuarioParaExcluir)
-                {
-                    await mediator.Send(new ExcluirUsuarioGrupoSerapPorUsuarioIdEGrupoIdCommand(usuario.Id, grupo.Id));
-                }
-
-                return true;
-            }
-            catch (Exception ex)
+            foreach (UsuarioSerapCoreSso usuario in usuarioParaExcluir)
             {
-                SentrySdk.CaptureMessage($"Tratar usuários do grupo para excluir. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
-                return false;
+                await mediator.Send(new ExcluirUsuarioGrupoSerapPorUsuarioIdEGrupoIdCommand(usuario.Id, grupo.Id));
             }
+
+            return true;
         }
     }
 }

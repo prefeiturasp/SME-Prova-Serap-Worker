@@ -22,58 +22,51 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            try
+            var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
+
+            var questoesSerap = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaId));
+
+            foreach (var questaoSerap in questoesSerap)
             {
+                var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(questaoSerap.ProvaLegadoId));
 
-                var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
+                if (prova == null)
+                    throw new Exception($"Prova {provaId} não localizada!");
 
-                var questoesSerap = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaId));
+                var questaoParaPersistir = new Questao(
+                    questaoSerap.TextoBase,
+                    questaoSerap.QuestaoId,
+                    questaoSerap.Enunciado,
+                    questaoSerap.Ordem,
+                    prova.Id,
+                    (QuestaoTipo)questaoSerap.TipoItem,
+                    questaoSerap.Caderno,
+                    questaoSerap.QuantidadeAlternativas
+                );
 
-                foreach (var questaoSerap in questoesSerap)
+                var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
+
+                if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
                 {
-                    var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(questaoSerap.ProvaLegadoId));
+                    questaoParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(questaoParaPersistir.Arquivos));
 
-                    if (prova == null)
-                        throw new Exception($"Prova {provaId} não localizada!");
-
-                    var questaoParaPersistir = new Questao(
-                        questaoSerap.TextoBase,
-                        questaoSerap.QuestaoId,
-                        questaoSerap.Enunciado,
-                        questaoSerap.Ordem,
-                        prova.Id,
-                        (QuestaoTipo)questaoSerap.TipoItem,
-                        questaoSerap.Caderno,
-                        questaoSerap.QuantidadeAlternativas
-                    );
-
-                    var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
-
-                    if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
+                    foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
                     {
-                        questaoParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(questaoParaPersistir.Arquivos));
-
-                        foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
-                        {
-                            var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
-                            await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
-                        }
-                    }
-
-                    await TratarAudiosQuestao(questaoSerap, questaoId);
-
-                    await TratarVideosQuestao(questaoSerap.QuestaoId, questaoId);
-
-                    if (questaoSerap.TipoItem == (int)QuestaoTipo.MultiplaEscolha)
-                    {
-                        await TratarAlternativasQuestao(questaoSerap, questaoId);
+                        var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+                        await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
                     }
                 }
+
+                await TratarAudiosQuestao(questaoSerap, questaoId);
+
+                await TratarVideosQuestao(questaoSerap.QuestaoId, questaoId);
+
+                if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
+                {
+                    await TratarAlternativasQuestao(questaoSerap, questaoId);
+                }
             }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureException(ex);
-            }
+
             return true;
         }
 
@@ -83,40 +76,29 @@ namespace SME.SERAp.Prova.Aplicacao
 
             foreach (var alternativaLegadoId in alternativasLegadoId)
             {
-                try
+                var alternativa = await mediator.Send(new ObterAlternativaDetalheLegadoPorIdQuery(questaoSerap.QuestaoId, alternativaLegadoId));
+
+                if (alternativa == null)
+                    throw new Exception($"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
+
+                var alternativaParaPersistir = new Alternativa(
+                alternativa.Ordem,
+                alternativa.Numeracao,
+                alternativa.Descricao,
+                questaoId);
+
+                var alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
+
+                if (alternativaParaPersistir.Arquivos != null && alternativaParaPersistir.Arquivos.Any())
                 {
-                    var alternativa =
-               await mediator.Send(
-                   new ObterAlternativaDetalheLegadoPorIdQuery(questaoSerap.QuestaoId, alternativaLegadoId));
+                    alternativaParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(alternativaParaPersistir.Arquivos));
 
-                    if (alternativa == null)
-                        throw new Exception(
-                            $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
-
-                    var alternativaParaPersistir = new Alternativa(
-                    alternativa.Ordem,
-                    alternativa.Numeracao,
-                    alternativa.Descricao,
-                    questaoId);
-
-                    var alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
-
-                    if (alternativaParaPersistir.Arquivos != null && alternativaParaPersistir.Arquivos.Any())
+                    foreach (var arquivoParaPersistir in alternativaParaPersistir.Arquivos)
                     {
-                        alternativaParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(alternativaParaPersistir.Arquivos));
-
-                        foreach (var arquivoParaPersistir in alternativaParaPersistir.Arquivos)
-                        {
-                            var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
-                            await mediator.Send(new AlternativaArquivoPersistirCommand(alternativaId, arquivoId));
-                        }
+                        var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+                        await mediator.Send(new AlternativaArquivoPersistirCommand(alternativaId, arquivoId));
                     }
                 }
-                catch (Exception ex)
-                {
-                    SentrySdk.CaptureException(ex);
-                }
-
             }
         }
 
@@ -138,7 +120,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var videosQuestao = await mediator.Send(new ObterVideosPorQuestaoLegadoIdQuery(questaoLegadoId));
             if (videosQuestao != null && videosQuestao.Any())
-            {                
+            {
                 IEnumerable<Arquivo> videos = videosQuestao.Select(v => new Arquivo
                 {
                     LegadoId = v.VideoId,
@@ -148,26 +130,26 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 IEnumerable<Arquivo> thumbnails = videosQuestao.Where(t => t.ThumbnailVideoId > 0)
                     .Select(t => new Arquivo
-                {
-                    LegadoId = t.ThumbnailVideoId,
-                    Caminho = t.CaminhoThumbnailVideo
-                });
+                    {
+                        LegadoId = t.ThumbnailVideoId,
+                        Caminho = t.CaminhoThumbnailVideo
+                    });
                 thumbnails = await mediator.Send(new ObterTamanhoArquivosQuery(thumbnails));
 
                 IEnumerable<Arquivo> videosConvertido = videosQuestao.Where(vc => vc.VideoConvertidoId > 0)
                     .Select(vc => new Arquivo
-                {
-                    LegadoId = vc.VideoConvertidoId,
-                    Caminho = vc.CaminhoVideoConvertido
-                });
+                    {
+                        LegadoId = vc.VideoConvertidoId,
+                        Caminho = vc.CaminhoVideoConvertido
+                    });
                 videosConvertido = await mediator.Send(new ObterTamanhoArquivosQuery(videosConvertido));
 
                 foreach (var video in videosQuestao)
                 {
                     long arquivoVideoId = await mediator.Send(new ArquivoPersistirCommand(videos.FirstOrDefault(v => v.LegadoId == video.VideoId)));
-                    
+
                     long? arquivoThumbnailId = null;
-                    if(video.ThumbnailVideoId > 0)
+                    if (video.ThumbnailVideoId > 0)
                         arquivoThumbnailId = await mediator.Send(new ArquivoPersistirCommand(thumbnails.FirstOrDefault(t => t.LegadoId == video.ThumbnailVideoId)));
 
                     long? arquivoVideoConvertidoId = null;

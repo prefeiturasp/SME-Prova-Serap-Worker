@@ -4,8 +4,6 @@ using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,49 +27,90 @@ namespace SME.SERAp.Prova.Aplicacao
             if (grupoSerap == null)
                 throw new NegocioException($"Sync abrangência - Grupo não encontrado, IdGrupo:{usuarioGrupoSerap.IdGrupoSerap}.");
 
-            if (grupoSerap.IdCoreSso == GruposCoreSso.Professor || grupoSerap.IdCoreSso == GruposCoreSso.Professor_old)
-                throw new NegocioException("Abrangência de professor ainda não está sendo tratada.");
-
             string parametrosMsgLog = ObterParametrosMsgLog(usuarioSerap, grupoSerap);
-
-            var abrangencia = await mediator.Send(new ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(usuarioSerap.IdCoreSso, grupoSerap.IdCoreSso));
-            if (abrangencia == null || !abrangencia.Any())
-                abrangencia = await mediator.Send(new ObterUeDreAtribuidasEolPorUsuarioQuery(usuarioSerap.Login));
-
-            if (abrangencia == null || !abrangencia.Any())
+            if (grupoSerap.IdCoreSso == GruposCoreSso.Professor || grupoSerap.IdCoreSso == GruposCoreSso.Professor_old)
             {
-                SentrySdk.CaptureMessage($"Abrangência do usuário não encontrada. {parametrosMsgLog}", SentryLevel.Warning);
-                return true;
-            }
+                var atribuicoes = await mediator.Send(new ObterTurmaAtribuidasEolPorUsuarioQuery(usuarioSerap.Login));
 
-            var novaAbrangencia = new List<Abrangencia>();
-            var dresSerap = await mediator.Send(new ObterDresSerapQuery());
-            foreach (string codigo in abrangencia)
-            {
-                var abrangenciaItem = new Abrangencia(usuarioSerap.Id, grupoSerap.Id);
-                var dre = dresSerap.Where(d => d.CodigoDre == codigo).FirstOrDefault();
-                if (dre != null)
+                TurmaAtribuicaoDto turma;
+                Abrangencia abrangencia;
+                foreach (var atribuicao in atribuicoes)
                 {
-                    abrangenciaItem.DreId = dre.Id;
-                    novaAbrangencia.Add(abrangenciaItem);
-                }
-                else
-                {
-                    var ue = await mediator.Send(new ObterUePorCodigoQuery(codigo));
-                    if (ue != null)
+                    turma = await mediator.Send(new ObterTurmaPorCodigoQuery(atribuicao.AnoLetivo, atribuicao.TurmaCodigo.ToString()));
+                    if (turma == null)
+                        continue;
+
+                    abrangencia = await mediator.Send(new ObterAbrangenciaPorUsuarioGrupoDreUeTurmaQuery(usuarioSerap.Id,
+                        grupoSerap.Id,
+                        turma.DreId,
+                         turma.UeId,
+                        turma.TurmaId));
+
+                    if (abrangencia == null)
                     {
-                        abrangenciaItem.DreId = ue.DreId;
-                        abrangenciaItem.UeId = ue.Id;
-                        novaAbrangencia.Add(abrangenciaItem);
+                        abrangencia = new Abrangencia(
+                            usuarioSerap.Id,
+                            grupoSerap.Id,
+                            turma.DreId,
+                             turma.UeId,
+                            turma.TurmaId,
+                            atribuicao.DataAtribuicao,
+                            atribuicao.DataDisponibilizacaoAula);
+
+                        await mediator.Send(new InserirAbrangenciaCommand(abrangencia));
+                    }
+                    else if(abrangencia.Inicio != atribuicao.DataAtribuicao || abrangencia.Fim != atribuicao.DataDisponibilizacaoAula)
+                    {
+                        abrangencia.Inicio = atribuicao.DataAtribuicao;
+                        abrangencia.Fim = atribuicao.DataDisponibilizacaoAula;
+
+                        await mediator.Send(new AlterarAbrangenciaCommand(abrangencia));
+                    }
+                }
+            }
+            else
+            {
+                var abrangencias = await mediator.Send(new ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(usuarioSerap.IdCoreSso, grupoSerap.IdCoreSso));
+                if (abrangencias == null || !abrangencias.Any())
+                    abrangencias = await mediator.Send(new ObterUeDreAtribuidasEolPorUsuarioQuery(usuarioSerap.Login));
+
+                if (abrangencias == null || !abrangencias.Any())
+                {
+                    SentrySdk.CaptureMessage($"Abrangência do usuário não encontrada. {parametrosMsgLog}", SentryLevel.Warning);
+                    return true;
+                }
+
+                Abrangencia abrangencia;
+                var dresSerap = await mediator.Send(new ObterDresSerapQuery());
+                foreach (string codigo in abrangencias)
+                {
+                    var dre = dresSerap.Where(d => d.CodigoDre == codigo).FirstOrDefault();
+                    if (dre != null)
+                    {
+                        abrangencia = abrangencia = new Abrangencia(
+                            usuarioSerap.Id,
+                            grupoSerap.Id,
+                            dre.Id);
+
+                        await mediator.Send(new InserirAbrangenciaCommand(abrangencia));
                     }
                     else
-                        SentrySdk.CaptureMessage($"Sync abrangência - Ue não encontrada: {codigo}. {parametrosMsgLog}", SentryLevel.Warning);
-                }
-            }
+                    {
+                        var ue = await mediator.Send(new ObterUePorCodigoQuery(codigo));
+                        if (ue != null)
+                        {
+                            abrangencia = abrangencia = new Abrangencia(
+                                usuarioSerap.Id,
+                                grupoSerap.Id,
+                                ue.DreId,
+                                ue.Id);
 
-            foreach (Abrangencia abrangenciaInserir in novaAbrangencia)
-            {
-                await mediator.Send(new InserirAbrangenciaCommand(abrangenciaInserir));
+                            await mediator.Send(new InserirAbrangenciaCommand(abrangencia));
+                        }
+                        else
+                            SentrySdk.CaptureMessage($"Sync abrangência - Ue não encontrada: {codigo}. {parametrosMsgLog}", SentryLevel.Warning);
+                    }
+                }
             }
 
             return true;

@@ -7,6 +7,7 @@ using SME.SERAp.Prova.IoC;
 using System.Reflection;
 using RabbitMQ.Client;
 using StackExchange.Redis;
+using System.Threading;
 
 namespace SME.SERAp.Prova.Aplicacao.Worker
 {
@@ -21,12 +22,13 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 .ConfigureAppConfiguration(a => a.AddUserSecrets(Assembly.GetExecutingAssembly()))
                 .ConfigureServices((hostContext, services) =>
                 {
+                    ThreadPool.SetMinThreads(50, 50);
+
                     RegistraDependencias.Registrar(services);
 
                     services.AddHostedService<WorkerRabbit>();
 
                     ConfigEnvoiromentVariables(hostContext, services);
-
                 });
 
         private static void ConfigEnvoiromentVariables(HostBuilderContext hostContext, IServiceCollection services)
@@ -75,7 +77,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             var redisConfigurationOptions = new ConfigurationOptions()
             {
                 EndPoints = { hostContext.Configuration.GetConnectionString("Redis") },
-                Proxy = Proxy.Twemproxy
+                Proxy = Proxy.Twemproxy,
+                SyncTimeout = 10000
             };
             var muxer = ConnectionMultiplexer.Connect(redisConfigurationOptions);
             services.AddSingleton<IConnectionMultiplexer>(muxer);

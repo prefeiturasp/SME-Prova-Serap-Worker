@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
@@ -380,6 +381,27 @@ namespace SME.SERAp.Prova.Dados
                                 where t.codigo = ANY(@codigos)";
 
                 return await conn.QueryAsync<Turma>(query, new { codigos });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<TurmaAtribuicaoDto> ObterTurmaAtribuicaoPorCodigo(int anoLetivo, string codigo)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select u.dre_id as dreId,
+	                            u.id as ueId,
+	                            t.id as turmaId
+                            from turma t
+                            inner join ue u on u.id = t.ue_id 
+                            where t.codigo = @codigo and t.ano_letivo = @anoLetivo";
+
+                return await conn.QueryFirstOrDefaultAsync<TurmaAtribuicaoDto>(query, new { anoLetivo, codigo });
             }
             finally
             {

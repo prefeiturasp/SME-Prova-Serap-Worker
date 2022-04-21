@@ -1,4 +1,5 @@
 ﻿using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Dtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,5 +20,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<Turma>> ObterTurmasPorCodigoUeEAnoLetivo(string codigoUe, int anoLetivo);
         Task<IEnumerable<Turma>> ObterTurmasPorCodigos(string[] codigos);
         Task<IEnumerable<Turma>> ObterTurmasPorCodigoUeEProvaSerap(string codigoUe, long provaSerap);
+        Task<TurmaAtribuicaoDto> ObterTurmaAtribuicaoPorCodigo(int anoLetivo, string codigo);
     }
 }

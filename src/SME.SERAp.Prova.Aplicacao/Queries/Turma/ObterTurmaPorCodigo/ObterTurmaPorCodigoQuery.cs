@@ -1,25 +1,17 @@
-﻿using FluentValidation;
-using MediatR;
-using SME.SERAp.Prova.Dominio;
+﻿using MediatR;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterTurmaPorCodigoQuery : IRequest<Turma>
+    public class ObterTurmaPorCodigoQuery : IRequest<TurmaAtribuicaoDto>
     {
-        public ObterTurmaPorCodigoQuery(string turmaCodigo)
+        public ObterTurmaPorCodigoQuery(int anoLetivo, string codigo)
         {
-            TurmaCodigo = turmaCodigo;
+            AnoLetivo = anoLetivo;
+            Codigo = codigo;
         }
 
-        public string TurmaCodigo { get; set; }
-    }
-    public class ObterTurmaPorCodigoQueryValidator : AbstractValidator<ObterTurmaPorCodigoQuery>
-    {
-        public ObterTurmaPorCodigoQueryValidator()
-        {
-            RuleFor(c => c.TurmaCodigo)
-                .NotEmpty()
-                .WithMessage("O código da turma deve ser informado.");
-        }
+        public int AnoLetivo { get; set; }
+        public string Codigo { get; set; }
     }
 }

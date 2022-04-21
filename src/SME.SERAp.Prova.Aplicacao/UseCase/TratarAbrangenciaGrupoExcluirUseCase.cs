@@ -17,9 +17,6 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var grupo = mensagemRabbit.ObterObjetoMensagem<GrupoSerapCoreSso>();
 
-            if (grupo.IdCoreSso == GruposCoreSso.Professor || grupo.IdCoreSso == GruposCoreSso.Professor_old)
-                throw new NegocioException("Abrangência de professor ainda não está sendo tratada.");
-
             var abrangenciaGrupo = await mediator.Send(new ObterAbrangenciaPorGrupoIdQuery(grupo.Id));
             foreach (Abrangencia abrangencia in abrangenciaGrupo)
             {

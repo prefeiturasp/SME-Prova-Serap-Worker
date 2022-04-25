@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<GrupoSerapCoreSso> Handle(ObterGrupoSerapPorIdQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioCache.ObterRedisAsync($"grp-{request.Id}", ()=> repositorioGrupoSerapCoreSso.ObterPorIdAsync(request.Id), 5);
+            return await repositorioCache.ObterRedisAsync($"grp-{request.Id}", ()=> repositorioGrupoSerapCoreSso.ObterPorIdAsync(request.Id), 60);
         }
     }
 }

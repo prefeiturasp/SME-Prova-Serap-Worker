@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<UsuarioSerapCoreSso> Handle(ObterUsuarioSerapPorIdQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioCache.ObterRedisAsync($"usu-{request.Id}", () => repositorioUsuarioSerapCoreSso.ObterPorIdAsync(request.Id), 5);
+            return await repositorioCache.ObterRedisAsync($"usu-{request.Id}", () => repositorioUsuarioSerapCoreSso.ObterPorIdAsync(request.Id), 60);
         }
 
     }

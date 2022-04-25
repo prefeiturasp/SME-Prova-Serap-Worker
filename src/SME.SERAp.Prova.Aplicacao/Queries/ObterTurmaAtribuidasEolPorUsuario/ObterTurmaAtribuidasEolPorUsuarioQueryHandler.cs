@@ -40,7 +40,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 .Select(c => int.Parse(c))
                 .ToArray();
 
-           return await repositorioGeralEol.ObterTurmaAtribuicaoEol(anoInicial, request.Login, tiposEscola);
+           return await repositorioGeralEol.ObterTurmaAtribuicaoEol(anoInicial, request.Login, tiposEscola, request.TurmaCodigo, request.AnoLetivo);
         }
     }
 }

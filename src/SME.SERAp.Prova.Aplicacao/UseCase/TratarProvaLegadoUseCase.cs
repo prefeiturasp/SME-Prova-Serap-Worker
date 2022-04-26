@@ -66,25 +66,26 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.AderirTodos = provaParaTratar.AderirTodos;
                 provaAtual.Multidisciplinar = provaParaTratar.Multidisciplinar;
                 provaAtual.TipoProvaId = provaParaTratar.TipoProvaId;
+                provaAtual.UltimaAtualizacao = provaParaTratar.UltimaAtualizacao;
 
-                    var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
-                    if (verificaSePossuiRespostas)
+                var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
+                if (verificaSePossuiRespostas)
+                {
+                    provaAtual.InicioDownload = provaLegado.InicioDownload;
+                    provaAtual.Inicio = provaLegado.Inicio;
+                    provaAtual.Fim = provaLegado.Fim;
+                    provaAtual.QtdItensSincronizacaoRespostas = provaLegado.QtdItensSincronizacaoRespostas;
+
+                    await mediator.Send(new ProvaAtualizarCommand(provaAtual));
+                    //TO DO ==> para atualizar os anos de aplicação da prova após ajuste nas configurações de EJA - Avaliar a remoção futuramente.
+                    if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
                     {
-                        provaAtual.InicioDownload = provaLegado.InicioDownload;
-                        provaAtual.Inicio = provaLegado.Inicio;
-                        provaAtual.Fim = provaLegado.Fim;
-                        provaAtual.QtdItensSincronizacaoRespostas = provaLegado.QtdItensSincronizacaoRespostas;
-
-                        await mediator.Send(new ProvaAtualizarCommand(provaAtual));
-                        //TO DO ==> para atualizar os anos de aplicação da prova após ajuste nas configurações de EJA - Avaliar a remoção futuramente.
-                        if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
-                        {
-                            await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
-                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
-                        }
-                        //--------------------------------------------------------
-                        return true;
+                        await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
                     }
+                    //--------------------------------------------------------
+                    return true;
+                }
 
                 await RemoverEntidadesFilhas(provaAtual);
 
@@ -121,7 +122,7 @@ namespace SME.SERAp.Prova.Aplicacao
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
-                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaFormatoTaiItem, provaLegado.QtdItensSincronizacaoRespostas);
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaFormatoTaiItem, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao);
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

@@ -2,7 +2,7 @@
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class DetalheAlternativaDto
+    public class DetalheAlternativaDto : DtoBase
     {
         
         public long ProvaId { get; set; }

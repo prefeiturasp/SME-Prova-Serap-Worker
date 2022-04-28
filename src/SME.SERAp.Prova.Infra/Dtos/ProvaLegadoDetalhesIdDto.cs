@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class ProvaLegadoDetalhesIdDto
+    public class ProvaLegadoDetalhesIdDto : DtoBase
     {
         public ProvaLegadoDetalhesIdDto()
         {

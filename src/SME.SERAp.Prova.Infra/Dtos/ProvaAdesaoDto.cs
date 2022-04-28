@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.SERAp.Prova.Infra
+﻿namespace SME.SERAp.Prova.Infra
 {
-    public class ProvaAdesaoDto
+    public class ProvaAdesaoDto : DtoBase
     {
         public ProvaAdesaoDto(long provaId, long provaLegadoId, bool aderirTodos)
         {

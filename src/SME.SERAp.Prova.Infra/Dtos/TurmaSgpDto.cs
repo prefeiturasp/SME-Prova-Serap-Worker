@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace SME.SERAp.Prova.Infra.Dtos
+﻿namespace SME.SERAp.Prova.Infra.Dtos
 {
-    public class TurmaSgpDto
+    public class TurmaSgpDto : DtoBase
     {
         public long Id { get; set; }
         public string Ano { get; set; }

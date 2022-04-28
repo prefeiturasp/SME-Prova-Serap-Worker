@@ -2,8 +2,8 @@
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class ConsolidadoProvaRespostaDto
-    {
+    public class ConsolidadoProvaRespostaDto : DtoBase
+	{
         public long ProvaSerapId { get; set; }
 		public long ProvaSerapEstudantesId { get; set; }
 		public string DreCodigoEol { get; set; }

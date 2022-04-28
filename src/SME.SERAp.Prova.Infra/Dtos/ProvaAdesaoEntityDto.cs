@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class ProvaAdesaoEntityDto
+    public class ProvaAdesaoEntityDto : DtoBase
     {
         public long ProvaId { get; set; }
         public string UeCodigo { get; set; }

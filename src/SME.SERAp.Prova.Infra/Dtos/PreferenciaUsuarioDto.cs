@@ -1,6 +1,6 @@
 ﻿namespace SME.SERAp.Prova.Infra
 {
-    public class PreferenciaUsuarioDto
+    public class PreferenciaUsuarioDto : DtoBase
     {
         public PreferenciaUsuarioDto()
         {

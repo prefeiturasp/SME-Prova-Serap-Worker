@@ -2,7 +2,7 @@
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class UsuarioCoreSsoDto
+    public class UsuarioCoreSsoDto : DtoBase
     {
 
         public Guid IdCoreSso { get; set; }

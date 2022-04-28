@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.SERAp.Prova.Infra
+﻿namespace SME.SERAp.Prova.Infra
 {
-    public class UsuarioGrupoSerapDto
+    public class UsuarioGrupoSerapDto : DtoBase
     {
 
         public long IdUsuarioSerap { get; set; }

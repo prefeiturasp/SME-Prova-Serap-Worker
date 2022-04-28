@@ -1,6 +1,6 @@
 ﻿namespace SME.SERAp.Prova.Infra.Dtos
 {
-    public class DreParaSincronizacaoInstitucionalDto
+    public class DreParaSincronizacaoInstitucionalDto : DtoBase
     {
         public DreParaSincronizacaoInstitucionalDto(long id, string dreCodigo)
         {

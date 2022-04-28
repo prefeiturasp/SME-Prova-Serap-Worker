@@ -2,7 +2,7 @@
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class ContextoProvaLegadoDto
+    public class ContextoProvaLegadoDto : DtoBase
     {
         public ContextoProvaLegadoDto()
         {

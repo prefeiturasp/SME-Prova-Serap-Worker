@@ -1,7 +1,7 @@
 ﻿
 namespace SME.SERAp.Prova.Infra
 {
-    public class ExportacaoResultadoFiltroDto
+    public class ExportacaoResultadoFiltroDto : DtoBase
     {
         public ExportacaoResultadoFiltroDto(long processoId, long provaId, long itemId, string dreEolId, string[] ueEolIds)
         {

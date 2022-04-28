@@ -61,12 +61,12 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 Password = rabbitOptions.Password,
                 VirtualHost = rabbitOptions.VirtualHost
             };
-            
+
             services.AddSingleton(factory);
 
             var conexaoRabbit = factory.CreateConnection();
             IModel channel = conexaoRabbit.CreateModel();
-            
+
             services.AddSingleton(channel);
             services.AddSingleton(conexaoRabbit);
 
@@ -84,9 +84,9 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             var redisConfigurationOptions = new ConfigurationOptions()
             {
                 Proxy = redisOptions.Proxy,
-                SyncTimeout = redisOptions.SyncTimeout
+                SyncTimeout = redisOptions.SyncTimeout,
+                EndPoints = { redisOptions.Endpoint }
             };
-            redisOptions.Endpoints.ForEach(endpoint => redisConfigurationOptions.EndPoints.Add(endpoint));
             var muxer = ConnectionMultiplexer.Connect(redisConfigurationOptions);
             services.AddSingleton<IConnectionMultiplexer>(muxer);
         }

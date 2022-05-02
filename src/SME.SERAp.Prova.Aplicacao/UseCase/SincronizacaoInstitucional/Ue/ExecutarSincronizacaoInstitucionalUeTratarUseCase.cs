@@ -4,9 +4,7 @@ using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Exceptions;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao

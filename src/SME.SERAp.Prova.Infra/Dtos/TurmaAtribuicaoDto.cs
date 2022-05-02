@@ -1,9 +1,6 @@
-﻿using MessagePack;
-
-namespace SME.SERAp.Prova.Infra
+﻿namespace SME.SERAp.Prova.Infra
 {
-    [MessagePackObject(keyAsPropertyName: true)]
-    public class TurmaAtribuicaoDto
+    public class TurmaAtribuicaoDto : DtoBase
     {
         public int DreId { get; set; }
         public int UeId { get; set; }

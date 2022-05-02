@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SME.SERAp.Prova.Infra.Dtos
+namespace SME.SERAp.Prova.Infra
 {
-    public class RetornoBaseDto
+    public class RetornoBaseDto : DtoBase
     {
         public RetornoBaseDto(IEnumerable<ValidationFailure> validationFailures)
         {

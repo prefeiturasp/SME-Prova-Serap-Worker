@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class ProvaParaAtualizarDto
+    public class ProvaParaAtualizarDto : DtoBase
     {
         public long ProvaId { get; set; }        
         public int Status { get; set; }

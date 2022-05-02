@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace SME.SERAp.Prova.Infra
+﻿namespace SME.SERAp.Prova.Infra
 {
-    public class ProvaTurmaBIBSyncDto
+    public class ProvaTurmaBIBSyncDto : DtoBase
     {
         public long ProvaId { get; set; }
         public long TurmaId { get; set; }

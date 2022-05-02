@@ -2,7 +2,7 @@
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class TurmaEolDto
+    public class TurmaEolDto : DtoBase
     {
         public long AlunoRa { get; set; }
         public long CodigoTurma { get; set; }

@@ -3,7 +3,7 @@ using System;
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class ProvaAlunoDto
+    public class ProvaAlunoDto : DtoBase
     {
         public long ProvaAlunoId { get; set; }
         public long ProvaId { get; set; }

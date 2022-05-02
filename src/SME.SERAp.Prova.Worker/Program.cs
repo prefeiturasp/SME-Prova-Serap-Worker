@@ -7,6 +7,7 @@ using SME.SERAp.Prova.IoC;
 using System.Reflection;
 using RabbitMQ.Client;
 using StackExchange.Redis;
+using SME.SERAp.Prova.Infra;
 using System.Threading;
 
 namespace SME.SERAp.Prova.Aplicacao.Worker
@@ -22,8 +23,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 .ConfigureAppConfiguration(a => a.AddUserSecrets(Assembly.GetExecutingAssembly()))
                 .ConfigureServices((hostContext, services) =>
                 {
-                    ThreadPool.SetMinThreads(50, 50);
-
                     RegistraDependencias.Registrar(services);
 
                     services.AddHostedService<WorkerRabbit>();
@@ -61,12 +60,12 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 Password = rabbitOptions.Password,
                 VirtualHost = rabbitOptions.VirtualHost
             };
-            
+
             services.AddSingleton(factory);
 
             var conexaoRabbit = factory.CreateConnection();
             IModel channel = conexaoRabbit.CreateModel();
-            
+
             services.AddSingleton(channel);
             services.AddSingleton(conexaoRabbit);
 
@@ -74,11 +73,18 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             hostContext.Configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(fireBaseOptions);
 
+            var threadPoolOptions = new ThreadPoolOptions();
+            hostContext.Configuration.GetSection("ThreadPoolOptions").Bind(threadPoolOptions, c => c.BindNonPublicProperties = true);
+            if (threadPoolOptions.WorkerThreads > 0 && threadPoolOptions.CompletionPortThreads > 0)
+                ThreadPool.SetMinThreads(threadPoolOptions.WorkerThreads, threadPoolOptions.CompletionPortThreads);
+
+            var redisOptions = new RedisOptions();
+            hostContext.Configuration.GetSection("RedisOptions").Bind(redisOptions, c => c.BindNonPublicProperties = true);
             var redisConfigurationOptions = new ConfigurationOptions()
             {
-                EndPoints = { hostContext.Configuration.GetConnectionString("Redis") },
-                Proxy = Proxy.Twemproxy,
-                SyncTimeout = 10000
+                Proxy = redisOptions.Proxy,
+                SyncTimeout = redisOptions.SyncTimeout,
+                EndPoints = { redisOptions.Endpoint }
             };
             var muxer = ConnectionMultiplexer.Connect(redisConfigurationOptions);
             services.AddSingleton<IConnectionMultiplexer>(muxer);

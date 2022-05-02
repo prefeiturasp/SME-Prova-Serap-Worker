@@ -1,7 +1,7 @@
 ﻿
 namespace SME.SERAp.Prova.Infra
 {
-    public class UsuarioGrupoDto
+    public class UsuarioGrupoDto : DtoBase
     {
 
         public long IdGrupo { get; set; }

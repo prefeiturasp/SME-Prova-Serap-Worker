@@ -15,28 +15,15 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            try
+            var grupo = mensagemRabbit.ObterObjetoMensagem<GrupoSerapCoreSso>();
+
+            var abrangenciaGrupo = await mediator.Send(new ObterAbrangenciaPorGrupoIdQuery(grupo.Id));
+            foreach (Abrangencia abrangencia in abrangenciaGrupo)
             {
-                var grupo = mensagemRabbit.ObterObjetoMensagem<GrupoSerapCoreSso>();
-
-                if (grupo.IdCoreSso == GruposCoreSso.Professor || grupo.IdCoreSso == GruposCoreSso.Professor_old)
-                    throw new NegocioException("Abrangência de professor ainda não está sendo tratada.");
-
-                var abrangenciaGrupo = await mediator.Send(new ObterAbrangenciaPorGrupoIdQuery(grupo.Id));
-                foreach (Abrangencia abrangencia in abrangenciaGrupo)
-                {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, abrangencia));
-                }
-
-                return true;
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, abrangencia));
             }
-            catch (Exception ex)
-            {
-                SentrySdk.CaptureMessage($"Obter abrangência do grupo para fila excluir. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
-                return false;
-            }
+
+            return true;
         }
-
     }
 }

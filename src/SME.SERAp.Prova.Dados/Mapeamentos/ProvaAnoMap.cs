@@ -7,13 +7,14 @@ namespace SME.SERAp.Prova.Dados
     {
         public ProvaAnoMap()
         {
-            ToTable("prova_ano_original");
+            ToTable("prova_ano");
             
             Map(c => c.Id).ToColumn("id").IsKey();
             
             Map(c => c.ProvaId).ToColumn("prova_id");
             Map(c => c.Ano).ToColumn("ano");
-
+            Map(c => c.Modalidade).ToColumn("modalidade");
+            Map(c => c.EtapaEja).ToColumn("etapa_eja");
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Dapper;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -59,7 +61,10 @@ namespace SME.SERAp.Prova.Dados
                                      t.tipo_turma as tipoturma,
                                      t.modalidade_codigo as modalidadeCodigo,
                                      t.nome as nomeTurma,
-                                     t.tipo_turno as tipoturno                                      
+                                     t.tipo_turno as tipoturno,
+                                     t.semestre as semestre,
+                                     t.etapa_eja as etapaEja,
+                                     t.serie_ensino as serieEnsino
                                 from turma t
                                inner join ue u on t.ue_id = u.id
                                inner join dre d on u.dre_id  = d.id
@@ -76,6 +81,49 @@ namespace SME.SERAp.Prova.Dados
                 };
 
                 return await conn.QueryAsync<TurmaSgpDto>(query, parametros);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+        public async Task<IEnumerable<TurmaSgpDto>> ObterTurmasSgpPorDreCodigoEAnoLetivoAsync(string dreCodigo, long anoLetivo, bool historica)
+        {
+            using var conn = ObterConexaoSgp();
+            try
+            {
+                var query = new StringBuilder();
+                query.AppendLine(@"select t.ano, 
+                                     t.ano_letivo as anoLetivo,
+                                     t.turma_id as Codigo,
+                                     t.tipo_turma as tipoturma,
+                                     t.modalidade_codigo as modalidadeCodigo,
+                                     t.nome as nomeTurma,
+                                     t.tipo_turno as tipoturno,
+                                     t.semestre as semestre,
+                                     t.etapa_eja as etapaEja,
+                                     t.serie_ensino as serieEnsino
+                                from turma t
+                               inner join ue u on t.ue_id = u.id
+                               inner join dre d on u.dre_id  = d.id
+                               where t.tipo_turma = 1
+                                 and t.modalidade_codigo in (3,4,5,6)
+                                 and t.ano_letivo = @anoLetivo 
+                                 and d.dre_id = @dreCodigo");
+
+                if (historica)
+                    query.AppendLine(" and t.historica");
+                else
+                    query.AppendLine(" and not t.historica");
+
+                var parametros = new
+                {
+                    dreCodigo,
+                    anoLetivo
+                };
+
+                return await conn.QueryAsync<TurmaSgpDto>(query.ToString(), parametros);
             }
             finally
             {
@@ -213,6 +261,43 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task<IEnumerable<TurmaSgpDto>> ObterTurmasSerapPorDreCodigoEAnoLetivoAsync(string dreCodigo, long anoLetivo)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select t.id,
+                                     t.ano, 
+                                     t.ano_letivo as anoLetivo,
+                                     t.Codigo as Codigo,
+                                     t.tipo_turma as tipoturma,
+                                     t.modalidade_codigo as modalidadeCodigo,
+                                     t.nome as nomeTurma,
+                                     t.tipo_turno as tipoturno,
+                                     t.ue_id as UeId                                     
+                                from turma t
+                               inner join ue u on t.ue_id = u.id
+                               inner join dre d on u.dre_id  = d.id
+                               where t.tipo_turma = 1
+                                 and t.modalidade_codigo in (3,4,5,6)
+                                 and t.ano_letivo = @anoLetivo 
+                                 and d.dre_id = @dreCodigo";
+
+                var parametros = new
+                {
+                    dreCodigo,
+                    anoLetivo
+                };
+
+                return await conn.QueryAsync<TurmaSgpDto>(query, parametros);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<IEnumerable<Turma>> ObterTodasPorAnoAsync(int year)
         {
             using var conn = ObterConexaoLeitura();
@@ -267,8 +352,10 @@ namespace SME.SERAp.Prova.Dados
                                         on p.id = pa.prova_id
                                     inner join turma t 
                                         on t.ano_letivo = EXTRACT(YEAR FROM p.inicio)
-                                        and t.ano = pa.ano
-                                        and (case when t.modalidade_codigo::text in('3','4') then '3'::text else t.modalidade_codigo::text end) = p.modalidade::text
+                                        and (
+     		   									(p.modalidade not in(3,4) and p.modalidade = t.modalidade_codigo and t.ano = pa.ano)
+	     									 or (t.ano = pa.ano and t.modalidade_codigo = pa.modalidade and t.etapa_eja = pa.etapa_eja)
+     	 									)                                        
                                     inner join ue 
                                         on ue.id = t.ue_id
                                     where 
@@ -294,6 +381,27 @@ namespace SME.SERAp.Prova.Dados
                                 where t.codigo = ANY(@codigos)";
 
                 return await conn.QueryAsync<Turma>(query, new { codigos });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<TurmaAtribuicaoDto> ObterTurmaAtribuicaoPorCodigo(int anoLetivo, string codigo)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select u.dre_id as dreId,
+	                            u.id as ueId,
+	                            t.id as turmaId
+                            from turma t
+                            inner join ue u on u.id = t.ue_id 
+                            where t.codigo = @codigo and t.ano_letivo = @anoLetivo";
+
+                return await conn.QueryFirstOrDefaultAsync<TurmaAtribuicaoDto>(query, new { anoLetivo, codigo });
             }
             finally
             {

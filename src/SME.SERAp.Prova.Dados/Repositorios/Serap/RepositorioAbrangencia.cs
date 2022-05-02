@@ -24,8 +24,10 @@ namespace SME.SERAp.Prova.Dados
                 query.AppendLine(abrangencia.DreId is null ? "and a.dre_id is null" : "and a.dre_id = @DreId ");
                 query.AppendLine(abrangencia.UeId is null ? "and a.ue_id is null" : "and a.ue_id = @UeId ");
                 query.AppendLine(abrangencia.TurmaId is null ? "and a.turma_id is null" : "and a.turma_id = @TurmaId ");
+                query.AppendLine(abrangencia.Inicio is null ? "and a.inicio is null" : "and a.inicio = @Inicio ");
+                query.AppendLine(abrangencia.Fim is null ? "and a.fim is null" : "and a.fim = @Fim ");
 
-                return await conn.QueryFirstOrDefaultAsync<Abrangencia>(query.ToString(), new { abrangencia.UsuarioId, abrangencia.GrupoId, abrangencia.DreId, abrangencia.UeId, abrangencia.TurmaId });
+                return await conn.QueryFirstOrDefaultAsync<Abrangencia>(query.ToString(), new { abrangencia.UsuarioId, abrangencia.GrupoId, abrangencia.DreId, abrangencia.UeId, abrangencia.TurmaId, abrangencia.Inicio, abrangencia.Fim });
             }
             finally
             {
@@ -63,6 +65,28 @@ namespace SME.SERAp.Prova.Dados
 
                 await conn.QueryAsync<long>(query.ToString(), new { id });
                 return true;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<Abrangencia> ObterPorUsuarioGrupoDreUeTurmaAsync(long usuarioId, long grupoId, long dreId, long ueId, long turmaId)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select a.id, a.usuario_id, a.grupo_id, a.dre_id, a.ue_id, a.turma_id, a.inicio, a.fim
+                                        from abrangencia a
+                                        where a.usuario_id = @usuarioId
+                                          and a.grupo_id = @grupoId
+                                          and a.dre_id = @dreId
+                                          and a.ue_id = @ueId
+                                          and a.turma_id = @turmaId";
+
+                return await conn.QueryFirstOrDefaultAsync<Abrangencia>(query.ToString(), new { usuarioId, grupoId, dreId, ueId, turmaId });
             }
             finally
             {

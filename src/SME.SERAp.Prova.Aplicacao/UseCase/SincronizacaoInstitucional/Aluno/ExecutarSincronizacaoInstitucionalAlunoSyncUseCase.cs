@@ -117,7 +117,7 @@ namespace SME.SERAp.Prova.Aplicacao
                             var turmaNova = turmaSerapDtos.FirstOrDefault(a => a.Codigo == turmaCodigoParaBuscar);
                             if (turmaNova == null)
                             {
-                                var turmaParaAlunoNovo = await mediator.Send(new ObterTurmaPorCodigoQuery(turmaCodigoParaBuscar));
+                                var turmaParaAlunoNovo = await mediator.Send(new ObterTurmaPorCodigoUeQuery(turmaCodigoParaBuscar));
                                 if (turmaParaAlunoNovo == null)
                                     throw new NegocioException($"Turma não localizada para o aluno {alunoQuePodeAlterar.CodigoAluno}");
 

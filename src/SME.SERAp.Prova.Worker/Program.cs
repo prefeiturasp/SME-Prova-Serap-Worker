@@ -28,7 +28,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     services.AddHostedService<WorkerRabbit>();
 
                     ConfigEnvoiromentVariables(hostContext, services);
-
                 });
 
         private static void ConfigEnvoiromentVariables(HostBuilderContext hostContext, IServiceCollection services)

@@ -32,6 +32,8 @@ namespace SME.SERAp.Prova.Infra
         public int TipoProva { get; set; }
         public bool FormatoTai { get; set; }
 
+        public int? QtdItensSincronizacaoRespostas { get; set; }
+
         public void AddAno(string ano)
         {
             if (!string.IsNullOrEmpty(ano))

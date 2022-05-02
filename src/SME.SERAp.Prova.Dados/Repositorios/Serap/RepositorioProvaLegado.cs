@@ -126,6 +126,67 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task<IEnumerable<ProvaAnoDetalheDto>> ObterProvaAnoDetalhesPorId(long id)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @" SELECT DISTINCT
+									case 
+										when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
+									end Ano
+									,cp.cur_id as CurId
+									,curso.cur_codigo as CurCodigo
+									,tme.tme_id as TmeId
+									,tne.tne_id as TneId
+									FROM
+									Test t 
+									INNER JOIN TestCurriculumGrade tcg ON
+									t.Id = tcg.Test_Id	
+									INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
+									tcg.TypeCurriculumGradeId = tt.tcp_id
+									inner join SGP_ACA_CurriculoPeriodo cp on
+									tt.tcp_id = cp.tcp_id
+									inner join SGP_ACA_Curriculo c on 
+									cp.cur_id = c.cur_id and cp.crr_id = c.crr_id
+									inner join SGP_ACA_Curso curso on
+									curso.cur_id = c.cur_id
+									and curso.tme_id = tt.tme_id
+									INNER JOIN TESTTIME ttime on
+									t.TestTime_Id = ttime.id
+									INNER JOIN TestTypeCourse ttc ON
+									ttc.TestType_Id = t.TestType_Id
+									LEFT JOIN Discipline d ON
+									t.Discipline_Id = d.Id 
+									INNER JOIN TestType on
+									t.TestType_Id = TestType.id
+									INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
+									TestType.TypeLevelEducationId = tne.tne_id
+									and curso.tne_id = TestType.TypeLevelEducationId
+									and tne.tne_id = tt.tne_id and tne.tne_id = curso.tne_id
+									inner join SGP_ACA_TipoModalidadeEnsino tme on
+									tme.tme_id = tt.tme_id and tme.tme_id = curso.tme_id
+									INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
+									ttcp.crp_ordem = tt.tcp_ordem
+									AND tt.tme_id = ttcp.tme_id
+									INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
+									LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
+									AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+									where
+									cp.crp_situacao = 1 and c.crr_situacao = 1 
+									and curso.cur_situacao = 1 and tme.tme_situacao = 1 
+									and tne.tne_situacao = 1
+									and t.id = @id";
+
+                return await conn.QueryAsync<ProvaAnoDetalheDto>(query, new { id }, commandTimeout: 50000);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<ProvaLegadoDetalhesIdDto> ObterProvaPorId(long id)
         {
             using var conn = ObterConexao();
@@ -154,7 +215,8 @@ namespace SME.SERAp.Prova.Dados
 				convert(bit, t.AllAdhered) as AderirTodos,
                 convert(bit, t.Multidiscipline) as Multidisciplinar,
                 t.TestType_Id as TipoProva,
-                case when t.TestTai  is null then 0 else t.TestTai end FormatoTai
+                case when t.TestTai  is null then 0 else t.TestTai end FormatoTai,
+                t.NumberSynchronizedResponseItems as  QtdItensSincronizacaoRespostas
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

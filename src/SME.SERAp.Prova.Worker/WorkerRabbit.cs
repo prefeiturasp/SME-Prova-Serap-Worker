@@ -41,14 +41,13 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         {
             using (SentrySdk.Init(sentryOptions))
             {
-
                 using var conexaoRabbit = connectionFactory.CreateConnection();
                 using IModel channel = conexaoRabbit.CreateModel();
 
                 var props = channel.CreateBasicProperties();
                 props.Persistent = true;
 
-                channel.BasicQos(0, 10, false);
+                channel.BasicQos(0, rabbitOptions.LimiteDeMensagensPorExecucao, false);
 
                 channel.ExchangeDeclare(ExchangeRabbit.SerapEstudante, ExchangeType.Direct, true, false);
                 channel.ExchangeDeclare(ExchangeRabbit.SerapEstudanteDeadLetter, ExchangeType.Direct, true, false);
@@ -59,7 +58,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
                 await InicializaConsumer(channel, stoppingToken);
             }
-
         }
 
         private async Task InicializaConsumer(IModel channel, CancellationToken stoppingToken)
@@ -109,18 +107,18 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 var filaDeadLetter = $"{fila}.deadletter";
                 channel.QueueDeclare(filaDeadLetter, true, false, false, null);
                 channel.QueueBind(filaDeadLetter, ExchangeRabbit.SerapEstudanteDeadLetter, fila, null);
+
+                var filaDeadLetterFinal = $"{fila}.deadletter.final";
+                channel.QueueDeclare(filaDeadLetterFinal, true, false, false, null);
+                channel.QueueBind(filaDeadLetterFinal, ExchangeRabbit.SerapEstudanteDeadLetter, filaDeadLetterFinal, null);
             }
-
-            var filaDeadLetterFinalRespostasIncluir = $"{RotasRabbit.IncluirRespostaAluno}.deadletter.final";
-            channel.QueueDeclare(filaDeadLetterFinalRespostasIncluir, true, false, false, null);
-            channel.QueueBind(filaDeadLetterFinalRespostasIncluir, ExchangeRabbit.SerapEstudanteDeadLetter, filaDeadLetterFinalRespostasIncluir, null);
-
         }
 
         private void RegistrarUseCases()
         {
             comandos.Add(RotasRabbit.ProvaSync, new ComandoRabbit("Sincronização da prova", typeof(ITratarProvasLegadoSyncUseCase)));
             comandos.Add(RotasRabbit.ProvaTratar, new ComandoRabbit("Tratar Prova", typeof(ITratarProvaLegadoUseCase)));
+            comandos.Add(RotasRabbit.ProvaAnoTratar, new ComandoRabbit("Tratar Prova Ano", typeof(ITratarProvaAnoLegadoUseCase)));
             comandos.Add(RotasRabbit.QuestaoSync, new ComandoRabbit("Sincronização das questoes da prova", typeof(ITratarQuestoesLegadoSyncUseCase)));
             comandos.Add(RotasRabbit.AlternativaSync, new ComandoRabbit("Sincronização das alternativas da prova", typeof(ITratarAlternativaLegadoSyncUseCase)));
             comandos.Add(RotasRabbit.AlternativaTratar, new ComandoRabbit("Tratar as alternativas das provas", typeof(ITratarAlternativaLegadoUseCase)));
@@ -129,7 +127,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.QuestaoImagemIncorretaTratar, new ComandoRabbit("Atualizar questões com imagem incorreta", typeof(IAtualizaImagensQuestoesUseCase)));
             comandos.Add(RotasRabbit.AlternativaImagemIncorretaTratar, new ComandoRabbit("Atualizar alternativas com imagem incorreta", typeof(IAtualizaImagensAlternativasUseCase)));
             comandos.Add(RotasRabbit.IncluirRespostaAluno, new ComandoRabbit("Incluir as respostas do aluno", typeof(IIncluirRespostaAlunoUseCase)));
-            comandos.Add(RotasRabbit.IncluirPreferenciasAluno, new ComandoRabbit("Incluir as preferências do sistema do aluno", typeof(IIncluirPreferenciasAlunoUseCase)));            
+            comandos.Add(RotasRabbit.IncluirPreferenciasAluno, new ComandoRabbit("Incluir as preferências do sistema do aluno", typeof(IIncluirPreferenciasAlunoUseCase)));
             comandos.Add(RotasRabbit.AtualizarFrequenciaAlunoProvaTratar, new ComandoRabbit("Atualiza a prova do aluno com a frequência dele", typeof(ITratarFrequenciaAlunoProvaUseCase)));
             comandos.Add(RotasRabbit.AtualizarFrequenciaAlunoProvaSync, new ComandoRabbit("Obtem os alunos para serem atualizados", typeof(ITratarFrequenciaAlunoProvaSyncUseCase)));
 
@@ -223,8 +221,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     SentrySdk.CaptureMessage($"Worker Serap: Rota -> {ea.RoutingKey}  Cod Correl -> {mensagemRabbit.CodigoCorrelacao.ToString().Substring(0, 3)}", SentryLevel.Error);
                     SentrySdk.AddBreadcrumb($"Erros: { JsonSerializer.Serialize(vex.Mensagens())}", null, null, null, BreadcrumbLevel.Error);
                     SentrySdk.CaptureException(vex);
-
-
                 }
                 catch (Exception ex)
                 {
@@ -233,7 +229,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     SentrySdk.CaptureException(ex);
 
                 }
-
             }
             else
                 channel.BasicReject(ea.DeliveryTag, false);

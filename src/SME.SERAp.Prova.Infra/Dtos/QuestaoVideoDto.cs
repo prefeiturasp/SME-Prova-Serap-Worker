@@ -1,7 +1,7 @@
 ﻿
 namespace SME.SERAp.Prova.Infra
 {
-    public class QuestaoVideoDto
+    public class QuestaoVideoDto : DtoBase
     {
 
         public long VideoId { get; set; }

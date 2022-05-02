@@ -1,6 +1,6 @@
 ﻿namespace SME.SERAp.Prova.Infra
 {
-    public class AnoAlunoDto
+    public class AnoAlunoDto : DtoBase
     {
         public int Ano { get; set; }
     }

@@ -1,6 +1,6 @@
 ﻿namespace SME.SERAp.Prova.Infra
 {
-    public class BuscarPorProvaIdEQuestaoIdDto
+    public class BuscarPorProvaIdEQuestaoIdDto : DtoBase
     {
         public long ProvaId  { get; set; }
         public long QuestaoId  { get; set; }

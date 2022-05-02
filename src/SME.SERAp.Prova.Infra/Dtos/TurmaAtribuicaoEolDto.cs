@@ -2,7 +2,7 @@
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class TurmaAtribuicaoEolDto
+    public class TurmaAtribuicaoEolDto : DtoBase
     {
         public int AnoLetivo { get; set; }
         public int DreCodigo { get; set; }

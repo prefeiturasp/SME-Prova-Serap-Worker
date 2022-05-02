@@ -2,7 +2,7 @@
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class ProvaAnoDetalheDto
+    public class ProvaAnoDetalheDto : DtoBase
     {
         public ProvaAnoDetalheDto()
         {

@@ -52,5 +52,9 @@
 
         public const string FilaDeadletterTratar = "serap.deadletter.tratar";        
         public const string FilaDeadletterSync = "serap.deadletter.sync";
+
+
+        public const string QuestaoCompletaSync = "serap.estudante.questao.completa.legado.sync";
+        public const string QuestaoCompletaTratar = "serap.estudante.questao.completa.legado.tratar";
     }
 }

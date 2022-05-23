@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 
 namespace SME.SERAp.Prova.Dados
@@ -39,6 +42,106 @@ namespace SME.SERAp.Prova.Dados
                 var query = @"select * from questao where questao_legado_id = @id";
 
                 return await conn.QueryFirstOrDefaultAsync<Questao>(query, new { id });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<QuestaoCompletaDto> MontarQuestaoCompletaPorIdAsync(long id)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = new StringBuilder();
+
+                // questão
+                query.AppendLine(" select q.id, q.texto_base as titulo, q.enunciado as descricao, q.ordem, q.tipo, q.quantidade_alternativas as quantidadeAlternativas ");
+                query.AppendLine(" from questao q ");
+                query.AppendLine(" where q.id = @id; ");
+
+                // arquivos
+                query.AppendLine(" select distinct ar.id, ar.legado_id as legadoId, q.id as questaoId, ar.caminho, ar.tamanho_bytes as tamanhoBytes");
+                query.AppendLine(" from questao q ");
+                query.AppendLine(" join questao_arquivo qa on qa.questao_id = q.id ");
+                query.AppendLine(" join arquivo ar on ar.id = qa.arquivo_id ");
+                query.AppendLine(" where q.id = @id; ");
+
+                // arquivos audio
+                query.AppendLine(" select distinct ar.id, ar.legado_id as legadoId, q.id as questaoId, ar.caminho, ar.tamanho_bytes as tamanhoBytes");
+                query.AppendLine(" from questao q ");
+                query.AppendLine(" join questao_audio qa on qa.questao_id = q.id ");
+                query.AppendLine(" join arquivo ar on ar.id = qa.arquivo_id ");
+                query.AppendLine(" where q.id = @id; ");
+
+                // arquivos video
+                query.AppendLine(" select distinct q.id as questaoId, qv.id, ");
+                query.AppendLine("     ar.caminho, ar.tamanho_bytes as tamanhoBytes,  ");
+                query.AppendLine("     art.caminho as caminhoVideoThumbinail, art.tamanho_bytes as videoThumbinailTamanhoBytes, ");
+                query.AppendLine("     arc.caminho as caminhoVideoConvertido, arc.tamanho_bytes as videoConvertidoTamanhoBytes ");
+                query.AppendLine(" from questao q ");
+                query.AppendLine(" join questao_video qv on qv.questao_id = q.id ");
+                query.AppendLine(" join arquivo ar on ar.id = qv.arquivo_video_id ");
+                query.AppendLine(" left join arquivo art on art.id = qv.arquivo_thumbnail_id ");
+                query.AppendLine(" left join arquivo arc on arc.id = qv.arquivo_video_convertido_id ");
+                query.AppendLine(" where q.id = @id; ");
+
+                // alternativas
+                query.AppendLine(" select q.id as questaoId, a.id, a.descricao, a.ordem, a.numeracao ");
+                query.AppendLine(" from questao q ");
+                query.AppendLine(" join alternativa a on a.questao_id = q.id ");
+                query.AppendLine(" where q.id = @id; ");
+
+                // arquivos alternativas
+                query.AppendLine(" select distinct ar.id, ar.legado_id as legadoId, a.questao_id as questaoId, ar.caminho, ar.tamanho_bytes as tamanhoBytes ");
+                query.AppendLine(" from questao q ");
+                query.AppendLine(" join alternativa a on a.questao_id = q.id ");
+                query.AppendLine(" join alternativa_arquivo aa on aa.alternativa_id = a.id ");
+                query.AppendLine(" join arquivo ar on ar.id = aa.arquivo_id ");
+                query.AppendLine(" where q.id = @id; ");
+
+                using (var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id }))
+                {
+                    var questaoCompleta = await sqlMapper.ReadFirstAsync<QuestaoCompletaDto>();
+
+                    questaoCompleta.Arquivos = sqlMapper.Read<ArquivoDto>();
+                    questaoCompleta.Audios = sqlMapper.Read<ArquivoDto>();
+                    questaoCompleta.Videos = sqlMapper.Read<ArquivoVideoDto>();
+                    questaoCompleta.Alternativas = sqlMapper.Read<AlternativaDto>();
+
+                    var arquivosAlternativas = sqlMapper.Read<ArquivoDto>();
+
+                    if (arquivosAlternativas.Any())
+                    {
+                        var arquivosQuestao = questaoCompleta.Arquivos.ToList();
+                        arquivosQuestao.AddRange(arquivosAlternativas);
+                        questaoCompleta.Arquivos = arquivosQuestao;
+                    }
+
+                    return questaoCompleta;
+                }
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas()
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select q.id, p.ultima_atualizacao as UltimaAtualizacao 
+                              from prova p
+                              left join questao q on q.prova_id = p.id 
+                              left join questao_completa qc on qc.id = q.id 
+                              where p.ultima_atualizacao <> qc.ultima_atualizacao or qc.ultima_atualizacao is null";
+
+                return await conn.QueryAsync<QuestaoAtualizada>(query);
             }
             finally
             {

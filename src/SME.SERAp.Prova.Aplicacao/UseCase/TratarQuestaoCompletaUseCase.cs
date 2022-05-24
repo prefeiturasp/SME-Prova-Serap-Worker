@@ -1,9 +1,9 @@
-﻿using MessagePack;
-using SME.SERAp.Prova.Dados;
+﻿using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -29,8 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
             if (questaoCompleta.QuantidadeAlternativas != questaoCompleta.Alternativas.Count())
                 throw new NegocioException($"Total de alternativas diferente do informado na questão {questaoAtualizada.Id}");
 
-            var bytes = MessagePackSerializer.Serialize(questaoCompleta);
-            var json = MessagePackSerializer.ConvertToJson(bytes);
+            var json = JsonSerializer.Serialize(questaoCompleta, new JsonSerializerOptions() { IgnoreNullValues = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
             await repositorioQuestaoCompleta.IncluirOuUpdateAsync(new QuestaoCompleta(questaoAtualizada.Id, json, questaoAtualizada.UltimaAtualizacao));
             await repositorioCache.RemoverRedisAsync(string.Format(CacheChave.QuestaoCompleta, questaoAtualizada.Id));

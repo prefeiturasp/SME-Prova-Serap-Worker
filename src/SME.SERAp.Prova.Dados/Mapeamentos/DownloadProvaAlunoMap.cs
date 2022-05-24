@@ -4,7 +4,6 @@ namespace SME.SERAp.Prova.Dados
 {
     public class DownloadProvaAlunoMap : DommelEntityMap<Dominio.DownloadProvaAluno>
     {
-
         public DownloadProvaAlunoMap()
         {
             ToTable("downloads_prova_aluno");
@@ -18,6 +17,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.Versao).ToColumn("versao");
             Map(c => c.CriadoEm).ToColumn("criado_em");
             Map(c => c.AlteradoEm).ToColumn("alterado_em");
+            Map(c => c.Codigo).ToColumn("codigo");
         }
     }
 }

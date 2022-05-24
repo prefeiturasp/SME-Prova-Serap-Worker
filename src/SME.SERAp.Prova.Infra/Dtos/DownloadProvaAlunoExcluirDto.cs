@@ -2,9 +2,9 @@
 
 namespace SME.SERAp.Prova.Infra
 {
-    public class ExcluirDownloadProvaAlunoDto
+    public class DownloadProvaAlunoExcluirDto
     {
-        public long[] Ids { get; set; }
+        public Guid[] Codigos { get; set; }
         public DateTime DataAlteracao { get; set; }
     }
 }

@@ -134,8 +134,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.AtualizarFrequenciaAlunoProvaTratar, new ComandoRabbit("Atualiza a prova do aluno com a frequência dele", typeof(ITratarFrequenciaAlunoProvaUseCase)));
             comandos.Add(RotasRabbit.AtualizarFrequenciaAlunoProvaSync, new ComandoRabbit("Obtem os alunos para serem atualizados", typeof(ITratarFrequenciaAlunoProvaSyncUseCase)));
 
-            comandos.Add(RotasRabbit.IncluirDownloadProva, new ComandoRabbit("Incluir download prova", typeof(IIncluirDownloadProvaUseCase)));
-            comandos.Add(RotasRabbit.ExcluirDownloadProva, new ComandoRabbit("Excluir download prova", typeof(IExcluirDownloadProvaUseCase)));
+            comandos.Add(RotasRabbit.DownloadProvaAlunoTratar, new ComandoRabbit("tratar a situação do download da prova por aluno", typeof(ITratarDownloadProvaAlunoUseCase)));
 
             // Questao completa
             comandos.Add(RotasRabbit.QuestaoCompletaSync, new ComandoRabbit("Sincronização das questoes completas", typeof(ITratarQuestaoCompletaSyncUseCase)));

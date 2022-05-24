@@ -6,6 +6,6 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioDownloadProvaAluno : IRepositorioBase<DownloadProvaAluno>
     {
-        Task<bool> ExcluirDownloadProvaAluno(long[] ids, DateTime? dataAlteracao);
+        Task<bool> ExcluirDownloadProvaAluno(Guid[] codigos, DateTime? dataAlteracao);
     }
 }

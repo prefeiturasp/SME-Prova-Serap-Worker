@@ -15,6 +15,6 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         public async Task<bool> Handle(ExcluirDownloadsProvaAlunoCommand request, CancellationToken cancellationToken)
-         => await repositorioDownloadProvaAluno.ExcluirDownloadProvaAluno(request.Ids, request.DataAlteracao);
+         => await repositorioDownloadProvaAluno.ExcluirDownloadProvaAluno(request.DownloadProvaAlunoExcluirDto.Codigos, request.DownloadProvaAlunoExcluirDto.DataAlteracao);
     }
 }

@@ -1,17 +1,14 @@
 ﻿using MediatR;
-using System;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExcluirDownloadsProvaAlunoCommand : IRequest<bool>
     {
-        public ExcluirDownloadsProvaAlunoCommand(long[] ids, DateTime? dataAlteracao)
+        public ExcluirDownloadsProvaAlunoCommand(DownloadProvaAlunoExcluirDto downloadProvaAlunoExcluirDto)
         {
-            Ids = ids;
-            DataAlteracao = dataAlteracao;
+            DownloadProvaAlunoExcluirDto = downloadProvaAlunoExcluirDto;
         }
-
-        public long[] Ids { get; set; }
-        public DateTime? DataAlteracao { get; set; }
+        public DownloadProvaAlunoExcluirDto DownloadProvaAlunoExcluirDto { get; set; }
     }
 }

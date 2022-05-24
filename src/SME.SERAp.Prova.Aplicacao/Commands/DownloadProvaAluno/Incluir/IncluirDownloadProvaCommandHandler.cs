@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class IncluirDownloadProvaCommandHandler : IRequestHandler<IncluirDownloadProvaCommand, long>
+    public class IncluirDownloadProvaCommandHandler : IRequestHandler<IncluirDownloadProvaCommand, bool>
     {
         private readonly IRepositorioDownloadProvaAluno repositorioDownloadProvaAluno;
 
@@ -14,16 +14,21 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioDownloadProvaAluno = repositorioDownloadProvaAluno ?? throw new System.ArgumentNullException(nameof(repositorioDownloadProvaAluno));
         }
 
-        public async Task<long> Handle(IncluirDownloadProvaCommand request, CancellationToken cancellationToken)
-            => await repositorioDownloadProvaAluno.IncluirAsync(new Dominio.DownloadProvaAluno(request.DownloadProvaAlunoDto.ProvaId,
+        public async Task<bool> Handle(IncluirDownloadProvaCommand request, CancellationToken cancellationToken)
+        { 
+            var id = await repositorioDownloadProvaAluno.IncluirAsync(new Dominio.DownloadProvaAluno(request.DownloadProvaAlunoDto.ProvaId,
                 request.DownloadProvaAlunoDto.AlunoRa,
                 request.DownloadProvaAlunoDto.DispositivoId,
                 request.DownloadProvaAlunoDto.TipoDispositivo,
                 request.DownloadProvaAlunoDto.ModeloDispositivo,
                 request.DownloadProvaAlunoDto.Versao,
                 request.Situacao,
-                request.DownloadProvaAlunoDto.DataHora.AddHours(3))
+                request.DownloadProvaAlunoDto.DataHora.AddHours(3),
+                request.DownloadProvaAlunoDto.Codigo)
                 );
+
+            return id > 0;
+        }
     }
 }
 

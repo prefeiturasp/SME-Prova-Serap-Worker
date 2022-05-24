@@ -3,7 +3,7 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class IncluirDownloadProvaCommand : IRequest<long>
+    public class IncluirDownloadProvaCommand : IRequest<bool>
     {
         public IncluirDownloadProvaCommand(DownloadProvaAlunoDto downloadProvaAlunoDto)
         {

@@ -4,7 +4,7 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class DownloadProvaAluno : EntidadeBase
     {
-        public DownloadProvaAluno(long provaId, long alunoRa, string dispositivoId, TipoDispositivo tipoDispositivo, string modeloDispositivo, string versao, int situacao, DateTime criadoEm)
+        public DownloadProvaAluno(long provaId, long alunoRa, string dispositivoId, TipoDispositivo tipoDispositivo, string modeloDispositivo, string versao, int situacao, DateTime criadoEm, Guid codigo)
         {
             AlunoRA = alunoRa;
             ProvaId = provaId;
@@ -14,6 +14,7 @@ namespace SME.SERAp.Prova.Dominio
             Situacao = situacao;
             Versao = versao;
             CriadoEm = criadoEm;
+            Codigo = codigo;
         }
 
 
@@ -26,6 +27,7 @@ namespace SME.SERAp.Prova.Dominio
         public string Versao { get; set; }
         public DateTime CriadoEm { get; set; }
         public DateTime? AlteradoEm { get; set; }
+        public Guid Codigo { get; set; }
 
     }
 }

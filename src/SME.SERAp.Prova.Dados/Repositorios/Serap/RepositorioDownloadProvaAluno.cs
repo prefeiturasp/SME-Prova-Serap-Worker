@@ -11,14 +11,13 @@ namespace SME.SERAp.Prova.Dados
         {
         }
 
-        public async Task<bool> ExcluirDownloadProvaAluno(long[] ids, DateTime? dataAlteracao)
+        public async Task<bool> ExcluirDownloadProvaAluno(Guid[] codigos, DateTime? dataAlteracao)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = @"update downloads_prova_aluno set situacao = 3, alterado_em = @dataAlteracao  where id = any(@ids)";
-
-                return await (conn.ExecuteAsync(query, new { ids, dataAlteracao })) > 0;
+                var query = @"update downloads_prova_aluno set situacao = 3, alterado_em = @dataAlteracao  where codigo = any(@codigos)";
+                return await (conn.ExecuteAsync(query, new { codigos, dataAlteracao })) > 0;
             }
             finally
             {

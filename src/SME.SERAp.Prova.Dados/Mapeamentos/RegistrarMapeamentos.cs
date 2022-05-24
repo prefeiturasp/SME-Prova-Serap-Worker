@@ -42,6 +42,7 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new GrupoSerapCoreSsoMap());
                 config.AddMap(new UsuarioGrupoSerapCoreSsoMap());
                 config.AddMap(new AbrangenciaMap());
+                config.AddMap(new DownloadProvaAlunoMap());
 
                 config.ForDommel();
             });

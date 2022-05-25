@@ -193,7 +193,8 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"
-              SELECT DISTINCT  
+           
+							        SELECT DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
                 t.DownloadStartDate as InicioDownload,
@@ -216,7 +217,9 @@ namespace SME.SERAp.Prova.Dados
                 convert(bit, t.Multidiscipline) as Multidisciplinar,
                 t.TestType_Id as TipoProva,
                 case when t.TestTai  is null then 0 else t.TestTai end FormatoTai,
-                t.NumberSynchronizedResponseItems as  QtdItensSincronizacaoRespostas
+                t.NumberSynchronizedResponseItems as  QtdItensSincronizacaoRespostas,
+				nit.AdvanceWithoutAnswering as PermiteAvancarSemResponder, 
+				nit.BackToPreviousItem as  PermiteVoltarAoItemAnterior
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -234,6 +237,9 @@ namespace SME.SERAp.Prova.Dados
             INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
             LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
 			  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+            LEFT JOIN NumberItemTestTai nit on nit.TestId = t.id
+			                                   AND nit.State = 1
+            
             where
                 exists(select top 1 1 from TestTypeCourse ttc where ttc.TestType_Id = t.TestType_Id)
 				and exists(select top 1 1 from SGP_TUR_TurmaTipoCurriculoPeriodo ttcp where ttcp.crp_ordem = tt.tcp_ordem and tt.tme_id = ttcp.tme_id) 
@@ -419,32 +425,22 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<ItemTaiDto> ObterItemTaiPorProvaId(long provaId)
+        public async Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId)
         {
-
             using var conn = ObterConexao();
             try
             {
-                var query = @" select case when niat.Value = ''
-			            	          then 0 
-			            			  else niat.Value 
-			            			  end as ProvaFormatoTaiItem
-			            	        , Convert(int ,nit.AdvanceWithoutAnswering) as PermiteAvancarSemResponder
-			            	        , Convert(int ,nit.BackToPreviousItem)       as       PermiteVoltarAoItemAnterior
-			             	  from NumberItemTestTai nit
-                              inner join NumberItemsAplicationTai niat 
-			            	          on niat.Id = nit.ItemAplicationTaiId
-                              where nit.TestId =  @provaId
-                                and nit.State = 1";
-                var retorno = await conn.QueryAsync<ItemTaiDto>(query, new { provaId });
-                var item = retorno.FirstOrDefault();
+                var query = @"select case when niat.Value = '' then 0 else niat.Value end as value
+                              from NumberItemTestTai nit
+                              left join NumberItemsAplicationTai niat on niat.Id = nit.ItemAplicationTaiId
+                              where nit.TestId = @provaId
+							   and nit.State = 1";
+                var formatos = await conn.QueryAsync<long>(query, new { provaId });
 
+                if (formatos.Any())
+                    return (ProvaFormatoTaiItem)formatos.FirstOrDefault();
 
-                return item;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
+                return null;
             }
             finally
             {
@@ -454,5 +450,3 @@ namespace SME.SERAp.Prova.Dados
         }
     }
 }
-
-

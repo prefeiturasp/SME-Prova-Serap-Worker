@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao.Queries.ObterProvaLegadoItemFormatoTai
 {
-    public class ObterProvaLegadoItemFormatoTaiQueryHandler : IRequestHandler<ObterProvaLegadoItemFormatoTaiQuery, ItemTaiDto>
+    public class ObterProvaLegadoItemFormatoTaiQueryHandler : IRequestHandler<ObterProvaLegadoItemFormatoTaiQuery, ProvaFormatoTaiItem?>
     {
         private readonly IRepositorioProvaLegado repositorioProvaLegado;
 
@@ -17,9 +17,9 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.ObterProvaLegadoItemFormatoTai
             this.repositorioProvaLegado = repositorioProvaLegado ?? throw new ArgumentNullException(nameof(repositorioProvaLegado));
         }
 
-        public Task<ItemTaiDto> Handle(ObterProvaLegadoItemFormatoTaiQuery request, CancellationToken cancellationToken)
+        public Task<ProvaFormatoTaiItem?> Handle(ObterProvaLegadoItemFormatoTaiQuery request, CancellationToken cancellationToken)
         {
-            return repositorioProvaLegado.ObterItemTaiPorProvaId(request.ProvaLegadoId);
+            return repositorioProvaLegado.ObterFormatoTaiItemPorId(request.ProvaLegadoId);
         }
     }
 }

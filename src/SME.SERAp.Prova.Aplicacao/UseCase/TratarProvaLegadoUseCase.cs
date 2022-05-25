@@ -44,16 +44,16 @@ namespace SME.SERAp.Prova.Aplicacao
             var modalidadeSerap = ObterModalidade(provaLegado.Modalidade, provaLegado.ModeloProva);
             var tipoProvaSerap = await ObterTipoProva(provaLegado.TipoProva);
 
-            var itemTai = new ItemTaiDto();
+            ProvaFormatoTaiItem? provaFormatoTaiItem = null;
             if (provaLegado.FormatoTai)
             {
-                 itemTai  = await mediator.Send(new ObterProvaLegadoItemFormatoTaiQuery(provaId));
+                provaFormatoTaiItem = await mediator.Send(new ObterProvaLegadoItemFormatoTaiQuery(provaId));
 
-                if (itemTai.ProvaFormatoTaiItem == null)
+                if (provaFormatoTaiItem == null)
                     throw new Exception($"Formato Tai Item da prova {provaId} não localizado no legado.");
             }
 
-            var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap, itemTai);
+            var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap, provaFormatoTaiItem);
 
             if (provaAtual == null)
             {
@@ -117,13 +117,13 @@ namespace SME.SERAp.Prova.Aplicacao
             return true;
         }
 
-        private Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap, ItemTaiDto itemTai)
+        private Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap,  ProvaFormatoTaiItem? provaFormatoTaiItem)
         {
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
                 provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao,
-                 itemTai.ProvaFormatoTaiItem, itemTai.PermiteAvancarSemResponder, itemTai.PermiteVoltarAoItemAnterior);
+                 provaFormatoTaiItem , provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior);
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

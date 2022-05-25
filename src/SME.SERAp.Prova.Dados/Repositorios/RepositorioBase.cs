@@ -115,6 +115,10 @@ namespace SME.SERAp.Prova.Dados
                 entidade.Id = (long)await conexao.InsertAsync(entidade);
                 return entidade.Id;
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
             finally
             {
                 conexao.Close();

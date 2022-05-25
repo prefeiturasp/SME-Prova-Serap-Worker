@@ -4,7 +4,7 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterProvaLegadoItemFormatoTaiQuery : IRequest<ItemTaiDto>
+    public class ObterProvaLegadoItemFormatoTaiQuery : IRequest<ProvaFormatoTaiItem?>
     {
         public ObterProvaLegadoItemFormatoTaiQuery(long provaLegadoId)
         {

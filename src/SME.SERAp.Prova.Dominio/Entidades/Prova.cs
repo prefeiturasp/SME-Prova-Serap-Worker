@@ -10,7 +10,7 @@ namespace SME.SERAp.Prova.Dominio
         }
         public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB, 
             int totalCadernos, Modalidade modalidade, string disciplina, bool ocultarProva, bool aderirTodos, bool multidisciplinar, int tipoProvaId, bool formatoTai, 
-             int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, int permiteAvancarSemResponderTai = 0, int permiteVoltarItemAnteriorTai = 0)
+             int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, bool permiteAvancarSemResponderTai = false, bool permiteVoltarItemAnteriorTai = false)
         {
             Id = id;
             Descricao = descricao;
@@ -59,8 +59,8 @@ namespace SME.SERAp.Prova.Dominio
         public ProvaFormatoTaiItem? ProvaFormatoTaiItem { get; set; }
         public int? QtdItensSincronizacaoRespostas { get; set; }
 
-        public int PermiteAvancarSemResponderTai { get; set; }
-        public int PermiteVoltarItemAnteriorTai { get; set; }
+        public bool PermiteAvancarSemResponderTai { get; set; }
+        public bool PermiteVoltarItemAnteriorTai { get; set; }
         public DateTime UltimaAtualizacao { get; set; }
     }
 }

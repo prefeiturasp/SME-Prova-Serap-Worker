@@ -20,8 +20,8 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<Arquivo>> ObterAudiosPorQuestaoId(long questaoId);
         Task<IEnumerable<QuestaoVideoDto>> ObterVideosPorQuestaoId(long questaoId);
         Task<IEnumerable<ProvaAnoDetalheDto>> ObterProvaAnoDetalhesPorId(long id);
-        Task<ItemTaiDto> ObterItemTaiPorProvaId(long provaId);
-
+        Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId);
+      
 
 
     }

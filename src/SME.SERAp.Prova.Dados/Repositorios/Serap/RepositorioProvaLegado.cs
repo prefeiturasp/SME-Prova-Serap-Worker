@@ -419,21 +419,32 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId)
+        public async Task<ItemTaiDto> ObterItemTaiPorProvaId(long provaId)
         {
+
             using var conn = ObterConexao();
             try
             {
-                var query = @"select case when niat.Value = '' then 0 else niat.Value end as value
-                              from NumberItemTestTai nit
-                              left join NumberItemsAplicationTai niat on niat.Id = nit.ItemAplicationTaiId
-                              where nit.TestId = @provaId;";
-                var formatos = await conn.QueryAsync<long>(query, new { provaId });
+                var query = @" select case when niat.Value = ''
+			            	          then 0 
+			            			  else niat.Value 
+			            			  end as ProvaFormatoTaiItem
+			            	        , Convert(int ,nit.AdvanceWithoutAnswering) as PermiteAvancarSemResponder
+			            	        , Convert(int ,nit.BackToPreviousItem)       as       PermiteVoltarAoItemAnterior
+			             	  from NumberItemTestTai nit
+                              inner join NumberItemsAplicationTai niat 
+			            	          on niat.Id = nit.ItemAplicationTaiId
+                              where nit.TestId =  @provaId
+                                and nit.State = 1";
+                var retorno = await conn.QueryAsync<ItemTaiDto>(query, new { provaId });
+                var item = retorno.FirstOrDefault();
 
-                if (formatos.Any())
-                    return (ProvaFormatoTaiItem)formatos.FirstOrDefault();
 
-                return null;
+                return item;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {
@@ -443,3 +454,5 @@ namespace SME.SERAp.Prova.Dados
         }
     }
 }
+
+

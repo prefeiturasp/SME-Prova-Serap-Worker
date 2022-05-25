@@ -1,9 +1,10 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterProvaLegadoItemFormatoTaiQuery : IRequest<ProvaFormatoTaiItem?>
+    public class ObterProvaLegadoItemFormatoTaiQuery : IRequest<ItemTaiDto>
     {
         public ObterProvaLegadoItemFormatoTaiQuery(long provaLegadoId)
         {

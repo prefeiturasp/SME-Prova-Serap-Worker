@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Sentry;
 using SME.SERAp.Prova.Infra;
 using System;
 using System.Linq;
@@ -15,27 +16,21 @@ namespace SME.SERAp.Prova.Aplicacao
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var turmaBIB = mensagemRabbit.ObterObjetoMensagem<ProvaTurmaBIBSyncDto>();
-
-            var alunos = await mediator.Send(new ObterAlunosPorTurmaIdQuery(turmaBIB.TurmaId));
-
-            var caderno = 1;
-            if (alunos.Any())
+            try
             {
-                foreach (var aluno in alunos)
-                {
-                    await mediator.Send(new CadernoAlunoIncluirCommand(new Dominio.CadernoAluno(aluno.Id, turmaBIB.ProvaId, caderno.ToString())));
+                var provaCadernoAluno = mensagemRabbit.ObterObjetoMensagem<ProvaCadernoAlunoDto>();
+                Random sortear = new Random();
+                var cadernoSorteado = sortear.Next(1, provaCadernoAluno.TotalCadernos).ToString();
 
-                    caderno += 1;
-
-                    if (caderno > turmaBIB.TotalCadernos)
-                        caderno = 1;
-                }
+                await mediator.Send(new CadernoAlunoIncluirCommand(new Dominio.CadernoAluno(provaCadernoAluno.AlunoId, provaCadernoAluno.ProvaId, cadernoSorteado)));
             }
-
+            catch (Exception ex)
+            {
+                SentrySdk.AddBreadcrumb($"Erro ao incluir caderno para o aluno");
+                SentrySdk.CaptureException(ex);
+            }
             return true;
         }
     }

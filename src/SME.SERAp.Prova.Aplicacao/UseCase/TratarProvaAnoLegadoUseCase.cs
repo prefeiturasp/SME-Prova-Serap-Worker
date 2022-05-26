@@ -23,7 +23,6 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-
                 var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
 
                 var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
@@ -38,25 +37,20 @@ namespace SME.SERAp.Prova.Aplicacao
                         foreach (ProvaAno provaAno in provaAnoInserir)
                         {
                             await mediator.Send(new ProvaAnoIncluirCommand(provaAno));
-                            if (provaLegado.PossuiBIB)
-                                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, provaAno.Ano, provaAtual.TotalCadernos)));
                         }
                     }
                 }
                 else
                 {
-
                     if (provaLegado == null)
                         throw new Exception($"Prova {provaLegado} não localizada!");
 
                     foreach (var ano in provaLegado.Anos)
                     {
                         await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id, provaAtual.Modalidade)));
-                        if (provaLegado.PossuiBIB)
-                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBSync, new ProvaBIBSyncDto(provaAtual.Id, ano, provaAtual.TotalCadernos)));
                     }
                 }
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -146,7 +140,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var anosCieja = ObterAnosListaDistinct(cieja);
                 foreach (string ano in anosCieja)
                 {
-                    provaAnoRetorno.Add(new ProvaAno(ano, provaSerapEstudantesId , Modalidade.CIEJA));
+                    provaAnoRetorno.Add(new ProvaAno(ano, provaSerapEstudantesId, Modalidade.CIEJA));
                 }
             }
 

@@ -15,22 +15,18 @@ namespace SME.SERAp.Prova.Aplicacao
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var provaBIB = mensagemRabbit.ObterObjetoMensagem<ProvaBIBSyncDto>();
+            var provaCadernosAlunos = await mediator.Send(new ObterAlunosSemCadernoProvaBibQuery());
 
-            var turmas = await mediator.Send(new ObterTurmasPorAnoEAnoLetivoQuery(provaBIB.Ano, DateTime.Now.Year));
-
-            if(turmas.Any())
+            if (provaCadernosAlunos.Any())
             {
-                foreach(var turma in turmas)
+                foreach (var prova in provaCadernosAlunos)
                 {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBTratar, 
-                        new ProvaTurmaBIBSyncDto(provaBIB.ProvaId, provaBIB.TotalCadernos, turma.Id)));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBTratar, prova));
                 }
             }
-            
+
             return true;
         }
     }

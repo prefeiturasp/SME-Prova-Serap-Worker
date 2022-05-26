@@ -412,7 +412,6 @@ namespace SME.SERAp.Prova.Dados
                 throw;
             }
         }
-
         public static int Execute(this IDbConnection cnn, CommandDefinition command)
         {
 
@@ -437,7 +436,6 @@ namespace SME.SERAp.Prova.Dados
                 throw;
             }
         }
-
         public static async Task<int> ExecuteAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
 

@@ -26,6 +26,7 @@
         public const string TratarAdesaoProva = "serap.estudante.prova.adesao.tratar";
         public const string TratarTipoProvaDeficiencia = "serap.estudante.prova.tipo.prova.deficiencia.tratar";
         public const string TratarAlunoDeficiencia = "serap.estudante.aluno.deficiencia.tratar";
+        public const string DownloadProvaAlunoTratar = "serap.estudante.download.prova.aluno.tratar";
 
         public const string IniciarProcessoFinalizarProvasAutomaticamente = "serap.estudante.prova.finalizar.automaticamente.iniciar";
         public const string FinalizarProvaAutomaticamente = "serap.estudante.prova.finalizar.automaticamente";

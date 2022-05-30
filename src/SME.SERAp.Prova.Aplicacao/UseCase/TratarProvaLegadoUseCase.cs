@@ -67,6 +67,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.Multidisciplinar = provaParaTratar.Multidisciplinar;
                 provaAtual.TipoProvaId = provaParaTratar.TipoProvaId;
                 provaAtual.UltimaAtualizacao = provaParaTratar.UltimaAtualizacao;
+                provaAtual.Disciplina = provaParaTratar.Disciplina;
+                provaAtual.DisciplinaId = provaParaTratar.DisciplinaId;
 
                 var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
                 if (verificaSePossuiRespostas)
@@ -94,7 +96,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
 
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
 
             var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
 
@@ -117,13 +119,13 @@ namespace SME.SERAp.Prova.Aplicacao
             return true;
         }
 
-        private Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap,  ProvaFormatoTaiItem? provaFormatoTaiItem)
+        private Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap, ProvaFormatoTaiItem? provaFormatoTaiItem)
         {
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
-                provaLegado.TotalCadernos, modalidadeSerap, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
-                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao,
-                 provaFormatoTaiItem , provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior);
+                provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, provaFormatoTaiItem,
+                provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior);
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

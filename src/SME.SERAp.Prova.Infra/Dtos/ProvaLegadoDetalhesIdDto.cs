@@ -13,6 +13,7 @@ namespace SME.SERAp.Prova.Infra
         }
         public long Id { get; set; }
         public string Descricao { get; set; }
+        public long? DisciplinaId { get; set; }
         public string Disciplina { get; set; }
         public DateTime? InicioDownload { get; set; }
         public DateTime Inicio { get; set; }

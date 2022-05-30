@@ -23,19 +23,17 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 var ultimaProficiencia = await mediator.Send(new ObterUltimaProficienciaAlunoPorDisciplinaIdQuery(alunoProvaDto.AlunoId, alunoProvaDto.DisciplinaId));
 
-                if (ultimaProficiencia > 0)
+                await mediator.Send(new IncluirAlunoProvaProficienciaCommand(new Dominio.AlunoProvaProficiencia()
                 {
-                    await mediator.Send(new IncluirAlunoProvaProficienciaCommand(new Dominio.AlunoProvaProficiencia()
-                    {
-                        AlunoId = alunoProvaDto.AlunoId,
-                        Ra = alunoProvaDto.AlunoRa,
-                        ProvaId = alunoProvaDto.ProvaId,
-                        DisciplinaId = alunoProvaDto.DisciplinaId.GetValueOrDefault() > 0 ? (long)alunoProvaDto.DisciplinaId.Value : (long?)null,
-                        Origem = Dominio.AlunoProvaProficienciaOrigem.TAI_estudante,
-                        Tipo = Dominio.AlunoProvaProficienciaTipo.Inicial,
-                        Proficiencia = ultimaProficiencia
-                    }));
-                }
+                    AlunoId = alunoProvaDto.AlunoId,
+                    Ra = alunoProvaDto.AlunoRa,
+                    ProvaId = alunoProvaDto.ProvaId,
+                    DisciplinaId = alunoProvaDto.DisciplinaId.GetValueOrDefault() > 0 ? (long)alunoProvaDto.DisciplinaId.Value : (long?)null,
+                    Origem = Dominio.AlunoProvaProficienciaOrigem.TAI_estudante,
+                    Tipo = Dominio.AlunoProvaProficienciaTipo.Inicial,
+                    Proficiencia = ultimaProficiencia,
+                    UltimaAtualizacao = alunoProvaDto.UltimaAtualizacao
+                }));
             }
 
             return true;

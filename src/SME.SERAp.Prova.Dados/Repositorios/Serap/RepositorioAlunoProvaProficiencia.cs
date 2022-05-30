@@ -34,24 +34,24 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"select a.id as alunoId, a.ra as alunoRa, p.id as provaId, p.prova_legado_id as provaLegadoId, p.disciplina_id as disciplinaId
+                var query = @"select a.id as alunoId, a.ra as alunoRa, p.id as provaId, p.prova_legado_id as provaLegadoId, p.disciplina_id as disciplinaId, p.ultima_atualizacao as ultimaAtualizacao
                               from prova p
                               left join prova_ano_original pa on pa.prova_id = p.id 
                               left join turma t on t.ano = pa.ano and t.modalidade_codigo = p.modalidade and t.ano_letivo::double precision = date_part('year'::text, p.inicio)
                               join aluno a on a.turma_id = t.id
                               where (p.aderir_todos is null or p.aderir_todos)
 	                             and p.formato_tai = true
-	                             and not exists(select 1 from aluno_prova_proficiencia ca where ca.prova_id = p.id and ca.aluno_id = a.id)
+	                             and not exists(select 1 from aluno_prova_proficiencia ca where ca.prova_id = p.id and ca.aluno_id = a.id and ca.ultima_atualizacao = p.ultima_atualizacao)
 		
                               union all 
  
-                              select a.id as alunoId, a.ra as alunoRa, p.id as provaId, p.prova_legado_id as provaLegadoId, p.disciplina_id as disciplinaId
+                              select a.id as alunoId, a.ra as alunoRa, p.id as provaId, p.prova_legado_id as provaLegadoId, p.disciplina_id as disciplinaId, p.ultima_atualizacao as ultimaAtualizacao
                               from prova p
                               left join prova_adesao pa on pa.prova_id = p.id
                               join aluno a on a.ra = pa.aluno_ra
                               where p.aderir_todos = false
 	                            and p.formato_tai = true
-	                            and not exists(select 1 from aluno_prova_proficiencia ca where	ca.prova_id = p.id and ca.aluno_id = a.id)";
+	                            and not exists(select 1 from aluno_prova_proficiencia ca where	ca.prova_id = p.id and ca.aluno_id = a.id  and ca.ultima_atualizacao = p.ultima_atualizacao)";
 
                 return await conn.QueryAsync<AlunoProvaDto>(query);
             }

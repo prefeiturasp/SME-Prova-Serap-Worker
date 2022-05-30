@@ -14,6 +14,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.Descricao).ToColumn("descricao");
             Map(c => c.InicioDownload).ToColumn("inicio_download");
             Map(c => c.Inicio).ToColumn("inicio");
+            Map(c => c.DisciplinaId).ToColumn("disciplina_id");
             Map(c => c.Disciplina).ToColumn("disciplina");
             Map(c => c.Fim).ToColumn("fim");
             Map(c => c.Inclusao).ToColumn("inclusao");
@@ -31,6 +32,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.ProvaFormatoTaiItem).ToColumn("formato_tai_item");
             Map(c => c.QtdItensSincronizacaoRespostas).ToColumn("qtd_itens_sincronizacao_respostas");
             Map(c => c.UltimaAtualizacao).ToColumn("ultima_atualizacao");
+            
         }
     }
 }

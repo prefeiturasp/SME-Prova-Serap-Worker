@@ -26,14 +26,17 @@ namespace SME.SERAp.Prova.Aplicacao
             var questaoAtualizada = mensagemRabbit.ObterObjetoMensagem<QuestaoAtualizada>();
             var questaoCompleta = await repositorioQuestao.MontarQuestaoCompletaPorIdAsync(questaoAtualizada.Id);
 
-            if (questaoCompleta.QuantidadeAlternativas != questaoCompleta.Alternativas.Count())
+            if (questaoCompleta != null)
+            {
+                if (questaoCompleta.QuantidadeAlternativas != questaoCompleta.Alternativas.Count())
                 throw new NegocioException($"Total de alternativas diferente do informado na questão {questaoAtualizada.Id}");
 
-            var bytes = MessagePackSerializer.Serialize(questaoCompleta);
-            var json = MessagePackSerializer.ConvertToJson(bytes);
+                var bytes = MessagePackSerializer.Serialize(questaoCompleta);
+                var json = MessagePackSerializer.ConvertToJson(bytes);
 
-            await repositorioQuestaoCompleta.IncluirOuUpdateAsync(new QuestaoCompleta(questaoAtualizada.Id, json, questaoAtualizada.UltimaAtualizacao));
-            await repositorioCache.RemoverRedisAsync(string.Format(CacheChave.QuestaoCompleta, questaoAtualizada.Id));
+                await repositorioQuestaoCompleta.IncluirOuUpdateAsync(new QuestaoCompleta(questaoAtualizada.Id, json, questaoAtualizada.UltimaAtualizacao));
+                await repositorioCache.RemoverRedisAsync(string.Format(CacheChave.QuestaoCompleta, questaoAtualizada.Id));
+            } 
 
             return true;
         }

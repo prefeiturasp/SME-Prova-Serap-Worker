@@ -140,6 +140,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.QuestaoCompletaSync, new ComandoRabbit("Sincronização das questoes completas", typeof(ITratarQuestaoCompletaSyncUseCase)));
             comandos.Add(RotasRabbit.QuestaoCompletaTratar, new ComandoRabbit("Realiza a atualização dos dados completos da questão", typeof(ITratarQuestaoCompletaUseCase)));
 
+            // proficiencia
+            comandos.Add(RotasRabbit.AlunoProvaProficienciaAsync, new ComandoRabbit("Sincronização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaAsyncUseCase)));
+            comandos.Add(RotasRabbit.AlunoProvaProficienciaTratar, new ComandoRabbit("Realiza a atuaização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaUseCase)));
+
             comandos.Add(RotasRabbit.ExtrairResultadosProva, new ComandoRabbit("Realizar a extração de uma prova", typeof(ITratarProvaResultadoExtracaoUseCase)));
             comandos.Add(RotasRabbit.ExtrairResultadosProvaFiltro, new ComandoRabbit("Realizar a extração de uma prova por filtro", typeof(ITratarProvaResultadoExtracaoFiltroUseCase)));
             comandos.Add(RotasRabbit.ConsolidarProvaResultado, new ComandoRabbit("Inicia consolidação dos dados da prova para exportação", typeof(IConsolidarProvaResultadoUseCase)));
@@ -236,7 +240,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     channel.BasicReject(ea.DeliveryTag, false);
                     SentrySdk.AddBreadcrumb($"Erros: {ex.Message}", null, null, null, BreadcrumbLevel.Error);
                     SentrySdk.CaptureException(ex);
-
                 }
             }
             else

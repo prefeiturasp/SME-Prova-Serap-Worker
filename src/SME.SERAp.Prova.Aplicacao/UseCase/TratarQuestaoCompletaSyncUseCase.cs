@@ -1,7 +1,5 @@
 ﻿using MediatR;
-using MessagePack;
 using SME.SERAp.Prova.Dados;
-using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var questoesAtualizadas = await repositorioQuestao.ObterQuestoesAtualizadas();
-            if (questoesAtualizadas.Any())
+            if (questoesAtualizadas != null && questoesAtualizadas.Any())
             {
                 foreach(var questaoAtualizada in questoesAtualizadas)
                 {

@@ -8,9 +8,9 @@ namespace SME.SERAp.Prova.Dominio
         {
             Inclusao = DateTime.Now;
         }
-        public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB, 
-            int totalCadernos, Modalidade modalidade, string disciplina, bool ocultarProva, bool aderirTodos, bool multidisciplinar, int tipoProvaId, bool formatoTai, 
-             int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, bool permiteAvancarSemResponderTai = false, bool permiteVoltarItemAnteriorTai = false)
+        public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB,
+            int totalCadernos, Modalidade modalidade, long? disciplinaId, string disciplina, bool ocultarProva, bool aderirTodos, bool multidisciplinar, int tipoProvaId, bool formatoTai,
+            int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, bool permiteAvancarSemResponderTai = false, bool permiteVoltarItemAnteriorTai = false)
         {
             Id = id;
             Descricao = descricao;
@@ -25,6 +25,7 @@ namespace SME.SERAp.Prova.Dominio
             PossuiBIB = possuiBIB;
             TotalCadernos = totalCadernos;
             Modalidade = modalidade;
+            DisciplinaId = disciplinaId;
             Disciplina = disciplina;
             OcultarProva = ocultarProva;
             AderirTodos = aderirTodos;
@@ -45,6 +46,7 @@ namespace SME.SERAp.Prova.Dominio
         public DateTime Inclusao { get; set; }
         public int TotalItens { get; set; }
         public int TempoExecucao { get; set; }
+        public long? DisciplinaId { get; set; }
         public string Disciplina { get; set; }
         public long LegadoId { get; set; }
         public string Senha { get; set; }

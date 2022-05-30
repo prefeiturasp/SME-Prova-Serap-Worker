@@ -17,6 +17,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.Proficiencia).ToColumn("proficiencia");
             Map(c => c.Tipo).ToColumn("tipo");
             Map(c => c.Origem).ToColumn("origem");
+            Map(c => c.UltimaAtualizacao).ToColumn("ultima_atualizacao");
         }
     }
 }

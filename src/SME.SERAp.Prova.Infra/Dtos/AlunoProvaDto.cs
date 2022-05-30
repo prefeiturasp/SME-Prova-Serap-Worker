@@ -1,4 +1,6 @@
-﻿namespace SME.SERAp.Prova.Infra
+﻿using System;
+
+namespace SME.SERAp.Prova.Infra
 {
     public class AlunoProvaDto : DtoBase
     {
@@ -7,5 +9,6 @@
         public long ProvaId { get; set; }
         public long ProvaLegadoId { get; set; }
         public long? DisciplinaId { get; set; }
+        public DateTime UltimaAtualizacao { get; set; }
     }
 }

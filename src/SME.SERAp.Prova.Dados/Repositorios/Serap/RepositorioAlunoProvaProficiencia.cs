@@ -72,7 +72,7 @@ namespace SME.SERAp.Prova.Dados
                 var query = @"select proficiencia  
                               from aluno_prova_proficiencia app
                               left join prova p on p.id = app.prova_id 
-                              where app.tipo = @tipo and app.aluno_id = @alunoId ";
+                              where app.tipo = @tipo and app.aluno_id = @alunoId and app.proficiencia > 0 ";
 
                 if (disciplinaId.HasValue && disciplinaId.Value > 0)
                     query += " and app.disciplina_id = @disciplinaId";

@@ -143,6 +143,9 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<ITratarQuestaoCompletaSyncUseCase, TratarQuestaoCompletaSyncUseCase>();
             services.AddScoped<ITratarQuestaoCompletaUseCase, TratarQuestaoCompletaUseCase>();
+
+            services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasUseCase>();
+
         }
     }
 }

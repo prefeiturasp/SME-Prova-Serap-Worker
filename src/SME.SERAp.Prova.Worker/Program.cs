@@ -80,6 +80,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             var redisOptions = new RedisOptions();
             hostContext.Configuration.GetSection("RedisOptions").Bind(redisOptions, c => c.BindNonPublicProperties = true);
+
             var redisConfigurationOptions = new ConfigurationOptions()
             {
                 Proxy = redisOptions.Proxy,

@@ -86,6 +86,44 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<TurmaSgpDto> ObterTurmaSgpPorCodigoAsync(string codigoTurma)
+        {
+            using var conn = ObterConexaoSgp();
+            try
+            {
+                var query = @"select t.ano, 
+                                     t.ano_letivo as anoLetivo,
+                                     t.turma_id as Codigo,
+                                     t.tipo_turma as tipoturma,
+                                     t.modalidade_codigo as modalidadeCodigo,
+                                     t.nome as nomeTurma,
+                                     t.tipo_turno as tipoturno,
+                                     t.semestre as semestre,
+                                     t.etapa_eja as etapaEja,
+                                     t.serie_ensino as serieEnsino,
+                                     u.ue_id as ueCodigo
+                                from turma t
+                               inner join ue u on t.ue_id = u.id
+                               inner join dre d on u.dre_id  = d.id
+                               where t.tipo_turma = 1
+                                 and t.modalidade_codigo in (3,4,5,6)
+                                 and t.turma_id = @codigoTurma;";
+
+                var parametros = new
+                {
+                    codigoTurma
+                };
+
+                return await conn.QueryFirstOrDefaultAsync<TurmaSgpDto>(query, parametros);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<IEnumerable<TurmaSgpDto>> ObterTurmasSgpPorDreCodigoEAnoLetivoAsync(string dreCodigo, long anoLetivo, bool historica)
         {
             using var conn = ObterConexaoSgp();
@@ -101,7 +139,8 @@ namespace SME.SERAp.Prova.Dados
                                      t.tipo_turno as tipoturno,
                                      t.semestre as semestre,
                                      t.etapa_eja as etapaEja,
-                                     t.serie_ensino as serieEnsino
+                                     t.serie_ensino as serieEnsino,
+                                     t.ue_id UeId
                                 from turma t
                                inner join ue u on t.ue_id = u.id
                                inner join dre d on u.dre_id  = d.id
@@ -324,7 +363,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
+                var query = @"select t.id, t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
                                 from turma t
                                 inner join ue on t.ue_id = ue.id
                                 where t.ano_letivo = @anoLetivo

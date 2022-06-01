@@ -63,6 +63,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
 
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new DreParaSincronizacaoInstitucionalDto(dre.Id, dre.DreCodigo)));
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, dre));
 
             return true;
         }

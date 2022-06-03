@@ -11,6 +11,7 @@
         public string NomeTurma { get; set; }
         public int TipoTurno { get; set; }        
         public long UeId { get; set; }
+        public string UeCodigo { get; set; }
         public int Semestre { get; set; }
         public int EtapaEja { get; set; }
         public string SerieEnsino { get; set; }

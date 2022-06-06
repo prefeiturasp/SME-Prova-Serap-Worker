@@ -1,4 +1,6 @@
-﻿using RabbitMQ.Client;
+﻿using Polly;
+using Polly.Registry;
+using RabbitMQ.Client;
 using SME.SERAp.Prova.Infra;
 using System;
 using System.Collections.Generic;
@@ -8,21 +10,20 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class RabbitDeadletterSerapTratarUseCase : IRabbitDeadletterSerapTratarUseCase
     {
-
-
         private readonly IConnection connectionRabbit;
+        private readonly IAsyncPolicy policy;
 
-        public RabbitDeadletterSerapTratarUseCase(IConnection connectionRabbit)
+        public RabbitDeadletterSerapTratarUseCase(IConnection connectionRabbit, IReadOnlyPolicyRegistry<string> registry)
         {
-
             this.connectionRabbit = connectionRabbit ?? throw new ArgumentNullException(nameof(connectionRabbit));
+            this.policy = registry != null ? registry.Get<IAsyncPolicy>(PoliticaPolly.PublicaFila) : throw new ArgumentNullException(nameof(registry));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var fila = mensagemRabbit.Mensagem.ToString();
 
-            await TratarMensagens(fila);
+            await policy.ExecuteAsync(() => TratarMensagens(fila));
 
             return await Task.FromResult(true);
         }
@@ -40,40 +41,27 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     if (mensagemParaEnviar == null)
                         break;
+
+                    mensagemParaEnviar.BasicProperties.Headers.TryGetValue("x-retry", out object qntMensagem);
+                    var qntAtual = qntMensagem != null ? (int)qntMensagem : 0;
+
+                    if (qntAtual == 2)
+                    {
+                        await Task.Run(() => canal.BasicPublish(ExchangeRabbit.SerapEstudanteDeadLetter, $"{fila}.deadletter.final", mensagemParaEnviar.BasicProperties, mensagemParaEnviar.Body.ToArray()));
+                    }
                     else
                     {
-                        var qntAtual = 0;
-
-                        mensagemParaEnviar.BasicProperties.Headers.TryGetValue("x-retry", out object qntMensagem);
-                        
+                        qntAtual += 1;
                         IBasicProperties basicProperties = canal.CreateBasicProperties();
                         basicProperties.Persistent = true;
 
-                        if (qntMensagem != null)
-                        {
-                            qntAtual = (int)qntMensagem;
-                        }
+                        basicProperties.Headers = new Dictionary<string, object>();
+                        basicProperties.Headers.Add("x-retry", qntAtual);
 
-                        if (qntAtual == 2)
-                        {
-                            await Task.Run(() => canal.BasicPublish(ExchangeRabbit.SerapEstudanteDeadLetter, $"{fila}.deadletter.final", mensagemParaEnviar.BasicProperties, mensagemParaEnviar.Body.ToArray()));
-                        }
-                        else
-                        {
-                            qntAtual += 1;
-
-                            basicProperties.Headers = new Dictionary<string, object>();
-                            basicProperties.Headers.Add("x-retry", qntAtual);                            
-
-                            await Task.Run(() => canal.BasicPublish(ExchangeRabbit.SerapEstudante, fila, basicProperties, mensagemParaEnviar.Body.ToArray()));
-
-                        }
-
-
+                        await Task.Run(() => canal.BasicPublish(ExchangeRabbit.SerapEstudante, fila, basicProperties, mensagemParaEnviar.Body.ToArray()));
                     }
                 }
             }
-
         }
     }
 }

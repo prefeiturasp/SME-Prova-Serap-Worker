@@ -13,6 +13,7 @@ namespace SME.SERAp.Prova.Infra
         }
         public long Id { get; set; }
         public string Descricao { get; set; }
+        public long? DisciplinaId { get; set; }
         public string Disciplina { get; set; }
         public DateTime? InicioDownload { get; set; }
         public DateTime Inicio { get; set; }
@@ -31,6 +32,12 @@ namespace SME.SERAp.Prova.Infra
         public bool Multidisciplinar { get; set; }
         public int TipoProva { get; set; }
         public bool FormatoTai { get; set; }
+
+        public bool PermiteAvancarSemResponder { get; set; }
+
+        public bool PermiteVoltarAoItemAnterior { get; set; }
+
+        public int? QtdItensSincronizacaoRespostas { get; set; }
 
         public void AddAno(string ano)
         {

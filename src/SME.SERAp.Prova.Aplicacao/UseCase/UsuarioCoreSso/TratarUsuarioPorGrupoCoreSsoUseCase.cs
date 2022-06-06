@@ -13,24 +13,15 @@ namespace SME.SERAp.Prova.Aplicacao
         public TratarUsuarioPorGrupoCoreSsoUseCase(IMediator mediator) : base(mediator){}
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
-        {            
-            try
+        {
+            var grupo = mensagemRabbit.ObterObjetoMensagem<GrupoSerapCoreSso>();
+            var usuariosGrupo = await mediator.Send(new ObterUsuariosPorGrupoCoreSsoQuery(grupo.IdCoreSso));
+            foreach (UsuarioCoreSsoDto usuario in usuariosGrupo)
             {
-                var grupo = mensagemRabbit.ObterObjetoMensagem<GrupoSerapCoreSso>();
-                var usuariosGrupo = await mediator.Send(new ObterUsuariosPorGrupoCoreSsoQuery(grupo.IdCoreSso));
-                foreach(UsuarioCoreSsoDto usuario in usuariosGrupo)
-                {
-                    var usuarioMsg = new UsuarioGrupoDto(grupo.Id, usuario);
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioCoreSsoTratar, usuarioMsg));
-                }
-                return true;
+                var usuarioMsg = new UsuarioGrupoDto(grupo.Id, usuario);
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioCoreSsoTratar, usuarioMsg));
             }
-            catch(Exception ex)
-            {
-                SentrySdk.CaptureMessage($"Tratar usuários do grupo. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
-                return false;
-            }
+            return true;
         }
     }
 }

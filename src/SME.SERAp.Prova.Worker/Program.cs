@@ -28,7 +28,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     services.AddHostedService<WorkerRabbit>();
 
                     ConfigEnvoiromentVariables(hostContext, services);
-
                 });
 
         private static void ConfigEnvoiromentVariables(HostBuilderContext hostContext, IServiceCollection services)
@@ -81,6 +80,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             var redisOptions = new RedisOptions();
             hostContext.Configuration.GetSection("RedisOptions").Bind(redisOptions, c => c.BindNonPublicProperties = true);
+
             var redisConfigurationOptions = new ConfigurationOptions()
             {
                 Proxy = redisOptions.Proxy,

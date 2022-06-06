@@ -1,10 +1,6 @@
-﻿using FluentValidation;
-using MediatR;
+﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.Dtos;
 using System;
-using System.Collections.Generic;
 
 namespace SME.SERAp.Prova.Aplicacao
 {

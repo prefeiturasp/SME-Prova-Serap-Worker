@@ -1,4 +1,4 @@
-﻿namespace SME.SERAp.Prova.Infra.Dtos
+﻿namespace SME.SERAp.Prova.Infra
 {
     public class TurmaSgpDto : DtoBase
     {
@@ -10,7 +10,11 @@
         public int ModalidadeCodigo { get; set; }
         public string NomeTurma { get; set; }
         public int TipoTurno { get; set; }        
-        public long UeId { get; set; }        
+        public long UeId { get; set; }
+        public string UeCodigo { get; set; }
+        public int Semestre { get; set; }
+        public int EtapaEja { get; set; }
+        public string SerieEnsino { get; set; }
 
         public bool DeveAtualizar(TurmaSgpDto turmaQuePodeAlterar)
         {
@@ -19,7 +23,10 @@
                    TipoTurma != turmaQuePodeAlterar.TipoTurma ||
                    ModalidadeCodigo != turmaQuePodeAlterar.ModalidadeCodigo ||
                    NomeTurma != turmaQuePodeAlterar.NomeTurma ||
-                   TipoTurno != turmaQuePodeAlterar.TipoTurno;     
+                   TipoTurno != turmaQuePodeAlterar.TipoTurno ||
+                   Semestre != turmaQuePodeAlterar.Semestre ||
+                   EtapaEja != turmaQuePodeAlterar.EtapaEja ||
+                   SerieEnsino != turmaQuePodeAlterar.SerieEnsino;     
         }
     }
 }

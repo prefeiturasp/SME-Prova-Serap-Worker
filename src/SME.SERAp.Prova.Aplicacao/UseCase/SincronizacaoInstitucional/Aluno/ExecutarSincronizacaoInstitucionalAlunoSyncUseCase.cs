@@ -3,7 +3,6 @@ using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -34,7 +33,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 var turmasDaDreCodigo = turmasDaDre.Select(a => long.Parse(a.Codigo)).Distinct().ToArray();
                 var turmasDaDreId = turmasDaDre.Select(a => a.Id).Distinct().ToArray();
-                
+
                 var alunosEol = await mediator.Send(new ObterAlunosEolPorTurmasCodigoQuery(turmasDaDreCodigo));
 
 
@@ -93,10 +92,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     var alunoAntigo = todasAlunosSerap.FirstOrDefault(a => a.RA == alunoQuePodeAlterar.CodigoAluno);
 
                     var turmaAntigaDoAluno = turmaSerapDtos.FirstOrDefault(a => a.Id == alunoAntigo.TurmaId);
-                    
+
                     if (turmaAntigaDoAluno == null)
                     {
-                        var turmaFix =  await mediator.Send(new ObterTurmaSerapPorIdQuery(alunoAntigo.TurmaId));
+                        var turmaFix = await mediator.Send(new ObterTurmaSerapPorIdQuery(alunoAntigo.TurmaId));
                         turmaAntigaDoAluno = new TurmaSgpDto() { Id = turmaFix.Id, Codigo = turmaFix.Codigo };
                     }
 
@@ -106,7 +105,7 @@ namespace SME.SERAp.Prova.Aplicacao
                                                 alunoAntigo.Situacao != alunoQuePodeAlterar.SituacaoAluno ||
                                                 long.Parse(turmaAntigaDoAluno.Codigo) != alunoQuePodeAlterar.TurmaCodigo ||
                                                 alunoAntigo.DataNascimento != alunoQuePodeAlterar.DataNascimento ||
-                                                alunoAntigo.NomeSocial != alunoQuePodeAlterar.NomeSocial || 
+                                                alunoAntigo.NomeSocial != alunoQuePodeAlterar.NomeSocial ||
                                                 alunoAntigo.Sexo != alunoQuePodeAlterar.Sexo))
                     {
 
@@ -117,14 +116,16 @@ namespace SME.SERAp.Prova.Aplicacao
                             var turmaNova = turmaSerapDtos.FirstOrDefault(a => a.Codigo == turmaCodigoParaBuscar);
                             if (turmaNova == null)
                             {
-                                var turmaParaAlunoNovo = await mediator.Send(new ObterTurmaPorCodigoQuery(turmaCodigoParaBuscar));
+                                var turmaParaAlunoNovo = await mediator.Send(new ObterTurmaPorCodigoUeQuery(turmaCodigoParaBuscar));
                                 if (turmaParaAlunoNovo == null)
                                     throw new NegocioException($"Turma não localizada para o aluno {alunoQuePodeAlterar.CodigoAluno}");
 
                                 turmaId = turmaParaAlunoNovo.Id;
                             }
-                                
-                            turmaId = turmaNova.Id;
+
+                            if (turmaNova != null)
+                                turmaId = turmaNova.Id;
+
                             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, new long[] { alunoQuePodeAlterar.CodigoAluno }));
                         }
 

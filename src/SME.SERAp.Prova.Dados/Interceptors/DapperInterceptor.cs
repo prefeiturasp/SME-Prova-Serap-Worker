@@ -412,7 +412,6 @@ namespace SME.SERAp.Prova.Dados
                 throw;
             }
         }
-
         public static int Execute(this IDbConnection cnn, CommandDefinition command)
         {
 
@@ -434,6 +433,29 @@ namespace SME.SERAp.Prova.Dados
             catch (Exception ex)
             {
                 insightsClient?.TrackDependency("PostgreSQL", "Execute", $"{command.CommandText} -> erro: {ex.Message}", inicioOperacao, timer.Elapsed, false);
+                throw;
+            }
+        }
+        public static async Task<int> ExecuteAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        {
+
+
+            var inicioOperacao = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+
+            try
+            {
+                var result = await SqlMapper.ExecuteAsync(cnn, sql, param, transaction, commandTimeout, commandType);
+
+                timer.Stop();
+
+                insightsClient?.TrackDependency("PostgreSQL", "Execute", sql, inicioOperacao, timer.Elapsed, true);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                insightsClient?.TrackDependency("PostgreSQL", "Execute", $"{sql} -> erro: {ex.Message}", inicioOperacao, timer.Elapsed, false);
                 throw;
             }
         }

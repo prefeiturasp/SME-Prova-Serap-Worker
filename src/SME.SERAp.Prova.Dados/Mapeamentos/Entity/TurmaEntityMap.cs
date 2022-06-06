@@ -47,7 +47,19 @@ namespace SME.SERAp.Prova.Dados
             builder.Property(c => c.DataAtualizacao)
                 .HasColumnType("timestamp")
                 .HasColumnName("data_atualizacao")
-                .IsRequired();      
+                .IsRequired();
+
+            builder.Property(c => c.Semestre)
+                .HasColumnName("semestre")
+                .IsRequired();
+
+            builder.Property(c => c.EtapaEja)
+                .HasColumnName("etapa_eja")
+                .IsRequired();
+
+            builder.Property(c => c.SerieEnsino)
+                .HasColumnName("serie_ensino")
+                .IsRequired();
         }
     }
 }

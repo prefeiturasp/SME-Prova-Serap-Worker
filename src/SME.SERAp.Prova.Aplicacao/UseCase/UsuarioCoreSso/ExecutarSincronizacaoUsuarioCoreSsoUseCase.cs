@@ -14,23 +14,14 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            try
+            var grupos = await mediator.Send(new ObterGruposSerapCoreSsoQuery());
+            foreach (GrupoSerapCoreSso grupo in grupos)
             {
-                var grupos = await mediator.Send(new ObterGruposSerapCoreSsoQuery());
-                foreach (GrupoSerapCoreSso grupo in grupos)
-                {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioPorGrupoCoreSsoTratar, grupo));
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoCoreSsoExcluirTratar, grupo));
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.GrupoAbrangenciaExcluir, grupo));
-                }
-                return true;
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioPorGrupoCoreSsoTratar, grupo));
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioGrupoCoreSsoExcluirTratar, grupo));
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.GrupoAbrangenciaExcluir, grupo));
             }
-            catch(Exception ex)
-            {
-                SentrySdk.CaptureMessage($"Sync usuários dos grupos.", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
-                return false;
-            }            
+            return true;
         }
     }
 }

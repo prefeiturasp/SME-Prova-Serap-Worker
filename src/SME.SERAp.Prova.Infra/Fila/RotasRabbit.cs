@@ -4,6 +4,7 @@
     {
         public const string ProvaSync = "serap.estudante.prova.legado.sync";       
         public const string ProvaTratar = "serap.estudante.prova.legado.tratar";
+        public const string ProvaAnoTratar = "serap.estudante.prova.ano.legado.tratar";
         public const string QuestaoSync = "serap.estudante.questao.legado.sync";       
         public const string QuestaoTratar = "serap.estudante.questao.legado.tratar";
         public const string QuestaoImagemIncorretaTratar = "serap.estudante.questoes.imagens.tratar";
@@ -25,6 +26,9 @@
         public const string TratarAdesaoProva = "serap.estudante.prova.adesao.tratar";
         public const string TratarTipoProvaDeficiencia = "serap.estudante.prova.tipo.prova.deficiencia.tratar";
         public const string TratarAlunoDeficiencia = "serap.estudante.aluno.deficiencia.tratar";
+        public const string DownloadProvaAlunoTratar = "serap.estudante.download.prova.aluno.tratar";
+        public const string AlunoProvaProficienciaAsync = "serap.estudante.aluno.prova.proficiencia.sync";
+        public const string AlunoProvaProficienciaTratar = "serap.estudante.aluno.prova.proficiencia.tratar";
 
         public const string IniciarProcessoFinalizarProvasAutomaticamente = "serap.estudante.prova.finalizar.automaticamente.iniciar";
         public const string FinalizarProvaAutomaticamente = "serap.estudante.prova.finalizar.automaticamente";
@@ -39,6 +43,7 @@
         public const string SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync = "serap.sincronizacao.institucional.turma.aluno.historico.sync";
         public const string SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar = "serap.sincronizacao.institucional.turma.aluno.historico.tratar";
         public const string SincronizaEstruturaInstitucionalAlunoTratar = "serap.sincronizacao.institucional.aluno.tratar";
+        public const string SincronizaEstruturaInstitucionalAtualizarUeTurma = "serap.sincronizacao.institucional.turma.atualizar.ue";
 
         public const string UsuarioCoreSsoSync = "serap.estudante.usuario.coresso.sync";
         public const string UsuarioPorGrupoCoreSsoTratar = "serap.estudante.usuario.grupo.coresso.tratar";
@@ -51,5 +56,9 @@
 
         public const string FilaDeadletterTratar = "serap.deadletter.tratar";        
         public const string FilaDeadletterSync = "serap.deadletter.sync";
+
+
+        public const string QuestaoCompletaSync = "serap.estudante.questao.completa.legado.sync";
+        public const string QuestaoCompletaTratar = "serap.estudante.questao.completa.legado.tratar";
     }
 }

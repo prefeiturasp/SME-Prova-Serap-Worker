@@ -57,7 +57,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> ExcluirPorId(long id)
         {
-            using var conn = ObterConexaoLeitura();
+            using var conn = ObterConexao();
             try
             {
                 StringBuilder query = new StringBuilder();

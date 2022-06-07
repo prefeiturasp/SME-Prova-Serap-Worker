@@ -37,7 +37,10 @@ namespace SME.SERAp.Prova.Dados
                 var query = @"select a.id as alunoId, a.ra as alunoRa, p.id as provaId, p.prova_legado_id as provaLegadoId, p.disciplina_id as disciplinaId, p.ultima_atualizacao as ultimaAtualizacao
                               from prova p
                               left join prova_ano_original pa on pa.prova_id = p.id 
-                              left join turma t on t.ano = pa.ano and t.modalidade_codigo = p.modalidade and t.ano_letivo::double precision = date_part('year'::text, p.inicio)
+                              left join turma t on (((pa.modalidade = 3 or pa.modalidade = 4) and pa.etapa_eja = t.etapa_eja) or (pa.modalidade <> 3 and pa.modalidade <> 4)) 
+  	                                 and t.ano = pa.ano 
+  	                                 and t.modalidade_codigo = pa.modalidade 
+  	                                 and t.ano_letivo::double precision = date_part('year'::text, p.inicio)  
                               join aluno a on a.turma_id = t.id
                               where (p.aderir_todos is null or p.aderir_todos)
 	                             and p.formato_tai = true

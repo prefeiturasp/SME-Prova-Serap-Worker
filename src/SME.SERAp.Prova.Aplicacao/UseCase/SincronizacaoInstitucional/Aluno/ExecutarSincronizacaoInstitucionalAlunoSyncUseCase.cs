@@ -118,8 +118,10 @@ namespace SME.SERAp.Prova.Aplicacao
                             {
                                 var turmaParaAlunoNovo = await mediator.Send(new ObterTurmaPorCodigoUeQuery(turmaCodigoParaBuscar));
                                 if (turmaParaAlunoNovo == null)
-                                    throw new NegocioException($"Turma não localizada para o aluno {alunoQuePodeAlterar.CodigoAluno}");
-
+                                {
+                                    SentrySdk.CaptureMessage($"Turma não localizada para o aluno {alunoQuePodeAlterar.CodigoAluno}");
+                                    continue;
+                                }
                                 turmaId = turmaParaAlunoNovo.Id;
                             }
 

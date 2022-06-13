@@ -63,19 +63,25 @@ namespace SME.SERAp.Prova.Aplicacao
             if (alunosNovasCodigos != null && alunosNovasCodigos.Any())
             {
                 var alunosNovosParaIncluir = todasAlunosEol.Where(a => alunosNovasCodigos.Contains(a.CodigoAluno)).ToList();
-
-                var alunosNovasParaIncluirNormalizada = alunosNovosParaIncluir.Select(a => new Aluno()
+                if (alunosNovosParaIncluir != null && alunosNovosParaIncluir.Any())
                 {
-                    Nome = a.Nome,
-                    RA = a.CodigoAluno,
-                    Situacao = a.SituacaoAluno,
-                    NomeSocial = a.NomeSocial,
-                    Sexo = a.Sexo,
-                    DataNascimento = a.DataNascimento,
-                    TurmaId = turmaSerapDtos.FirstOrDefault(b => b.Codigo == a.TurmaCodigo.ToString()).Id
-                }).ToList();
+                    var alunosNovosParaIncluirNormalizada = alunosNovosParaIncluir.Select(a => new Aluno()
+                    {
+                        Nome = a.Nome,
+                        RA = a.CodigoAluno,
+                        Situacao = a.SituacaoAluno,
+                        NomeSocial = a.NomeSocial,
+                        Sexo = a.Sexo,
+                        DataNascimento = a.DataNascimento,
+                        TurmaId = turmaSerapDtos.Any(b => b.Codigo == a.TurmaCodigo.ToString()) ? turmaSerapDtos.FirstOrDefault(b => b.Codigo == a.TurmaCodigo.ToString()).Id : 0
+                    }).ToList();
 
-                await mediator.Send(new InserirAlunosCommand(alunosNovasParaIncluirNormalizada));
+                    var alunosSemturma = alunosNovosParaIncluirNormalizada.Where(a => a.TurmaId == 0);
+                    if (alunosSemturma.Any())
+                        SentrySdk.CaptureMessage($"Turma não localizada para os alunos: {string.Join(",", alunosSemturma.Select(a => a.RA.ToString()))}");
+
+                    await mediator.Send(new InserirAlunosCommand(alunosNovosParaIncluirNormalizada.Where(a => a.TurmaId > 0)));
+                }
             }
         }
         private async Task TratarAlteracao(IEnumerable<AlunoEolDto> todasAlunosEol, List<long> todasAlunosEolCodigo, IEnumerable<Aluno> todasAlunosSerap, List<long> todasAlunosSerapCodigo, IEnumerable<TurmaSgpDto> turmaSerapDtos)

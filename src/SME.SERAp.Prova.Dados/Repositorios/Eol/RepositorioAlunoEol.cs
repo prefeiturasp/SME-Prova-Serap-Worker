@@ -93,14 +93,18 @@ namespace SME.SERAp.Prova.Dados
         public async Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo)
         {            
 
-            var query = $@"with mtr_norm as (
-								select ROW_NUMBER() OVER(PARTITION BY matr_cd_aluno,cd_turma_escola ORDER BY dt_situacao_aluno DESC) AS Linha,
-								matr_cd_aluno,matr_cd_matricula,cd_turma_escola,an_letivo,
-								dt_situacao_aluno
-								from matricula_norm 
-								where cd_turma_escola IN ({string.Join(',', turmasCodigo)})
-								)
-								SELECT 
+            var query = $@";with alunos as (
+							select distinct CodigoAluno,MAX(AnoLetivo) AnoLetivo
+							from alunos_matriculas_norm 
+							where CodigoTurma in ({string.Join(',', turmasCodigo)})
+							group by CodigoAluno),
+							mtr_norm as (
+							select ROW_NUMBER() OVER(PARTITION BY amn.CodigoAluno ORDER BY amn.DataSituacao DESC) AS Linha,
+							amn.CodigoAluno,amn.CodigoTurma,amn.AnoLetivo,amn.CodigoSituacaoMatricula,amn.DataSituacao
+							from alunos_matriculas_norm amn
+							inner join alunos a on a.CodigoAluno = amn.CodigoAluno
+							and amn.AnoLetivo = a.AnoLetivo)
+							SELECT 
 								aluno.cd_aluno CodigoAluno,
 								aluno.nm_aluno as Nome,
 								aluno.dt_nascimento_aluno as DataNascimento,
@@ -110,24 +114,21 @@ namespace SME.SERAp.Prova.Dados
 								turesc.cd_tipo_turno as TipoTurno,
 								turesc.cd_turma_escola as TurmaCodigo,
 								turesc.an_letivo as AnoLetivo,
-								matrTurma.cd_situacao_aluno as SituacaoAluno								
-								FROM
-									mtr_norm matricula
-								INNER JOIN v_aluno_cotic aluno ON
-									matricula.matr_cd_aluno = aluno.cd_aluno
-								INNER JOIN matricula_turma_escola matrTurma ON
-									matricula.matr_cd_matricula = matrTurma.cd_matricula
-								INNER JOIN turma_escola turesc ON
-									matrTurma.cd_turma_escola = turesc.cd_turma_escola
-								INNER JOIN escola e ON
-									turesc.cd_escola = e.cd_escola
-								INNER JOIN serie_turma_escola ste ON
-									ste.cd_turma_escola = turesc.cd_turma_escola
-								INNER JOIN serie_ensino se ON 
-									se.cd_serie_ensino = ste.cd_serie_ensino
-								WHERE
-									turesc.cd_turma_escola IN ({string.Join(',', turmasCodigo)})
-									and matricula.Linha = 1";
+								matricula.CodigoSituacaoMatricula as SituacaoAluno
+							FROM
+								mtr_norm matricula
+							INNER JOIN v_aluno_cotic aluno ON
+								matricula.CodigoAluno = aluno.cd_aluno
+							INNER JOIN turma_escola turesc ON
+								matricula.CodigoTurma = turesc.cd_turma_escola
+							INNER JOIN escola e ON
+								turesc.cd_escola = e.cd_escola
+							INNER JOIN serie_turma_escola ste ON
+								ste.cd_turma_escola = turesc.cd_turma_escola
+							INNER JOIN serie_ensino se ON 
+								se.cd_serie_ensino = ste.cd_serie_ensino
+							WHERE matricula.Linha = 1
+							order by aluno.nm_aluno";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
             return await conn.QueryAsync<AlunoEolDto>(query);

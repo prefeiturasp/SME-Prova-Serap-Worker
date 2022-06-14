@@ -103,7 +103,8 @@ namespace SME.SERAp.Prova.Dados
 							amn.CodigoAluno,amn.CodigoTurma,amn.AnoLetivo,amn.CodigoSituacaoMatricula,amn.DataSituacao
 							from alunos_matriculas_norm amn
 							inner join alunos a on a.CodigoAluno = amn.CodigoAluno
-							and amn.AnoLetivo = a.AnoLetivo)
+							and amn.AnoLetivo = a.AnoLetivo
+							where amn.CodigoSituacaoMatricula <> 14)
 							SELECT 
 								aluno.cd_aluno CodigoAluno,
 								aluno.nm_aluno as Nome,

@@ -1,6 +1,4 @@
 ﻿using MediatR;
-using Sentry;
-using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
@@ -11,37 +9,41 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ExecutarSincronizacaoInstitucionalAlunoSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalAlunoSyncUseCase
+    public class ExecutarSincronizacaoInstitucionalAlunoTratarUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalAlunoTratarUseCase
     {
-        public ExecutarSincronizacaoInstitucionalAlunoSyncUseCase(IMediator mediator) : base(mediator)
+        public ExecutarSincronizacaoInstitucionalAlunoTratarUseCase(IMediator mediator) : base(mediator)
         {
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var dre = mensagemRabbit.ObterObjetoMensagem<DreParaSincronizacaoInstitucionalDto>();
+            var turma = mensagemRabbit.ObterObjetoMensagem<TurmaSgpDto>();
 
-            if (dre == null)
-            {
-                var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
-                SentrySdk.CaptureMessage(mensagem);
-                throw new NegocioException(mensagem);
-            }
+            if (turma == null)
+                throw new NegocioException($"Turma não informada.");
 
-            var turmasDaDre = await mediator.Send(new ObterTurmasSerapPorDreCodigoQuery(dre.DreCodigo));
-            if (turmasDaDre != null && turmasDaDre.Any())
+            var alunosEol = await mediator.Send(new ObterAlunosEolPorTurmasCodigoQuery(new long[] { long.Parse(turma.Codigo) }));
+
+            if (alunosEol != null && alunosEol.Any())
             {
-                foreach (var turma in turmasDaDre)
-                {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, turma.Codigo));
-                }
+                var alunosEolAgrupadosParaTratarCodigos = alunosEol.Select(a => a.CodigoAluno).Distinct().ToList();
+                var alunosSerap = await mediator.Send(new ObterAlunosSerapPorCodigosQuery(alunosEolAgrupadosParaTratarCodigos.ToArray()));
+
+                List<long> alunosSerapCodigo = new List<long>();
+                if (alunosSerap != null && alunosSerap.Any())
+                    alunosSerapCodigo = alunosSerap.Select(a => a.RA).Distinct().ToList();
+
+                await TratarInclusao(alunosEol, alunosEolAgrupadosParaTratarCodigos, alunosSerapCodigo, turma);
+
+                await TratarAlteracao(alunosEol, alunosEolAgrupadosParaTratarCodigos, alunosSerap, alunosSerapCodigo, turma);
+
+                await PublicarSincronizacaoAlunoDeficiencia(alunosEolAgrupadosParaTratarCodigos);
             }
-            else throw new NegocioException($"Não foi possível localizar as turmas da Dre {dre.DreCodigo} para fazer sync dos alunos.");
 
             return true;
         }
 
-        private async Task TratarInclusao(IEnumerable<AlunoEolDto> todasAlunosEol, List<long> todosAlunosEolCodigo, List<long> todosAlunosSerapCodigo, IEnumerable<TurmaSgpDto> turmaSerapDtos)
+        private async Task TratarInclusao(IEnumerable<AlunoEolDto> todasAlunosEol, List<long> todosAlunosEolCodigo, List<long> todosAlunosSerapCodigo, TurmaSgpDto turma)
         {
             var alunosNovasCodigos = todosAlunosEolCodigo.Where(a => !todosAlunosSerapCodigo.Contains(a)).ToList();
 
@@ -58,18 +60,15 @@ namespace SME.SERAp.Prova.Aplicacao
                         NomeSocial = a.NomeSocial,
                         Sexo = a.Sexo,
                         DataNascimento = a.DataNascimento,
-                        TurmaId = turmaSerapDtos.Any(b => b.Codigo == a.TurmaCodigo.ToString()) ? turmaSerapDtos.FirstOrDefault(b => b.Codigo == a.TurmaCodigo.ToString()).Id : 0
+                        TurmaId = turma.Id
                     }).ToList();
 
-                    var alunosSemturma = alunosNovosParaIncluirNormalizada.Where(a => a.TurmaId == 0);
-                    if (alunosSemturma.Any())
-                        SentrySdk.CaptureMessage($"Turma não localizada para os alunos: {string.Join(",", alunosSemturma.Select(a => a.RA.ToString()))}");
-
-                    await mediator.Send(new InserirAlunosCommand(alunosNovosParaIncluirNormalizada.Where(a => a.TurmaId > 0)));
+                    await mediator.Send(new InserirAlunosCommand(alunosNovosParaIncluirNormalizada));
                 }
             }
         }
-        private async Task TratarAlteracao(IEnumerable<AlunoEolDto> todasAlunosEol, List<long> todasAlunosEolCodigo, IEnumerable<Aluno> todasAlunosSerap, List<long> todasAlunosSerapCodigo, IEnumerable<TurmaSgpDto> turmaSerapDtos)
+
+        private async Task TratarAlteracao(IEnumerable<AlunoEolDto> todasAlunosEol, List<long> todasAlunosEolCodigo, IEnumerable<Aluno> todasAlunosSerap, List<long> todasAlunosSerapCodigo, TurmaSgpDto turma)
         {
             var alunosParaAlterarCodigos = todasAlunosEolCodigo.Where(a => todasAlunosSerapCodigo.Contains(a)).ToList();
 
@@ -82,13 +81,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     var alunoAntigo = todasAlunosSerap.FirstOrDefault(a => a.RA == alunoQuePodeAlterar.CodigoAluno);
 
-                    var turmaAntigaDoAluno = turmaSerapDtos.FirstOrDefault(a => a.Id == alunoAntigo.TurmaId);
-
-                    if (turmaAntigaDoAluno == null)
-                    {
-                        var turmaFix = await mediator.Send(new ObterTurmaSerapPorIdQuery(alunoAntigo.TurmaId));
-                        turmaAntigaDoAluno = new TurmaSgpDto() { Id = turmaFix.Id, Codigo = turmaFix.Codigo };
-                    }
+                    var turmaFix = await mediator.Send(new ObterTurmaSerapPorIdQuery(alunoAntigo.TurmaId));
+                    var turmaAntigaDoAluno = new TurmaSgpDto() { Id = turmaFix.Id, Codigo = turmaFix.Codigo };
 
 
                     //TODO: Normalizar com uma entidade AlunoEol
@@ -104,20 +98,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         if (long.Parse(turmaAntigaDoAluno.Codigo) != alunoQuePodeAlterar.TurmaCodigo)
                         {
                             var turmaCodigoParaBuscar = alunoQuePodeAlterar.TurmaCodigo.ToString();
-                            var turmaNova = turmaSerapDtos.FirstOrDefault(a => a.Codigo == turmaCodigoParaBuscar);
-                            if (turmaNova == null)
-                            {
-                                var turmaParaAlunoNovo = await mediator.Send(new ObterTurmaPorCodigoUeQuery(turmaCodigoParaBuscar));
-                                if (turmaParaAlunoNovo == null)
-                                {
-                                    SentrySdk.CaptureMessage($"Turma não localizada para o aluno {alunoQuePodeAlterar.CodigoAluno}");
-                                    continue;
-                                }
-                                turmaId = turmaParaAlunoNovo.Id;
-                            }
-
-                            if (turmaNova != null)
-                                turmaId = turmaNova.Id;
+                            turmaId = turma.Id;
 
                             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, new long[] { alunoQuePodeAlterar.CodigoAluno }));
                         }
@@ -141,6 +122,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     await mediator.Send(new AlterarAlunosCommand(listaParaAlterar));
             }
         }
+
         private async Task PublicarSincronizacaoAlunoDeficiencia(List<long> alunosRa)
         {
             foreach (long alunoRa in alunosRa)

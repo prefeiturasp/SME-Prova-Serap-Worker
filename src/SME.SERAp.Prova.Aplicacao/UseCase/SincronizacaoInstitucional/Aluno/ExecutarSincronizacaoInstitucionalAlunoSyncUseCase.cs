@@ -33,7 +33,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 foreach (var turma in turmasDaDre)
                 {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, turma.Codigo));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, turma));
                 }
             }
             else throw new NegocioException($"Não foi possível localizar as turmas da Dre {dre.DreCodigo} para fazer sync dos alunos.");

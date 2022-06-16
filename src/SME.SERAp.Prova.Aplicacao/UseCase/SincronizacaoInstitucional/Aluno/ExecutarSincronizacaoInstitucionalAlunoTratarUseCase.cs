@@ -37,6 +37,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 await TratarAlteracao(alunosEol, alunosEolAgrupadosParaTratarCodigos, alunosSerap, alunosSerapCodigo, turma);
 
+                await TratarInativo(alunosEol, turma);
+
                 await PublicarSincronizacaoAlunoDeficiencia(alunosEolAgrupadosParaTratarCodigos);
             }
 
@@ -120,6 +122,20 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (listaParaAlterar.Any())
                     await mediator.Send(new AlterarAlunosCommand(listaParaAlterar));
+            }
+        }
+
+        private async Task TratarInativo(IEnumerable<AlunoEolDto> alunosEol, TurmaSgpDto turma)
+        {
+            var alunosTurma = await mediator.Send(new ObterAlunosPorTurmaIdQuery(turma.Id));
+            if (alunosTurma != null && alunosTurma.Any())
+            {
+                var alunosInativos = alunosTurma.Where(t => !alunosEol.Any(x => x.CodigoAluno == t.RA)).ToList();
+                if (alunosInativos.Any())
+                {
+                    alunosInativos.ForEach(t => t.Situacao = 99);
+                    await mediator.Send(new AlterarAlunosCommand(alunosInativos));
+                }
             }
         }
 

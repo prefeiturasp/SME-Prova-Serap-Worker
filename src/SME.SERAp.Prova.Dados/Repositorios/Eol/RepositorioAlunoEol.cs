@@ -85,7 +85,7 @@ namespace SME.SERAp.Prova.Dados
 							INNER JOIN serie_ensino se ON 
 								se.cd_serie_ensino = ste.cd_serie_ensino
 							WHERE matricula.Linha = 1
-							and CodigoSituacaoMatricula <> 14
+							and CodigoSituacaoMatricula in (1, 5, 6, 10, 13)
 							order by aluno.nm_aluno";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);

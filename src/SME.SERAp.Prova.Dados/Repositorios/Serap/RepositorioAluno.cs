@@ -91,7 +91,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select id, nome, turma_id as TurmaId, ra from aluno where turma_id = @turmaId";
+                var query = @"select id, nome, ra, turma_id as turmaId, situacao, data_atualizacao as DataAtualizacao, nome_social as nomeSocial, data_nascimento as dataNascimento, sexo from aluno where turma_id = @turmaId";
 
                 return await conn.QueryAsync<Aluno>(query, new { turmaId });
             }

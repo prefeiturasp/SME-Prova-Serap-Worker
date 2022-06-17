@@ -1,5 +1,4 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
@@ -16,49 +15,7 @@ namespace SME.SERAp.Prova.Dados
         {
             this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
         }
-        /*
-        public async Task<ObterAlunoAtivoEolRetornoDto> ObterAlunoAtivoAsync(long alunoRA)
-        {
-
-            var query = @"SELECT top 1
-	                            aluno.cd_aluno CodigoAluno,
-	                            se.sg_resumida_serie as Ano,
-                                turesc.cd_tipo_turno as TipoTurno
-                            FROM
-	                            v_matricula_cotic matricula
-                            INNER JOIN v_aluno_cotic aluno ON
-	                            matricula.cd_aluno = aluno.cd_aluno
-                            INNER JOIN matricula_turma_escola matrTurma ON
-	                            matricula.cd_matricula = matrTurma.cd_matricula
-                            INNER JOIN turma_escola turesc ON
-	                            matrTurma.cd_turma_escola = turesc.cd_turma_escola
-                            INNER JOIN escola e ON
-	                            turesc.cd_escola = e.cd_escola
-                            INNER JOIN serie_turma_escola ste ON
-								ste.cd_turma_escola = turesc.cd_turma_escola
-							INNER JOIN serie_ensino se ON 
-								se.cd_serie_ensino = ste.cd_serie_ensino
-                            WHERE
-	                            aluno.cd_aluno = @alunoRA
-	                            AND matrTurma.cd_situacao_aluno IN (1, 6, 10, 13)
-	                            AND e.tp_escola IN (1, 3, 4, 16)";
-
-            using var conn = new SqlConnection(connectionStringOptions.Eol);
-            return await conn.QueryFirstOrDefaultAsync<ObterAlunoAtivoEolRetornoDto>(query, new { alunoRA });
-
-        }
-        public async Task<AlunoEol> ObterAlunoDetalhePorRa(long alunoRA)
-        {
-
-            var query = @"select al.nm_aluno as nome, al.nm_social_aluno as nomeSocial 
-                            from aluno al 
-			                    where al.cd_aluno = @alunoRA";
-
-            using var conn = new SqlConnection(connectionStringOptions.Eol);
-            return await conn.QueryFirstOrDefaultAsync<AlunoEol>(query, new { alunoRA });
-
-        }*/
-
+        
         public async Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmaCodigoAsync(long turmaCodigo)
         {
             var query = @"SELECT 
@@ -90,21 +47,20 @@ namespace SME.SERAp.Prova.Dados
             using var conn = new SqlConnection(connectionStringOptions.Eol);
             return await conn.QueryAsync<AlunoEolDto>(query, new { turmaCodigo });
         }
+
         public async Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo)
         {            
+            var query = $@";with mtr_norm as (
+								select ROW_NUMBER() OVER(PARTITION BY amn.CodigoMatricula ORDER BY amn.DataSituacao DESC) AS Linha,
+									amn.CodigoAluno,
+									amn.CodigoTurma,
+									amn.AnoLetivo,
+									amn.CodigoSituacaoMatricula,
+									amn.DataSituacao
+								from alunos_matriculas_norm amn
+								where amn.CodigoTurma in ({string.Join(',', turmasCodigo)})
+							)
 
-            var query = $@";with alunos as (
-							select distinct CodigoAluno,MAX(AnoLetivo) AnoLetivo
-							from alunos_matriculas_norm 
-							where CodigoTurma in ({string.Join(',', turmasCodigo)})
-							group by CodigoAluno),
-							mtr_norm as (
-							select ROW_NUMBER() OVER(PARTITION BY amn.CodigoAluno ORDER BY amn.DataSituacao DESC) AS Linha,
-							amn.CodigoAluno,amn.CodigoTurma,amn.AnoLetivo,amn.CodigoSituacaoMatricula,amn.DataSituacao
-							from alunos_matriculas_norm amn
-							inner join alunos a on a.CodigoAluno = amn.CodigoAluno
-							and amn.AnoLetivo = a.AnoLetivo
-							where amn.CodigoSituacaoMatricula <> 14)
 							SELECT 
 								aluno.cd_aluno CodigoAluno,
 								aluno.nm_aluno as Nome,
@@ -117,7 +73,7 @@ namespace SME.SERAp.Prova.Dados
 								turesc.an_letivo as AnoLetivo,
 								matricula.CodigoSituacaoMatricula as SituacaoAluno
 							FROM
-								mtr_norm matricula
+								mtr_norm matricula 
 							INNER JOIN v_aluno_cotic aluno ON
 								matricula.CodigoAluno = aluno.cd_aluno
 							INNER JOIN turma_escola turesc ON
@@ -129,6 +85,7 @@ namespace SME.SERAp.Prova.Dados
 							INNER JOIN serie_ensino se ON 
 								se.cd_serie_ensino = ste.cd_serie_ensino
 							WHERE matricula.Linha = 1
+							and CodigoSituacaoMatricula in (1, 5, 6, 10, 13)
 							order by aluno.nm_aluno";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);

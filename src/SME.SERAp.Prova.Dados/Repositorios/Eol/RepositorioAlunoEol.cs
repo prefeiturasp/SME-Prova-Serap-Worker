@@ -61,7 +61,7 @@ namespace SME.SERAp.Prova.Dados
 								where amn.CodigoTurma in ({string.Join(',', turmasCodigo)})
 							)
 
-							SELECT 
+							SELECT distinct
 								aluno.cd_aluno CodigoAluno,
 								aluno.nm_aluno as Nome,
 								aluno.dt_nascimento_aluno as DataNascimento,
@@ -85,7 +85,8 @@ namespace SME.SERAp.Prova.Dados
 							INNER JOIN serie_ensino se ON 
 								se.cd_serie_ensino = ste.cd_serie_ensino
 							WHERE matricula.Linha = 1
-							and CodigoSituacaoMatricula in (1, 5, 6, 10, 13)
+							and turesc.cd_tipo_turma = 1
+							and CodigoSituacaoMatricula in (1, 6, 10, 13)
 							order by aluno.nm_aluno";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);

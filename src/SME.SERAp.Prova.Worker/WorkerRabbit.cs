@@ -182,6 +182,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.FilaDeadletterSync, new ComandoRabbit("Sync de fila Deadletter", typeof(IRabbitDeadletterSerapSyncUseCase)));
 
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));
+            comandos.Add(RotasRabbit.ProvaTratarItensAmostraTai, new ComandoRabbit("Tratamento itens amostra TAI", typeof(ITratarItensAmostraProvaTaiUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

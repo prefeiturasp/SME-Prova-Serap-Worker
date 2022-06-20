@@ -12,6 +12,9 @@ namespace SME.SERAp.Prova.Infra
         public long AssuntoId { get; set; }
         public string AssuntoNome { get; set; }
         public long SubAssuntoId { get; set; }
-        public string SubAssuntoNome { get; set; }
+        public string SubAssuntoNome { get; set; }        
+        public decimal Discriminacao { get; set; }
+        public decimal ProporcaoAcertos { get; set; }
+        public decimal AcertoCasual { get; set; }
     }
 }

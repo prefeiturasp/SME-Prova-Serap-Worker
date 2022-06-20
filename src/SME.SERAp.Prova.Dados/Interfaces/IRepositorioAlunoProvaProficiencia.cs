@@ -10,5 +10,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<AlunoProvaDto>> ObterAlunosSemProficienciaAsync();
         Task<bool> ExisteAsync(long alunoId, long provaId);
         Task<decimal> ObterUltimaProficienciaAlunoPorDisciplinaIdAsync(long alunoId, long? disciplinaId);
+        Task<decimal> ObterProficienciaInicialAlunoPorProvaIdAsync(long provaId, long alunoId);
     }
 }

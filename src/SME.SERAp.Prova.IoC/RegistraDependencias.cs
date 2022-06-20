@@ -148,7 +148,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaAsyncUseCase, TratarAlunoProvaProficienciaAsyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaUseCase, TratarAlunoProvaProficienciaUseCase>();
-            services.AddScoped<ITratarItensAmostraProvaTaiUseCase, TratarItensAmostraProvaTaiUseCase>();
+            services.AddScoped<ITratarCadernosProvaTaiUseCase, TratarCadernosProvaTaiUseCase>();
+            services.AddScoped<ITratarCadernoAlunoProvaTaiUseCase, TratarCadernoAlunoProvaTaiUseCase>();
         }
     }
 }

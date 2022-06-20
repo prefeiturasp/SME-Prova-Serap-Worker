@@ -55,51 +55,52 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"
-              SELECT DISTINCT  
-	            t.Id,
-	            t.Description as descricao,
-                t.DownloadStartDate as InicioDownload,
-	            t.ApplicationStartDate as Inicio,
-	            t.ApplicationEndDate as Fim,
-	            case 
-	            	when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
-	            end TotalItens,
-	            t.NumberBlock as TotalCadernos,
-	            t.UpdateDate as UltimaAtualizacao,
-                ttime.Segundos AS TempoExecucao,
-                t.Password as Senha,
-                d.id as DisciplinaId,
-                d.Description as Disciplina,
-                t.Bib as PossuiBIB,
-	            tne.tne_id as Modalidade,
-	            tne.tne_nome as ModalidadeNome,
-                mt.Id ModeloProva,
-                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
-	              case 
-	            	when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
-	            end Ano,	           
-                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
-            FROM
-	            Test t 
-	            INNER JOIN TestCurriculumGrade tcg ON
-	            t.Id = tcg.Test_Id	
-            INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
-	            tcg.TypeCurriculumGradeId = tt.tcp_id
-            INNER JOIN TESTTIME ttime on
-                t.TestTime_Id = ttime.id
-            LEFT JOIN Discipline d ON
-	            t.Discipline_Id = d.Id 
-	        INNER JOIN TestType on
-	        	t.TestType_Id = TestType.id
-	       	INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
-	       		TestType.TypeLevelEducationId = tne.tne_id
-            INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
-            LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
-			  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
-            where 
-                exists(select top 1 1 from TestTypeCourse ttc where ttc.TestType_Id = t.TestType_Id)
-				and exists(select top 1 1 from SGP_TUR_TurmaTipoCurriculoPeriodo ttcp where ttcp.crp_ordem = tt.tcp_ordem and tt.tme_id = ttcp.tme_id) 
-	            and t.id = @id";
+              				    SELECT DISTINCT  
+										t.Id,
+										t.Description as descricao,
+										t.DownloadStartDate as InicioDownload,
+										t.ApplicationStartDate as Inicio,
+										t.ApplicationEndDate as Fim,
+										case 
+	            							when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
+										end TotalItens,
+										t.NumberBlock as TotalCadernos,
+										t.UpdateDate as UltimaAtualizacao,
+										ttime.Segundos AS TempoExecucao,
+										t.Password as Senha,
+										d.id as DisciplinaId,
+										d.Description as Disciplina,
+										t.Bib as PossuiBIB,
+										tne.tne_id as Modalidade,
+										tne.tne_nome as ModalidadeNome,
+										mt.Id ModeloProva,
+										case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
+										  case 
+	            							when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
+										end Ano,	           
+										case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
+									FROM
+										Test t 
+										INNER JOIN TestCurriculumGrade tcg ON
+										t.Id = tcg.Test_Id	
+									INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
+										tcg.TypeCurriculumGradeId = tt.tcp_id
+									INNER JOIN TESTTIME ttime on
+										t.TestTime_Id = ttime.id
+									LEFT JOIN Discipline d ON
+										t.Discipline_Id = d.Id 
+									INNER JOIN TestType on
+	        							t.TestType_Id = TestType.id
+	       							INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
+	       								TestType.TypeLevelEducationId = tne.tne_id
+									INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
+									LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
+									  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+									where 
+										exists(select top 1 1 from TestTypeCourse ttc where ttc.TestType_Id = t.TestType_Id)
+										and exists(select top 1 1 from SGP_TUR_TurmaTipoCurriculoPeriodo ttcp where ttcp.crp_ordem = tt.tcp_ordem and tt.tme_id = ttcp.tme_id)
+										and tcg.[State] = 1
+										and t.id = @id";
 
                 var lookup = new Dictionary<long, ProvaLegadoDetalhesIdDto>();
 
@@ -132,7 +133,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT DISTINCT
+                var query = @"SELECT DISTINCT
 									case 
 										when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
 									end Ano
@@ -140,43 +141,41 @@ namespace SME.SERAp.Prova.Dados
 									,curso.cur_codigo as CurCodigo
 									,tme.tme_id as TmeId
 									,tne.tne_id as TneId
-									FROM
+								FROM
 									Test t 
-									INNER JOIN TestCurriculumGrade tcg ON
-									t.Id = tcg.Test_Id	
-									INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
-									tcg.TypeCurriculumGradeId = tt.tcp_id
-									inner join SGP_ACA_CurriculoPeriodo cp on
-									tt.tcp_id = cp.tcp_id
-									inner join SGP_ACA_Curriculo c on 
-									cp.cur_id = c.cur_id and cp.crr_id = c.crr_id
-									inner join SGP_ACA_Curso curso on
-									curso.cur_id = c.cur_id
-									and curso.tme_id = tt.tme_id
-									INNER JOIN TESTTIME ttime on
-									t.TestTime_Id = ttime.id
-									INNER JOIN TestTypeCourse ttc ON
-									ttc.TestType_Id = t.TestType_Id
-									LEFT JOIN Discipline d ON
-									t.Discipline_Id = d.Id 
-									INNER JOIN TestType on
-									t.TestType_Id = TestType.id
-									INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
-									TestType.TypeLevelEducationId = tne.tne_id
-									and curso.tne_id = TestType.TypeLevelEducationId
-									and tne.tne_id = tt.tne_id and tne.tne_id = curso.tne_id
-									inner join SGP_ACA_TipoModalidadeEnsino tme on
-									tme.tme_id = tt.tme_id and tme.tme_id = curso.tme_id
-									INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp ON
-									ttcp.crp_ordem = tt.tcp_ordem
-									AND tt.tme_id = ttcp.tme_id
-									INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
-									LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
-									AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
-									where
+									INNER JOIN TestCurriculumGrade tcg ON t.Id = tcg.Test_Id	
+									INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON tcg.TypeCurriculumGradeId = tt.tcp_id
+									inner join SGP_ACA_CurriculoPeriodo cp ON tt.tcp_id = cp.tcp_id
+									inner join SGP_ACA_Curriculo c 
+										ON cp.cur_id = c.cur_id 
+									   and cp.crr_id = c.crr_id
+									inner join SGP_ACA_Curso curso 
+										ON curso.cur_id = c.cur_id
+									   and curso.tme_id = tt.tme_id
+									INNER JOIN TESTTIME ttime ON t.TestTime_Id = ttime.id
+									INNER JOIN TestTypeCourse ttc ON ttc.TestType_Id = t.TestType_Id
+									LEFT JOIN Discipline d ON t.Discipline_Id = d.Id 
+									INNER JOIN TestType ON t.TestType_Id = TestType.id
+									INNER JOIN SGP_ACA_TipoNivelEnsino tne 
+										ON TestType.TypeLevelEducationId = tne.tne_id
+									   and curso.tne_id = TestType.TypeLevelEducationId
+									   and tne.tne_id = tt.tne_id 
+									   and tne.tne_id = curso.tne_id
+									inner join SGP_ACA_TipoModalidadeEnsino tme 
+										ON tme.tme_id = tt.tme_id 
+									   and tme.tme_id = curso.tme_id
+									INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp 
+										ON ttcp.crp_ordem = tt.tcp_ordem
+									   AND tt.tme_id = ttcp.tme_id
+									INNER JOIN modeltest mt ON TestType.modeltest_id = mt.id
+									LEFT JOIN TestPermission tp 
+										ON tp.Test_Id = t.Id 
+									   AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+								WHERE
 									cp.crp_situacao = 1 and c.crr_situacao = 1 
 									and curso.cur_situacao = 1 and tme.tme_situacao = 1 
 									and tne.tne_situacao = 1
+									and tcg.[State] = 1
 									and t.id = @id";
 
                 return await conn.QueryAsync<ProvaAnoDetalheDto>(query, new { id }, commandTimeout: 50000);

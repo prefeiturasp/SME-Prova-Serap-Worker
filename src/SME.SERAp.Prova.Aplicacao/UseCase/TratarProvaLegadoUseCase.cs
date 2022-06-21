@@ -109,7 +109,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
             }
 
-            if (!provaLegado.FormatoTai)
+            if (provaLegado.FormatoTai)
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai, provaAtual.Id));
+            else
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
 
             await mediator.Send(new RemoverProvasCacheCommand());

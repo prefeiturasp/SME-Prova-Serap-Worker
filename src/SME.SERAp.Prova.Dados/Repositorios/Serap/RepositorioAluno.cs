@@ -133,5 +133,24 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<Aluno>> ObterAlunosAdesaoPorProvaId(long provaId)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select a.id, a.nome, a.turma_id as TurmaId, a.ra, a.Situacao 
+                                from prova_adesao pa
+                                inner join aluno a on pa.aluno_ra = a.ra
+                                where pa.prova_id = @provaId";
+
+                return await conn.QueryAsync<Aluno>(query, new { provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

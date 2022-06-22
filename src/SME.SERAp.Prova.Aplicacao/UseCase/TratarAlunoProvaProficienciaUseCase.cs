@@ -21,6 +21,12 @@ namespace SME.SERAp.Prova.Aplicacao
             var existeProficiencia = await mediator.Send(new VerificaAlunoProvaProficienciaExisteQuery(alunoProvaDto.AlunoId, alunoProvaDto.ProvaId));
             if (!existeProficiencia)
             {
+
+                var aluno = await mediator.Send(new ObterAlunoPorIdQuery(alunoProvaDto.AlunoId));
+                var turma = await mediator.Send(new ObterTurmaSerapPorIdQuery(aluno.TurmaId));
+                var ue = await mediator.Send(new ObterUePorIdQuery(turma.UeId));
+                var dre = await mediator.Send(new ObterDrePorIdQuery(ue.DreId));
+
                 var ultimaProficiencia = await mediator.Send(new ObterUltimaProficienciaAlunoPorDisciplinaIdQuery(alunoProvaDto.AlunoId, alunoProvaDto.DisciplinaId));
 
                 await mediator.Send(new IncluirAlunoProvaProficienciaCommand(new Dominio.AlunoProvaProficiencia()

@@ -16,17 +16,19 @@ namespace SME.SERAp.Prova.Dados
             this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
         }        
 
-        public async Task<decimal> ObterProficienciaAlunoPorAreaConhecimento(string alunoRa, long areaConhecimentoId)
+        public async Task<decimal> ObterProficienciaAluno(string alunoRa, string codigoAnoTurma, string codigoEscola, long areaConhecimentoId)
         {
             var query = $@"select top 1 Valor 
 							from ResultadoAluno 
 							where alu_matricula = @alunoRa
 								and AreaConhecimentoID = @areaConhecimentoId
+								and tur_codigo = @codigoAnoTurma
+								and esc_codigo = @codigoEscola
 								and Valor is not null
 						order by Edicao desc";
 
             using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
-            return await conn.QueryFirstOrDefaultAsync<decimal>(query, new { alunoRa, areaConhecimentoId });
+            return await conn.QueryFirstOrDefaultAsync<decimal>(query, new { alunoRa, codigoAnoTurma, codigoEscola, areaConhecimentoId });
         }
 
         public async Task<decimal> ObterMediaProficienciaEscolaAluno(string alunoRa, long areaConhecimentoId)

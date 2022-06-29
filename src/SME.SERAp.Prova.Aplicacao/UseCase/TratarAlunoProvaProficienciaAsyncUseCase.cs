@@ -22,7 +22,7 @@ namespace SME.SERAp.Prova.Aplicacao
             var alunosProva = await mediator.Send(new ObterAlunosSemProficienciaQuery(provaId));
             if (alunosProva.Any())
             {
-                foreach (var alunoProva in alunosProva)
+                foreach (var alunoProva in alunosProva.Where(a => a.DisciplinaId != null))
                 {
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaTratar, alunoProva));
                 }

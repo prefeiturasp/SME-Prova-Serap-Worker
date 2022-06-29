@@ -29,9 +29,9 @@ namespace SME.SERAp.Prova.Aplicacao
                     Ra = alunoProvaDto.AlunoRa,
                     ProvaId = alunoProvaDto.ProvaId,
                     DisciplinaId = alunoProvaDto.DisciplinaId.GetValueOrDefault() > 0 ? (long)alunoProvaDto.DisciplinaId.Value : (long?)null,
-                    Origem = Dominio.AlunoProvaProficienciaOrigem.TAI_estudante,
+                    Origem = ultimaProficiencia.origem,
                     Tipo = Dominio.AlunoProvaProficienciaTipo.Inicial,
-                    Proficiencia = ultimaProficiencia,
+                    Proficiencia = ultimaProficiencia.proficiencia,
                     UltimaAtualizacao = alunoProvaDto.UltimaAtualizacao
                 }));
             }

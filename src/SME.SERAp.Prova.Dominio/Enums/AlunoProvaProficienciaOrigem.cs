@@ -4,6 +4,7 @@
     {
         TAI_estudante, 
         PSP_estudante,
-        PSP_ano_escolar
+        PSP_ano_escolar,
+        PSP_Dre
     }
 }

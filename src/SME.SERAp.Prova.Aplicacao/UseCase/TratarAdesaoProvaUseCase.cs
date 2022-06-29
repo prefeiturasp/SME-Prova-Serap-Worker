@@ -65,10 +65,11 @@ namespace SME.SERAp.Prova.Aplicacao
                             }
                         }
                     }
+
+                    if (provaSerap.FormatoTai)
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaAsync, provaSerap.Id));
                 }
 
-                if (provaSerap.FormatoTai)
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaAsync, provaSerap.Id));
             }
             catch (Exception ex)
             {

@@ -102,7 +102,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<Aluno>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo) 
+        public async Task<IEnumerable<Aluno>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo)
         {
             using var conn = ObterConexaoLeitura();
             try
@@ -152,5 +152,34 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCaderno()
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select f.prova_id as ProvaId,
+                                     f.aluno_id as AlunoId,
+                                     f.aluno_situacao as Situacao
+                                from v_prova_turma_aluno f
+                               where f.formato_tai = true
+                                 and f.prova_id in(211, 210)
+                                 and f.turma_id = 33226
+                                 and not exists(select 1
+                                                  from caderno_aluno ca 
+                                                  where	ca.prova_id = f.prova_id 
+                                                    and ca.aluno_id = f.aluno_id)
+                                order by f.prova_id
+                                           limit 1";
+
+                return await conn.QueryAsync<ProvaAlunoTaiSemCadernoDto>(query);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }
+

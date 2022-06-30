@@ -20,6 +20,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
+
                 var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
                 var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(alunoProva.ProvaId));
                 if (provaAtual == null)
@@ -28,6 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var dadosDaAmostraTai = await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaAtual.LegadoId));
                 var itens = await mediator.Send(new ObterItensAmostraTaiQuery(dadosDaAmostraTai.MatrizId, dadosDaAmostraTai.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()));
                 var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(provaAtual.Id, alunoProva.AlunoId));
+                //var 
 
                 return true;
             }

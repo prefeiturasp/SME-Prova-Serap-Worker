@@ -21,48 +21,12 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-                var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
-                var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(provaId));
-                if (provaAtual == null)
-                    throw new Exception($"Prova {provaId} não localizada.");
+                var alunosProvaTaiSemCaderno = await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery());
 
-                if (provaAtual.AderirTodos)
+                foreach (var item in alunosProvaTaiSemCaderno.Where(a => a.Ativo()))
                 {
-                    var dres = await mediator.Send(new ObterDresSerapQuery());
-                    foreach (Dre dre in dres)
-                    {
-                        var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(provaAtual.Id, dre.CodigoDre));
-                        if (ues != null && ues.Any())
-                        {
-                            foreach (Ue ue in ues)
-                            {
-                                var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ue.CodigoUe, provaAtual.Id));
-                                foreach (Turma turma in turmasUe)
-                                {
-                                    var alunos = await mediator.Send(new ObterAlunosPorTurmaIdQuery(turma.Id));
-                                    foreach (Aluno aluno in alunos.Where(a => a.Ativo()))
-                                    {
-                                        await PublicarFilaTratarCadernoAluno(provaAtual.Id, aluno.Id);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    await PublicarFilaTratarCadernoAluno(item.ProvaId, item.AlunoId);
                 }
-                else
-                {
-                    var alunosAdesao = await mediator.Send(new ObterAlunosAdesaoPorProvaIdQuery(provaAtual.Id));
-                    if (alunosAdesao != null && alunosAdesao.Any())
-                    {
-                        foreach (Aluno aluno in alunosAdesao.Where(a => a.Ativo()))
-                        {
-                            await PublicarFilaTratarCadernoAluno(provaAtual.Id, aluno.Id);
-                        }
-                    }
-                    else
-                        throw new Exception($"Adesão da prova {provaId} não localizada.");
-                }
-
                 return true;
             }
             catch (Exception ex)

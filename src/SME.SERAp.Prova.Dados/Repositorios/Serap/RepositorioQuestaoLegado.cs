@@ -41,7 +41,7 @@ namespace SME.SERAp.Prova.Dados
 							where i.[State] = 1 and icg.[State] = 1 and s.[State] = 1
 								and ss.[State] = 1 and sub.[State] = 1
 								and s.Parent_Id is not null
-								and i.EvaluationMatrix_Id = @matrizId
+							--	and i.EvaluationMatrix_Id = @matrizId
 								and i.TRIDiscrimination is not null
 								and i.TRIDifficulty is not null
 								and i.TRICasualSetting is not null

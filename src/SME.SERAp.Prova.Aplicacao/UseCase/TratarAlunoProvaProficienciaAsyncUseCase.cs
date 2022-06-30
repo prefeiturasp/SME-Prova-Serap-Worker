@@ -17,10 +17,12 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var alunosProvas = await mediator.Send(new ObterAlunosSemProficienciaQuery());
-            if (alunosProvas.Any())
+            var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
+
+            var alunosProva = await mediator.Send(new ObterAlunosSemProficienciaQuery(provaId));
+            if (alunosProva.Any())
             {
-                foreach (var alunoProva in alunosProvas)
+                foreach (var alunoProva in alunosProva.Where(a => a.DisciplinaId != null))
                 {
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaTratar, alunoProva));
                 }

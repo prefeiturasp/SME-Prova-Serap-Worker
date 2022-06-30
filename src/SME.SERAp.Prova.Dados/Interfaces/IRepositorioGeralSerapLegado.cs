@@ -9,5 +9,6 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<TipoProva> ObterTipoProvaLegadoPorId(long tipoProvaLegadoId);
         Task<IEnumerable<Guid>> ObterTipoProvaDeficienciaPorTipoProvaLegadoId(long tipoProvaLegadoId);
+        Task<AreaConhecimentoSerap> ObterAreaConhecimentoSerapPorDisciplinaId(long disciplinaId);
     }
 }

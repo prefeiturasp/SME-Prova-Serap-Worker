@@ -7,7 +7,7 @@ namespace SME.SERAp.Prova.Dados
 {
     public interface IRepositorioAlunoProvaProficiencia : IRepositorioBase<AlunoProvaProficiencia>
     {
-        Task<IEnumerable<AlunoProvaDto>> ObterAlunosSemProficienciaAsync();
+        Task<IEnumerable<AlunoProvaDto>> ObterAlunosSemProficienciaAsync(long provaId);
         Task<bool> ExisteAsync(long alunoId, long provaId);
         Task<decimal> ObterUltimaProficienciaAlunoPorDisciplinaIdAsync(long alunoId, long? disciplinaId);
     }

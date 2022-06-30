@@ -26,12 +26,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (prova is null)
                     return default;
 
+                var provaSerap = await mediator.Send(new ObterProvaDetalhesPorIdQuery(prova.ProvaLegadoId));
                 await mediator.Send(new ExcluirAdesaoPorProvaIdCommand(prova.ProvaId));
 
                 if (!prova.AderirTodos)
                 {
                     var adesaoLegado = await mediator.Send(new ObterAdesaoProvaLegadoPorIdQuery(prova.ProvaLegadoId));
-                    var provaSerap = await mediator.Send(new ObterProvaDetalhesPorIdQuery(prova.ProvaLegadoId));
 
                     if (adesaoLegado is null || !adesaoLegado.Any())
                         return default;
@@ -47,12 +47,12 @@ namespace SME.SERAp.Prova.Aplicacao
                             var raAlunosAdesaoLegado = adesaoLegado.Where(t => t.TurmaId == turma && t.UeCodigo == escola).Select(a => a.AlunoRa).Distinct().ToList();
                             if (raAlunosAdesaoLegado.Any())
                             {
-                                var adesaoParaInserir = raAlunosAdesaoLegado.Select(a => 
-                                        new ProvaAdesao(prova.ProvaId, 
-                                                        ue.Id, 
-                                                        a, 
-                                                        turmaLegado.AnoTurma.ToString(), 
-                                                        turmaLegado.TipoTurma, 
+                                var adesaoParaInserir = raAlunosAdesaoLegado.Select(a =>
+                                        new ProvaAdesao(prova.ProvaId,
+                                                        ue.Id,
+                                                        a,
+                                                        turmaLegado.AnoTurma.ToString(),
+                                                        turmaLegado.TipoTurma,
                                                         (int)provaSerap.Modalidade,
                                                         ObterTipoTurno((TipoTurnoSerapLegado)turmaLegado.TipoTurno)))
                                                         .ToList();
@@ -62,10 +62,14 @@ namespace SME.SERAp.Prova.Aplicacao
                             else
                             {
                                 LogarAlunosNaoSincronizados(prova.ProvaLegadoId, ue.Id, turma, raAlunosAdesaoLegado.ToArray());
-                            }                            
+                            }
                         }
                     }
-                }                
+
+                    if (provaSerap.FormatoTai)
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaAsync, provaSerap.Id));
+                }
+
             }
             catch (Exception ex)
             {
@@ -81,7 +85,7 @@ namespace SME.SERAp.Prova.Aplicacao
             msg += $"CodigoUE: {codigoUe}, CodigoTurma: {codigoTurma}, RaAlunos: {string.Join(",", raAlunos)}.";
             SentrySdk.CaptureMessage(msg, SentryLevel.Warning);
         }
-        
+
         public int ObterTipoTurno(TipoTurnoSerapLegado tipoTurnoSerapLegado)
         {
             switch (tipoTurnoSerapLegado)

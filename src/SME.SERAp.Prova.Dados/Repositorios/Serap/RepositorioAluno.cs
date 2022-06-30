@@ -133,5 +133,21 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<Aluno> ObterAlunoPorIdAsync(long alunoId)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select top 1 id, nome, turma_id as TurmaId, ra, Situacao from aluno where id = @alunoId";
+
+                return await conn.QueryFirstOrDefaultAsync<Aluno>(query, new { alunoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

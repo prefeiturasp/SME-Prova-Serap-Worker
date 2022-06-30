@@ -45,7 +45,7 @@ namespace SME.SERAp.Prova.Aplicacao
             var turma = await repositorioTurma.ObterPorIdAsync(aluno.TurmaId);
             var escola = await repositorioUe.ObterPorIdAsync(turma.UeId);
 
-            var proficienciaAluno = await repositorioProficienciaProvaSP.ObterProficienciaAluno(request.AlunoRa.ToString(), turma.NomeTurma, escola.CodigoUe, (long)areaConhecimentoProvaSp);
+            var proficienciaAluno = await repositorioProficienciaProvaSP.ObterProficienciaAluno(request.AlunoRa.ToString(), turma.NomeTurma, turma.Ano, escola.CodigoUe, (long)areaConhecimentoProvaSp);
             if (proficienciaAluno > 0)
                 return (proficienciaAluno, AlunoProvaProficienciaOrigem.PSP_estudante);
 

@@ -56,5 +56,31 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<AreaConhecimentoSerap> ObterAreaConhecimentoSerapPorDisciplinaId(long disciplinaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"   select distinct a.Id AreaConhecimentoId
+								   from KnowledgeArea a
+							 inner join KnowledgeAreaDiscipline ad
+									 on a.id = ad.KnowledgeArea_Id
+							 inner join Discipline d
+									 on d.Id = ad.Discipline_Id
+								  where a.[State] = 1
+									and ad.[State] = 1
+									and d.[State] = 1
+									and ad.Discipline_Id is not null
+									and d.Id = @disciplinaId";
+
+                return await conn.QueryFirstOrDefaultAsync<AreaConhecimentoSerap>(query, new { disciplinaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

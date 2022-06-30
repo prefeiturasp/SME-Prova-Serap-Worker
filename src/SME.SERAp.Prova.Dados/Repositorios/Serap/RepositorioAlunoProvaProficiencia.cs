@@ -29,7 +29,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<AlunoProvaDto>> ObterAlunosSemProficienciaAsync()
+        public async Task<IEnumerable<AlunoProvaDto>> ObterAlunosSemProficienciaAsync(long provaId)
         {
             using var conn = ObterConexao();
             try
@@ -45,6 +45,7 @@ namespace SME.SERAp.Prova.Dados
                               where (p.aderir_todos is null or p.aderir_todos)
 	                             and p.formato_tai = true
 	                             and not exists(select 1 from aluno_prova_proficiencia ca where ca.prova_id = p.id and ca.aluno_id = a.id and ca.ultima_atualizacao = p.ultima_atualizacao)
+                                 and p.id = @provaId
 		
                               union all 
  
@@ -54,9 +55,10 @@ namespace SME.SERAp.Prova.Dados
                               join aluno a on a.ra = pa.aluno_ra
                               where p.aderir_todos = false
 	                            and p.formato_tai = true
-	                            and not exists(select 1 from aluno_prova_proficiencia ca where	ca.prova_id = p.id and ca.aluno_id = a.id  and ca.ultima_atualizacao = p.ultima_atualizacao)";
+	                            and not exists(select 1 from aluno_prova_proficiencia ca where	ca.prova_id = p.id and ca.aluno_id = a.id  and ca.ultima_atualizacao = p.ultima_atualizacao)
+                                and p.id = @provaId";
 
-                return await conn.QueryAsync<AlunoProvaDto>(query);
+                return await conn.QueryAsync<AlunoProvaDto>(query, new { provaId });
             }
             finally
             {

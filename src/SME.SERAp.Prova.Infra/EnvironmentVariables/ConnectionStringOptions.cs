@@ -8,6 +8,7 @@
         public string ApiSgp { get; set; }
         public string Eol { get; set; }
         public string CoreSSO { get; set; }
+        public string ProvaSP { get; set; }
 
     }
 }

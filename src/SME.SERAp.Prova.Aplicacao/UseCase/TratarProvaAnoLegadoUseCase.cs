@@ -51,6 +51,9 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
                 }
 
+                if (provaAtual.AderirTodos && provaAtual.FormatoTai)
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaAsync, provaAtual.Id));
+
                 return true;
             }
             catch (Exception ex)

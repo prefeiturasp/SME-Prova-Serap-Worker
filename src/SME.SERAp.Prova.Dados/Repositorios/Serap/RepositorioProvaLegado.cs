@@ -500,8 +500,13 @@ namespace SME.SERAp.Prova.Dados
                     amostraProvaTai.ListaConfigItens = configItens.ToList();
 
                 return amostraProvaTai;
-
             }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
             finally
             {
                 conn.Close();

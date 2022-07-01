@@ -4,6 +4,7 @@ namespace SME.SERAp.Prova.Infra
     public class ItemAmostraTaiDto
     {
         public long ItemId { get; set; }
+        public string Enunciado { get; set; }
         public string ItemCodigo { get; set; }
         public long TipoCurriculoGradeId { get; set; }
         public long HabilidadeId { get; set; }
@@ -16,5 +17,9 @@ namespace SME.SERAp.Prova.Infra
         public decimal Discriminacao { get; set; }
         public decimal ProporcaoAcertos { get; set; }
         public decimal AcertoCasual { get; set; }
+        public int QuantidadeAlternativas { get; set; }
+        public int TipoItem { get; set; }
+        public string TextoBase { get; set; }
+
     }
 }

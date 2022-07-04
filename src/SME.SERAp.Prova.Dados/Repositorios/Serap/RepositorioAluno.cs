@@ -91,7 +91,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select id, nome, turma_id as TurmaId, ra, situacao from aluno where turma_id = @turmaId";
+                var query = @"select id, nome, ra, turma_id as turmaId, situacao, data_atualizacao as DataAtualizacao, nome_social as nomeSocial, data_nascimento as dataNascimento, sexo from aluno where turma_id = @turmaId";
 
                 return await conn.QueryAsync<Aluno>(query, new { turmaId });
             }
@@ -203,6 +203,22 @@ namespace SME.SERAp.Prova.Dados
 
 
                 return await conn.QueryAsync<ProvaAlunoTaiSemCadernoDto>(query);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<Aluno> ObterAlunoPorIdAsync(long alunoId)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select top 1 id, nome, turma_id as TurmaId, ra, Situacao from aluno where id = @alunoId";
+
+                return await conn.QueryFirstOrDefaultAsync<Aluno>(query, new { alunoId });
             }
             finally
             {

@@ -39,6 +39,10 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.EnviarNotificacaoPorAno
 
             mensagemFirebase.Topic = $"ano-{request.Ano}";
 
+            mensagemFirebase.Android = new AndroidConfig()
+            {
+                Priority = Priority.High
+            };
 
             var resultado = await FirebaseMessaging.DefaultInstance.SendAsync(mensagemFirebase);
             return resultado != null;

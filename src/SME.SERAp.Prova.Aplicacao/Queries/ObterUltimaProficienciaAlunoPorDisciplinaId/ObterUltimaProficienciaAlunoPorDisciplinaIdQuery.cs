@@ -1,16 +1,17 @@
 ﻿using MediatR;
+using SME.SERAp.Prova.Dominio;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterUltimaProficienciaAlunoPorDisciplinaIdQuery : IRequest<decimal>
+    public class ObterUltimaProficienciaAlunoPorDisciplinaIdQuery : IRequest<(decimal proficiencia, AlunoProvaProficienciaOrigem origem)>
     {
-        public ObterUltimaProficienciaAlunoPorDisciplinaIdQuery(long alunoId, long? disciplinaId)
+        public ObterUltimaProficienciaAlunoPorDisciplinaIdQuery(long alunoRa, long? disciplinaId)
         {
-            AlunoId = alunoId;
+            AlunoRa = alunoRa;
             DisciplinaId = disciplinaId;
         }
 
-        public long AlunoId { get; set; }
+        public long AlunoRa { get; set; }
         public long? DisciplinaId { get; set; }
     }
 }

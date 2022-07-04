@@ -51,6 +51,9 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
                 }
 
+                if (provaAtual.AderirTodos && provaAtual.FormatoTai)
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaAsync, provaAtual.Id));
+
                 return true;
             }
             catch (Exception ex)
@@ -92,8 +95,10 @@ namespace SME.SERAp.Prova.Aplicacao
             }
 
             //Básica 1
-            var basicaI = provaAnoDetalhesEjaEFundamental.Where(p => p.Ano == "3"
-                                                                  && (p.CurCodigo == "3" || p.CurCodigo == "9"));
+            var basicaI = provaAnoDetalhes.Where(p => (p.TmeId == (int)TipoModalidadeEnsinoSerap.EJA && p.TneId == (int)TipoNivelEnsinoSerap.Ensino_Fundamental && p.Ano == "3" && (p.CurCodigo == "3" || p.CurCodigo == "9"))
+                                                    || p.TmeId == (int)TipoModalidadeEnsinoSerap.EJA_Regular && p.TneId == (int)TipoNivelEnsinoSerap.Ensino_Fundamental && p.Ano == "5" && p.CurCodigo == "3"
+                                                    && p.CurId != (int)CursoSerap.EJA_Modular);
+
             if (ListaPossuiDados(basicaI))
                 provaAnoRetorno.Add(new ProvaAno("2", provaSerapEstudantesId, modalidadeProva, 1));
 

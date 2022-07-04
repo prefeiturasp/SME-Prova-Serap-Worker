@@ -19,8 +19,9 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @$"select
-									i.Id ItemId,
+								i.Id ItemId,
 								i.ItemCode ItemCodigo,
+                                i.Statement as Enunciado, 
 								icg.TypeCurriculumGradeId TipoCurriculoGradeId,
 								s.Id HabilidadeId,
 								s.[Description] HabilidadeNome,

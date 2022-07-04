@@ -449,5 +449,68 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<AmostraProvaTaiDto> ObterDadosAmostraProvaTai(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"with DisciplinaMatriz as(
+								select top 1
+									tcg.Discipline_Id DisciplinaId,
+									tcg.EvaluationMatrix_Id MatrizId,
+									tcg.Test_Id
+								from TestTaiCurriculumGrade tcg 
+								where tcg.[State] = 1
+									and tcg.Test_Id = @provaId
+								)
+								select
+									nit.TestId ProvaLegadoId,
+									dm.DisciplinaId,
+									dm.MatrizId,
+									niat.[Value] NumeroItensAmostra,
+									nit.AdvanceWithoutAnswering AvancarSemResponder,
+									nit.BackToPreviousItem VoltarAoItemAnterior
+								from NumberItemTestTai nit
+								inner join NumberItemsAplicationTai niat
+									on nit.ItemAplicationTaiId = niat.Id
+								inner join DisciplinaMatriz dm on dm.Test_Id = nit.TestId
+								where nit.[State] = 1
+									and niat.[State] = 1
+									and nit.TestId = @provaId
+								order by nit.Id desc
+
+								select
+									tcg.TypeCurriculumGradeId TipoCurriculoGradeId,
+									tcg.[Percentage] Porcentagem
+								from TestTaiCurriculumGrade tcg 
+								where tcg.[State] = 1
+									and tcg.Test_Id = @provaId";
+
+                var dados = await conn.QueryMultipleAsync(query, new { provaId });
+
+                if (dados == null)
+                    return null;
+
+                var amostraProvaTai = await dados.ReadSingleAsync<AmostraProvaTaiDto>();
+                var configItens = await dados.ReadAsync<ConfigAnoItensProvaTaiDto>();
+
+                if (configItens != null)
+                    amostraProvaTai.ListaConfigItens = configItens.ToList();
+
+                return amostraProvaTai;
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

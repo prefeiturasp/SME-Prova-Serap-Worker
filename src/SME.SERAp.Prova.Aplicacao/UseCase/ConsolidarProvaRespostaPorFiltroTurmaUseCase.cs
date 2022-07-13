@@ -14,9 +14,10 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
 
-        public ConsolidarProvaRespostaPorFiltroTurmaUseCase(IMediator mediator)
+        public ConsolidarProvaRespostaPorFiltroTurmaUseCase(IMediator mediator, IServicoLog servicoLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)

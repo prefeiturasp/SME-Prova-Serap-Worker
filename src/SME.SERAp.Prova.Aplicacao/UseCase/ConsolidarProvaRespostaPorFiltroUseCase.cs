@@ -21,7 +21,6 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.serviceLog = serviceLog ?? throw new ArgumentNullException(nameof(serviceLog));
-
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)

@@ -5,7 +5,7 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class LogMensagem
     {
-        public LogMensagem(string mensagem, LogNivel nivel, string observacao, string rastreamento = null, string excecaoInterna = null, string projeto = "Serap-Estudantes-API")
+        public LogMensagem(string mensagem, LogNivel nivel, string observacao, string rastreamento = null, string excecaoInterna = null, string projeto = "Serap-Prova-Worker")
         {
             Mensagem = mensagem;
             Nivel = nivel;

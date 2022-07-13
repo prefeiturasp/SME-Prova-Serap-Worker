@@ -15,9 +15,10 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IServicoLog serviceLog;
 
 
-        public TratarProvasLegadoSyncUseCase(IMediator mediator)
+        public TratarProvasLegadoSyncUseCase(IMediator mediator, IServicoLog serviceLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.serviceLog = serviceLog ?? throw new ArgumentNullException(nameof(serviceLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)

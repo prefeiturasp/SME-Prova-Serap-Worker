@@ -109,10 +109,6 @@ namespace SME.SERAp.Prova.Worker
 
             var conexaoRabbitLog = factoryLog.CreateConnection();
             IModel channelLog = conexaoRabbitLog.CreateModel();
-
-            //services.AddSingleton(channelLog);
-            //services.AddSingleton(conexaoRabbitLog);
-
             var fireBaseOptions = new FireBaseOptions();
             configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(fireBaseOptions);

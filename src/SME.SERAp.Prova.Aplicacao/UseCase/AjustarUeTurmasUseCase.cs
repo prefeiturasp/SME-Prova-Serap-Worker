@@ -12,7 +12,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class AjustarUeTurmasUseCase : AbstractUseCase, IAjustarUeTurmasUseCase
     {
-        private readonly IServicoLog servicoLog;
         public AjustarUeTurmasUseCase(IMediator mediator) : base(mediator)
         {
 

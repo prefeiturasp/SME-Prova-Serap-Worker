@@ -30,14 +30,12 @@ namespace SME.SERAp.Prova.Infra.Services
         {
             LogMensagem logMensagem = new LogMensagem(erro, nivel, observacoes, stackTrace);
             Registrar(logMensagem);
-
         }
 
         public void Registrar(LogNivel nivel, string mensagem)
         {
             LogMensagem logMensagem = new LogMensagem(mensagem, nivel, "");
             Registrar(logMensagem);
-
         }
 
         public void Registrar(string mensagem, Exception ex)

@@ -15,10 +15,11 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioCache repositorioCache;
         private readonly IServicoLog servicoLog;
 
-        public ExportacaoResultadoAtualizarCommandHandler(IRepositorioExportacaoResultado repositorioExportacaoResultado, IRepositorioCache repositorioCache)
+        public ExportacaoResultadoAtualizarCommandHandler(IRepositorioExportacaoResultado repositorioExportacaoResultado, IRepositorioCache repositorioCache, IServicoLog servicoLog)
         {
             this.repositorioExportacaoResultado = repositorioExportacaoResultado ?? throw new ArgumentNullException(nameof(repositorioExportacaoResultado));
             this.repositorioCache = repositorioCache ?? throw new ArgumentNullException(nameof(repositorioCache));
+            this.servicoLog = servicoLog ?? throw new ArgumentException(nameof(servicoLog));
         }
 
         public async Task<long> Handle(ExportacaoResultadoAtualizarCommand request, CancellationToken cancellationToken)

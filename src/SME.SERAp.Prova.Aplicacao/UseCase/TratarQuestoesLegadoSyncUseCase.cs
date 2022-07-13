@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 

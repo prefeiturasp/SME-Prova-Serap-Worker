@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System.Collections.Generic;
@@ -22,7 +21,6 @@ namespace SME.SERAp.Prova.Aplicacao
             if(alunosRa == null)
             {
                 var mensagem = $"Não foi possível fazer parse da mensagem para tratar turmas histórico dos alunos. {mensagemRabbit.Mensagem}.";
-                SentrySdk.CaptureMessage(mensagem);
                 throw new NegocioException(mensagem);
             }
 

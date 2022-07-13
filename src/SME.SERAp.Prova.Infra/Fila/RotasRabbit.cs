@@ -63,5 +63,7 @@
 
         public const string TratarCadernosProvaTai = "serap.estudante.prova.legado.tratar.cadernos.amostra.tai";
         public const string TratarCadernoAlunoProvaTai = "serap.estudante.prova.legado.tratar.caderno.aluno.tai";
+
+        public static string RotaLogs => "ApplicationLog";
     }
 }

@@ -1,7 +1,8 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -9,12 +10,13 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarTipoProvaDeficienciaUseCase : ITratarTipoProvaDeficienciaUseCase
     {
-
+        private readonly IServicoLog servicoLog; 
         private readonly IMediator mediator;
 
-        public TratarTipoProvaDeficienciaUseCase(IMediator mediator)
+        public TratarTipoProvaDeficienciaUseCase(IMediator mediator, IServicoLog servicoLog)
         {
-            this.mediator = mediator;
+            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -44,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         }
                         else
                         {
-                            SentrySdk.CaptureMessage($"Tipo de deficiência não cadastrada no serap estudantes: {tipoDeficienciaId}", SentryLevel.Warning);
+                            servicoLog.Registrar(LogNivel.Informacao, $"Tipo de deficiência não cadastrada no serap estudantes: {tipoDeficienciaId}");
                         }
                     }
                 }
@@ -52,7 +54,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
+                servicoLog.Registrar(ex);
                 return false;
             }
             return true;

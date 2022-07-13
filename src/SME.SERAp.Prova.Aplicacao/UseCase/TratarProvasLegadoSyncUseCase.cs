@@ -1,8 +1,10 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -10,6 +12,7 @@ namespace SME.SERAp.Prova.Aplicacao
     public class TratarProvasLegadoSyncUseCase : ITratarProvasLegadoSyncUseCase
     {
         private readonly IMediator mediator;
+        private readonly IServicoLog serviceLog;
 
 
         public TratarProvasLegadoSyncUseCase(IMediator mediator)
@@ -23,12 +26,14 @@ namespace SME.SERAp.Prova.Aplicacao
 
             try
             {
-                SentrySdk.CaptureMessage($"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
+                serviceLog.Registrar(LogNivel.Informacao, $"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
                 var provaIds = await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao));
-                SentrySdk.CaptureMessage($"Total de provas para sincronizar {provaIds}");
+               
+                serviceLog.Registrar(LogNivel.Informacao, $"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
+                serviceLog.Registrar(LogNivel.Informacao, $"Total de provas para sincronizar {provaIds.ToList().Count}");
                 foreach (var provaId in provaIds)
                 {
-                    SentrySdk.CaptureMessage($"Enviando prova {provaId} para tratar");
+                    serviceLog.Registrar(LogNivel.Informacao, $"Enviando prova {provaId} para tratar");
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
                 }              
             }  

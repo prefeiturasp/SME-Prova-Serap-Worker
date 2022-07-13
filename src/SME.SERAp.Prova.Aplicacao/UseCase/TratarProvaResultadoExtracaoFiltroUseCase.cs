@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.IO;
 using System.Linq;
@@ -14,10 +14,12 @@ namespace SME.SERAp.Prova.Aplicacao
     {
 
         private readonly IMediator mediator;
-
-        public TratarProvaResultadoExtracaoFiltroUseCase(IMediator mediator)
+        private readonly IServicoLog servicoLog;
+       
+        public TratarProvaResultadoExtracaoFiltroUseCase(IMediator mediator, IServicoLog servicoLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -55,8 +57,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
-                SentrySdk.CaptureMessage($"Escrever dados no arquivo CSV. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
+                servicoLog.Registrar($"Escrever dados no arquivo CSV. msg: {mensagemRabbit.Mensagem}", ex);
                 return false;
             }
             return true;

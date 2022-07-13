@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
-using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
@@ -37,7 +36,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (!publicarTratamentoUe)
                 {
                     var mensagem = $"Não foi possível inserir a Ue : {publicarTratamentoUe} na fila de sync.";
-                    SentrySdk.CaptureMessage(mensagem);
+                    throw new NegocioException(mensagem);
                 }
             }
 

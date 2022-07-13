@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -12,6 +12,7 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         
         private readonly IMediator mediator;
+        private readonly IServicoLog servicoLog;
 
         public ConsolidarProvaRespostaPorFiltroTurmaUseCase(IMediator mediator)
         {
@@ -49,8 +50,8 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
-                SentrySdk.CaptureMessage($"Erro ao consolidar os dados da prova por filtro. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
+
+                servicoLog.Registrar($"Erro ao consolidar os dados da prova por filtro. msg: {mensagemRabbit.Mensagem}", ex);
                 return false;
             }
 

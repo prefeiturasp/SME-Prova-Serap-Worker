@@ -16,7 +16,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<ProvaCadernoAlunoDto>> ObterAlunosSemCadernosProvaBibAsync()
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select p.id as provaId, p.total_cadernos as totalCadernos, a.id as alunoId

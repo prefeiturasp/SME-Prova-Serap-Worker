@@ -75,6 +75,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     SentrySdk.AddBreadcrumb($"Erro ao tratar mensagem {ea.DeliveryTag}", "erro", null, null, BreadcrumbLevel.Error);
                     SentrySdk.CaptureException(ex);
                     channel.BasicReject(ea.DeliveryTag, false);
+                    _logger.LogError($"Erro ao tratar mensagem {ea.DeliveryTag}");
                 }
             };
 
@@ -208,6 +209,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             var rota = ea.RoutingKey;
             if (comandos.ContainsKey(rota))
             {
+                _logger.LogInformation($"Worker rota: {rota}");
                 var jsonSerializerOptions = new JsonSerializerOptions();
                 jsonSerializerOptions.PropertyNameCaseInsensitive = true;
 
@@ -229,7 +231,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     SentrySdk.AddBreadcrumb($"Erros: {nex.Message}", null, null, null, BreadcrumbLevel.Error);
                     SentrySdk.CaptureMessage($"Worker Serap: Rota -> {ea.RoutingKey}  Cod Correl -> {mensagemRabbit.CodigoCorrelacao.ToString().Substring(0, 3)}", SentryLevel.Error);
                     SentrySdk.CaptureException(nex);
-
+                    _logger.LogError(nex, $"Worker Serap: Negocio Rota -> {ea.RoutingKey}");
                 }
                 catch (ValidacaoException vex)
                 {
@@ -237,12 +239,14 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     SentrySdk.CaptureMessage($"Worker Serap: Rota -> {ea.RoutingKey}  Cod Correl -> {mensagemRabbit.CodigoCorrelacao.ToString().Substring(0, 3)}", SentryLevel.Error);
                     SentrySdk.AddBreadcrumb($"Erros: { JsonSerializer.Serialize(vex.Mensagens())}", null, null, null, BreadcrumbLevel.Error);
                     SentrySdk.CaptureException(vex);
+                    _logger.LogError(vex, $"Worker Serap: Validacao Rota -> {ea.RoutingKey}");
                 }
                 catch (Exception ex)
                 {
                     channel.BasicReject(ea.DeliveryTag, false);
                     SentrySdk.AddBreadcrumb($"Erros: {ex.Message}", null, null, null, BreadcrumbLevel.Error);
                     SentrySdk.CaptureException(ex);
+                    _logger.LogError(ex, $"Worker Serap: Rota -> {ea.RoutingKey}");
                 }
             }
             else

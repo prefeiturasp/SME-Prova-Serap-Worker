@@ -46,23 +46,13 @@ namespace SME.SERAp.Prova.Infra.Services
         }
         private void Registrar(LogMensagem log)
         {
-            try
-            {
                 var mensagem = JsonConvert.SerializeObject(log, new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore
-
                 });
 
                 var body = Encoding.UTF8.GetBytes(mensagem);
-
                 servicoTelemetria.Registrar(() => PublicarMensagem(body), "RabbitMQ", "Salvar Log Via Rabbit", RotasRabbit.RotaLogs);
-
-            }
-            catch (System.Exception ex)
-            {
-                throw ex;
-            }
         }
 
         private void PublicarMensagem(byte[] body)
@@ -80,7 +70,7 @@ namespace SME.SERAp.Prova.Infra.Services
                 using (IModel _channel = conexaoRabbit.CreateModel())
                 {
                     var props = _channel.CreateBasicProperties();
-
+                    props.Persistent = true;
                     _channel.BasicPublish(ExchangeRabbit.Logs, RotasRabbit.RotaLogs, props, body);
                 }
             }

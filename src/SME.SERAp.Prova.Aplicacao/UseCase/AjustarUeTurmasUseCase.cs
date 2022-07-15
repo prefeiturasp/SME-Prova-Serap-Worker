@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class AjustarUeTurmasUseCase : AbstractUseCase, IAjustarUeTurmasUseCase
     {
-
         public AjustarUeTurmasUseCase(IMediator mediator) : base(mediator)
         {
 
@@ -26,7 +25,6 @@ namespace SME.SERAp.Prova.Aplicacao
             if (dre == null)
             {
                 var mensagem = $"Não foi possível fazer parse da mensagem para atualizar ue das turmas da dre {mensagemRabbit.Mensagem}.";
-                SentrySdk.CaptureMessage(mensagem);
                 throw new NegocioException(mensagem);
             }
 

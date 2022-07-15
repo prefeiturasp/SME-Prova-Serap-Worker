@@ -79,13 +79,11 @@ namespace SME.SERAp.Prova.Aplicacao
                     provaAtual.QtdItensSincronizacaoRespostas = provaLegado.QtdItensSincronizacaoRespostas;
 
                     await mediator.Send(new ProvaAtualizarCommand(provaAtual));
-                    //TO DO ==> para atualizar os anos de aplicação da prova após ajuste nas configurações de EJA - Avaliar a remoção futuramente.
                     if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
                     {
                         await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
                         await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
                     }
-                    //--------------------------------------------------------
                     return true;
                 }
 

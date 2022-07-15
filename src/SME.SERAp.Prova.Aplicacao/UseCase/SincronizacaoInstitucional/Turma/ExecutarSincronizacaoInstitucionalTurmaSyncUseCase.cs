@@ -1,9 +1,10 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,10 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExecutarSincronizacaoInstitucionalTurmaSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalTurmaSyncUseCase
     {
-        public ExecutarSincronizacaoInstitucionalTurmaSyncUseCase(IMediator mediator) : base(mediator)
+        private readonly IServicoLog servicoLog;
+        public ExecutarSincronizacaoInstitucionalTurmaSyncUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
         {
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -24,7 +27,6 @@ namespace SME.SERAp.Prova.Aplicacao
             if (dre == null)
             {
                 var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
-                SentrySdk.CaptureMessage(mensagem);
                 throw new NegocioException(mensagem);
             }
 
@@ -48,7 +50,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var turmasSgp = todasTurmasSgp.AsEnumerable();
                 if (turmasSgp == null || !turmasSgp.Any())
                 {
-                    SentrySdk.CaptureMessage($"Dre: {dre.DreCodigo}, AnoLetivo: {anoLetivo} -- Não foi possível localizar as Turmas no Sgp para a sincronização instituicional.", SentryLevel.Error);
+                    servicoLog.Registrar(LogNivel.Critico, $"Dre: {dre.DreCodigo}, AnoLetivo: {anoLetivo} -- Não foi possível localizar as Turmas no Sgp para a sincronização instituicional.");
                     continue;
                 }
 

@@ -1,9 +1,11 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,7 +13,11 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarAbrangenciaUsuarioGrupoSerapUseCase : AbstractUseCase, ITratarAbrangenciaUsuarioGrupoSerapUseCase
     {
-        public TratarAbrangenciaUsuarioGrupoSerapUseCase(IMediator mediator) : base(mediator) { }
+        private readonly IServicoLog servicoLog;
+        public TratarAbrangenciaUsuarioGrupoSerapUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator) 
+        {
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
+        }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
@@ -76,7 +82,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (abrangencias == null || !abrangencias.Any())
                 {
-                    SentrySdk.CaptureMessage($"Abrangência do usuário não encontrada. {parametrosMsgLog}", SentryLevel.Warning);
+                    servicoLog.Registrar(LogNivel.Negocio, $"Abrangência do usuário não encontrada. { parametrosMsgLog}");
+                   
                     return true;
                 }
 
@@ -108,7 +115,7 @@ namespace SME.SERAp.Prova.Aplicacao
                             await mediator.Send(new InserirAbrangenciaCommand(abrangencia));
                         }
                         else
-                            SentrySdk.CaptureMessage($"Sync abrangência - Ue não encontrada: {codigo}. {parametrosMsgLog}", SentryLevel.Warning);
+                            servicoLog.Registrar(LogNivel.Negocio, $"Sync abrangência - Ue não encontrada: {codigo}. {parametrosMsgLog}");
                     }
                 }
             }

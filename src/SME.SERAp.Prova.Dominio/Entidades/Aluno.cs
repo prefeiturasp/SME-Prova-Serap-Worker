@@ -16,6 +16,7 @@ namespace SME.SERAp.Prova.Dominio
             RA = ra;
             Situacao = situacao;
         }
+
         public string Nome { get; set; }
         public long TurmaId { get; set; }
         public long RA { get; set; }
@@ -24,5 +25,15 @@ namespace SME.SERAp.Prova.Dominio
         public DateTime DataNascimento { get; set; }
         public DateTime DataAtualizacao { get; set; }
         public string NomeSocial { get; set; }
+
+        public bool Ativo()
+        {
+            var situacao = (SituacaoAluno)Situacao;
+            return situacao == SituacaoAluno.Ativo 
+                || situacao == SituacaoAluno.PendenteRematricula 
+                || situacao == SituacaoAluno.Rematriculado 
+                || situacao == SituacaoAluno.SemContinuidade 
+                || situacao == SituacaoAluno.Concluido;
+        }
     }
 }

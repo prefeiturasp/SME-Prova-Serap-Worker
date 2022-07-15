@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
@@ -23,7 +22,6 @@ namespace SME.SERAp.Prova.Aplicacao
             if (dreCodigo == null)
             {
                 var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas histórico dos alunos da dre {mensagemRabbit.Mensagem}.";
-                SentrySdk.CaptureMessage(mensagem);
                 throw new NegocioException(mensagem);
             }
 

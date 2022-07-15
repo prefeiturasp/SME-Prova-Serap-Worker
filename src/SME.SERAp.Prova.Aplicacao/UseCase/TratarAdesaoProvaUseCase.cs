@@ -1,7 +1,8 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,9 +12,10 @@ namespace SME.SERAp.Prova.Aplicacao
     public class TratarAdesaoProvaUseCase : ITratarAdesaoProvaUseCase
     {
         private readonly IMediator mediator;
-
+        private readonly IServicoLog servicoLog;
         public TratarAdesaoProvaUseCase(IMediator mediator)
         {
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
             this.mediator = mediator;
         }
 
@@ -73,7 +75,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
+                servicoLog.Registrar(ex);
                 return false;
             }
             return true;
@@ -83,7 +85,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             string msg = $"Alunos não sincronizados no serap estudantes para adesão da prova {provaLegadoId}. ";
             msg += $"CodigoUE: {codigoUe}, CodigoTurma: {codigoTurma}, RaAlunos: {string.Join(",", raAlunos)}.";
-            SentrySdk.CaptureMessage(msg, SentryLevel.Warning);
+            servicoLog.Registrar(LogNivel.Informacao, msg);
         }
 
         public int ObterTipoTurno(TipoTurnoSerapLegado tipoTurnoSerapLegado)

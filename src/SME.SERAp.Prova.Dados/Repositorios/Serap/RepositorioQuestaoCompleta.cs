@@ -15,7 +15,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"insert into questao_completa (id, json, ultima_atualizacao) values (@id, @json, @UltimaAtualizacao) on conflict (id) do update set json = @json, ultima_atualizacao = @UltimaAtualizacao;";
+                var query = @"insert into questao_completa (id, questao_legado_id, json, ultima_atualizacao) values (@id, @questaoLegadoId, @json, @UltimaAtualizacao) on conflict (id) do update set questao_legado_id = @questaoLegadoId, json = @json, ultima_atualizacao = @UltimaAtualizacao;";
                 await conn.ExecuteAsync(query, questaoCompleta);
             }
             finally

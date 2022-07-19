@@ -13,7 +13,7 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         private readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
-        public TratarAdesaoProvaUseCase(IMediator mediator)
+        public TratarAdesaoProvaUseCase(IMediator mediator, IServicoLog servicoLog)
         {
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
             this.mediator = mediator;

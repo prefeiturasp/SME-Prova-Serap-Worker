@@ -4,8 +4,11 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class RemoverProvasCacheCommand : IRequest<bool>
     {
-        public RemoverProvasCacheCommand()
+        public RemoverProvasCacheCommand(long provaId)
         {
+            ProvaId = provaId;
         }
+
+        public long ProvaId { get; set; }
     }
 }

@@ -218,6 +218,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             if (comandos.ContainsKey(rota))
 
             {
+                _logger.LogInformation($"Worker rota: {rota}");
                 var jsonSerializerOptions = new JsonSerializerOptions();
                 jsonSerializerOptions.PropertyNameCaseInsensitive = true;
 

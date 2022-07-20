@@ -16,7 +16,7 @@ namespace SME.SERAp.Prova.Aplicacao
         public TratarAdesaoProvaUseCase(IMediator mediator, IServicoLog servicoLog)
         {
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
-            this.mediator = mediator;
+            this.mediator = mediator ?? throw new ArgumentException(nameof(mediator));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)

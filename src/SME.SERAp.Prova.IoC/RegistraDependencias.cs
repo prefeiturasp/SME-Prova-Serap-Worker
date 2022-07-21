@@ -82,6 +82,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioAlunoProvaProficiencia, RepositorioAlunoProvaProficiencia>();
             services.AddScoped<IRepositorioProficienciaProvaSP, RepositorioProficienciaProvaSP>();
             services.AddScoped<IRepositorioQuestaoLegado, RepositorioQuestaoLegado>();
+            services.AddScoped<IRepositorioVersaoAppDispositivo, RepositorioVersaoAppDispositivo>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -154,6 +155,18 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarAlunoProvaProficienciaUseCase, TratarAlunoProvaProficienciaUseCase>();
             services.AddScoped<ITratarCadernosProvaTaiUseCase, TratarCadernosProvaTaiUseCase>();
             services.AddScoped<ITratarCadernoAlunoProvaTaiUseCase, TratarCadernoAlunoProvaTaiUseCase>();
+            // Persistencia Serap 
+
+            services.AddScoped<IIncluirUsuarioSerapUseCase, IncluirUsuarioSerapUseCase>();
+            services.AddScoped<IAlterarUsuarioSerapUseCase, AlterarUsuarioSerapUseCase>();
+
+            services.AddScoped<IAlterarProvaAlunoUseCase, AlterarProvaAlunoUseCase>();
+            services.AddScoped<IIncluirUsuarioSerapUseCase, IncluirUsuarioSerapUseCase>();
+
+            services.AddScoped<IVersaoAppDispositivoAppUseCase, VersaoAppDispositivoAppUseCase>();
+
+            //IVersaoAppDispositivoApp
+
         }
     }
 }

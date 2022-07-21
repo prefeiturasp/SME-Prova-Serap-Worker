@@ -44,6 +44,7 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new AbrangenciaMap());
                 config.AddMap(new DownloadProvaAlunoMap());
                 config.AddMap(new AlunoProvaProficienciaMap());
+                config.AddMap(new VersaoAppDispositivoMap());
 
                 config.ForDommel();
             });

@@ -64,6 +64,13 @@
         public const string TratarCadernosProvaTai = "serap.estudante.prova.legado.tratar.cadernos.amostra.tai";
         public const string TratarCadernoAlunoProvaTai = "serap.estudante.prova.legado.tratar.caderno.aluno.tai";
 
+
+        public const string IncluirUsuario = "serap.estudantes.usuario.incluir";
+        public const string AlterarUsuario = "serap.estudantes.usuario.alterar";
+        public const string IncluirVersaoDispositivoApp = "serap.estudantes.versaoAppDispositivo.incluir";
+        public const string IncluirProvaAluno = "serap.estudantes.provaAluno.incluir";
+        public const string AlterarProvaAluno = "serap.estudantes.provaAluno.alterar";
+
         public static string RotaLogs => "ApplicationLog";
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class IncluirUsuarioCommandHandler : IRequestHandler<IncluirUsuarioCommand, bool>
+    public class IncluirUsuarioCommandHandler : IRequestHandler<IncluirUsuarioCommand, long>
     {
         private readonly IRepositorioUsuario repositorioUsuario;
 
@@ -13,7 +13,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.repositorioUsuario = repositorioUsuario ?? throw new System.ArgumentNullException(nameof(repositorioUsuario));
         }
-        public async Task<bool> Handle(IncluirUsuarioCommand request, CancellationToken cancellationToken)
-            => await repositorioUsuario.IncluirAsync(new Dominio.Usuario(request.Nome, request.Login)) > 0;
+        public async Task<long> Handle(IncluirUsuarioCommand request, CancellationToken cancellationToken)
+            => await repositorioUsuario.SalvarAsync(request.Usuario);
     }
 }

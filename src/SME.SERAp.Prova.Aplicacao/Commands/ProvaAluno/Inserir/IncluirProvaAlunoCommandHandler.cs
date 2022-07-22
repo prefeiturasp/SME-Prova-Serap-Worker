@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class IncluirProvaAlunoCommandHandler : IRequestHandler<IncluirProvaAlunoCommand, bool>
+    public class IncluirProvaAlunoCommandHandler : IRequestHandler<IncluirProvaAlunoCommand, long>
     {
         private readonly IRepositorioProvaAluno repositorioProvaAluno;
 
@@ -17,9 +17,9 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.repositorioProvaAluno = repositorioProvaAluno ?? throw new System.ArgumentNullException(nameof(repositorioProvaAluno));
         }
-        public async Task<bool> Handle(IncluirProvaAlunoCommand request, CancellationToken cancellationToken)
+        public async Task<long> Handle(IncluirProvaAlunoCommand request, CancellationToken cancellationToken)
         {
-            return await repositorioProvaAluno.SalvarAsync(request.ProvaAluno) > 0;
+            return await repositorioProvaAluno.SalvarAsync(request.ProvaAluno);
         }
     }
 }

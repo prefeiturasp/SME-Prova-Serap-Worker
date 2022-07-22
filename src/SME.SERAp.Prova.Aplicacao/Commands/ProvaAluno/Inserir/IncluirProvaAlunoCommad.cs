@@ -4,7 +4,7 @@ using System;
 
 namespace SME.SERAp.Prova.Aplicacao
 { 
-    public class IncluirProvaAlunoCommand : IRequest<bool>
+    public class IncluirProvaAlunoCommand : IRequest<long>
     {
         public IncluirProvaAlunoCommand(ProvaAluno provaAluno)
         {

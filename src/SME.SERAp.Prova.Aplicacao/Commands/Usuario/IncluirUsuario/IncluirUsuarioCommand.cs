@@ -1,16 +1,14 @@
 ﻿using MediatR;
+using SME.SERAp.Prova.Dominio;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class IncluirUsuarioCommand : IRequest<bool>
+    public class IncluirUsuarioCommand : IRequest<long>
     {
-        public IncluirUsuarioCommand(long login, string nome)
+        public IncluirUsuarioCommand(Usuario usuario)
         {
-            Login = login;
-            Nome = nome;
+            Usuario = usuario;
         }
-
-        public long Login { get; set; }
-        public string Nome { get; set; }
+        public Usuario Usuario { get; set; }
     }
 }

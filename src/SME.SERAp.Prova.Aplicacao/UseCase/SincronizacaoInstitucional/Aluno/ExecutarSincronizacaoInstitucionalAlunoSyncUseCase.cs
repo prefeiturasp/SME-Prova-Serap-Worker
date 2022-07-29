@@ -1,9 +1,10 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,10 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExecutarSincronizacaoInstitucionalAlunoSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalAlunoSyncUseCase
     {
-        public ExecutarSincronizacaoInstitucionalAlunoSyncUseCase(IMediator mediator) : base(mediator)
+       private readonly IServicoLog servicoLog;
+        public ExecutarSincronizacaoInstitucionalAlunoSyncUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
         {
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -24,7 +27,6 @@ namespace SME.SERAp.Prova.Aplicacao
             if (dre == null)
             {
                 var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
-                SentrySdk.CaptureMessage(mensagem);
                 throw new NegocioException(mensagem);
             }
 
@@ -63,7 +65,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     var alunosSemturma = alunosNovosParaIncluirNormalizada.Where(a => a.TurmaId == 0);
                     if (alunosSemturma.Any())
-                        SentrySdk.CaptureMessage($"Turma não localizada para os alunos: {string.Join(",", alunosSemturma.Select(a => a.RA.ToString()))}");
+                        servicoLog.Registrar(LogNivel.Informacao, $"Turma não localizada para os alunos: {string.Join(",", alunosSemturma.Select(a => a.RA.ToString()))}");
 
                     await mediator.Send(new InserirAlunosCommand(alunosNovosParaIncluirNormalizada.Where(a => a.TurmaId > 0)));
                 }
@@ -110,7 +112,7 @@ namespace SME.SERAp.Prova.Aplicacao
                                 var turmaParaAlunoNovo = await mediator.Send(new ObterTurmaPorCodigoUeQuery(turmaCodigoParaBuscar));
                                 if (turmaParaAlunoNovo == null)
                                 {
-                                    SentrySdk.CaptureMessage($"Turma não localizada para o aluno {alunoQuePodeAlterar.CodigoAluno}");
+                                   servicoLog.Registrar(LogNivel.Critico, $"Turma não localizada para o aluno {alunoQuePodeAlterar.CodigoAluno}");
                                     continue;
                                 }
                                 turmaId = turmaParaAlunoNovo.Id;

@@ -1,8 +1,9 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,16 +14,18 @@ namespace SME.SERAp.Prova.Aplicacao
     public class ConsolidarProvaResultadoUseCase : IConsolidarProvaResultadoUseCase
     {
         private readonly IMediator mediator;
-
-        public ConsolidarProvaResultadoUseCase(IMediator mediator)
+        private readonly IServicoLog serviceLog;
+        public ConsolidarProvaResultadoUseCase(IMediator mediator, IServicoLog serviceLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.serviceLog = serviceLog ?? throw new ArgumentNullException(nameof(serviceLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
-            SentrySdk.CaptureMessage($"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}", SentryLevel.Info);
+
+            serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
 
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));
             try
@@ -58,7 +61,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (!filtrosParaPublicar.Any())
                 {
                     await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
-                    SentrySdk.CaptureMessage($"Não foi possível localizar escolas para consolidar os dados da prova: {extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
+                    serviceLog.Registrar(LogNivel.Critico, $"Não foi possível localizar escolas para consolidar os dados da prova: {extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
                     return false;
                 }
 
@@ -66,14 +69,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
                 }
-
             }
             catch (Exception ex)
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
-                SentrySdk.CaptureMessage($"Consolidar os dados da prova. msg: {mensagemRabbit.Mensagem}", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
+                serviceLog.Registrar(LogNivel.Critico, $"Erro -- Consolidar os dados da prova. msg: {mensagemRabbit.Mensagem}", ex.Message, ex.StackTrace);
                 return false;
             }
             return true;

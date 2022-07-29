@@ -5,18 +5,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RabbitMQ.Client;
-using Sentry;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Interfaces;
 
 namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
 {
     public class PublicaFilaRabbitCommandHandler : IRequestHandler<PublicaFilaRabbitCommand, bool>
     {
         private readonly IModel model;
+        private readonly IServicoLog servicoLog;
 
-        public PublicaFilaRabbitCommandHandler(IModel model)
+        public PublicaFilaRabbitCommandHandler(IModel model, IServicoLog servicoLog)
         {
             this.model = model ?? throw new ArgumentNullException(nameof(model));
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public Task<bool> Handle(PublicaFilaRabbitCommand request, CancellationToken cancellationToken)
@@ -38,9 +41,7 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
             }
             catch (Exception ex)
             {
-                SentrySdk.AddBreadcrumb($"Erros: PublicaFilaRabbitCommand", null, null, null, BreadcrumbLevel.Error);
-                SentrySdk.CaptureMessage($"Worker Serap: Rota -> {request.NomeRota} Fila -> {request.NomeFila}", SentryLevel.Error);
-                SentrySdk.CaptureException(ex);
+                servicoLog.Registrar(LogNivel.Critico, $"Erros: PublicaFilaRabbitCommand --{ex.Message}", $"Worker Serap: Rota -> {request.NomeRota} Fila -> {request.NomeFila}", ex.StackTrace);
                 return Task.FromResult(false);
             }
         }

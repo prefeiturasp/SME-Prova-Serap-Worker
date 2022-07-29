@@ -1,13 +1,15 @@
+using Elastic.Apm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Sentry;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -22,42 +24,49 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
     {
         private readonly ILogger<WorkerRabbit> _logger;
         private readonly RabbitOptions rabbitOptions;
-        private readonly SentryOptions sentryOptions;
         private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly ConnectionFactory connectionFactory;
+        private readonly IServicoLog servicolog;
+        private readonly IServicoTelemetria servicoTelemetria;
         private readonly Dictionary<string, ComandoRabbit> comandos;
-        public WorkerRabbit(ILogger<WorkerRabbit> logger, RabbitOptions rabbitOptions, SentryOptions sentryOptions,
-            IServiceScopeFactory serviceScopeFactory, ConnectionFactory connectionFactory)
+        public WorkerRabbit(
+            ILogger<WorkerRabbit> logger,
+            RabbitOptions rabbitOptions,
+            IServiceScopeFactory serviceScopeFactory,
+            ConnectionFactory connectionFactory,
+            IServicoLog servicolog,
+            IServicoTelemetria servicoTelemetria
+           )
         {
             _logger = logger;
             this.rabbitOptions = rabbitOptions ?? throw new ArgumentNullException(nameof(rabbitOptions));
-            this.sentryOptions = sentryOptions ?? throw new ArgumentNullException(nameof(sentryOptions));
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
             this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            this.servicolog = servicolog ?? throw new ArgumentNullException(nameof(servicolog));
+            this.servicoTelemetria = servicoTelemetria ?? throw new ArgumentNullException(nameof(servicoTelemetria));
             comandos = new Dictionary<string, ComandoRabbit>();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using (SentrySdk.Init(sentryOptions))
-            {
-                using var conexaoRabbit = connectionFactory.CreateConnection();
-                using IModel channel = conexaoRabbit.CreateModel();
 
-                var props = channel.CreateBasicProperties();
-                props.Persistent = true;
+            using var conexaoRabbit = connectionFactory.CreateConnection();
+            using IModel channel = conexaoRabbit.CreateModel();
 
-                channel.BasicQos(0, rabbitOptions.LimiteDeMensagensPorExecucao, false);
+            var props = channel.CreateBasicProperties();
+            props.Persistent = true;
 
-                channel.ExchangeDeclare(ExchangeRabbit.SerapEstudante, ExchangeType.Direct, true, false);
-                channel.ExchangeDeclare(ExchangeRabbit.SerapEstudanteDeadLetter, ExchangeType.Direct, true, false);
+            channel.BasicQos(0, rabbitOptions.LimiteDeMensagensPorExecucao, false);
 
-                DeclararFilas(channel);
+            channel.ExchangeDeclare(ExchangeRabbit.SerapEstudante, ExchangeType.Direct, true, false);
+            channel.ExchangeDeclare(ExchangeRabbit.SerapEstudanteDeadLetter, ExchangeType.Direct, true, false);
 
-                RegistrarUseCases();
+            DeclararFilas(channel);
 
-                await InicializaConsumer(channel, stoppingToken);
-            }
+            RegistrarUseCases();
+
+            await InicializaConsumer(channel, stoppingToken);
+
         }
 
         private async Task InicializaConsumer(IModel channel, CancellationToken stoppingToken)
@@ -72,10 +81,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception ex)
                 {
-                    SentrySdk.AddBreadcrumb($"Erro ao tratar mensagem {ea.DeliveryTag}", "erro", null, null, BreadcrumbLevel.Error);
-                    SentrySdk.CaptureException(ex);
-                    channel.BasicReject(ea.DeliveryTag, false);
-                    _logger.LogError($"Erro ao tratar mensagem {ea.DeliveryTag}");
+                    servicolog.Registrar($"Erro ao tratar mensagem {ea.DeliveryTag}", ex);
                 }
             };
 
@@ -184,6 +190,16 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.FilaDeadletterSync, new ComandoRabbit("Sync de fila Deadletter", typeof(IRabbitDeadletterSerapSyncUseCase)));
 
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));
+            comandos.Add(RotasRabbit.TratarCadernosProvaTai, new ComandoRabbit("Tratamento cadernos amostra TAI", typeof(ITratarCadernosProvaTaiUseCase)));
+            comandos.Add(RotasRabbit.TratarCadernoAlunoProvaTai, new ComandoRabbit("Tratamento cadernos alunos prova TAI", typeof(ITratarCadernoAlunoProvaTaiUseCase)));
+
+            // Persistencia Serap Estudantes
+            comandos.Add(RotasRabbit.IncluirUsuario, new ComandoRabbit("Incluir Usuario Persistencia Serap", typeof(IIncluirUsuarioSerapUseCase)));
+            comandos.Add(RotasRabbit.AlterarUsuario, new ComandoRabbit("Alterar Usuario Persistencia Serap", typeof(IAlterarUsuarioSerapUseCase)));
+            comandos.Add(RotasRabbit.IncluirProvaAluno, new ComandoRabbit("Incluir Prova Aluno Serap Estudantes", typeof(IIncluirProvaAlunoUseCase)));
+            comandos.Add(RotasRabbit.AlterarProvaAluno, new ComandoRabbit("Alterar Prova Aluno Serap Estudantes", typeof(IAlterarProvaAlunoUseCase)));
+            comandos.Add(RotasRabbit.IncluirVersaoDispositivoApp , new ComandoRabbit("Incluir Versao Dispositivo App", typeof(IVersaoAppDispositivoAppUseCase)));
+
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)
@@ -208,6 +224,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             var mensagem = Encoding.UTF8.GetString(ea.Body.Span);
             var rota = ea.RoutingKey;
             if (comandos.ContainsKey(rota))
+
             {
                 _logger.LogInformation($"Worker rota: {rota}");
                 var jsonSerializerOptions = new JsonSerializerOptions();
@@ -216,6 +233,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
 
                 var comandoRabbit = comandos[rota];
+
+                var transacao = servicoTelemetria.Apm ?
+                   Agent.Tracer.StartTransaction(rota, "WorkerRabbitSerapAcompanhamento") :
+                   null;
+
                 try
                 {
                     using var scope = serviceScopeFactory.CreateScope();
@@ -228,26 +250,26 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 catch (NegocioException nex)
                 {
                     channel.BasicAck(ea.DeliveryTag, false);
-                    SentrySdk.AddBreadcrumb($"Erros: {nex.Message}", null, null, null, BreadcrumbLevel.Error);
-                    SentrySdk.CaptureMessage($"Worker Serap: Rota -> {ea.RoutingKey}  Cod Correl -> {mensagemRabbit.CodigoCorrelacao.ToString().Substring(0, 3)}", SentryLevel.Error);
-                    SentrySdk.CaptureException(nex);
-                    _logger.LogError(nex, $"Worker Serap: Negocio Rota -> {ea.RoutingKey}");
+                    servicolog.Registrar(LogNivel.Negocio, $"Rota-- {ea.RoutingKey} -- Erros: {nex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem.ToString()} --", nex.StackTrace);
+                    transacao.CaptureException(nex);
                 }
                 catch (ValidacaoException vex)
                 {
                     channel.BasicAck(ea.DeliveryTag, false);
-                    SentrySdk.CaptureMessage($"Worker Serap: Rota -> {ea.RoutingKey}  Cod Correl -> {mensagemRabbit.CodigoCorrelacao.ToString().Substring(0, 3)}", SentryLevel.Error);
-                    SentrySdk.AddBreadcrumb($"Erros: { JsonSerializer.Serialize(vex.Mensagens())}", null, null, null, BreadcrumbLevel.Error);
-                    SentrySdk.CaptureException(vex);
-                    _logger.LogError(vex, $"Worker Serap: Validacao Rota -> {ea.RoutingKey}");
+                    servicolog.Registrar(LogNivel.Negocio, $"Rota-- {ea.RoutingKey} -- Erros: {vex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem.ToString()} --", vex.StackTrace);
+                    transacao.CaptureException(vex);
                 }
                 catch (Exception ex)
                 {
-                    channel.BasicReject(ea.DeliveryTag, false);
-                    SentrySdk.AddBreadcrumb($"Erros: {ex.Message}", null, null, null, BreadcrumbLevel.Error);
-                    SentrySdk.CaptureException(ex);
-                    _logger.LogError(ex, $"Worker Serap: Rota -> {ea.RoutingKey}");
+                    channel.BasicAck(ea.DeliveryTag, false);
+                    servicolog.Registrar(LogNivel.Critico, $"Rota-- {ea.RoutingKey} -- Erros: {ex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem.ToString()} --", ex.StackTrace);
+                    transacao.CaptureException(ex);
                 }
+                finally
+                {
+                    transacao?.End();
+                }
+
             }
             else
                 channel.BasicReject(ea.DeliveryTag, false);

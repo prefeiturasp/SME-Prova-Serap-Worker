@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
 using SME.SERAp.Prova.Infra.Services;
 
@@ -20,8 +21,9 @@ namespace SME.SERAp.Prova.IoC
             RegistrarServicos(services);
             RegistrarCasosDeUso(services);
             RegistrarMapeamentos.Registrar();
-        }
 
+
+        }
         private static void RegistrarRepositorios(IServiceCollection services)
         {
             services.AddScoped<IRepositorioProvaLegado, RepositorioProvaLegado>();
@@ -78,11 +80,14 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioQuestaoCompleta, RepositorioQuestaoCompleta>();
             services.AddScoped<IRepositorioDownloadProvaAluno, RepositorioDownloadProvaAluno>();
             services.AddScoped<IRepositorioAlunoProvaProficiencia, RepositorioAlunoProvaProficiencia>();
+            services.AddScoped<IRepositorioProficienciaProvaSP, RepositorioProficienciaProvaSP>();
+            services.AddScoped<IRepositorioQuestaoLegado, RepositorioQuestaoLegado>();
+            services.AddScoped<IRepositorioVersaoAppDispositivo, RepositorioVersaoAppDispositivo>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
         {
-            services.TryAddScoped<IServicoLog, ServicoLog>();
+            services.AddSingleton<IServicoLog, ServicoLog>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
@@ -148,6 +153,23 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaAsyncUseCase, TratarAlunoProvaProficienciaAsyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaUseCase, TratarAlunoProvaProficienciaUseCase>();
+            services.AddScoped<ITratarCadernosProvaTaiUseCase, TratarCadernosProvaTaiUseCase>();
+            services.AddScoped<ITratarCadernoAlunoProvaTaiUseCase, TratarCadernoAlunoProvaTaiUseCase>();
+            // Persistencia Serap 
+
+            services.AddScoped<IIncluirUsuarioSerapUseCase, IncluirAtualizarUsuarioSerapUseCase>();
+            services.AddScoped<IAlterarUsuarioSerapUseCase, AlterarUsuarioSerapUseCase>();
+
+            services.AddScoped<IAlterarProvaAlunoUseCase, AlterarProvaAlunoUseCase>();
+            services.AddScoped<IIncluirUsuarioSerapUseCase, IncluirAtualizarUsuarioSerapUseCase>();
+
+            services.AddScoped<IVersaoAppDispositivoAppUseCase, VersaoAppDispositivoAppUseCase>();
+
+            services.AddScoped<IIncluirProvaAlunoUseCase, IncluirProvaAlunoUseCase>();
+            
+
+            //IVersaoAppDispositivoApp
+
         }
     }
 }

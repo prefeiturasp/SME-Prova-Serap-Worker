@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +11,13 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarProvaAnoLegadoUseCase : ITratarProvaAnoLegadoUseCase
     {
-
+        private readonly IServicoLog servicoLog;
         private readonly IMediator mediator;
 
-        public TratarProvaAnoLegadoUseCase(IMediator mediator)
+        public TratarProvaAnoLegadoUseCase(IMediator mediator, IServicoLog servicoLog)
         {
             this.mediator = mediator;
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -51,11 +52,14 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
                 }
 
+                if (provaAtual.AderirTodos && provaAtual.FormatoTai)
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaAsync, provaAtual.Id));
+
                 return true;
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
+                servicoLog.Registrar(ex);
                 throw ex;
             }
         }

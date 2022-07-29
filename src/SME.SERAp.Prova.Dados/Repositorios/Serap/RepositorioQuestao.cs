@@ -58,7 +58,7 @@ namespace SME.SERAp.Prova.Dados
                 var query = new StringBuilder();
 
                 // questão
-                query.AppendLine(" select q.id, q.texto_base as titulo, q.enunciado as descricao, q.ordem, q.tipo, q.quantidade_alternativas as quantidadeAlternativas ");
+                query.AppendLine(" select q.id, q.questao_legado_id as QuestaoLegadoId, q.texto_base as titulo, q.enunciado as descricao, q.ordem, q.tipo, q.quantidade_alternativas as quantidadeAlternativas ");
                 query.AppendLine(" from questao q ");
                 query.AppendLine(" where q.id = @id; ");
 

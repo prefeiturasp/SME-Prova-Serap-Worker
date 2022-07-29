@@ -1,7 +1,8 @@
 ﻿using MediatR;
-using Sentry;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,10 +12,11 @@ namespace SME.SERAp.Prova.Aplicacao
     public class TratarAdesaoProvaUseCase : ITratarAdesaoProvaUseCase
     {
         private readonly IMediator mediator;
-
-        public TratarAdesaoProvaUseCase(IMediator mediator)
+        private readonly IServicoLog servicoLog;
+        public TratarAdesaoProvaUseCase(IMediator mediator, IServicoLog servicoLog)
         {
-            this.mediator = mediator;
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
+            this.mediator = mediator ?? throw new ArgumentException(nameof(mediator));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -26,12 +28,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (prova is null)
                     return default;
 
+                var provaSerap = await mediator.Send(new ObterProvaDetalhesPorIdQuery(prova.ProvaLegadoId));
                 await mediator.Send(new ExcluirAdesaoPorProvaIdCommand(prova.ProvaId));
 
                 if (!prova.AderirTodos)
                 {
                     var adesaoLegado = await mediator.Send(new ObterAdesaoProvaLegadoPorIdQuery(prova.ProvaLegadoId));
-                    var provaSerap = await mediator.Send(new ObterProvaDetalhesPorIdQuery(prova.ProvaLegadoId));
 
                     if (adesaoLegado is null || !adesaoLegado.Any())
                         return default;
@@ -47,12 +49,12 @@ namespace SME.SERAp.Prova.Aplicacao
                             var raAlunosAdesaoLegado = adesaoLegado.Where(t => t.TurmaId == turma && t.UeCodigo == escola).Select(a => a.AlunoRa).Distinct().ToList();
                             if (raAlunosAdesaoLegado.Any())
                             {
-                                var adesaoParaInserir = raAlunosAdesaoLegado.Select(a => 
-                                        new ProvaAdesao(prova.ProvaId, 
-                                                        ue.Id, 
-                                                        a, 
-                                                        turmaLegado.AnoTurma.ToString(), 
-                                                        turmaLegado.TipoTurma, 
+                                var adesaoParaInserir = raAlunosAdesaoLegado.Select(a =>
+                                        new ProvaAdesao(prova.ProvaId,
+                                                        ue.Id,
+                                                        a,
+                                                        turmaLegado.AnoTurma.ToString(),
+                                                        turmaLegado.TipoTurma,
                                                         (int)provaSerap.Modalidade,
                                                         ObterTipoTurno((TipoTurnoSerapLegado)turmaLegado.TipoTurno)))
                                                         .ToList();
@@ -62,14 +64,18 @@ namespace SME.SERAp.Prova.Aplicacao
                             else
                             {
                                 LogarAlunosNaoSincronizados(prova.ProvaLegadoId, ue.Id, turma, raAlunosAdesaoLegado.ToArray());
-                            }                            
+                            }
                         }
                     }
-                }                
+
+                    if (provaSerap.FormatoTai)
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaAsync, provaSerap.Id));
+                }
+
             }
             catch (Exception ex)
             {
-                SentrySdk.CaptureException(ex);
+                servicoLog.Registrar(ex);
                 return false;
             }
             return true;
@@ -79,9 +85,9 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             string msg = $"Alunos não sincronizados no serap estudantes para adesão da prova {provaLegadoId}. ";
             msg += $"CodigoUE: {codigoUe}, CodigoTurma: {codigoTurma}, RaAlunos: {string.Join(",", raAlunos)}.";
-            SentrySdk.CaptureMessage(msg, SentryLevel.Warning);
+            servicoLog.Registrar(LogNivel.Informacao, msg);
         }
-        
+
         public int ObterTipoTurno(TipoTurnoSerapLegado tipoTurnoSerapLegado)
         {
             switch (tipoTurnoSerapLegado)

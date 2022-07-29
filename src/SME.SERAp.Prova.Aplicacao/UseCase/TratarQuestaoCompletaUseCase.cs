@@ -1,7 +1,7 @@
-﻿using SME.SERAp.Prova.Dados;
-using SME.SERAp.Prova.Dominio;
+﻿using MediatR;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -10,32 +10,29 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarQuestaoCompletaUseCase : ITratarQuestaoCompletaUseCase
     {
-        private readonly IRepositorioQuestao repositorioQuestao;
-        private readonly IRepositorioQuestaoCompleta repositorioQuestaoCompleta;
-        private readonly IRepositorioCache repositorioCache;
+        private readonly IMediator mediator;
 
-        public TratarQuestaoCompletaUseCase(IRepositorioQuestao repositorioQuestao, IRepositorioQuestaoCompleta repositorioQuestaoCompleta, IRepositorioCache repositorioCache)
+        public TratarQuestaoCompletaUseCase(IMediator mediator)
         {
-            this.repositorioQuestao = repositorioQuestao;
-            this.repositorioQuestaoCompleta = repositorioQuestaoCompleta;
-            this.repositorioCache = repositorioCache;
+            this.mediator = mediator ?? throw new ArgumentException(nameof(mediator));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var questaoAtualizada = mensagemRabbit.ObterObjetoMensagem<QuestaoAtualizada>();
-            var questaoCompleta = await repositorioQuestao.MontarQuestaoCompletaPorIdAsync(questaoAtualizada.Id);
+
+            var questaoCompleta = await mediator.Send(new MontarQuestaoCompletaPorIdQuery(questaoAtualizada.Id));
 
             if (questaoCompleta != null)
             {
                 if (questaoCompleta.QuantidadeAlternativas != questaoCompleta.Alternativas.Count())
-                throw new NegocioException($"Total de alternativas diferente do informado na questão {questaoAtualizada.Id}");
+                    throw new NegocioException($"Total de alternativas diferente do informado na questão {questaoAtualizada.Id}");
 
-            var json = JsonSerializer.Serialize(questaoCompleta, new JsonSerializerOptions() { IgnoreNullValues = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                var json = JsonSerializer.Serialize(questaoCompleta, new JsonSerializerOptions() { IgnoreNullValues = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-                await repositorioQuestaoCompleta.IncluirOuUpdateAsync(new QuestaoCompleta(questaoAtualizada.Id, json, questaoAtualizada.UltimaAtualizacao));
-                await repositorioCache.RemoverRedisAsync(string.Format(CacheChave.QuestaoCompleta, questaoAtualizada.Id));
-            } 
+                await mediator.Send(new QuestaoCompletaIncluirCommand(questaoAtualizada.Id, questaoCompleta.QuestaoLegadoId, json, questaoAtualizada.UltimaAtualizacao));
+                await mediator.Send(new RemoverQuestaoCacheCommand(questaoAtualizada.Id, questaoCompleta.QuestaoLegadoId));
+            }
 
             return true;
         }

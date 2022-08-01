@@ -23,13 +23,18 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var provaAluno = mensagemRabbit.ObterObjetoMensagem<ProvaAluno>();
+
+                var provaAlunoBanco = await mediator.Send(new ObterProvaAlunoPorProvaIdRaQuery(provaAluno.ProvaId, provaAluno.AlunoRA));
+
+                if (provaAlunoBanco != null && provaAluno.Id == 0)
+                    provaAluno.Id = provaAlunoBanco.Id;
                 provaAluno.Id = await mediator.Send(new IncluirProvaAlunoCommand(provaAluno));
-                await repositorioCache.SalvarRedisAsync(provaAluno.ProvaId + provaAluno.AlunoRA.ToString(), provaAluno);
+                await repositorioCache.SalvarRedisAsync(provaAluno.ProvaId.ToString() + provaAluno.AlunoRA.ToString(), provaAluno);
                 return true;
             }
             catch (Exception ex)
             {
-                servicoLog.Registrar($"Erro ao inicializar prova! -- Mensagem: {mensagemRabbit}", ex);
+                servicoLog.Registrar($"Erro ao gravar  prova! -- Mensagem: {mensagemRabbit}", ex);
                 return false;
             }
         }

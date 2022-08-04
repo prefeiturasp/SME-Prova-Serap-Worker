@@ -87,12 +87,16 @@ namespace SME.SERAp.Prova.Dados
 	                            rpc.questao_id as QuestaoId, 
 	                            rpc.questao_ordem as QuestaoOrdem,
 	                            rpc.resposta as Resposta
-                              from resultado_prova_consolidado rpc ";
+                              from resultado_prova_consolidado rpc 
+                                inner join aluno a on a.ra = rpc.aluno_codigo_eol
+                                inner join turma t on a.turma_id = t.id
+                                inner join prova p on p.prova_legado_id = rpc.prova_serap_id";
 
                 string where = "where 1=1";
                 where += @"     and rpc.prova_serap_id = @provaSerapId
                                 and rpc.dre_codigo_eol = @dreCodigoEol
-                                and rpc.ue_codigo_eol = @ueCodigoEol ";
+                                and rpc.ue_codigo_eol = @ueCodigoEol 
+                                and ((t.ano_letivo = EXTRACT(YEAR FROM p.inicio) and rpc.turma_codigo = t.codigo) or t.ano_letivo <> EXTRACT(YEAR FROM p.inicio))";
 
                 if (turmasCodigosEol != null)
                     where += "and rpc.turma_codigo = any(@turmasCodigosEol) ";

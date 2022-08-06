@@ -133,8 +133,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var alunosInativos = alunosTurma.Where(t => !alunosEol.Any(x => x.CodigoAluno == t.RA)).ToList();
                 if (alunosInativos.Any())
                 {
-                    alunosInativos.ForEach(t => t.Situacao = 99);
-                    await mediator.Send(new AlterarAlunosCommand(alunosInativos));
+                    await mediator.Send(new InativarAlunosCommand(turma.Id, alunosInativos));
                 }
             }
         }

@@ -72,7 +72,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<Aluno>> ObterAlunoPorCodigosAsync(long[] codigos)
         {
-            using var conn = ObterConexaoLeitura();
+            using var conn = ObterConexao();
             try
             {
                 var query = @"select id, nome, turma_id as TurmaId, ra from aluno where ra = ANY(@codigos)";
@@ -88,7 +88,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<Aluno>> ObterAlunosPorTurmaIdAsync(long turmaId)
         {
-            using var conn = ObterConexaoLeitura();
+            using var conn = ObterConexao();
             try
             {
                 var query = @"select id, nome, ra, turma_id as turmaId, situacao, data_atualizacao as DataAtualizacao, nome_social as nomeSocial, data_nascimento as dataNascimento, sexo from aluno where turma_id = @turmaId";
@@ -225,6 +225,22 @@ namespace SME.SERAp.Prova.Dados
                 conn.Close();
                 conn.Dispose();
             }
+        }
+
+        public async Task<bool> InativarAlunoPorIdETurmaIdAsync(long turmaId, long alunoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"update aluno set situacao = 99 where turma_id = @turmaId and id = @alunoId;";
+                return await conn.ExecuteAsync(query, new { turmaId, alunoId }) > 1;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+
         }
     }
 }

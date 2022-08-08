@@ -227,13 +227,13 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<bool> InativarAlunoPorIdETurmaIdAsync(long turmaId, long alunoId)
+        public async Task<bool> InativarAlunoPorIdETurmaIdAsync(long turmaId, long[] alunosId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = @"update aluno set situacao = 99 where turma_id = @turmaId and id = @alunoId;";
-                return await conn.ExecuteAsync(query, new { turmaId, alunoId }) > 1;
+                var query = @"update aluno set situacao = 99 where turma_id = @turmaId and id = ANY(@alunosId);";
+                return await conn.ExecuteAsync(query, new { turmaId, alunosId }) > 1;
             }
             finally
             {

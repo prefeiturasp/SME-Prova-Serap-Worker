@@ -1,8 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using MediatR;
-using SME.SERAp.Prova.Dados;
-using SME.SERAp.Prova.Infra;
 using System;
 using System.Globalization;
 using System.IO;

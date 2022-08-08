@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dados;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,8 +17,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Handle(InativarAlunosCommand request, CancellationToken cancellationToken)
         {
-            foreach (var aluno in request.Alunos)
-                await repositorioAluno.InativarAlunoPorIdETurmaIdAsync(request.TurmaId, aluno.Id);
+            await repositorioAluno.InativarAlunoPorIdETurmaIdAsync(request.TurmaId, request.Alunos.Select(t => t.Id).ToArray());
             return true;
         }
     }

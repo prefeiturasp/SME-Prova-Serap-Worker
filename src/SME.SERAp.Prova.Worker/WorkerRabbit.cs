@@ -1,4 +1,3 @@
-using Elastic.Apm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,6 +11,7 @@ using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -49,7 +49,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
             using var conexaoRabbit = connectionFactory.CreateConnection();
             using IModel channel = conexaoRabbit.CreateModel();
 
@@ -198,8 +197,9 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.AlterarUsuario, new ComandoRabbit("Alterar Usuario Persistencia Serap", typeof(IAlterarUsuarioSerapUseCase)));
             comandos.Add(RotasRabbit.IncluirProvaAluno, new ComandoRabbit("Incluir Prova Aluno Serap Estudantes", typeof(IIncluirProvaAlunoUseCase)));
             comandos.Add(RotasRabbit.AlterarProvaAluno, new ComandoRabbit("Alterar Prova Aluno Serap Estudantes", typeof(IAlterarProvaAlunoUseCase)));
-            comandos.Add(RotasRabbit.IncluirVersaoDispositivoApp , new ComandoRabbit("Incluir Versao Dispositivo App", typeof(IVersaoAppDispositivoAppUseCase)));
+            comandos.Add(RotasRabbit.IncluirVersaoDispositivoApp, new ComandoRabbit("Incluir Versao Dispositivo App", typeof(IVersaoAppDispositivoAppUseCase)));
 
+            comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)
@@ -224,19 +224,12 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             var mensagem = Encoding.UTF8.GetString(ea.Body.Span);
             var rota = ea.RoutingKey;
             if (comandos.ContainsKey(rota))
-
             {
                 _logger.LogInformation($"Worker rota: {rota}");
-                var jsonSerializerOptions = new JsonSerializerOptions();
-                jsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                var transacao = servicoTelemetria.IniciarTransacao(rota);
 
                 var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
-
                 var comandoRabbit = comandos[rota];
-
-                var transacao = servicoTelemetria.Apm ?
-                   Agent.Tracer.StartTransaction(rota, "WorkerRabbitSerapAcompanhamento") :
-                   null;
 
                 try
                 {
@@ -250,26 +243,25 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 catch (NegocioException nex)
                 {
                     channel.BasicAck(ea.DeliveryTag, false);
-                    servicolog.Registrar(LogNivel.Negocio, $"Rota-- {ea.RoutingKey} -- Erros: {nex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem.ToString()} --", nex.StackTrace);
-                    transacao.CaptureException(nex);
+                    servicolog.Registrar(LogNivel.Negocio, $"Rota-- {ea.RoutingKey} -- Erros: {nex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem} --", nex.StackTrace);
+                    servicoTelemetria.RegistrarExcecao(transacao, nex);
                 }
                 catch (ValidacaoException vex)
                 {
                     channel.BasicAck(ea.DeliveryTag, false);
-                    servicolog.Registrar(LogNivel.Negocio, $"Rota-- {ea.RoutingKey} -- Erros: {vex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem.ToString()} --", vex.StackTrace);
-                    transacao.CaptureException(vex);
+                    servicolog.Registrar(LogNivel.Negocio, $"Rota-- {ea.RoutingKey} -- Erros: {vex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem} --", vex.StackTrace);
+                    servicoTelemetria.RegistrarExcecao(transacao, vex);
                 }
                 catch (Exception ex)
                 {
                     channel.BasicAck(ea.DeliveryTag, false);
-                    servicolog.Registrar(LogNivel.Critico, $"Rota-- {ea.RoutingKey} -- Erros: {ex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem.ToString()} --", ex.StackTrace);
-                    transacao.CaptureException(ex);
+                    servicolog.Registrar(LogNivel.Critico, $"Rota-- {ea.RoutingKey} -- Erros: {ex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem} --", ex.StackTrace);
+                    servicoTelemetria.RegistrarExcecao(transacao, ex);
                 }
                 finally
                 {
-                    transacao?.End();
+                    servicoTelemetria.FinalizarTransacao(transacao);
                 }
-
             }
             else
                 channel.BasicReject(ea.DeliveryTag, false);

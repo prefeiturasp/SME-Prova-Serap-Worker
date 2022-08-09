@@ -1,6 +1,7 @@
 ﻿using Elastic.Apm.AspNetCore;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm.SqlClient;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -130,7 +131,12 @@ namespace SME.SERAp.Prova.Worker
             var muxer = ConnectionMultiplexer.Connect(redisConfigurationOptions);
             services.AddSingleton<IConnectionMultiplexer>(muxer);
 
-            var servicoTelemetria = new ServicoTelemetria(telemetriaOptions);
+            services.AddApplicationInsightsTelemetry(configuration);
+            var serviceProvider = services.BuildServiceProvider();
+            var clientTelemetry = serviceProvider.GetService<TelemetryClient>();
+
+            var servicoTelemetria = new ServicoTelemetria(clientTelemetry, telemetriaOptions);
+
             services.AddSingleton<IServicoTelemetria>(servicoTelemetria);
             DapperExtensionMethods.Init(servicoTelemetria);
         }

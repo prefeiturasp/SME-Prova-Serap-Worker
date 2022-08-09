@@ -87,5 +87,16 @@
         /// 0 - Código
         /// </summary>
         public const string CodigoAutenticacaoAdmin = "auth-adm-{0}";
+        /// <summary>
+        /// Turmas do aluno
+        /// 0 - Código ra do aluno
+        /// </summary>
+        public const string AlunoTurma = "al-turmas-{0}";
+        /// <summary>
+        /// Prova do aluno
+        /// 0 - Código da prova
+        /// 1 - Código ra do aluno
+        /// </summary>
+        public const string AlunoProva = "al-prova-{0}-{1}";
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
+using SME.SERAp.Prova.Aplicacao.UseCase;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Infra;
@@ -166,10 +167,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IVersaoAppDispositivoAppUseCase, VersaoAppDispositivoAppUseCase>();
 
             services.AddScoped<IIncluirProvaAlunoUseCase, IncluirProvaAlunoUseCase>();
-            
 
-            //IVersaoAppDispositivoApp
-
+            services.AddScoped<IReabrirProvaAlunoUseCase, ReabrirProvaAlunoUseCase>();
         }
     }
 }

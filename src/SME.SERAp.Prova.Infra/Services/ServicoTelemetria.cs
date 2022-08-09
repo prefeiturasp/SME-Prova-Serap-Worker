@@ -1,6 +1,7 @@
 ﻿using Elastic.Apm;
 using Elastic.Apm.Api;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Diagnostics;

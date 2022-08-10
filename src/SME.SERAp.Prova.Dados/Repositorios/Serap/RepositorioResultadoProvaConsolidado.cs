@@ -1,6 +1,4 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
@@ -87,15 +85,17 @@ namespace SME.SERAp.Prova.Dados
 	                            rpc.questao_id as QuestaoId, 
 	                            rpc.questao_ordem as QuestaoOrdem,
 	                            rpc.resposta as Resposta
-                              from resultado_prova_consolidado rpc ";
+                              from resultado_prova_consolidado rpc 
+                                 ";                
 
-                string where = "where 1=1";
+                string where = " where 1=1 ";
                 where += @"     and rpc.prova_serap_id = @provaSerapId
                                 and rpc.dre_codigo_eol = @dreCodigoEol
-                                and rpc.ue_codigo_eol = @ueCodigoEol ";
+                                and rpc.ue_codigo_eol = @ueCodigoEol 
+                                 ";
 
                 if (turmasCodigosEol != null)
-                    where += "and rpc.turma_codigo = any(@turmasCodigosEol) ";
+                    where += " and rpc.turma_codigo = any(@turmasCodigosEol) ";
 
                 query += where;
 
@@ -117,12 +117,58 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select distinct 1 from resultado_prova_consolidado where prova_serap_id = @provaLegadoId limit 1;";
-                return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaLegadoId });
+                var query = @"select 1 from resultado_prova_consolidado where prova_serap_id = @provaLegadoId limit 1;";
+                return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaLegadoId }, commandTimeout: 9000);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task ExcluirResultadoProvaAlunoTurma(long provaLegadoId, long alunoCodigoEol, string turmaCodigo)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"delete from resultado_prova_consolidado 
+                                    where prova_serap_id = @provaLegadoId
+                                      and aluno_codigo_eol = @alunoCodigoEol
+                                      and turma_codigo = @turmaCodigo";
+
+                await conn.ExecuteAsync(query, new { provaLegadoId, alunoCodigoEol, turmaCodigo }, commandTimeout: 9000);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<string>> ObterTurmasResultadoProvaAluno(long provaLegadoId, long alunoCodigoEol)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select distinct turma_codigo 
+                                         from resultado_prova_consolidado 
+                                        where prova_serap_id = @provaLegadoId 
+                                          and aluno_codigo_eol = @alunoCodigoEol";
+
+                return await conn.QueryAsync<string>(query, new { provaLegadoId, alunoCodigoEol }, commandTimeout: 9000);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {

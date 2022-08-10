@@ -28,8 +28,9 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (provaAlunoBanco != null && provaAluno.Id == 0)
                     provaAluno.Id = provaAlunoBanco.Id;
+
                 provaAluno.Id = await mediator.Send(new IncluirProvaAlunoCommand(provaAluno));
-                await repositorioCache.SalvarRedisAsync(provaAluno.ProvaId.ToString() + provaAluno.AlunoRA.ToString(), provaAluno);
+                await repositorioCache.SalvarRedisAsync(string.Format(CacheChave.AlunoProva, provaAluno.ProvaId, provaAluno.AlunoRA), provaAluno);
                 return true;
             }
             catch (Exception ex)

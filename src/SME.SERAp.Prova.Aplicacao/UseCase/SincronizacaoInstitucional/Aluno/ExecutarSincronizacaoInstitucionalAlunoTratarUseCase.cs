@@ -121,7 +121,10 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
 
                 if (listaParaAlterar.Any())
+                {
                     await mediator.Send(new AlterarAlunosCommand(listaParaAlterar));
+                    await mediator.Send(new RemoverAlunosCacheCommand(listaParaAlterar.Select(x => x.RA).ToArray()));
+                }
             }
         }
 
@@ -133,8 +136,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 var alunosInativos = alunosTurma.Where(t => !alunosEol.Any(x => x.CodigoAluno == t.RA)).ToList();
                 if (alunosInativos.Any())
                 {
-                    alunosInativos.ForEach(t => t.Situacao = 99);
-                    await mediator.Send(new AlterarAlunosCommand(alunosInativos));
+                    await mediator.Send(new InativarAlunosCommand(turma.Id, alunosInativos));
+                    await mediator.Send(new RemoverAlunosCacheCommand(alunosInativos.Select(x => x.RA).ToArray()));
                 }
             }
         }

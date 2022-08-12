@@ -254,7 +254,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception ex)
                 {
-                    channel.BasicAck(ea.DeliveryTag, false);
+                    channel.BasicReject(ea.DeliveryTag, false);
                     servicolog.Registrar(LogNivel.Critico, $"Rota-- {ea.RoutingKey} -- Erros: {ex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem} --", ex.StackTrace);
                     servicoTelemetria.RegistrarExcecao(transacao, ex);
                 }

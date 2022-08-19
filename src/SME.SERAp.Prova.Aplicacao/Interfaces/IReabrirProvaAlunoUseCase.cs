@@ -5,6 +5,6 @@ namespace SME.SERAp.Prova.Aplicacao.Interfaces
 {
     public interface IReabrirProvaAlunoUseCase
     {
-        Task Executar(MensagemRabbit mensagemRabbit);
+        Task<bool> Executar(MensagemRabbit mensagemRabbit);
     }
 }

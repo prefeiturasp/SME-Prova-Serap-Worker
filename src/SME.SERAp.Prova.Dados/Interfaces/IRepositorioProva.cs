@@ -15,6 +15,7 @@ namespace SME.SERAp.Prova.Dados
         Task ConsolidarProvaRespostasPorProvaSerapId(long provaId);
         Task LimparDadosConsolidadosPorProvaSerapId(long provaId);
         Task ConsolidarProvaRespostasPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo);
+        Task<IEnumerable<ProvaBIBSyncDto>> ObterProvasBibAsync();
         Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo);
         Task<IEnumerable<ResultadoProvaConsolidado>> ObterDadosPorUeId(long provaId, string dreId, string ueId);
         Task<bool> FinalizarProvaAsync(ProvaParaAtualizarDto provaParaAtualizar);

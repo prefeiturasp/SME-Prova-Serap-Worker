@@ -28,10 +28,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     var provaCadernosAlunos = await mediator.Send(new ObterAlunosSemCadernoProvaBibQuery(prova.ProvaId));
                     if (provaCadernosAlunos != null && provaCadernosAlunos.Any())
                     {
-                        foreach (var alunos in provaCadernosAlunos)
+                        foreach (var aluno in provaCadernosAlunos)
                         {
-                            alunos.TotalCadernos = prova.TotalCadernos;
-                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBTratar, prova));
+                            aluno.TotalCadernos = prova.TotalCadernos;
+                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBTratar, aluno));
                         }
                     }
                 }

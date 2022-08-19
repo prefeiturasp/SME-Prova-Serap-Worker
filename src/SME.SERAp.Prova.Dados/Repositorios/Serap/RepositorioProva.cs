@@ -365,7 +365,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public Task<IEnumerable<ProvaBIBSyncDto>> ObterProvasBibAsync()
+        public async Task<IEnumerable<ProvaBIBSyncDto>> ObterProvasBibAsync()
         {
             using var conn = ObterConexao();
             try
@@ -374,7 +374,7 @@ namespace SME.SERAp.Prova.Dados
                               from prova p
                               where p.possui_bib = true";
 
-                return conn.QueryAsync<ProvaBIBSyncDto>(query);
+                return await conn.QueryAsync<ProvaBIBSyncDto>(query);
             }
             finally
             {

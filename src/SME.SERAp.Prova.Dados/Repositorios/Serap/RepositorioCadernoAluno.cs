@@ -14,34 +14,17 @@ namespace SME.SERAp.Prova.Dados
 
         }
 
-        public async Task<IEnumerable<ProvaCadernoAlunoDto>> ObterAlunosSemCadernosProvaBibAsync()
+        public async Task<IEnumerable<ProvaCadernoAlunoDto>> ObterAlunosSemCadernosProvaBibAsync(long provaId)
         {
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select p.id as provaId, p.total_cadernos as totalCadernos, a.id as alunoId
-                              from prova p
-                              left join prova_ano_original pa on pa.prova_id = p.id 
-                              left join turma t on (((pa.modalidade = 3 or pa.modalidade = 4) and pa.etapa_eja = t.etapa_eja) or (pa.modalidade <> 3 and pa.modalidade <> 4)) 
-  	                                 and t.ano = pa.ano 
-  	                                 and t.modalidade_codigo = pa.modalidade 
-  	                                 and t.ano_letivo::double precision = date_part('year'::text, p.inicio)  
-                              join aluno a on a.turma_id = t.id
-                              where (p.aderir_todos is null or p.aderir_todos)
-                                 and p.possui_bib = true
-                                 and not exists(select 1 from caderno_aluno ca where ca.prova_id = p.id and aluno_id = a.id)
-		
-                              union all 
- 
-                              select p.id as provaId, p.total_cadernos as totalCadernos, a.id as alunoId
-                              from prova p
-                              left join prova_adesao pa on pa.prova_id = p.id
-                              join aluno a on a.ra = pa.aluno_ra
-                              where p.aderir_todos = false
-	                            and p.possui_bib = true
-	                            and not exists(select 1 from caderno_aluno ca where	ca.prova_id = p.id and aluno_id = a.id)";
+                var query = @"SELECT vpta.prova_id as provaId, vpta.turma_ano as ano, vpta.aluno_id as alunoId
+                              FROM v_prova_turma_aluno vpta
+                              WHERE vpta.prova_id = @provaId
+                                and not exists(select 1 from caderno_aluno ca where ca.prova_id = vpta.prova_id and ca.aluno_id = vpta.aluno_id)";
 
-                return await conn.QueryAsync<ProvaCadernoAlunoDto>(query);
+                return await conn.QueryAsync<ProvaCadernoAlunoDto>(query, new { provaId });
             }
             finally
             {

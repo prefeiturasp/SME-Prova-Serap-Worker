@@ -6,7 +6,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterTurmaAtribuidasEolPorUsuarioQuery : IRequest<IEnumerable<TurmaAtribuicaoEolDto>>
     {
-        public ObterTurmaAtribuidasEolPorUsuarioQuery(string login, string turmaCodigo = null, int? anoLetivo = null)
+        public ObterTurmaAtribuidasEolPorUsuarioQuery(string login, long? turmaCodigo = null, int? anoLetivo = null)
         {
             Login = login;
             TurmaCodigo = turmaCodigo;
@@ -14,7 +14,7 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         public string Login { get; set; }
-        public string TurmaCodigo { get; set; }
+        public long? TurmaCodigo { get; set; }
         public int? AnoLetivo { get; set; }
     }
 }

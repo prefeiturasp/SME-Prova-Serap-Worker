@@ -364,5 +364,23 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<IEnumerable<ProvaBIBSyncDto>> ObterProvasBibAsync()
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select p.id as ProvaId, p.total_cadernos as TotalCadernos
+                              from prova p
+                              where p.possui_bib = true";
+
+                return await conn.QueryAsync<ProvaBIBSyncDto>(query);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

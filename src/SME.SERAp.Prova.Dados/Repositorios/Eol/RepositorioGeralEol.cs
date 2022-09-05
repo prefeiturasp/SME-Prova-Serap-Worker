@@ -1,4 +1,5 @@
-﻿using SME.SERAp.Prova.Infra;
+﻿using Dapper;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
@@ -78,7 +79,7 @@ namespace SME.SERAp.Prova.Dados
 			return await conn.QueryAsync<string>(query, new { codigoRf, tiposEscola });
 		}
 
-		public async Task<IEnumerable<TurmaAtribuicaoEolDto>> ObterTurmaAtribuicaoEol(int anoInicial, string codigoRf, int[] tiposEscola, string turmaCodigo, int? anoLetivo)
+		public async Task<IEnumerable<TurmaAtribuicaoEolDto>> ObterTurmaAtribuicaoEol(int anoInicial, string codigoRf, int[] tiposEscola, long? turmaCodigo, int? anoLetivo)
 		{
 			var query = @"
 						select atb.an_atribuicao as AnoLetivo,
@@ -117,7 +118,7 @@ namespace SME.SERAp.Prova.Dados
 						  and esc.tp_escola in @tiposEscola
 						  and (tur_reg.cd_turma_escola is not null or tur_pro.cd_turma_escola is not null)";
 
-			if (!string.IsNullOrEmpty(turmaCodigo) && anoLetivo.HasValue)
+			if (turmaCodigo.HasValue && anoLetivo.HasValue)
 			{
 				query += @" and atb.an_atribuicao = @anoLetivo 
 							and (stg.cd_turma_escola = @turmaCodigo or tegp.cd_turma_escola = @turmaCodigo) ";
@@ -130,7 +131,15 @@ namespace SME.SERAp.Prova.Dados
 								coalesce(stg.cd_turma_escola, tegp.cd_turma_escola)";
 
 			using var conn = new SqlConnection(connectionStringOptions.Eol);
-			return await conn.QueryAsync<TurmaAtribuicaoEolDto>(query, new { anoInicial, codigoRf, tiposEscola, turmaCodigo, anoLetivo = anoLetivo.GetValueOrDefault() });
+
+			DynamicParameters param = new DynamicParameters();
+			param.Add("@anoInicial", anoInicial);
+			param.Add("@codigoRf", codigoRf, System.Data.DbType.String, null, 7);
+			param.Add("@tiposEscola", tiposEscola);
+			param.Add("@turmaCodigo", turmaCodigo);
+			param.Add("@anoLetivo", anoLetivo.GetValueOrDefault());
+
+			return await conn.QueryAsync<TurmaAtribuicaoEolDto>(query, param);
 		}
 	}
 }

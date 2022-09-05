@@ -134,7 +134,7 @@ namespace SME.SERAp.Prova.Dados
 
 			DynamicParameters param = new DynamicParameters();
 			param.Add("@anoInicial", anoInicial);
-			param.Add("@codigoRf", codigoRf, System.Data.DbType.String, null, 7);
+			param.Add("@codigoRf", codigoRf, System.Data.DbType.AnsiStringFixedLength, null, 7);
 			param.Add("@tiposEscola", tiposEscola);
 			param.Add("@turmaCodigo", turmaCodigo);
 			param.Add("@anoLetivo", anoLetivo.GetValueOrDefault());

@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<IEnumerable<ProvaCadernoAlunoDto>> Handle(ObterAlunosSemCadernoProvaBibQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioCadernoAluno.ObterAlunosSemCadernosProvaBibAsync();
+            return await repositorioCadernoAluno.ObterAlunosSemCadernosProvaBibAsync(request.ProvaId);
         }
     }
 }

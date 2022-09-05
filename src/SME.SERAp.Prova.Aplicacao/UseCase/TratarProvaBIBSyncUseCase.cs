@@ -20,26 +20,21 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            logger.LogInformation("PROVABIB SYNC - Iniciou");
-
-            try
+            var provasbib = await mediator.Send(new ObterProvasBibQuery());
+            if (provasbib != null && provasbib.Any())
             {
-                var provaCadernosAlunos = await mediator.Send(new ObterAlunosSemCadernoProvaBibQuery());
-
-                logger.LogInformation("PROVABIB SYNC - Total de registros: " + provaCadernosAlunos.Count());
-
-                if (provaCadernosAlunos != null && provaCadernosAlunos.Any())
+                foreach (var prova in provasbib)
                 {
-                    foreach (var prova in provaCadernosAlunos)
+                    var provaCadernosAlunos = await mediator.Send(new ObterAlunosSemCadernoProvaBibQuery(prova.ProvaId));
+                    if (provaCadernosAlunos != null && provaCadernosAlunos.Any())
                     {
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBTratar, prova));
+                        foreach (var aluno in provaCadernosAlunos)
+                        {
+                            aluno.TotalCadernos = prova.TotalCadernos;
+                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaBIBTratar, aluno));
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "PROVABIB SYNC - ERRO");
-                throw ex;
             }
 
             return true;

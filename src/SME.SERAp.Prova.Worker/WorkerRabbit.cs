@@ -199,7 +199,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.AlterarProvaAluno, new ComandoRabbit("Alterar Prova Aluno Serap Estudantes", typeof(IAlterarProvaAlunoUseCase)));
             comandos.Add(RotasRabbit.IncluirVersaoDispositivoApp, new ComandoRabbit("Incluir Versao Dispositivo App", typeof(IVersaoAppDispositivoAppUseCase)));
 
-            comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));
+            comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));           
+            comandos.Add(RotasRabbit.TratarUsuarioDispositivoLogin, new ComandoRabbit("Salvar dispositivo no login do usuário", typeof(ITratarUsuarioDispositivoLoginUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

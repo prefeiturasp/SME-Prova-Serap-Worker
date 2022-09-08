@@ -71,8 +71,7 @@
         public const string IncluirProvaAluno = "serap.estudantes.provaAluno.incluir";
         public const string AlterarProvaAluno = "serap.estudantes.provaAluno.alterar";
 
-
-        public const string ReabrirProvaAluno = "serap.estudantes.provaAluno.reabrir";
+        public const string ReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura";
 
         public static string RotaLogs => "ApplicationLog";
     }

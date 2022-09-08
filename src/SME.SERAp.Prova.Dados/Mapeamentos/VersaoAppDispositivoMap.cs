@@ -13,6 +13,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.DispositivoImei).ToColumn("dispositivo_imei");
             Map(c => c.AtualizadoEm).ToColumn("atualizado_em");
             Map(c => c.CriadoEm).ToColumn("criado_em");
+            Map(c => c.DispositivoId).ToColumn("dispositivo_id");
         }
     }
 }

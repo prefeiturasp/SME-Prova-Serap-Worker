@@ -1,6 +1,4 @@
-﻿
-
-using MediatR;
+﻿using MediatR;
 using SME.SERAp.Prova.Dados;
 using System;
 using System.Threading;
@@ -20,9 +18,6 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Handle(IncluirVersaoAppDispositivoCommand request, CancellationToken cancellationToken)
         {
             await repositorioVersaoAppDispositivo.IncluirAsync(request.VersaoAppDispositivo);
-
-
-
             return true;
         }
     }

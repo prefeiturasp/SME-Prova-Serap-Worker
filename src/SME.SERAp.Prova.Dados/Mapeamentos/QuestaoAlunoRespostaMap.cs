@@ -18,6 +18,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.CriadoEm).ToColumn("criado_em");
             Map(c => c.TempoRespostaAluno).ToColumn("tempo_resposta_aluno");
             Map(c => c.Visualizacoes).ToColumn("visualizacoes");
+            Map(c => c.DispositivoId).ToColumn("dispositivo_id");
         }
     }
 }

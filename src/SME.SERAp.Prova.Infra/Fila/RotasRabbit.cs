@@ -73,6 +73,7 @@
 
 
         public const string ReabrirProvaAluno = "serap.estudantes.provaAluno.reabrir";
+        public const string TratarUsuarioDispositivoLogin = "serap.estudantes.usuario.dispositivo.login.tratar";
 
         public static string RotaLogs => "ApplicationLog";
     }

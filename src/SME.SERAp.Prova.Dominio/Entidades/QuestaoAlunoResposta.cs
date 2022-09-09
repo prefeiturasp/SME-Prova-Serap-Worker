@@ -9,7 +9,7 @@ namespace SME.SERAp.Prova.Dominio
             CriadoEm = DateTime.Now;
         }
 
-        public QuestaoAlunoResposta(long questaoId, long alunoRa, long? alternativaId, string resposta, DateTime criadoEm, int tempoRespostaAluno, int visualizacoes)
+        public QuestaoAlunoResposta(long questaoId, long alunoRa, long? alternativaId, string resposta, DateTime criadoEm, int tempoRespostaAluno, int visualizacoes, string dispositivoId)
         {
             QuestaoId = questaoId;
             AlunoRa = alunoRa;
@@ -18,6 +18,7 @@ namespace SME.SERAp.Prova.Dominio
             CriadoEm = criadoEm;
             TempoRespostaAluno = tempoRespostaAluno;
             Visualizacoes = visualizacoes;
+            DispositivoId = dispositivoId;
         }
 
         public long QuestaoId { get; set; }
@@ -27,5 +28,6 @@ namespace SME.SERAp.Prova.Dominio
         public int Visualizacoes { get; set; }
         public DateTime CriadoEm { get; set; }
         public int TempoRespostaAluno { get; set; }
+        public string DispositivoId { get; set; }
     }
 }

@@ -25,7 +25,13 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (questaoRespondida == null)
             {
-                return await mediator.Send(new IncluirQuestaoAlunoRespostaCommand(dto.QuestaoId, dto.AlunoRa, dto.AlternativaId, dto.Resposta, horaDataResposta, dto.TempoRespostaAluno ?? 0));
+                return await mediator.Send(new IncluirQuestaoAlunoRespostaCommand(dto.QuestaoId, 
+                                                                                  dto.AlunoRa, 
+                                                                                  dto.AlternativaId, 
+                                                                                  dto.Resposta, 
+                                                                                  horaDataResposta, 
+                                                                                  dto.TempoRespostaAluno ?? 0,
+                                                                                  dto.DispositivoId));
             }
             else
             {
@@ -53,6 +59,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 questaoRespondida.TempoRespostaAluno += dto.TempoRespostaAluno ?? 0;
                 questaoRespondida.CriadoEm = horaDataResposta;
                 questaoRespondida.Visualizacoes += 1;
+                questaoRespondida.DispositivoId = dto.DispositivoId;
 
                 return await mediator.Send(new AtualizarQuestaoAlunoRespostaCommand(questaoRespondida));
             }

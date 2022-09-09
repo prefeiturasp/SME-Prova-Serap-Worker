@@ -8,5 +8,6 @@
         public string Resposta { get; set; }
         public long DataHoraRespostaTicks { get; set; }
         public int? TempoRespostaAluno { get; set; }
+        public string DispositivoId { get; set; }
     }
 }

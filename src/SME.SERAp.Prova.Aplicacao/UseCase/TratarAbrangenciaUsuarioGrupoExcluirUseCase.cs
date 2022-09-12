@@ -37,7 +37,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (grupo.IdCoreSso == GruposCoreSso.Professor || grupo.IdCoreSso == GruposCoreSso.Professor_old)
             {
-                var atribuicoes = await mediator.Send(new ObterTurmaAtribuidasEolPorUsuarioQuery(usuario.Login, turma.Codigo, turma.AnoLetivo));
+                var atribuicoes = await mediator.Send(new ObterTurmaAtribuidasEolPorUsuarioQuery(usuario.Login, long.Parse(turma.Codigo), turma.AnoLetivo));
 
                 if (!atribuicoes.Any(t => t.AnoLetivo == turma.AnoLetivo && t.TurmaCodigo.ToString() == turma.Codigo))
                     await mediator.Send(new ExcluirAbrangenciaPorIdCommand(abrangencia.Id));

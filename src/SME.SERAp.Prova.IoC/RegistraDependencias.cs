@@ -84,6 +84,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioProficienciaProvaSP, RepositorioProficienciaProvaSP>();
             services.AddScoped<IRepositorioQuestaoLegado, RepositorioQuestaoLegado>();
             services.AddScoped<IRepositorioVersaoAppDispositivo, RepositorioVersaoAppDispositivo>();
+            services.AddScoped<IRepositorioUsuarioDispositivo, RepositorioUsuarioDispositivo>();
             services.AddScoped<IRepositorioProvaAlunoReabertura, RepositorioProvaReabertura>();
 
             
@@ -170,10 +171,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IVersaoAppDispositivoAppUseCase, VersaoAppDispositivoAppUseCase>();
 
             services.AddScoped<IIncluirProvaAlunoUseCase, IncluirProvaAlunoUseCase>();
-            
 
-            //IVersaoAppDispositivoApp
-
+            services.AddScoped<IReabrirProvaAlunoUseCase, ReabrirProvaAlunoUseCase>();
+            services.AddScoped<ITratarUsuarioDispositivoLoginUseCase, TratarUsuarioDispositivoLoginUseCase>();
         }
     }
 }

@@ -340,7 +340,8 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"update prova_aluno 
                                      set status = @status, 
-                                     finalizado_em = @finalizadoEm
+                                     finalizado_em = @finalizadoEm,
+                                     finalizado_em_servidor = @finalizadoEm
                                 where prova_id = @provaId
                                 and id = any(@ids)";
 

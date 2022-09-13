@@ -76,6 +76,12 @@
         public const string TratarUsuarioDispositivoLogin = "serap.estudantes.usuario.dispositivo.login.tratar";
         public const string ReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura";
 
+          public const string TratarReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura.tratar";
+
+        public const string ProvaAlunoReaberturaTratarAcompanhamento = "serap.estudante.acomp.prova.aluno.reabertura.tratar";
+
+
+
         public static string RotaLogs => "ApplicationLog";
     }
 }

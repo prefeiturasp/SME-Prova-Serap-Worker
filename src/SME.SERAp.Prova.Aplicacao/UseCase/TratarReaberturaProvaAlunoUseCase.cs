@@ -9,8 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SME.SERAp.Prova.Aplicacao.UseCase.PersistenciaSerap
-{
+namespace SME.SERAp.Prova.Aplicacao.UseCase
     public class TratarReaberturaProvaAlunoUseCase : ITratarReaberturaProvaAlunoUseCase
     {
         private readonly IMediator mediator;

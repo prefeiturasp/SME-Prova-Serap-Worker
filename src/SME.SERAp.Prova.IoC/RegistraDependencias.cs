@@ -175,6 +175,7 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<IReabrirProvaAlunoUseCase, ReabrirProvaAlunoUseCase>();
             services.AddScoped<ITratarUsuarioDispositivoLoginUseCase, TratarUsuarioDispositivoLoginUseCase>();
+            services.AddScoped<ITratarReaberturaProvaAlunoUseCase, TratarReaberturaProvaAlunoUseCase>();
         }
     }
 }

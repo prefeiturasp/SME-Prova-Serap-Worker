@@ -9,17 +9,6 @@ namespace SME.SERAp.Prova.Dominio
             CriadoEm = DateTime.Now;
         }
 
-        public ProvaAluno(long provaId, ProvaStatus status, long alunoRa, DateTime criadoEm, DateTime? finalizadoEm, TipoDispositivo tipoDispositivo, string dispositivoId)
-        {
-            ProvaId = provaId;
-            Status = status;
-            CriadoEm = criadoEm;
-            AlunoRA = alunoRa;
-            FinalizadoEm = finalizadoEm;
-            TipoDispositivo = tipoDispositivo;
-            DispositivoId = dispositivoId;
-        }
-
         public long ProvaId { get; set; }
         public long AlunoRA { get; set; }
         public ProvaStatus Status { get; set; }
@@ -27,6 +16,8 @@ namespace SME.SERAp.Prova.Dominio
         public DateTime? FinalizadoEm { get; set; }
         public FrequenciaAluno Frequencia { get; set; }
         public TipoDispositivo TipoDispositivo { get; set; }
+        public DateTime? CriadoEmServidor { get; set; }
+        public DateTime? FinalizadoEmServidor { get; set; }
         public string DispositivoId { get; set; }
 
         public DateTime ObterCriadoMais3Horas()

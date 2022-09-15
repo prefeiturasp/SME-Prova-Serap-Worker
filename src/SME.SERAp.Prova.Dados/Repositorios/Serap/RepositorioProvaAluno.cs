@@ -111,5 +111,21 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<int> ExcluirProvaAlunoAsync(long provaId, long alunoRa)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"delete prova_aluno where prova_id = @provaid and aluno_ra = @alunoRa;";
+
+                return await conn.ExecuteAsync(query, new { provaId, alunoRa });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

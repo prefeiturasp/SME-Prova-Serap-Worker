@@ -3,13 +3,11 @@ using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
-using SME.SERAp.Prova.Infra.Services;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao.UseCase
+{ 
     public class TratarReaberturaProvaAlunoUseCase : ITratarReaberturaProvaAlunoUseCase
     {
         private readonly IMediator mediator;

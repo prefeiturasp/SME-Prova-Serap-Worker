@@ -22,76 +22,69 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            try
+            var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
+            var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(alunoProva.ProvaLegadoId));
+            if (provaAtual == null)
+                throw new Exception($"Prova {alunoProva.ProvaId} não localizada.");
+
+            var dadosDaAmostraTai = await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaAtual.LegadoId));
+            if (dadosDaAmostraTai == null)
+                throw new NegocioException($"Os dados da amostra tai não foram cadastrados para  a prova {alunoProva.ProvaId}");
+
+            var itens = await mediator.Send(new ObterItensAmostraTaiQuery(dadosDaAmostraTai.MatrizId, dadosDaAmostraTai.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()));
+            if (itens == null || itens.Count() < dadosDaAmostraTai.NumeroItensAmostra)
+                throw new NegocioException($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaAtual.LegadoId}");
+
+            var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(provaAtual.Id, alunoProva.AlunoId));
+
+            //Chamar Api TAI
+            var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId, proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra));
+            var cadernoAluno = new CadernoAluno(
+                    alunoProva.AlunoId,
+                    provaAtual.Id,
+                    alunoProva.AlunoId.ToString());
+
+            var provaALuno = await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
+
+            var ordem = 0;
+            foreach(var questao in itens.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
             {
-                var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
-                var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(alunoProva.ProvaLegadoId));
-                if (provaAtual == null)
-                    throw new Exception($"Prova {alunoProva.ProvaId} não localizada.");
+                var questaoParaPersistir = new Questao(
+                    questao.TextoBase,
+                    questao.ItemId,
+                    questao.Enunciado,
+                    ordem,
+                    alunoProva.ProvaId,
+                    (QuestaoTipo)questao.TipoItem,
+                    alunoProva.AlunoId.ToString(),
+                    questao.QuantidadeAlternativas);
 
-                var dadosDaAmostraTai = await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaAtual.LegadoId));
-                if (dadosDaAmostraTai == null)
-                    throw new NegocioException($"Os dados da amostra tai não foram cadastrados para  a prova {alunoProva.ProvaId}");
-               
-                var itens = await mediator.Send(new ObterItensAmostraTaiQuery(dadosDaAmostraTai.MatrizId, dadosDaAmostraTai.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()));
-                var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(provaAtual.Id, alunoProva.AlunoId));
+                var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
 
-                //Chamar Api TAI
-                // var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId, proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra));
-                var cadernoAluno = new CadernoAluno(
-                        alunoProva.AlunoId,
-                        provaAtual.Id,
-                        "0",
-                        alunoProva.AlunoId.ToString());
-
-
-                var provaALuno = await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
-
-
-                foreach (var questao in itens)
+                if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
                 {
-                    var questaoParaPersistir = new Questao(
-                        questao.TextoBase,
-                        questao.ItemId,
-                        questao.Enunciado,
-                         0,
-                        alunoProva.ProvaId,
-                        (QuestaoTipo)questao.TipoItem,
-                        "0",
-                        questao.QuantidadeAlternativas,
-                        alunoProva.AlunoId.ToString());
+                    questaoParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(questaoParaPersistir.Arquivos));
 
-
-                    var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
-                   
-
-                    if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
+                    foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
                     {
-                        questaoParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(questaoParaPersistir.Arquivos));
-
-                        foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
-                        {
-                            var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
-                            await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
-                        }
-                    }
-
-                    await TratarAudiosQuestao(questao, questaoId);
-
-                    await TratarVideosQuestao(questao.ItemId, questaoId);
-
-                    if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
-                    {
-                        await TratarAlternativasQuestao(questao, questaoId);
+                        var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+                        await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
                     }
                 }
 
-                return true;
+                await TratarAudiosQuestao(questao, questaoId);
+
+                await TratarVideosQuestao(questao.ItemId, questaoId);
+
+                if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
+                {
+                    await TratarAlternativasQuestao(questao, questaoId);
+                }
+
+                ordem++;
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+
+            return true;
         }
         private async Task TratarAlternativasQuestao(ItemAmostraTaiDto questaoSerap, long questaoId)
         {

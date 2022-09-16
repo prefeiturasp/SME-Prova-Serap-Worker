@@ -14,7 +14,6 @@ namespace SME.SERAp.Prova.Dominio
         public long ProvaId { get; set; }
         public QuestaoTipo Tipo { get; set; }
         public string Caderno { get; set; }
-        public string CadernoTai { get; set; }
         public IEnumerable<Arquivo> Arquivos { get; set; }
 
 
@@ -22,7 +21,7 @@ namespace SME.SERAp.Prova.Dominio
         {
         }
 
-        public Questao(string textoBase, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas, string cadernoTai = null)
+        public Questao(string textoBase, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas)
         {
             Ordem = ordem;
             TextoBase = textoBase;
@@ -32,7 +31,6 @@ namespace SME.SERAp.Prova.Dominio
             Tipo = tipo;
             Caderno = caderno;
             QuantidadeAlternativas = quantidadeAlternativas;
-            CadernoTai = cadernoTai;
             TrataArquivos();
         }
 

@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using System.Collections.Generic;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterItensProvaTAISorteioRQuery : IRequest<string>
+    public class ObterItensProvaTAISorteioRQuery : IRequest<ItensProvaTAISorteioDto>
     {
         public ObterItensProvaTAISorteioRQuery(long alunoId, decimal proeficienciaAluno, IEnumerable<ItemAmostraTaiDto> itens, int quantidadeItensDaAmostra)
         {

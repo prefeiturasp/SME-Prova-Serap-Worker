@@ -1,8 +1,9 @@
 ﻿using Dapper.FluentMap.Dommel.Mapping;
+using SME.SERAp.Prova.Dominio;
 
 namespace SME.SERAp.Prova.Dados.Mapeamentos
 {
-    public class ProvaAlunoReaberturaMap : DommelEntityMap<Dominio.ProvaAlunoReabertura>
+    public class ProvaAlunoReaberturaMap : DommelEntityMap<ProvaAlunoReabertura>
     {
         public ProvaAlunoReaberturaMap()
         {

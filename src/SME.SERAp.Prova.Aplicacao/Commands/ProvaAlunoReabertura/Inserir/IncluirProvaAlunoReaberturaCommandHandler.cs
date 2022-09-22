@@ -18,7 +18,14 @@ namespace SME.SERAp.Prova.Aplicacao
         }
         public async Task<long> Handle(IncluirProvaAlunoReaberturaCommand request, CancellationToken cancellationToken)
         {
-            return await repositorioProvaAlunoReabertura.SalvarAsync(request.ProvaAlunoReabertura);
+            try
+            {
+                return await repositorioProvaAlunoReabertura.SalvarAsync(request.ProvaAlunoReabertura);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

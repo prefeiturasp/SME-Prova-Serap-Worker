@@ -77,7 +77,7 @@
         public const string ReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura";
         public const string TratarReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura.tratar";  
 
-      public static string ProvaAlunoReaberturaTratarAcompanhamento = "serap.estudante.acomp.prova.aluno.reabertura.tratar";
+      public static string ProvaAlunoReaberturaTratarAcompanhamento => "serap.estudante.acomp.prova.aluno.reabertura.tratar";
 
         public static string RotaLogs => "ApplicationLog";
     }

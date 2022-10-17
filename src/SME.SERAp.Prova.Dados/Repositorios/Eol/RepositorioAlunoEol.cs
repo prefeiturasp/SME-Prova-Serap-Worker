@@ -86,7 +86,7 @@ namespace SME.SERAp.Prova.Dados
 								se.cd_serie_ensino = ste.cd_serie_ensino
 							WHERE matricula.Linha = 1
 							and turesc.cd_tipo_turma = 1
-							and CodigoSituacaoMatricula in (1, 6, 10) -- Alunos que podem acessar o serap
+							and CodigoSituacaoMatricula in (1, 6, 10, 13, 5) -- Alunos que podem acessar o serap
 							order by aluno.nm_aluno";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);

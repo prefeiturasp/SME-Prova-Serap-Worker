@@ -489,8 +489,7 @@ namespace SME.SERAp.Prova.Dados
 
                 var dados = await conn.QueryMultipleAsync(query, new { provaId });
 
-                if (dados == null)
-                    return null;
+                //if (dados. == null) return null;
 
                 var amostraProvaTai = await dados.ReadSingleAsync<AmostraProvaTaiDto>();
                 var configItens = await dados.ReadAsync<ConfigAnoItensProvaTaiDto>();
@@ -500,12 +499,6 @@ namespace SME.SERAp.Prova.Dados
 
                 return amostraProvaTai;
             }
-
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
             finally
             {
                 conn.Close();

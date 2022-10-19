@@ -50,9 +50,9 @@ namespace SME.SERAp.Prova.Dados
 								and ss.[State] = 1 and sub.[State] = 1
 								and s.Parent_Id is not null
 								and i.EvaluationMatrix_Id = @matrizId
-							--	and i.TRIDiscrimination is not null
-							--	and i.TRIDifficulty is not null
-							--	and i.TRICasualSetting is not null
+								and i.TRIDiscrimination is not null
+								and i.TRIDifficulty is not null
+								and i.TRICasualSetting is not null
 								and icg.TypeCurriculumGradeId in({string.Join(",", tipoCurriculoGradeIds)})";
 
                 return await conn.QueryAsync<ItemAmostraTaiDto>(query, new { matrizId });

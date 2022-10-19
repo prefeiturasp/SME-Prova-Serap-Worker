@@ -2,14 +2,14 @@
 {
     public static class RotasRabbit
     {
-        public const string ProvaSync = "serap.estudante.prova.legado.sync";       
+        public const string ProvaSync = "serap.estudante.prova.legado.sync";
         public const string ProvaTratar = "serap.estudante.prova.legado.tratar";
         public const string ProvaAnoTratar = "serap.estudante.prova.ano.legado.tratar";
-        public const string QuestaoSync = "serap.estudante.questao.legado.sync";       
+        public const string QuestaoSync = "serap.estudante.questao.legado.sync";
         public const string QuestaoTratar = "serap.estudante.questao.legado.tratar";
         public const string QuestaoImagemIncorretaTratar = "serap.estudante.questoes.imagens.tratar";
         public const string AlternativaImagemIncorretaTratar = "serap.estudante.alternativas.imagens.tratar";
-        public const string AlternativaSync = "serap.estudante.alternativa.legado.sync";       
+        public const string AlternativaSync = "serap.estudante.alternativa.legado.sync";
         public const string AlternativaTratar = "serap.estudante.alternativa.legado.tratar";
         public const string ProvaBIBSync = "serap.estudante.provabib.sync";
         public const string ProvaBIBTratar = "serap.estudante.provabib.tratar";
@@ -54,7 +54,7 @@
         public const string GrupoAbrangenciaExcluir = "serap.estudante.grupo.abrangencia.excluir";
         public const string UsuarioGrupoAbrangenciaExcluirTratar = "serap.estudante.usuario.grupo.abrangencia.excluir.tratar";
 
-        public const string FilaDeadletterTratar = "serap.deadletter.tratar";        
+        public const string FilaDeadletterTratar = "serap.deadletter.tratar";
         public const string FilaDeadletterSync = "serap.deadletter.sync";
 
 
@@ -73,6 +73,11 @@
 
 
         public const string ReabrirProvaAluno = "serap.estudantes.provaAluno.reabrir";
+        public const string TratarUsuarioDispositivoLogin = "serap.estudantes.usuario.dispositivo.login.tratar";
+        public const string ReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura";
+        public const string TratarReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura.tratar";  
+
+      public static string ProvaAlunoReaberturaTratarAcompanhamento => "serap.estudante.acomp.prova.aluno.reabertura.tratar";
 
         public static string RotaLogs => "ApplicationLog";
     }

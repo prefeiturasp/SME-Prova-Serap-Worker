@@ -22,22 +22,22 @@ namespace SME.SERAp.Prova.Aplicacao
             if (turma == null)
                 throw new NegocioException($"Turma não informada.");
 
-            var alunosEol = await mediator.Send(new ObterAlunosEolPorTurmasCodigoQuery(new long[] { long.Parse(turma.Codigo) }));
+            var alunosAtivosEol = await mediator.Send(new ObterAlunosEolPorTurmasCodigoQuery(new long[] { long.Parse(turma.Codigo) }));
 
-            if (alunosEol != null && alunosEol.Any())
+            if (alunosAtivosEol != null && alunosAtivosEol.Any())
             {
-                var alunosEolAgrupadosParaTratarCodigos = alunosEol.Select(a => a.CodigoAluno).Distinct().ToList();
+                var alunosEolAgrupadosParaTratarCodigos = alunosAtivosEol.Select(a => a.CodigoAluno).Distinct().ToList();
                 var alunosSerap = await mediator.Send(new ObterAlunosSerapPorCodigosQuery(alunosEolAgrupadosParaTratarCodigos.ToArray()));
 
                 List<long> alunosSerapCodigo = new List<long>();
                 if (alunosSerap != null && alunosSerap.Any())
                     alunosSerapCodigo = alunosSerap.Select(a => a.RA).Distinct().ToList();
 
-                await TratarInclusao(alunosEol, alunosEolAgrupadosParaTratarCodigos, alunosSerapCodigo, turma);
+                await TratarInclusao(alunosAtivosEol, alunosEolAgrupadosParaTratarCodigos, alunosSerapCodigo, turma);
 
-                await TratarAlteracao(alunosEol, alunosEolAgrupadosParaTratarCodigos, alunosSerap, alunosSerapCodigo, turma);
+                await TratarAlteracao(alunosAtivosEol, alunosEolAgrupadosParaTratarCodigos, alunosSerap, alunosSerapCodigo, turma);
 
-                await TratarInativo(alunosEol, turma);
+                await TratarInativo(alunosAtivosEol, turma);
 
                 await PublicarSincronizacaoAlunoDeficiencia(alunosEolAgrupadosParaTratarCodigos);
             }

@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -104,6 +105,27 @@ namespace SME.SERAp.Prova.Dados
                 var query = @"update prova_aluno set frequencia = @frequencia where id = @id;";
 
                 await conn.ExecuteAsync(query, new { frequencia, id });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<int> ExcluirProvaAlunoAsync(long provaId, long alunoRa)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"delete from  prova_aluno where prova_id = @provaid and aluno_ra = @alunoRa;";
+
+                return await conn.ExecuteAsync(query, new { provaId, alunoRa });
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {

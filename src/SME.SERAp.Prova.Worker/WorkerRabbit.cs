@@ -189,6 +189,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.FilaDeadletterSync, new ComandoRabbit("Sync de fila Deadletter", typeof(IRabbitDeadletterSerapSyncUseCase)));
 
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));
+
             comandos.Add(RotasRabbit.TratarCadernosProvaTai, new ComandoRabbit("Tratamento cadernos amostra TAI", typeof(ITratarCadernosProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarCadernoAlunoProvaTai, new ComandoRabbit("Tratamento cadernos alunos prova TAI", typeof(ITratarCadernoAlunoProvaTaiUseCase)));
 
@@ -196,10 +197,13 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.IncluirUsuario, new ComandoRabbit("Incluir Usuario Persistencia Serap", typeof(IIncluirUsuarioSerapUseCase)));
             comandos.Add(RotasRabbit.AlterarUsuario, new ComandoRabbit("Alterar Usuario Persistencia Serap", typeof(IAlterarUsuarioSerapUseCase)));
             comandos.Add(RotasRabbit.IncluirProvaAluno, new ComandoRabbit("Incluir Prova Aluno Serap Estudantes", typeof(IIncluirProvaAlunoUseCase)));
-            comandos.Add(RotasRabbit.AlterarProvaAluno, new ComandoRabbit("Alterar Prova Aluno Serap Estudantes", typeof(IAlterarProvaAlunoUseCase)));
             comandos.Add(RotasRabbit.IncluirVersaoDispositivoApp, new ComandoRabbit("Incluir Versao Dispositivo App", typeof(IVersaoAppDispositivoAppUseCase)));
 
-            comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));
+            comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));           
+            comandos.Add(RotasRabbit.TratarUsuarioDispositivoLogin, new ComandoRabbit("Salvar dispositivo no login do usuário", typeof(ITratarUsuarioDispositivoLoginUseCase)));
+            comandos.Add(RotasRabbit.TratarReaberturaProvaAluno, new ComandoRabbit("Tramento de reabertura de prova de aluno serap estudantes", typeof(ITratarReaberturaProvaAlunoUseCase)));
+         
+            
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

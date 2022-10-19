@@ -1,5 +1,6 @@
 ﻿using Dapper.FluentMap;
 using Dapper.FluentMap.Dommel;
+using SME.SERAp.Prova.Dados.Mapeamentos;
 
 namespace SME.SERAp.Prova.Dados
 {
@@ -46,6 +47,8 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new AlunoProvaProficienciaMap());
                 config.AddMap(new VersaoAppDispositivoMap());
                 config.AddMap(new UsuarioMap());
+                config.AddMap(new UsuarioDispositivoMap());
+                config.AddMap(new ProvaAlunoReaberturaMap());
 
                 config.ForDommel();
             });

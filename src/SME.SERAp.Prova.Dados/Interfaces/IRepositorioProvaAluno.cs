@@ -13,6 +13,8 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<ProvaAluno>> ObterPorProvaIdsRaAsync(long[] provaIds, long alunoRa);
         Task<IEnumerable<ProvaAlunoReduzidaDto>> ObterAlunosProvasFinalizadasReduzido();
         Task AtualizarFrequenciaAlunoAsync(long id, FrequenciaAluno frequencia);
-        
+        Task<int> ExcluirProvaAlunoAsync(long provaId, long alunoRa);
+
+
     }
 }

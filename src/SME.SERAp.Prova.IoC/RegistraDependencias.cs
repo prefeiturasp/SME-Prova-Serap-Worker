@@ -5,6 +5,8 @@ using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
+using SME.SERAp.Prova.Dados.Interfaces;
+using SME.SERAp.Prova.Dados.Repositorios.Serap;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
 using SME.SERAp.Prova.Infra.Services;
@@ -86,9 +88,12 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioVersaoAppDispositivo, RepositorioVersaoAppDispositivo>();
             services.AddScoped<IRepositorioUsuarioDispositivo, RepositorioUsuarioDispositivo>();
             services.AddScoped<IRepositorioProvaAlunoReabertura, RepositorioProvaReabertura>();
+            services.AddScoped<IRepositorioProvaGrupoPermissaoEntity, RepositorioProvaGrupoPermissaoEntity>();
+            services.AddScoped<IRepositorioProvaGrupoPermissao, RepositorioProvaGrupoPermissao>();
 
 
-            
+
+
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -176,6 +181,10 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IReabrirProvaAlunoUseCase, ReabrirProvaAlunoUseCase>();
             services.AddScoped<ITratarUsuarioDispositivoLoginUseCase, TratarUsuarioDispositivoLoginUseCase>();
             services.AddScoped<ITratarReaberturaProvaAlunoUseCase, TratarReaberturaProvaAlunoUseCase>();
+
+            services.AddScoped<IProvaGrupoPermissaoUseCase, ProvaGrupoPermissaoUseCase>();
+
+            
         }
     }
 }

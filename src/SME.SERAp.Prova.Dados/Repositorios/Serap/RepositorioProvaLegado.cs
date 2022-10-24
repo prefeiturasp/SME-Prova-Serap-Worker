@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
@@ -498,6 +499,27 @@ namespace SME.SERAp.Prova.Dados
                     amostraProvaTai.ListaConfigItens = configItens.ToList();
 
                 return amostraProvaTai;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<ProvaGrupoPermissaoDto>> ObterDadosProvaGrupoPermissaoPorId (long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"SELECT 
+                                      [gru_id] as GrupoCoressoId
+                                     ,[Test_Id] as ProvaLegadoId
+                                     ,[TestHide] as OcultarProva
+                                 FROM [GestaoAvaliacao].[dbo].[TestPermission]
+                                 Where Test_id = @provaId";
+
+                return await conn.QueryAsync<ProvaGrupoPermissaoDto>(query, new { provaId });
             }
             finally
             {

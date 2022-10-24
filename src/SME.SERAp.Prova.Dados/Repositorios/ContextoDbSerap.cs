@@ -20,6 +20,7 @@ namespace SME.SERAp.Prova.Dados
             modelBuilder.ApplyConfiguration(new AlunoEntityMap());
             modelBuilder.ApplyConfiguration(new ResultadoProvaConsolidadoEntityMap());
             modelBuilder.ApplyConfiguration(new ProvaAdesaoEntityMap());
+            modelBuilder.ApplyConfiguration(new ProvaGrupoPermissaoEntityMap());
         }
     }
 }

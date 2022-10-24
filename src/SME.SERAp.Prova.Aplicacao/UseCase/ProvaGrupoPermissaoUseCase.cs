@@ -21,7 +21,6 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            // Validações
             var idsProvaDto = mensagemRabbit.ObterObjetoMensagem<ProvaIdsDto>();
             if (idsProvaDto.ProvaId <= 0 || idsProvaDto.ProvaLegadoId <= 0)
             {

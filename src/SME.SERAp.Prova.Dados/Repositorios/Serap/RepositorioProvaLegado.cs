@@ -513,11 +513,11 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"SELECT 
-                                      [gru_id] as GrupoId
+                                      [gru_id] as GrupoCoressoId
                                      ,[Test_Id] as ProvaLegadoId
                                      ,[TestHide] as OcultarProva
                                  FROM [GestaoAvaliacao].[dbo].[TestPermission]
-                                 Where Test_id = @prova_legado_id";
+                                 Where Test_id = @provaId";
 
                 return await conn.QueryAsync<ProvaGrupoPermissaoDto>(query, new { provaId });
             }

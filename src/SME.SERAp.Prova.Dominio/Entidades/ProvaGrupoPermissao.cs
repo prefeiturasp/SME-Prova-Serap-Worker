@@ -4,6 +4,11 @@ namespace SME.SERAp.Prova.Dominio
 {
   public  class ProvaGrupoPermissao : EntidadeBase
     {
+        public ProvaGrupoPermissao()
+        {
+
+        }
+
         public ProvaGrupoPermissao(long provaId, long provaLegadoId, long grupoId, bool ocultarProva)
         {
             ProvaId = provaId;

@@ -96,7 +96,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
 
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaGrupoPermissaoTratar, new ProvaIdsDto(provaId, provaLegado.Id)));
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaGrupoPermissaoTratar, new ProvaIdsDto(provaParaTratar.Id, provaLegado.Id)));
 
             var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
 

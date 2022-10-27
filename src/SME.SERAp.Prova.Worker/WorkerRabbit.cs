@@ -11,10 +11,8 @@ using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 

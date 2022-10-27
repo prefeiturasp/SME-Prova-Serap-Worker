@@ -147,6 +147,7 @@ namespace SME.SERAp.Prova.IoC
 
             //sincronizar adesão das provas 
             services.AddScoped<ITratarAdesaoProvaUseCase, TratarAdesaoProvaUseCase>();
+            services.AddScoped<ITratarAdesaoProvaAlunoUseCase, TratarAdesaoProvaAlunoUseCase>();
 
             //sincronizar usuarios e grupos de usuarios coresso
             services.AddScoped<IExecutarSincronizacaoUsuarioCoreSsoUseCase, ExecutarSincronizacaoUsuarioCoreSsoUseCase>();

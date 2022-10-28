@@ -8,6 +8,7 @@ namespace SME.SERAp.Prova.Dados
     public interface IRepositorioCadernoAluno : IRepositorioBase<CadernoAluno>
     {
         Task<IEnumerable<ProvaCadernoAlunoDto>> ObterAlunosSemCadernosProvaBibAsync(long provaId);
+        Task<CadernoAluno> ObterCadernoAlunoPorProvaIdAlunoIdAsync(long provaId, long alunoId);
         Task<bool> RemoverCadernosPorProvaIdAsync(long provaId);
     }
 }

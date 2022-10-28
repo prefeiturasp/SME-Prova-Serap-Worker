@@ -51,5 +51,23 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<CadernoAluno> ObterCadernoAlunoPorProvaIdAlunoIdAsync(long provaId, long alunoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select id, prova_id, aluno_id, caderno
+                              from caderno_aluno 
+                              where prova_id = @provaId and aluno_id = @alunoId";
+
+                return await conn.QueryFirstOrDefaultAsync<CadernoAluno>(query, new { provaId, alunoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

@@ -22,10 +22,14 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var provaCadernoAluno = mensagemRabbit.ObterObjetoMensagem<ProvaCadernoAlunoDto>();
-                Random sortear = new Random();
-                var cadernoSorteado = sortear.Next(1, provaCadernoAluno.TotalCadernos + 1).ToString();
+                var caderno = await mediator.Send(new ObterCadernoAlunoPorProvaIdAlunoIdQuery(provaCadernoAluno.ProvaId, provaCadernoAluno.AlunoId));
 
-                await mediator.Send(new CadernoAlunoIncluirCommand(new Dominio.CadernoAluno(provaCadernoAluno.AlunoId, provaCadernoAluno.ProvaId, cadernoSorteado)));
+                if (caderno == null)
+                {
+                    Random sortear = new Random();
+                    var cadernoSorteado = sortear.Next(1, provaCadernoAluno.TotalCadernos + 1).ToString();
+                    await mediator.Send(new CadernoAlunoIncluirCommand(new Dominio.CadernoAluno(provaCadernoAluno.AlunoId, provaCadernoAluno.ProvaId, cadernoSorteado)));
+                }
             }
             catch (Exception ex)
             {

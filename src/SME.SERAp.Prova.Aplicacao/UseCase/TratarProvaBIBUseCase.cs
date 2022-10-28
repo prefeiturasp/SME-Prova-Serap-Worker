@@ -24,7 +24,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var provaCadernoAluno = mensagemRabbit.ObterObjetoMensagem<ProvaCadernoAlunoDto>();
                 var caderno = await mediator.Send(new ObterCadernoAlunoPorProvaIdAlunoIdQuery(provaCadernoAluno.ProvaId, provaCadernoAluno.AlunoId));
 
-                77577775777757777577if (caderno == null)
+                if (caderno == null)
                 {
                     Random sortear = new Random();
                     var cadernoSorteado = sortear.Next(1, provaCadernoAluno.TotalCadernos + 1).ToString();

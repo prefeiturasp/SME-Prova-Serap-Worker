@@ -3,6 +3,8 @@ using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Infra.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,12 +13,18 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExecutarSincronizacaoInstitucionalDreSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalDreSyncUseCase
     {
+        private readonly IServicoLog serviceLog;
         public ExecutarSincronizacaoInstitucionalDreSyncUseCase(IMediator mediator) : base(mediator)
         {
+            this.serviceLog = serviceLog ?? throw new ArgumentNullException(nameof(serviceLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
+            try
+            {
+
+          
             var todasDresSgp = await mediator.Send(new ObterDresSgpQuery());
             var todasDresSgpCodigo = todasDresSgp.Select(a => a.CodigoDre).ToList();
 
@@ -35,6 +43,13 @@ namespace SME.SERAp.Prova.Aplicacao
             await PublicarFilaParaTratarUes();
 
             return true;
+
+            }
+            catch (Exception ex)
+            {
+                serviceLog.Registrar($"Erro ao sincronizar as Dres: {mensagemRabbit.Mensagem}", ex);
+                throw;
+            }
         }
 
         private async Task TratarInclusao(IEnumerable<Dre> todasDresSgp, List<string> todasDresSgpCodigo, List<string> todasDresSerapCodigo)

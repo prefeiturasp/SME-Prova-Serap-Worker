@@ -14,7 +14,7 @@ namespace SME.SERAp.Prova.Aplicacao
     public class ExecutarSincronizacaoInstitucionalDreSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalDreSyncUseCase
     {
         private readonly IServicoLog serviceLog;
-        public ExecutarSincronizacaoInstitucionalDreSyncUseCase(IMediator mediator) : base(mediator)
+        public ExecutarSincronizacaoInstitucionalDreSyncUseCase(IMediator mediator, IServicoLog serviceLog) : base(mediator)
         {
             this.serviceLog = serviceLog ?? throw new ArgumentNullException(nameof(serviceLog));
         }

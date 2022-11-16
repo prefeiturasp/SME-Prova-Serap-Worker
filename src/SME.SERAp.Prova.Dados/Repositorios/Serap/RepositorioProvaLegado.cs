@@ -251,7 +251,8 @@ namespace SME.SERAp.Prova.Dados
                                     A.Id as AlternativaLegadoId,                                    
                                     A.Numeration as Numeracao,
                                     A.Description as Descricao,
-                                    A.[Order] as Ordem
+                                    A.[Order] as Ordem,
+                                    A.Correct as Correta
                                 FROM  Alternative A (NOLOCK)                             
                                 WHERE A.Item_Id = @questaoId and A.id = @alternativaId;";
 

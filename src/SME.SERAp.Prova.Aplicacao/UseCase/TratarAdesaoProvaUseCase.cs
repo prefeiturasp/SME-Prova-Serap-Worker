@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -59,7 +60,7 @@ namespace SME.SERAp.Prova.Aplicacao
                                                         ObterTipoTurno((TipoTurnoSerapLegado)turmaLegado.TipoTurno)))
                                                         .ToList();
 
-                                await mediator.Send(new InserirListaProvaAdesaoCommand(adesaoParaInserir));
+                                await EnviarParaFilaTratarAdesaoProvaAluno(adesaoParaInserir);
                             }
                             else
                             {
@@ -106,6 +107,14 @@ namespace SME.SERAp.Prova.Aplicacao
                     return (int)TipoTurno.Manha;
                 default:
                     throw new Exception($"Tipo turno não encontrado: {(int)tipoTurnoSerapLegado}");
+            }
+        }
+
+        private async Task EnviarParaFilaTratarAdesaoProvaAluno(List<ProvaAdesao> adesaoParaInserir)
+        {
+            foreach (ProvaAdesao adesao in adesaoParaInserir)
+            {
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProvaAluno, adesao));
             }
         }
     }

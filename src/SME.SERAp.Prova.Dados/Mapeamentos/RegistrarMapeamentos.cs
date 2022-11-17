@@ -49,6 +49,7 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new UsuarioMap());
                 config.AddMap(new UsuarioDispositivoMap());
                 config.AddMap(new ProvaAlunoReaberturaMap());
+                config.AddMap(new ProvaGrupoPermissaoMap());
 
                 config.ForDommel();
             });

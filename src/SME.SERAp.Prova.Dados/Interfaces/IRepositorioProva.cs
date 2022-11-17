@@ -11,6 +11,7 @@ namespace SME.SERAp.Prova.Dados
         Task<bool> VerificaSeExisteRespostasPorId(long id);
         Task<bool> VerificaSeExisteProvaFinalizadaPorId(long id);
         Task<bool> VerificaSeExistePorProvaSerapId(long provaId);
+        Task<long?> ObterProvaOrigemCadernoAsync(long provaId);
         Task CriarProvaRespostasExtracao(long provaId);
         Task ConsolidarProvaRespostasPorProvaSerapId(long provaId);
         Task LimparDadosConsolidadosPorProvaSerapId(long provaId);

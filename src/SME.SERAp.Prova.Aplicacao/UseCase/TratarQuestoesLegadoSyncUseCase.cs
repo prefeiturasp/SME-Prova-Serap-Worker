@@ -84,7 +84,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 alternativa.Ordem,
                 alternativa.Numeracao,
                 alternativa.Descricao,
-                questaoId);
+                questaoId,
+                alternativa.Correta);
 
                 var alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
 

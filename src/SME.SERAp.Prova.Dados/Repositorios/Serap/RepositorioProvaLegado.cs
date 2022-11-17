@@ -158,7 +158,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"
            
-							        SELECT DISTINCT  
+				SELECT DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
                 t.DownloadStartDate as InicioDownload,
@@ -184,7 +184,10 @@ namespace SME.SERAp.Prova.Dados
                 case when t.TestTai  is null then 0 else t.TestTai end FormatoTai,
                 t.NumberSynchronizedResponseItems as  QtdItensSincronizacaoRespostas,
 				nit.AdvanceWithoutAnswering as PermiteAvancarSemResponder, 
-				nit.BackToPreviousItem as  PermiteVoltarAoItemAnterior
+				nit.BackToPreviousItem as  PermiteVoltarAoItemAnterior,
+                t.ProvaComProficiencia,
+                t.ApresentarResultados,
+                t.ApresentarResultadosPorItem
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -248,7 +251,8 @@ namespace SME.SERAp.Prova.Dados
                                     A.Id as AlternativaLegadoId,                                    
                                     A.Numeration as Numeracao,
                                     A.Description as Descricao,
-                                    A.[Order] as Ordem
+                                    A.[Order] as Ordem,
+                                    A.Correct as Correta
                                 FROM  Alternative A (NOLOCK)                             
                                 WHERE A.Item_Id = @questaoId and A.id = @alternativaId;";
 

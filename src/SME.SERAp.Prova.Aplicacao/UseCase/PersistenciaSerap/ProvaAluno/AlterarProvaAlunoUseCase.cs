@@ -12,9 +12,12 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         private readonly IRepositorioCache repositorioCache;
         private readonly IServicoLog servicoLog;
-        public AlterarProvaAlunoUseCase(IMediator mediator, IRepositorioCache repositorioCache) : base(mediator)
+        public AlterarProvaAlunoUseCase(IMediator mediator, 
+                                        IRepositorioCache repositorioCache,
+                                        IServicoLog servicoLog) : base(mediator)
         {
             this.repositorioCache = repositorioCache ?? throw new ArgumentNullException(nameof(repositorioCache));
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)

@@ -1,5 +1,6 @@
 ﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<ProvaAnoDetalheDto>> ObterProvaAnoDetalhesPorId(long id);
         Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId);
         Task<AmostraProvaTaiDto> ObterDadosAmostraProvaTai(long provaId);
+        Task<IEnumerable<ProvaGrupoPermissaoDto>> ObterDadosProvaGrupoPermissaoPorId(long provaId);
 
     }
 }

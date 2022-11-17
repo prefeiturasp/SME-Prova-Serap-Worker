@@ -1,6 +1,7 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Dominio;
+﻿using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -23,9 +24,23 @@ namespace SME.SERAp.Prova.Dados
 
                 return true;
             }
-            catch (System.Exception)
+            finally
             {
-                throw;
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<TipoCurriculoPeriodoAnoDto>> ObterProvaAnoPorTipoCurriculoPeriodoId(int[] tcpIds)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select tcp_id as tcpId, ano, modalidade_codigo as Modalidade,etapa_eja as EtapaEja
+                              from tipo_curriculo_periodo_ano tcpa 
+                              where tcpa.tcp_id = ANY(@tcpIds)";
+
+                return await conn.QueryAsync<TipoCurriculoPeriodoAnoDto>(query, new { tcpIds });
             }
             finally
             {

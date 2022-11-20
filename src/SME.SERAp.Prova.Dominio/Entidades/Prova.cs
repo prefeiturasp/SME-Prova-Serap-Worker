@@ -10,7 +10,8 @@ namespace SME.SERAp.Prova.Dominio
         }
         public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB,
             int totalCadernos, Modalidade modalidade, long? disciplinaId, string disciplina, bool ocultarProva, bool aderirTodos, bool multidisciplinar, int tipoProvaId, bool formatoTai,
-            int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, bool permiteAvancarSemResponderTai = false, bool permiteVoltarItemAnteriorTai = false)
+            int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, bool permiteAvancarSemResponderTai = false, 
+            bool permiteVoltarItemAnteriorTai = false, bool provaComProficiencia = false, bool apresentarResultados = false, bool apresentarResultadosPorItem = false)
         {
             Id = id;
             Descricao = descricao;
@@ -37,6 +38,9 @@ namespace SME.SERAp.Prova.Dominio
             UltimaAtualizacao = ultimaAtualizacao;
             PermiteAvancarSemResponderTai = permiteAvancarSemResponderTai;
             PermiteVoltarItemAnteriorTai = permiteVoltarItemAnteriorTai;
+            ProvaComProficiencia = provaComProficiencia;
+            ApresentarResultados = apresentarResultados;
+            ApresentarResultadosPorItem = apresentarResultadosPorItem;
         }
 
         public string Descricao { get; set; }
@@ -64,5 +68,8 @@ namespace SME.SERAp.Prova.Dominio
         public bool PermiteAvancarSemResponderTai { get; set; }
         public bool PermiteVoltarItemAnteriorTai { get; set; }
         public DateTime UltimaAtualizacao { get; set; }
+        public bool ProvaComProficiencia { get; set; }
+        public bool ApresentarResultados { get; set; }
+        public bool ApresentarResultadosPorItem { get; set; }
     }
 }

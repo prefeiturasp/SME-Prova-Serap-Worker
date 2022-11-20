@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
@@ -133,50 +134,13 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"SELECT DISTINCT
-									case 
-										when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
-									end Ano
-									,cp.cur_id as CurId
-									,curso.cur_codigo as CurCodigo
-									,tme.tme_id as TmeId
-									,tne.tne_id as TneId
-								FROM
-									Test t 
-									INNER JOIN TestCurriculumGrade tcg ON t.Id = tcg.Test_Id	
-									INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON tcg.TypeCurriculumGradeId = tt.tcp_id
-									inner join SGP_ACA_CurriculoPeriodo cp ON tt.tcp_id = cp.tcp_id
-									inner join SGP_ACA_Curriculo c 
-										ON cp.cur_id = c.cur_id 
-									   and cp.crr_id = c.crr_id
-									inner join SGP_ACA_Curso curso 
-										ON curso.cur_id = c.cur_id
-									   and curso.tme_id = tt.tme_id
-									INNER JOIN TESTTIME ttime ON t.TestTime_Id = ttime.id
-									INNER JOIN TestTypeCourse ttc ON ttc.TestType_Id = t.TestType_Id
-									LEFT JOIN Discipline d ON t.Discipline_Id = d.Id 
-									INNER JOIN TestType ON t.TestType_Id = TestType.id
-									INNER JOIN SGP_ACA_TipoNivelEnsino tne 
-										ON TestType.TypeLevelEducationId = tne.tne_id
-									   and curso.tne_id = TestType.TypeLevelEducationId
-									   and tne.tne_id = tt.tne_id 
-									   and tne.tne_id = curso.tne_id
-									inner join SGP_ACA_TipoModalidadeEnsino tme 
-										ON tme.tme_id = tt.tme_id 
-									   and tme.tme_id = curso.tme_id
-									INNER JOIN SGP_TUR_TurmaTipoCurriculoPeriodo ttcp 
-										ON ttcp.crp_ordem = tt.tcp_ordem
-									   AND tt.tme_id = ttcp.tme_id
-									INNER JOIN modeltest mt ON TestType.modeltest_id = mt.id
-									LEFT JOIN TestPermission tp 
-										ON tp.Test_Id = t.Id 
-									   AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
-								WHERE
-									cp.crp_situacao = 1 and c.crr_situacao = 1 
-									and curso.cur_situacao = 1 and tme.tme_situacao = 1 
-									and tne.tne_situacao = 1
-									and tcg.[State] = 1
-									and t.id = @id";
+                var query = @"SELECT tt.tcp_id as TcpId, tt.tne_id as TneId, tne.tne_nome as TneNome, tt.tme_id as TmeId, tme.tme_nome as TmeNome, tt.tcp_descricao as Descricao
+                              FROM Test t
+                              INNER JOIN TestCurriculumGrade tcg ON t.Id = tcg.Test_Id	
+                              INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON tcg.TypeCurriculumGradeId = tt.tcp_id
+                              INNER JOIN SGP_ACA_TipoNivelEnsino tne ON tne.tne_id = tt.tne_id 
+                              INNER JOIN SGP_ACA_TipoModalidadeEnsino tme ON tme.tme_id = tt.tme_id 
+                              where t.id = @id";
 
                 return await conn.QueryAsync<ProvaAnoDetalheDto>(query, new { id }, commandTimeout: 50000);
             }
@@ -194,7 +158,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"
            
-							        SELECT DISTINCT  
+				SELECT DISTINCT  
 	            t.Id,
 	            t.Description as descricao,
                 t.DownloadStartDate as InicioDownload,
@@ -220,7 +184,10 @@ namespace SME.SERAp.Prova.Dados
                 case when t.TestTai  is null then 0 else t.TestTai end FormatoTai,
                 t.NumberSynchronizedResponseItems as  QtdItensSincronizacaoRespostas,
 				nit.AdvanceWithoutAnswering as PermiteAvancarSemResponder, 
-				nit.BackToPreviousItem as  PermiteVoltarAoItemAnterior
+				nit.BackToPreviousItem as  PermiteVoltarAoItemAnterior,
+                t.ProvaComProficiencia,
+                t.ApresentarResultados,
+                t.ApresentarResultadosPorItem
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON
@@ -284,7 +251,8 @@ namespace SME.SERAp.Prova.Dados
                                     A.Id as AlternativaLegadoId,                                    
                                     A.Numeration as Numeracao,
                                     A.Description as Descricao,
-                                    A.[Order] as Ordem
+                                    A.[Order] as Ordem,
+                                    A.Correct as Correta
                                 FROM  Alternative A (NOLOCK)                             
                                 WHERE A.Item_Id = @questaoId and A.id = @alternativaId;";
 
@@ -498,6 +466,27 @@ namespace SME.SERAp.Prova.Dados
                     amostraProvaTai.ListaConfigItens = configItens.ToList();
 
                 return amostraProvaTai;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<ProvaGrupoPermissaoDto>> ObterDadosProvaGrupoPermissaoPorId (long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"SELECT 
+                                      [gru_id] as GrupoCoressoId
+                                     ,[Test_Id] as ProvaLegadoId
+                                     ,[TestHide] as OcultarProva
+                                 FROM [GestaoAvaliacao].[dbo].[TestPermission]
+                                 Where Test_id = @provaId";
+
+                return await conn.QueryAsync<ProvaGrupoPermissaoDto>(query, new { provaId });
             }
             finally
             {

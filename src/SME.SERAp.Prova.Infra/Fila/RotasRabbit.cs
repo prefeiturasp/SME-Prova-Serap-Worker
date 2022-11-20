@@ -24,11 +24,13 @@
         public const string ConsolidarProvaResultadoFiltro = "serap.estudante.prova.resultados.consolidar.filtro";
         public const string ConsolidarProvaResultadoFiltroTurma = "serap.estudante.prova.resultados.consolidar.filtro.turma";
         public const string TratarAdesaoProva = "serap.estudante.prova.adesao.tratar";
+        public const string TratarAdesaoProvaAluno = "serap.estudante.prova.aluno.adesao.tratar";
         public const string TratarTipoProvaDeficiencia = "serap.estudante.prova.tipo.prova.deficiencia.tratar";
         public const string TratarAlunoDeficiencia = "serap.estudante.aluno.deficiencia.tratar";
         public const string DownloadProvaAlunoTratar = "serap.estudante.download.prova.aluno.tratar";
         public const string AlunoProvaProficienciaAsync = "serap.estudante.aluno.prova.proficiencia.sync";
         public const string AlunoProvaProficienciaTratar = "serap.estudante.aluno.prova.proficiencia.tratar";
+        public const string ProvaGrupoPermissaoTratar = "serap.estudante.prova.grupo.permissao.tratar";
 
         public const string IniciarProcessoFinalizarProvasAutomaticamente = "serap.estudante.prova.finalizar.automaticamente.iniciar";
         public const string FinalizarProvaAutomaticamente = "serap.estudante.prova.finalizar.automaticamente";

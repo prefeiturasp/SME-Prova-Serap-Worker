@@ -34,6 +34,9 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.PermiteAvancarSemResponderTai).ToColumn("formato_tai_avancar_sem_responder");
             Map(c => c.PermiteVoltarItemAnteriorTai).ToColumn("formato_tai_voltar_item_anterior");
             Map(c => c.UltimaAtualizacao).ToColumn("ultima_atualizacao");
+            Map(c => c.ProvaComProficiencia).ToColumn("prova_com_proficiencia");
+            Map(c => c.ApresentarResultados).ToColumn("apresentar_resultados");
+            Map(c => c.ApresentarResultadosPorItem).ToColumn("apresentar_resultados_por_item");
         }
     }
 }

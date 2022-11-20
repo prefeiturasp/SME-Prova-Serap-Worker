@@ -86,7 +86,7 @@ namespace SME.SERAp.Prova.Dados
 								se.cd_serie_ensino = ste.cd_serie_ensino
 							WHERE matricula.Linha = 1
 							and turesc.cd_tipo_turma = 1
-							and CodigoSituacaoMatricula in (1, 6, 10, 13)
+							and CodigoSituacaoMatricula in (1, 6, 10, 13, 5) -- Alunos que podem acessar o serap
 							order by aluno.nm_aluno";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
@@ -100,7 +100,8 @@ namespace SME.SERAp.Prova.Dados
                             inner join tipo_necessidade_especial tne 
                                 on tne.tp_necessidade_especial = nea.tp_necessidade_especial
                             where nea.cd_aluno = @alunoRa
-                                and tne.dt_cancelamento is null";
+                                and tne.dt_cancelamento is null
+								and (nea.dt_fim is null or nea.dt_fim >= GETDATE())";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
             return await conn.QueryAsync<int>(query, new { alunoRa });

@@ -24,6 +24,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
 
+
             if (provaLegado == null)
                 throw new Exception($"Prova {provaLegado} não localizada!");
 
@@ -69,6 +70,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.UltimaAtualizacao = provaParaTratar.UltimaAtualizacao;
                 provaAtual.Disciplina = provaParaTratar.Disciplina;
                 provaAtual.DisciplinaId = provaParaTratar.DisciplinaId;
+                provaAtual.ProvaComProficiencia = provaParaTratar.ProvaComProficiencia;
+                provaAtual.ApresentarResultados = provaParaTratar.ApresentarResultados;
+                provaAtual.ApresentarResultadosPorItem = provaParaTratar.ApresentarResultadosPorItem;
 
                 var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
                 if (verificaSePossuiRespostas)
@@ -95,6 +99,8 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
 
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
+
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaGrupoPermissaoTratar, new ProvaIdsDto(provaParaTratar.Id, provaLegado.Id)));
 
             var contextosProva = await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaId));
 
@@ -123,7 +129,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
                 provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, provaFormatoTaiItem,
-                provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior);
+                provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem);
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

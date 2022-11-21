@@ -136,7 +136,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"SELECT tt.tcp_id as TcpId, tt.tne_id as TneId, tne.tne_nome as TneNome, tt.tme_id as TmeId, tme.tme_nome as TmeNome, tt.tcp_descricao as Descricao
                               FROM Test t
-                              INNER JOIN TestCurriculumGrade tcg ON t.Id = tcg.Test_Id	
+                              INNER JOIN TestCurriculumGrade tcg ON t.Id = tcg.Test_Id and tcg.State = 1
                               INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON tcg.TypeCurriculumGradeId = tt.tcp_id
                               INNER JOIN SGP_ACA_TipoNivelEnsino tne ON tne.tne_id = tt.tne_id 
                               INNER JOIN SGP_ACA_TipoModalidadeEnsino tme ON tme.tme_id = tt.tme_id 

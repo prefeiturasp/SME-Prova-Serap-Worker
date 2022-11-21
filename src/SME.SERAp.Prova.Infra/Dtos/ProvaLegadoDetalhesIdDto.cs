@@ -39,6 +39,10 @@ namespace SME.SERAp.Prova.Infra
 
         public int? QtdItensSincronizacaoRespostas { get; set; }
 
+        public bool ProvaComProficiencia { get; set; }
+        public bool ApresentarResultados { get; set; }
+        public bool ApresentarResultadosPorItem { get; set; }
+
         public void AddAno(string ano)
         {
             if (!string.IsNullOrEmpty(ano))

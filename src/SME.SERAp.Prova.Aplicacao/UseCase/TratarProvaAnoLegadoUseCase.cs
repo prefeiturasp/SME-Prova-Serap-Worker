@@ -32,13 +32,24 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
                 {
                     var provaAnoDetalhes = await mediator.Send(new ObterProvaAnoLegadoDetalhesPorIdQuery(provaId));
-                    var provaAnoInserir = TratarProvaAnoEjaCieja(provaAnoDetalhes, provaAtual);
-                    if (provaAnoInserir.Any())
+
+                    var ids = provaAnoDetalhes.Select(t => t.TcpId).ToArray();
+                    var provaAnosDepara = await mediator.Send(new ObterProvaAnoDeparaPorTcpIdQuery(ids));
+
+                    var provaAnos = new List<ProvaAno>();
+                    foreach (var provaAnoDetalhe in provaAnoDetalhes)
                     {
-                        foreach (ProvaAno provaAno in provaAnoInserir)
-                        {
-                            await mediator.Send(new ProvaAnoIncluirCommand(provaAno));
-                        }
+                        var provaAnoDepara = provaAnosDepara.FirstOrDefault(t => t.TcpId == provaAnoDetalhe.TcpId);
+                        if (provaAnoDepara == null)
+                            throw new Exception($"Tipo curriculo período {provaAnoDetalhe.TcpId} depara não configurado na tabela tipo_curriculo_periodo_ano");
+
+                        if (!provaAnos.Any(t => t.Ano == provaAnoDepara.Ano && t.Modalidade == provaAnoDepara.Modalidade && t.EtapaEja == provaAnoDepara.EtapaEja))
+                            provaAnos.Add(new ProvaAno(provaAnoDepara.Ano, provaAtual.Id, provaAnoDepara.Modalidade, provaAnoDepara.EtapaEja));
+                    }
+
+                    foreach (var provaAno in provaAnos)
+                    {
+                        await mediator.Send(new ProvaAnoIncluirCommand(provaAno));
                     }
                 }
                 else
@@ -62,105 +73,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 servicoLog.Registrar(ex);
                 throw ex;
             }
-        }
-
-        private List<ProvaAno> TratarProvaAnoEjaCieja(IEnumerable<ProvaAnoDetalheDto> provaAnoDetalhes, Dominio.Prova provaSerapEstudantes)
-        {
-            var provaAnoRetorno = new List<ProvaAno>();
-            var provaSerapEstudantesId = provaSerapEstudantes.Id;
-            var modalidadeProva = provaSerapEstudantes.Modalidade;
-
-            //EJA MODULAR
-            var ejaModular = provaAnoDetalhes.Where(p => p.CurId == (int)CursoSerap.EJA_Modular);
-            if (ListaPossuiDados(ejaModular))
-            {
-                var anosEjaModular = ObterAnosListaDistinct(ejaModular);
-                foreach (string ano in anosEjaModular)
-                {
-                    provaAnoRetorno.Add(new ProvaAno(ano, provaSerapEstudantesId, modalidadeProva));
-                }
-            }
-
-            var provaAnoDetalhesEjaEFundamental = provaAnoDetalhes.Where(p => p.TmeId == (int)TipoModalidadeEnsinoSerap.EJA && p.TneId == (int)TipoNivelEnsinoSerap.Ensino_Fundamental);
-
-            //Alfabetização            
-            var alfabetizacao = provaAnoDetalhesEjaEFundamental.Where(p => (p.CurId == (int)CursoSerap.EJA || p.CurId == (int)CursoSerap.EJA_2017)
-                                                                        && (p.Ano == "1" || p.Ano == "2"));
-            if (ListaPossuiDados(alfabetizacao))
-            {
-                var anosAlfabetizacao = ObterAnosListaDistinct(alfabetizacao);
-                foreach (string ano in anosAlfabetizacao)
-                {
-                    provaAnoRetorno.Add(new ProvaAno("1", provaSerapEstudantesId, modalidadeProva, int.Parse(ano)));
-                }
-            }
-
-            //Básica 1
-            var basicaI = provaAnoDetalhes.Where(p => (p.TmeId == (int)TipoModalidadeEnsinoSerap.EJA && p.TneId == (int)TipoNivelEnsinoSerap.Ensino_Fundamental && p.Ano == "3" && (p.CurCodigo == "3" || p.CurCodigo == "9"))
-                                                    || p.TmeId == (int)TipoModalidadeEnsinoSerap.EJA_Regular && p.TneId == (int)TipoNivelEnsinoSerap.Ensino_Fundamental && p.Ano == "5" && p.CurCodigo == "3"
-                                                    && p.CurId != (int)CursoSerap.EJA_Modular);
-
-            if (ListaPossuiDados(basicaI))
-                provaAnoRetorno.Add(new ProvaAno("2", provaSerapEstudantesId, modalidadeProva, 1));
-
-
-            //Básica 2            
-            var basicaII = provaAnoDetalhes.Where(p => (p.TmeId == (int)TipoModalidadeEnsinoSerap.EJA_Especial || p.TmeId == (int)TipoModalidadeEnsinoSerap.EJA_Regular)
-                                                    && p.TneId == (int)TipoNivelEnsinoSerap.Ensino_Fundamental
-                                                    && p.Ano == "4"
-                                                    && (p.CurCodigo == "3" || p.CurCodigo == "11"));
-            if (ListaPossuiDados(basicaII))
-                provaAnoRetorno.Add(new ProvaAno("2", provaSerapEstudantesId, modalidadeProva, 2));
-
-
-            //Final 1
-            var finalI = provaAnoDetalhesEjaEFundamental.Where(p => p.Ano == "7"
-                                                                && (p.CurCodigo == "3" || p.CurCodigo == "9"));
-            if (ListaPossuiDados(finalI))
-                provaAnoRetorno.Add(new ProvaAno("4", provaSerapEstudantesId, modalidadeProva, 1));
-
-            //Final 2
-            var finalII = provaAnoDetalhes.Where(p => p.TmeId == (int)TipoModalidadeEnsinoSerap.EJA_Regular && p.TneId == (int)TipoNivelEnsinoSerap.Ensino_Fundamental
-                                                   && p.Ano == "8"
-                                                   && p.CurCodigo == "3");
-            if (ListaPossuiDados(finalII))
-                provaAnoRetorno.Add(new ProvaAno("4", provaSerapEstudantesId, modalidadeProva, 2));
-
-            //Complementar 1
-            var complementarI = provaAnoDetalhesEjaEFundamental.Where(p => p.Ano == "5"
-                                                                        && (p.CurCodigo == "3" || p.CurCodigo == "9"));
-            if (ListaPossuiDados(complementarI))
-                provaAnoRetorno.Add(new ProvaAno("3", provaSerapEstudantesId, modalidadeProva, 1));
-
-            //Complementar 2            
-            var complementarII = provaAnoDetalhesEjaEFundamental.Where(p => p.Ano == "6"
-                                                                        && (p.CurCodigo == "3" || p.CurCodigo == "9"));
-            if (ListaPossuiDados(complementarII))
-                provaAnoRetorno.Add(new ProvaAno("3", provaSerapEstudantesId, modalidadeProva, 2));
-
-            //CIEJA
-            var cieja = provaAnoDetalhesEjaEFundamental.Where(p => (p.Ano == "1" || p.Ano == "2" || p.Ano == "3" || p.Ano == "4")
-                                                                && p.CurCodigo == "2");
-            if (ListaPossuiDados(cieja))
-            {
-                var anosCieja = ObterAnosListaDistinct(cieja);
-                foreach (string ano in anosCieja)
-                {
-                    provaAnoRetorno.Add(new ProvaAno(ano, provaSerapEstudantesId, Modalidade.CIEJA));
-                }
-            }
-
-            return provaAnoRetorno;
-        }
-
-        private List<string> ObterAnosListaDistinct(IEnumerable<ProvaAnoDetalheDto> lista)
-        {
-            return lista.Select(e => e.Ano).Distinct().ToList();
-        }
-
-        private bool ListaPossuiDados(IEnumerable<ProvaAnoDetalheDto> lista)
-        {
-            return lista != null && lista.Any();
         }
     }
 }

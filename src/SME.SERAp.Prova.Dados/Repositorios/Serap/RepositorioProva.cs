@@ -57,7 +57,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                
+
                 var query = $@"                            
                             select 
 	                        vape.prova_serap_id,
@@ -110,7 +110,7 @@ namespace SME.SERAp.Prova.Dados
         {
             using var conn = ObterConexao();
             try
-            { 
+            {
                 var query = $@"call p_consolidar_dados_prova(@provaId, @dreId, @ueId, @turmaCodigo);";
                 await conn.ExecuteAsync(query, new { provaId, dreId, ueId, turmaCodigo }, commandTimeout: 50000);
             }
@@ -164,7 +164,7 @@ namespace SME.SERAp.Prova.Dados
                         left join alternativa a on qar.alternativa_id = a.id
                         where vape.prova_serap_id = @provaId;";
 
-                await conn.ExecuteAsync(query, new { provaId },commandTimeout: 50000);
+                await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 50000);
             }
             catch (System.Exception ex)
             {
@@ -345,13 +345,14 @@ namespace SME.SERAp.Prova.Dados
                                 where prova_id = @provaId
                                 and id = any(@ids)";
 
-                await conn.ExecuteAsync(query, 
-                    new { 
-                            provaParaAtualizar.ProvaId, 
-                            provaParaAtualizar.Status, 
-                            provaParaAtualizar.FinalizadoEm,
-                            ids = provaParaAtualizar.IdsProvasAlunos
-                        });
+                await conn.ExecuteAsync(query,
+                    new
+                    {
+                        provaParaAtualizar.ProvaId,
+                        provaParaAtualizar.Status,
+                        provaParaAtualizar.FinalizadoEm,
+                        ids = provaParaAtualizar.IdsProvasAlunos
+                    });
 
                 return true;
             }
@@ -376,6 +377,22 @@ namespace SME.SERAp.Prova.Dados
                               where p.possui_bib = true";
 
                 return await conn.QueryAsync<ProvaBIBSyncDto>(query);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<long?> ObterProvaOrigemCadernoAsync(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select prova_id_origem_caderno from prova p where p.id = @provaId";
+
+                return await conn.QueryFirstOrDefaultAsync<long?>(query, new { provaId });
             }
             finally
             {

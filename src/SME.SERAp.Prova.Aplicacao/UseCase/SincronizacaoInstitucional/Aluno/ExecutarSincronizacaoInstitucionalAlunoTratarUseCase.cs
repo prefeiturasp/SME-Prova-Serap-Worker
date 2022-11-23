@@ -88,6 +88,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     if (turmaFix.ModalidadeCodigo == (int)Modalidade.EJA && turma.ModalidadeCodigo == (int)Modalidade.EJA
                         && turmaFix.Semestre > turma.Semestre
+                        && turmaFix.AnoLetivo == turma.AnoLetivo
                         && turmaFix.Codigo != turma.Codigo)
                     {
                         alunoQuePodeAlterar.TurmaCodigo = long.Parse(turmaAntigaDoAluno.Codigo);

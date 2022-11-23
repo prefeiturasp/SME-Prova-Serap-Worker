@@ -86,6 +86,12 @@ namespace SME.SERAp.Prova.Aplicacao
                     var turmaFix = await mediator.Send(new ObterTurmaSerapPorIdQuery(alunoAntigo.TurmaId));
                     var turmaAntigaDoAluno = new TurmaSgpDto() { Id = turmaFix.Id, Codigo = turmaFix.Codigo };
 
+                    if (turmaFix.ModalidadeCodigo == (int)Modalidade.EJA && turma.ModalidadeCodigo == (int)Modalidade.EJA
+                        && turmaFix.Semestre > turma.Semestre
+                        && turmaFix.Codigo != turma.Codigo)
+                    {
+                        alunoQuePodeAlterar.TurmaCodigo = long.Parse(turmaAntigaDoAluno.Codigo);
+                    }
 
                     //TODO: Normalizar com uma entidade AlunoEol
                     if (alunoAntigo != null && (alunoAntigo.Nome != alunoQuePodeAlterar.Nome ||

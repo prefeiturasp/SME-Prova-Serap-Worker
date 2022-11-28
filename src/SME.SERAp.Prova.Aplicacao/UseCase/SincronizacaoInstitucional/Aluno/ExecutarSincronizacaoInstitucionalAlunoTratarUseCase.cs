@@ -62,7 +62,8 @@ namespace SME.SERAp.Prova.Aplicacao
                         NomeSocial = a.NomeSocial,
                         Sexo = a.Sexo,
                         DataNascimento = a.DataNascimento,
-                        TurmaId = turma.Id
+                        TurmaId = turma.Id,
+                        DataAtualizacao = a.DataSituacao
                     }).ToList();
 
                     await mediator.Send(new InserirAlunosCommand(alunosNovosParaIncluirNormalizada));
@@ -95,12 +96,14 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
 
                     //TODO: Normalizar com uma entidade AlunoEol
-                    if (alunoAntigo != null && (alunoAntigo.Nome != alunoQuePodeAlterar.Nome ||
-                                                alunoAntigo.Situacao != alunoQuePodeAlterar.SituacaoAluno ||
-                                                long.Parse(turmaAntigaDoAluno.Codigo) != alunoQuePodeAlterar.TurmaCodigo ||
-                                                alunoAntigo.DataNascimento != alunoQuePodeAlterar.DataNascimento ||
-                                                alunoAntigo.NomeSocial != alunoQuePodeAlterar.NomeSocial ||
-                                                alunoAntigo.Sexo != alunoQuePodeAlterar.Sexo))
+                    if (alunoAntigo != null && 
+                        alunoAntigo.DataAtualizacao < alunoQuePodeAlterar.DataSituacao && 
+                        (alunoAntigo.Nome != alunoQuePodeAlterar.Nome ||
+                        alunoAntigo.Situacao != alunoQuePodeAlterar.SituacaoAluno ||
+                        long.Parse(turmaAntigaDoAluno.Codigo) != alunoQuePodeAlterar.TurmaCodigo ||
+                        alunoAntigo.DataNascimento.Date != alunoQuePodeAlterar.DataNascimento.Date ||
+                        alunoAntigo.NomeSocial != alunoQuePodeAlterar.NomeSocial ||
+                        alunoAntigo.Sexo != alunoQuePodeAlterar.Sexo))
                     {
 
                         var turmaId = alunoAntigo.TurmaId;
@@ -120,7 +123,7 @@ namespace SME.SERAp.Prova.Aplicacao
                             Situacao = alunoQuePodeAlterar.SituacaoAluno,
                             NomeSocial = alunoQuePodeAlterar.NomeSocial,
                             Sexo = alunoQuePodeAlterar.Sexo,
-                            DataAtualizacao = DateTime.Now,
+                            DataAtualizacao = alunoQuePodeAlterar.DataSituacao,
                             DataNascimento = alunoQuePodeAlterar.DataNascimento,
                             TurmaId = turmaId
                         });

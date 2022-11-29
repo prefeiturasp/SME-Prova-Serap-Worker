@@ -46,14 +46,14 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var provaALuno = await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
 
-            var ordem = 0;
+            var primeiraQuestao = true;
             foreach(var questao in itens.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
             {
                 var questaoParaPersistir = new Questao(
                     questao.TextoBase,
                     questao.ItemId,
                     questao.Enunciado,
-                    ordem,
+                    primeiraQuestao ? 0 : 999,
                     alunoProva.ProvaId,
                     (QuestaoTipo)questao.TipoItem,
                     alunoProva.AlunoId.ToString(),
@@ -81,7 +81,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     await TratarAlternativasQuestao(questao, questaoId);
                 }
 
-                ordem++;
+                primeiraQuestao = false;
             }
 
             return true;

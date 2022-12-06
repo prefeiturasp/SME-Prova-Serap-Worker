@@ -77,10 +77,11 @@
         public const string ReabrirProvaAluno = "serap.estudantes.provaAluno.reabrir";
         public const string TratarUsuarioDispositivoLogin = "serap.estudantes.usuario.dispositivo.login.tratar";
         public const string ReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura";
-        public const string TratarReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura.tratar";  
+        public const string TratarReaberturaProvaAluno = "serap.estudantes.prova.aluno.reabertura.tratar";
 
-      public static string ProvaAlunoReaberturaTratarAcompanhamento => "serap.estudante.acomp.prova.aluno.reabertura.tratar";
+        public static string ProvaAlunoReaberturaTratarAcompanhamento => "serap.estudante.acomp.prova.aluno.reabertura.tratar";
 
         public static string RotaLogs => "ApplicationLog";
+        public static string TratarOrdemQuestaoAlunoProvaTai => "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
     }
 }

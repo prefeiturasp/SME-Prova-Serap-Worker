@@ -83,5 +83,6 @@
 
         public static string RotaLogs => "ApplicationLog";
         public static string TratarOrdemQuestaoAlunoProvaTai => "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
+        public static string TratarProficienciaAlunoProvaTai => "serap.estudante.prova.tai.proficiencia.aluno.tratar";
     }
 }

@@ -75,6 +75,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 await TratarAudiosQuestao(questao, questaoId);
 
                 await TratarVideosQuestao(questao.ItemId, questaoId);
+                
+                await TratarQuestaoTri(questao, questaoId);
 
                 if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
                 {
@@ -178,6 +180,19 @@ namespace SME.SERAp.Prova.Aplicacao
                     await mediator.Send(new QuestaoVideoPersistirCommand(questaoVideoInserir));
                 }
             }
+        }
+        
+        private async Task TratarQuestaoTri(ItemAmostraTaiDto questaoSerap, long questaoId)
+        {
+            var questaoTriInserir = new QuestaoTri()
+            {
+                QuestaoId = questaoId,
+                Discriminacao = questaoSerap.Discriminacao,
+                Dificuldade = questaoSerap.ProporcaoAcertos,
+                AcertoCasual = questaoSerap.AcertoCasual
+            };
+
+            await mediator.Send(new IncluirAtualizarQuestaoTriCommand(questaoTriInserir));
         }
     }
 }

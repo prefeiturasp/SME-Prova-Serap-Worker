@@ -82,7 +82,7 @@
         public static string ProvaAlunoReaberturaTratarAcompanhamento => "serap.estudante.acomp.prova.aluno.reabertura.tratar";
 
         public static string RotaLogs => "ApplicationLog";
-        public static string TratarOrdemQuestaoAlunoProvaTai => "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
-        public static string TratarProficienciaAlunoProvaTai => "serap.estudante.prova.tai.proficiencia.aluno.tratar";
+        public const string TratarOrdemQuestaoAlunoProvaTai = "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
+        public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";
     }
 }

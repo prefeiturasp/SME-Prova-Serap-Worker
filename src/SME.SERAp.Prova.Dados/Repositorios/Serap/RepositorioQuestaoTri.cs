@@ -1,8 +1,5 @@
 ﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -19,7 +16,13 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"";
+                var query = @"select id, 
+                                     questao_id as QuestaoId, 
+                                     discriminacao as Discriminacao, 
+                                     dificuldade as Dificuldade, 
+                                     acerto_casual as AcertoCasual
+                                from questao_tri 
+                                where questao_id = @questaoId";
 
                 return await conn.QueryFirstOrDefaultAsync<QuestaoTri>(query, new { questaoId });
             }

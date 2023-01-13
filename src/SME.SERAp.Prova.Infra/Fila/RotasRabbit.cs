@@ -88,7 +88,9 @@
 
         public const string ImportarProeficienciaCsvProvaSp= "serap.provaSp.importarCsv.proeficiencia";
         public const string TratarProeficienciaCsvProvaSp = "serap.provaSp.importarCsv.proeficiencia.tratar";
+
       
+        public const string ImportarResultadoAlunoPsp  = "serap.resultados.psp.resultado.aluno";
         public const string TratarResultadoAlunoPsp = "serap.resultados.psp.resultado.aluno.tratar";
 
     }

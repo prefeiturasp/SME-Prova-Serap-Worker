@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SME.SERAp.Prova.Aplicacao.Interfaces
 {
-    public interface IImportarProeficienciaAlunoTratarUseCase : IUseCase<MensagemRabbit, bool>
+    public interface ITratarProeficienciaAlunoTratarUseCase : IUseCase<MensagemRabbit, bool>
     {
 
     }

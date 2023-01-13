@@ -187,6 +187,9 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<IImportarProeficienciaAlunoUseCase, ImportarProficienciaAlunoUseCase>();
 
+            services.AddScoped<ITratarProeficienciaAlunoTratarUseCase, TratarProeficienciaAlunoTratarUseCase>();
+            
+
 
         }
     }

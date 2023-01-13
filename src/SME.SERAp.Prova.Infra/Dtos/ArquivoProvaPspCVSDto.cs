@@ -7,6 +7,7 @@ namespace SME.SERAp.Prova.Infra.Dtos
 {
     public class ArquivoProvaPspCVSDto
     {
+
         [Name("Edicao")]
         public string Edicao { get; set; }
         [Name("AreaConhecimentoID")]
@@ -30,6 +31,15 @@ namespace SME.SERAp.Prova.Infra.Dtos
         public int NivelProficienciaID { get; set; }
         [Name("Valor")]
         public string Valor { get; set; }
-
+        [Name("REDQ1")]
+        public string REDQ1 { get; set; }
+        [Name("REDQ2")]
+        public string REDQ2 { get; set; }
+        [Name("REDQ3")]
+        public string REDQ3 { get; set; }
+        [Name("REDQ4")]
+        public string REDQ4 { get; set; }
+        [Name("REDQ5")]
+        public string REDQ5 { get; set; }
     }
 }

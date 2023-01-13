@@ -200,20 +200,15 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.IncluirProvaAluno, new ComandoRabbit("Incluir Prova Aluno Serap Estudantes", typeof(IIncluirProvaAlunoUseCase)));
             comandos.Add(RotasRabbit.IncluirVersaoDispositivoApp, new ComandoRabbit("Incluir Versao Dispositivo App", typeof(IVersaoAppDispositivoAppUseCase)));
 
-            comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));           
+            comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));
             comandos.Add(RotasRabbit.TratarUsuarioDispositivoLogin, new ComandoRabbit("Salvar dispositivo no login do usuário", typeof(ITratarUsuarioDispositivoLoginUseCase)));
             comandos.Add(RotasRabbit.TratarReaberturaProvaAluno, new ComandoRabbit("Tramento de reabertura de prova de aluno serap estudantes", typeof(ITratarReaberturaProvaAlunoUseCase)));
             comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));
 
-            comandos.Add(RotasRabbit.TratarResultadoAlunoPsp, new ComandoRabbit("Importa arquivo csv proeficiencia aluno", typeof(IImportarProeficienciaAlunoUseCase)));
-
-
-            
-
-
-
-    }
+            comandos.Add(RotasRabbit.ImportarResultadoAlunoPsp, new ComandoRabbit("Importa arquivo csv proeficiencia aluno", typeof(IImportarProeficienciaAlunoUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoAlunoPsp, new ComandoRabbit("Tratar resgistros arquivo csv proeficiencia aluno", typeof(ITratarProeficienciaAlunoTratarUseCase)));
+        }
 
         private static MethodInfo ObterMetodo(Type objType, string method)
         {

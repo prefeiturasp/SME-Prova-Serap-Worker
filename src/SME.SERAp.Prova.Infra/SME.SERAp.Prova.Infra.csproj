@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.16.1" />
     <PackageReference Include="FluentValidation" Version="10.3.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.17.0" />

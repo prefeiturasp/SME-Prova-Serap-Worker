@@ -1,19 +1,15 @@
-﻿using CsvHelper;
-using MediatR;
+﻿using MediatR;
 using RabbitMQ.Client;
 using SME.SERAp.Prova.Aplicaca;
 using SME.SERAp.Prova.Aplicacao.Commands.ProvaSP.ProvaResultado;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.Queries;
-using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia;
 using SME.SERAp.Prova.Dominio.Entidades;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao

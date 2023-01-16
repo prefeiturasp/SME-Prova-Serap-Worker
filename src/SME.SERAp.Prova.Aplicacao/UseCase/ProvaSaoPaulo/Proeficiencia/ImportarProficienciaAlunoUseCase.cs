@@ -1,27 +1,16 @@
-﻿using MediatR;
-using SME.SERAp.Prova.Aplicacao.Interfaces;
-using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using CsvHelper.Configuration.Attributes;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
-using CsvHelper;
-using System.Globalization;
-using SME.SERAp.Prova.Aplicacao.Queries;
-using SME.SERAp.Prova.Infra.Dtos;
-using SME.SERAp.Prova.Aplicacao.Commands.ProvaSP.ProvaResultado;
-using SME.SERAp.Prova.Dominio.Entidades;
-using Npgsql.TypeHandlers.GeometricHandlers;
-using SME.SERAp.Prova.Infra.Interfaces;
+using MediatR;
 using SME.SERAp.Prova.Aplicaca;
+using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio.Enums;
-using RabbitMQ.Client;
+using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
+using SME.SERAp.Prova.Infra.Interfaces;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia
 {

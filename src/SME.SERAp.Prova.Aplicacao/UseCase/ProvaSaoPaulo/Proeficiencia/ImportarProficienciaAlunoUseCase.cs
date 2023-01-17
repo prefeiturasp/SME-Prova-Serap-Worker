@@ -45,7 +45,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia
                 registroProvaCsv.IdArquivo = arquivoResultadoPspDto.Id;
                 nomeArquivo = arquivoResultadoPspDto.NomeArquivo;
 
-                using (var reader = new StreamReader($"{Environment.GetEnvironmentVariable("PathArquivos")}\\{"ResultadoPsp"}\\{arquivoResultadoPspDto.NomeArquivo}"))
+                using (var reader = new StreamReader($"{Environment.GetEnvironmentVariable("PathArquivos")}/{"ResultadoPsp"}/{arquivoResultadoPspDto.NomeArquivo}"))
                 using (var csv = new CsvReader(reader, config))
                 {
                     var listaCsvResultadoAluno = csv.GetRecords<ArquivoProvaPspCVSDto>();

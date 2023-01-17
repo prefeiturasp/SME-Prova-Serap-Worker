@@ -75,7 +75,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              , @alu_nome
                            --  , @ResultadoLegadoID
                              , @NivelProficienciaID
-                             , CONVERT(decimal(10,2), @Valor))";
+                             , CONVERT(decimal(6,3), @Valor))";
 
                 return await conn.ExecuteAsync(query, new
                 {

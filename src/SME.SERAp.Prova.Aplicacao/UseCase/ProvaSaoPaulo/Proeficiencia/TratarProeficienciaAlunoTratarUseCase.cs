@@ -82,7 +82,7 @@ namespace SME.SERAp.Prova.Aplicacao
             decimal dec_valor = 0;
             if (decimal.TryParse(valor, out dec_valor))
             {
-                return Math.Round(Convert.ToDecimal(valor), 2).ToString().Replace(",",".");
+                return Math.Round(Convert.ToDecimal(valor), 2).ToString().Replace(".","").Replace(",",".");
             }
             throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
         }

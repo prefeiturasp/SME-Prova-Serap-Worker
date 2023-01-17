@@ -75,7 +75,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              , @alu_nome
                            --  , @ResultadoLegadoID
                              , @NivelProficienciaID
-                             , @Valor )";
+                             , CONVERT(decimal(10,2), @Valor))";
 
                 return await conn.ExecuteAsync(query, new
                 {
@@ -88,7 +88,6 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                     resultado.tur_id,
                     resultado.alu_matricula,
                     resultado.alu_nome,
-                    //   resultado.ResultadoLegadoId,
                     resultado.NivelProficienciaID,
                     resultado.Valor
                 });

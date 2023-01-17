@@ -47,14 +47,14 @@ namespace SME.SERAp.Prova.Aplicacao
                         alu_nome = objCsvResultadoAluno.alu_nome,
                         NivelProficienciaID = objCsvResultadoAluno.NivelProficienciaID,
                         AreaConhecimentoID = objCsvResultadoAluno.AreaConhecimentoID,
-                        Valor = Decimal.Parse(objCsvResultadoAluno.Valor)
+                        Valor = ObterValorDecimal(objCsvResultadoAluno.Valor)
                     };
 
                     await mediator.Send(new IncluirResultadoAlunoCommand(resultadoAlunoEntidade));
                 }
 
                 var qtd = model.MessageCount(RotasRabbit.TratarResultadoAlunoPsp);
-               
+
                 if (qtd == 0)
                     await AtualizaStatusDoArquivo(registroProvaPspCVSDto);
 
@@ -75,5 +75,17 @@ namespace SME.SERAp.Prova.Aplicacao
             if (arquivoResultadoPspDto.State != (long)StatusImportacao.Erro)
                 await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProvaPspCVSDto.IdArquivo, StatusImportacao.Processado));
         }
+
+        private decimal ObterValorDecimal(string valor)
+        {
+            if (string.IsNullOrEmpty(valor)) return 0;
+            decimal dec_valor = 0;
+            if (decimal.TryParse(valor, out dec_valor))
+            {
+                return Math.Round(Convert.ToDecimal(valor), 2);
+            }
+            throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
+        }
+
     }
 }

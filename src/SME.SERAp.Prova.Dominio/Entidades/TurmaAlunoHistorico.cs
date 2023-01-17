@@ -4,6 +4,19 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class TurmaAlunoHistorico : EntidadeBase
     {
+        public TurmaAlunoHistorico() { }
+
+        public TurmaAlunoHistorico(long id, long turmaId, int anoLetivo, long alunoId, DateTime dataMatricula, DateTime dataSituacao)
+        {
+            Id = id;
+            TurmaId = turmaId;
+            AnoLetivo = anoLetivo;
+            AlunoId = alunoId;
+            DataMatricula = dataMatricula;
+            DataSituacao = dataSituacao;
+            CriadoEm = AtualizadoEm = DateTime.Now;
+        }
+
         public TurmaAlunoHistorico(long turmaId, int anoLetivo, long alunoId, DateTime dataMatricula, DateTime dataSituacao)
         {
             TurmaId = turmaId;

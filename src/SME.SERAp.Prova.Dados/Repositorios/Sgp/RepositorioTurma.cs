@@ -282,13 +282,11 @@ namespace SME.SERAp.Prova.Dados
                                inner join dre d on u.dre_id  = d.id
                                where t.tipo_turma = 1
                                  and t.modalidade_codigo in (3,4,5,6)
-                                 and t.ano_letivo = @anoLetivo 
                                  and d.dre_id = @dreCodigo";
 
                 var parametros = new
                 {
-                    dreCodigo,
-                    anoLetivo = DateTime.Now.Year
+                    dreCodigo
                 };
 
                 return await conn.QueryAsync<TurmaSgpDto>(query, parametros);

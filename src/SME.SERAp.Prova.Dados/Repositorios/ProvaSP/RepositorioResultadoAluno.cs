@@ -49,7 +49,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
             using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
             try
             {
-                var query = @"INSERT INTO ResultadoAluno
+                var query = $@"INSERT INTO ResultadoAluno
                              (Edicao
                              ,AreaConhecimentoID
                       	     ,uad_sigla
@@ -59,10 +59,8 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              ,tur_id
                              ,alu_matricula
                              ,alu_nome
-                           --  ,ResultadoLegadoID
                              ,NivelProficienciaID
                              ,Valor)
-                          
                               VALUES
                              ( @Edicao  
                              , @AreaConhecimentoID
@@ -73,9 +71,8 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              , @tur_id
                              , @alu_matricula
                              , @alu_nome
-                           --  , @ResultadoLegadoID
                              , @NivelProficienciaID
-                             , CONVERT(decimal(6,3), @Valor))";
+                             , CONVERT(decimal(6,3), '{resultado.Valor}'))";
 
                 return await conn.ExecuteAsync(query, new
                 {

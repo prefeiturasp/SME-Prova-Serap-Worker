@@ -47,7 +47,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         alu_nome = objCsvResultadoAluno.alu_nome,
                         NivelProficienciaID = objCsvResultadoAluno.NivelProficienciaID,
                         AreaConhecimentoID = objCsvResultadoAluno.AreaConhecimentoID,
-                        Valor = ObterValorDecimal(objCsvResultadoAluno.Valor)
+                        Valor = ObterValor(objCsvResultadoAluno.Valor)
                     };
 
                     await mediator.Send(new IncluirResultadoAlunoCommand(resultadoAlunoEntidade));
@@ -64,7 +64,7 @@ namespace SME.SERAp.Prova.Aplicacao
             catch (Exception ex)
             {
                 servicoLog.Registrar($"Fila TratarProeficienciaAlunoTratarUseCase ObjetoMensagem: {objCsvResultadoAluno}, Erro ao processar o registro do Arquivo {registroProvaPspCVSDto.IdArquivo}", ex);
-                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProvaPspCVSDto.IdArquivo, StatusImportacao.EmAndamento));
+                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProvaPspCVSDto.IdArquivo, StatusImportacao.Erro));
                 return false;
             }
         }
@@ -76,13 +76,13 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProvaPspCVSDto.IdArquivo, StatusImportacao.Processado));
         }
 
-        private decimal ObterValorDecimal(string valor)
+        private string ObterValor(string valor)
         {
-            if (string.IsNullOrEmpty(valor)) return 0;
+            if (string.IsNullOrEmpty(valor)) return "0";
             decimal dec_valor = 0;
             if (decimal.TryParse(valor, out dec_valor))
             {
-                return Math.Round(Convert.ToDecimal(valor), 2);
+                return Math.Round(Convert.ToDecimal(valor), 2).ToString().Replace(",",".");
             }
             throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
         }

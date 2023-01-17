@@ -1,9 +1,4 @@
-﻿using Dapper.Contrib.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.SERAp.Prova.Dominio.Entidades
+﻿namespace SME.SERAp.Prova.Dominio.Entidades
 {
     public class ResultadoAluno
     {
@@ -17,8 +12,7 @@ namespace SME.SERAp.Prova.Dominio.Entidades
         public int tur_id { get; set; }
         public string alu_matricula { get; set; }
         public string alu_nome { get; set; }
-      //  public int? ResultadoLegadoId { get; set; }
         public int NivelProficienciaID { get; set; }
-        public decimal Valor { get; set; }
+        public string Valor { get; set; }
     }
 }

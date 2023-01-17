@@ -60,7 +60,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia
             {
                 var IdAquivo = long.Parse(mensagemRabbit.Mensagem.ToString());
                 servicoLog.Registrar($"Fila ImportarProficienciaAlunoUseCase Id: {mensagemRabbit.Mensagem.ToString()} --- Mensagem -- {mensagemRabbit}-- Erro ao processar o arquivo  {nomeArquivo} ", ex);
-                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(IdAquivo, StatusImportacao.EmAndamento));
+                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(IdAquivo, StatusImportacao.Erro));
                 return false;
             }
             return true;

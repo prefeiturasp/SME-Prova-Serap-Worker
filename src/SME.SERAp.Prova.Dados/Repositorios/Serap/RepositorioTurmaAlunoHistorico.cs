@@ -23,7 +23,8 @@ namespace SME.SERAp.Prova.Dados
                                      tah.ano_letivo as anoLetivo, 
                                      a.id as alunoId, 
                                      tah.data_matricula as dataMatricula, 
-                                     tah.data_situacao as dataSituacao 
+                                     tah.data_situacao as dataSituacao,
+                                     tah.matricula               
                             from aluno a
                             left join turma_aluno_historico tah ON tah.aluno_id = a.id 
                             where a.ra = ANY(@alunosRa)";

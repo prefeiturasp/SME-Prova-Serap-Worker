@@ -16,6 +16,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.AlunoId).ToColumn("aluno_id");
             Map(c => c.DataMatricula).ToColumn("data_matricula");
             Map(c => c.DataSituacao).ToColumn("data_situacao");
+            Map(c => c.Matricula).ToColumn("matricula");
             Map(c => c.CriadoEm).ToColumn("criado_em");
             Map(c => c.AtualizadoEm).ToColumn("atualizado_em");
         }

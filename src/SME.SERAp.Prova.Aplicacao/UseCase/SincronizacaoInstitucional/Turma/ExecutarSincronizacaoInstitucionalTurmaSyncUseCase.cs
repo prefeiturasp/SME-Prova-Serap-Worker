@@ -81,7 +81,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 var turmasNovasParaIncluirNormalizada = turmasNovasParaIncluir.Select(a => new Turma()
                 {
-                    Ano = a.Ano,
+                    Ano = a.NomeTurma.StartsWith("S") ? "S" : a.Ano,
                     AnoLetivo = a.AnoLetivo,
                     Codigo = a.Codigo,
                     ModalidadeCodigo = a.ModalidadeCodigo,
@@ -113,7 +113,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     {
                         listaParaAlterar.Add(new Turma()
                         {
-                            Ano = turmaQuePodeAlterar.Ano,
+                            Ano = turmaQuePodeAlterar.NomeTurma.StartsWith("S") ? "S" : turmaQuePodeAlterar.Ano,
                             AnoLetivo = turmaQuePodeAlterar.AnoLetivo,
                             Codigo = turmaQuePodeAlterar.Codigo,
                             ModalidadeCodigo = turmaQuePodeAlterar.ModalidadeCodigo,

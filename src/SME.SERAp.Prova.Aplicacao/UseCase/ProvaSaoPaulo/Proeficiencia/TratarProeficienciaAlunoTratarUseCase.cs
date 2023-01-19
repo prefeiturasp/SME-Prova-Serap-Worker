@@ -1,19 +1,15 @@
-﻿using CsvHelper;
-using MediatR;
+﻿using MediatR;
 using RabbitMQ.Client;
 using SME.SERAp.Prova.Aplicaca;
 using SME.SERAp.Prova.Aplicacao.Commands.ProvaSP.ProvaResultado;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.Queries;
-using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia;
 using SME.SERAp.Prova.Dominio.Entidades;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -51,14 +47,14 @@ namespace SME.SERAp.Prova.Aplicacao
                         alu_nome = objCsvResultadoAluno.alu_nome,
                         NivelProficienciaID = objCsvResultadoAluno.NivelProficienciaID,
                         AreaConhecimentoID = objCsvResultadoAluno.AreaConhecimentoID,
-                        Valor = Decimal.Parse(objCsvResultadoAluno.Valor)
+                        Valor = ObterValor(objCsvResultadoAluno.Valor)
                     };
 
                     await mediator.Send(new IncluirResultadoAlunoCommand(resultadoAlunoEntidade));
                 }
 
                 var qtd = model.MessageCount(RotasRabbit.TratarResultadoAlunoPsp);
-               
+
                 if (qtd == 0)
                     await AtualizaStatusDoArquivo(registroProvaPspCVSDto);
 
@@ -68,7 +64,7 @@ namespace SME.SERAp.Prova.Aplicacao
             catch (Exception ex)
             {
                 servicoLog.Registrar($"Fila TratarProeficienciaAlunoTratarUseCase ObjetoMensagem: {objCsvResultadoAluno}, Erro ao processar o registro do Arquivo {registroProvaPspCVSDto.IdArquivo}", ex);
-                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProvaPspCVSDto.IdArquivo, StatusImportacao.EmAndamento));
+                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProvaPspCVSDto.IdArquivo, StatusImportacao.Erro));
                 return false;
             }
         }
@@ -79,5 +75,17 @@ namespace SME.SERAp.Prova.Aplicacao
             if (arquivoResultadoPspDto.State != (long)StatusImportacao.Erro)
                 await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProvaPspCVSDto.IdArquivo, StatusImportacao.Processado));
         }
+
+        private string ObterValor(string valor)
+        {
+            if (string.IsNullOrEmpty(valor)) return "0";
+            decimal dec_valor = 0;
+            if (decimal.TryParse(valor, out dec_valor))
+            {
+                return valor.Replace(".", "").Replace(",", ".");
+            }
+            throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
+        }
+
     }
 }

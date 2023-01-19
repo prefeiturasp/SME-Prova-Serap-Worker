@@ -15,6 +15,7 @@ namespace SME.SERAp.Prova.Infra
         public long TurmaCodigo { get; set; }
         public int SituacaoAluno { get; set; }
         public long TurmaSerapId { get; set; }
-        
+        public DateTime DataSituacao { get; set; }
+
     }
 }

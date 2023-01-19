@@ -71,7 +71,8 @@ namespace SME.SERAp.Prova.Dados
 								turesc.cd_tipo_turno as TipoTurno,
 								turesc.cd_turma_escola as TurmaCodigo,
 								turesc.an_letivo as AnoLetivo,
-								matricula.CodigoSituacaoMatricula as SituacaoAluno
+								matricula.CodigoSituacaoMatricula as SituacaoAluno,
+								matricula.DataSituacao
 							FROM
 								mtr_norm matricula 
 							INNER JOIN v_aluno_cotic aluno ON

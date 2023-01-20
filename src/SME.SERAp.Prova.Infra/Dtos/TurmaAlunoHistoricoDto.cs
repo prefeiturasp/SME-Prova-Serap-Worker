@@ -5,6 +5,7 @@ namespace SME.SERAp.Prova.Infra
     public class TurmaAlunoHistoricoDto : DtoBase
     {
         public long Id { get; set; }
+        public long Matricula { get; set; }
         public long AlunoRa { get; set; }
         public long TurmaId { get; set; }
         public int AnoLetivo { get; set; }

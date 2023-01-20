@@ -19,13 +19,18 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<TurmaEolDto>> ObterTurmasAlunoHistoricoPorAlunosRa(long[] alunosRa)
         {
-            var query = $@"select tb.AlunoRa, tb.CodigoTurma, tb.AnoLetivo, tb.DataMatricula, tb.DataSituacao
+            var query = $@"select tb.CodigoMatricula as Matricula, 
+                                  tb.AlunoRa, 
+                                  tb.CodigoTurma, 
+                                  tb.AnoLetivo, 
+                                  tb.DataMatricula, 
+                                  tb.DataSituacao
                            from (
 	                            select matricula.CodigoMatricula, 
 	                                   matricula.CodigoAluno as AlunoRa, 
 		                               matricula.CodigoTurma, 
 		                               matricula.AnoLetivo, 
-		                               min(matricula.DataMatricula) as DataMatricula, 
+		                               min(matricula.DataSituacao) as DataMatricula, 
 		                               max(case when matricula.CodigoSituacaoMatricula <> 1 then matricula.DataSituacao else null end) as DataSituacao
 	                            from alunos_matriculas_norm matricula
 	                            where matricula.CodigoAluno in @alunosRa  

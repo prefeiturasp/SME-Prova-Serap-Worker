@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Aplicaca;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
@@ -29,19 +30,17 @@ namespace SME.SERAp.Prova.Aplicacao
                 var IdArquivoResultadoPsp = long.Parse(mensagemRabbit.Mensagem.ToString());
 
                 arquivoResultadoPsp = await mediator.Send(new ObterTipoResultadoPspQuery(IdArquivoResultadoPsp));
+                if (arquivoResultadoPsp == null) return false;
+
                 await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(IdArquivoResultadoPsp, StatusImportacao.EmAndamento));
 
-                var registroProvaCsv = new RegistroProficienciaPspCsvDto();
-                registroProvaCsv.ProcessoId = arquivoResultadoPsp.Id;
-
-                var csvUtil = new ResultadoPsp();
-                using (var csv = csvUtil.ObterReaderArquivoResultadosPsp(pathOptions, arquivoResultadoPsp.NomeArquivo))
+                using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(pathOptions, arquivoResultadoPsp.NomeArquivo))
                 {
                     var listaCsvResultados = csv.GetRecords<ResultadoSmeDto>().ToList();
                     foreach (var objCsvResultado in listaCsvResultados)
                     {
-                        registroProvaCsv.Registro = objCsvResultado;
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarResultadoSmePsp, registroProvaCsv));
+                        var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);
+                        await publicarFilaTratar(dto);
                     }
                 }
                 return true;
@@ -52,6 +51,13 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand((long)arquivoResultadoPsp?.Id, StatusImportacao.Erro));
                 return false;
             }
+        }
+
+        private async Task publicarFilaTratar(RegistroProficienciaPspCsvDto dto)
+        {
+            string fila = ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp((TipoResultadoPsp)arquivoResultadoPsp.CodigoTipoResultado);
+            if (!string.IsNullOrEmpty(fila))
+                await mediator.Send(new PublicaFilaRabbitCommand(fila, dto));
         }
     }
 }

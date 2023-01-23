@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SME.SERAp.Prova.Infra
+﻿namespace SME.SERAp.Prova.Infra
 {
     public class RegistroProficienciaPspCsvDto
     {
@@ -10,6 +6,12 @@ namespace SME.SERAp.Prova.Infra
         public RegistroProficienciaPspCsvDto()
         {
 
+        }
+
+        public RegistroProficienciaPspCsvDto(long processoId, object registro)
+        {
+            ProcessoId = processoId;
+            Registro = registro;
         }
 
         public long ProcessoId { get; set; }

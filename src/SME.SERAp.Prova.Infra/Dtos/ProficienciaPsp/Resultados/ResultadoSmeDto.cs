@@ -1,5 +1,4 @@
 ﻿using CsvHelper.Configuration.Attributes;
-using System;
 
 namespace SME.SERAp.Prova.Infra
 {
@@ -37,22 +36,11 @@ namespace SME.SERAp.Prova.Infra
         public string _percentualAvancado { get; set; }
 
 
-        public decimal? Valor { get { return ObterValorDecimal(_valor); } }
-        public decimal? PercentualAbaixoDoBasico { get { return ObterValorDecimal(_percentualAbaixoDoBasico); } }
-        public decimal? PercentualBasico { get { return ObterValorDecimal(_percentualBasico); } }
-        public decimal? PercentualAdequado { get { return ObterValorDecimal(_percentualAdequado); } }
-        public decimal? PercentualAvancado { get { return ObterValorDecimal(_percentualAvancado); } }
-
-        private decimal? ObterValorDecimal(string valor)
-        {
-            if (string.IsNullOrEmpty(valor)) return null;
-            decimal dec_valor = 0;
-            if (decimal.TryParse(valor.Trim(), out dec_valor))
-            {
-                return dec_valor;
-            }
-            throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
-        }
+        public decimal? Valor { get { return _valor.ConverterStringPraDecimal(); } }
+        public decimal? PercentualAbaixoDoBasico { get { return _percentualAbaixoDoBasico.ConverterStringPraDecimal(); } }
+        public decimal? PercentualBasico { get { return _percentualBasico.ConverterStringPraDecimal(); } }
+        public decimal? PercentualAdequado { get { return _percentualAdequado.ConverterStringPraDecimal(); } }
+        public decimal? PercentualAvancado { get { return _percentualAvancado.ConverterStringPraDecimal(); } }
 
     }
 }

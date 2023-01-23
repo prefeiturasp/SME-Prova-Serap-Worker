@@ -1,12 +1,8 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Dados;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using SME.SERAp.Prova.Aplicaca;
 using SME.SERAp.Prova.Dados.Interfaces;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {

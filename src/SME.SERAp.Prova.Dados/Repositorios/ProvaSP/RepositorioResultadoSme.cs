@@ -61,14 +61,14 @@ namespace SME.SERAp.Prova.Dados.Repositorios
 								(@Edicao
 								,@AreaConhecimentoID
 								,@AnoEscolar
-								,@Valor
+								,CONVERT(decimal(6,3), @Valor))
 								,@TotalAlunos
 								,@NivelProficienciaID
-								,@PercentualAbaixoDoBasico
-								,@PercentualBasico
-								,@PercentualAdequado
-								,@PercentualAvancado
-								,@PercentualAlfabetizado)";
+								,CONVERT(decimal(6,2), @PercentualAbaixoDoBasico))
+								,CONVERT(decimal(6,2), @PercentualBasico))
+								,CONVERT(decimal(6,2), @PercentualAdequado))
+								,CONVERT(decimal(6,2), @PercentualAvancado))
+								,CONVERT(decimal(6,2), @PercentualAlfabetizado)))";
 
                 return await conn.ExecuteAsync(query, new
                 {

@@ -16,6 +16,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IServicoLog servicoLog;
         private readonly PathOptions pathOptions;
         private ArquivoResultadoPspDto arquivoResultadoPsp = null;
+        private TipoResultadoPsp tipoResultadoProcesso = TipoResultadoPsp.ResultadoSme;
 
         public ImportarProficienciaSmeUseCase(IMediator mediator, IServicoLog servicoLog, PathOptions pathOptions) : base(mediator)
         {
@@ -47,7 +48,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             catch (Exception ex)
             {
-                servicoLog.Registrar($"Fila {GetType().Name} Id: {arquivoResultadoPsp?.Id} --- Mensagem -- {mensagemRabbit}-- Erro ao processar o arquivo  {arquivoResultadoPsp?.NomeOriginalArquivo} ", ex);
+                servicoLog.Registrar($"Fila {GetType().Name} Id: {arquivoResultadoPsp?.Id} --- Mensagem -- {mensagemRabbit.Mensagem.ToString()} -- Erro ao processar o arquivo  {arquivoResultadoPsp?.NomeOriginalArquivo} ", ex);
                 await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand((long)arquivoResultadoPsp?.Id, StatusImportacao.Erro));
                 return false;
             }
@@ -55,7 +56,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task publicarFilaTratar(RegistroProficienciaPspCsvDto dto)
         {
-            string fila = ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp((TipoResultadoPsp)arquivoResultadoPsp.CodigoTipoResultado);
+            string fila = ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp(tipoResultadoProcesso);
             if (!string.IsNullOrEmpty(fila))
                 await mediator.Send(new PublicaFilaRabbitCommand(fila, dto));
         }

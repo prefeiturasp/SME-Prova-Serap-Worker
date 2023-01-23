@@ -1,7 +1,9 @@
-﻿using SME.SERAp.Prova.Dados.Interfaces;
+﻿using Dapper;
+using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -61,29 +63,29 @@ namespace SME.SERAp.Prova.Dados.Repositorios
 								(@Edicao
 								,@AreaConhecimentoID
 								,@AnoEscolar
-								,CONVERT(decimal(6,3), @Valor)
+								,@Valor
 								,@TotalAlunos
 								,@NivelProficienciaID
-								,CONVERT(decimal(6,2), @PercentualAbaixoDoBasico)
-								,CONVERT(decimal(6,2), @PercentualBasico)
-								,CONVERT(decimal(6,2), @PercentualAdequado)
-								,CONVERT(decimal(6,2), @PercentualAvancado)
-								,CONVERT(decimal(6,2), @PercentualAlfabetizado))";
+								,@PercentualAbaixoDoBasico
+								,@PercentualBasico
+								,@PercentualAdequado
+								,@PercentualAvancado
+								,@PercentualAlfabetizado)";
 
-                return await conn.ExecuteAsync(query, new
-                {
-                    resultado.Edicao,
-                    resultado.AreaConhecimentoID,
-                    resultado.AnoEscolar,
-                    resultado.Valor,
-                    resultado.TotalAlunos,
-                    resultado.NivelProficienciaID,
-                    resultado.PercentualAbaixoDoBasico,
-                    resultado.PercentualBasico,
-                    resultado.PercentualAdequado,
-                    resultado.PercentualAvancado,
-                    resultado.PercentualAlfabetizado
-                });
+                var parametros = new DynamicParameters();
+                parametros.Add("@Edicao", resultado.Edicao, DbType.String, ParameterDirection.Input, 10);
+                parametros.Add("@AreaConhecimentoID", resultado.AreaConhecimentoID, DbType.Int16, ParameterDirection.Input);
+                parametros.Add("@AnoEscolar", resultado.AnoEscolar, DbType.String, ParameterDirection.Input, 3);
+                parametros.Add("@Valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input);
+                parametros.Add("@TotalAlunos", resultado.TotalAlunos, DbType.Int32, ParameterDirection.Input);
+                parametros.Add("@NivelProficienciaID", resultado.NivelProficienciaID, DbType.Int16, ParameterDirection.Input);
+                parametros.Add("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico, DbType.Decimal, ParameterDirection.Input);
+                parametros.Add("@PercentualBasico", resultado.PercentualBasico, DbType.Decimal, ParameterDirection.Input);
+                parametros.Add("@PercentualAdequado", resultado.PercentualAdequado, DbType.Decimal, ParameterDirection.Input);
+                parametros.Add("@PercentualAvancado", resultado.PercentualAvancado, DbType.Decimal, ParameterDirection.Input);
+                parametros.Add("@PercentualAlfabetizado", resultado.PercentualAlfabetizado, DbType.Decimal, ParameterDirection.Input);
+
+                return await conn.ExecuteAsync(query, parametros);
 
             }
             catch (Exception)

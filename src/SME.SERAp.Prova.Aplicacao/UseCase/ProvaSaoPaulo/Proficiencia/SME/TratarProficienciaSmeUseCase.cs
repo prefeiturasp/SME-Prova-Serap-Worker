@@ -16,6 +16,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IServicoLog servicoLog;
         private readonly IModel model;
         private RegistroProficienciaPspCsvDto registroProficienciaPsp;
+        private TipoResultadoPsp tipoResultadoProcesso = TipoResultadoPsp.ResultadoSme;
 
         public TratarProficienciaSmeUseCase(IMediator mediator, IServicoLog servicoLog, IModel model) : base(mediator)
         {
@@ -57,7 +58,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             catch (Exception ex)
             {
-                servicoLog.Registrar($"Fila {GetType().Name} ObjetoMensagem: {objResultadoCsv}, Erro ao processar o registro do Arquivo {registroProficienciaPsp.ProcessoId}", ex);
+                servicoLog.Registrar($"Fila {GetType().Name} ObjetoMensagem: {registroProficienciaPsp.Registro}, Erro ao processar o registro do Arquivo {registroProficienciaPsp.ProcessoId}", ex);
                 await AtualizaStatusDoProcesso(StatusImportacao.Erro);
                 return false;
             }
@@ -65,7 +66,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task<ResultadoSme> ObterResultadoBanco(ResultadoSmeDto dto)
         {
-            var objBusca = new ObjResultadoPspDto(TipoResultadoPsp.ResultadoSme, dto);
+            var objBusca = new ObjResultadoPspDto(tipoResultadoProcesso, dto);
             var resultadoBanco = await mediator.Send(new ObterObjResultadoPspQuery(objBusca));
             if (resultadoBanco == null) return null;
             return (ResultadoSme)resultadoBanco.Resultado;
@@ -73,7 +74,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task Inserir(ResultadoSme resultado)
         {
-            var objResultadoInserir = new ObjResultadoPspDto(TipoResultadoPsp.ResultadoSme, resultado);
+            var objResultadoInserir = new ObjResultadoPspDto(tipoResultadoProcesso, resultado);
             await mediator.Send(new IncluirResultadoPspCommand(objResultadoInserir));
         }
 
@@ -84,7 +85,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task VerificaSeFinalizaProcesso()
         {
-            var qtd = model.MessageCount(RotasRabbit.TratarResultadoSmePsp);
+            var qtd = model.MessageCount(ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp(tipoResultadoProcesso));
             if (qtd == 0)
             {
                 var arquivoResultadoPspDto = await mediator.Send(new ObterTipoResultadoPspQuery(registroProficienciaPsp.ProcessoId));

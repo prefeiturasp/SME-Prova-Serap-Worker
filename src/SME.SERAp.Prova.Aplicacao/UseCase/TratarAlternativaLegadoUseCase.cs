@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using System;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -37,11 +37,12 @@ namespace SME.SERAp.Prova.Aplicacao
                         $"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
                 var alternativas = new Alternativa(
-                alternativa.Ordem,
-                alternativa.Numeracao,
-                alternativa.Descricao,
-                questao.Id,
-                alternativa.Correta);
+                    alternativa.AlternativaLegadoId,
+                    alternativa.Ordem,
+                    alternativa.Numeracao,
+                    alternativa.Descricao,
+                    questao.Id,
+                    alternativa.Correta);
 
                 await mediator.Send(new AlternativaIncluirCommand(alternativas));
             }

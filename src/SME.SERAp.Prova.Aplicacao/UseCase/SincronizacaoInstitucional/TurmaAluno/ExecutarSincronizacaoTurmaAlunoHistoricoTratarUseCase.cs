@@ -18,14 +18,14 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var alunosRa = mensagemRabbit.ObterObjetoMensagem<long[]>();
 
-            if(alunosRa == null)
+            if (alunosRa == null)
             {
                 var mensagem = $"Não foi possível fazer parse da mensagem para tratar turmas histórico dos alunos. {mensagemRabbit.Mensagem}.";
                 throw new NegocioException(mensagem);
             }
 
             var turmasHistoricoEol = await mediator.Send(new ObterTurmaAlunoHistoricoEolPorAlunosRaQuery(alunosRa));
-            
+
             var turmasCodigo = turmasHistoricoEol.Select(t => t.CodigoTurma.ToString()).Distinct().ToArray();
             var turmas = await mediator.Send(new ObterTurmaPorCodigosQuery(turmasCodigo));
 
@@ -38,15 +38,34 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (turma != null && aluno != null)
                 {
-                    if (!turmasHistoricoSerap.Any(t =>
+                    var turmaHistoricoSerao = turmasHistoricoSerap.FirstOrDefault(t => 
+                        t.Matricula == turmaHistoricoEol.Matricula && 
                         t.AlunoRa == turmaHistoricoEol.AlunoRa &&
                         t.TurmaId == turma.Id &&
-                        t.AnoLetivo == turmaHistoricoEol.AnoLetivo &&
-                        t.DataMatricula == turmaHistoricoEol.DataMatricula &&
-                        t.DataSituacao == turmaHistoricoEol.DataSituacao
-                    ))
+                        t.AnoLetivo == turmaHistoricoEol.AnoLetivo);
+
+                    if (turmaHistoricoSerao == null)
                     {
-                        await mediator.Send(new TurmaAlunoHistoricoIncluirCommand(new Dominio.TurmaAlunoHistorico(turma.Id, turmaHistoricoEol.AnoLetivo, aluno.AlunoId, turmaHistoricoEol.DataMatricula, turmaHistoricoEol.DataSituacao)));
+                        await mediator.Send(new TurmaAlunoHistoricoIncluirCommand(new Dominio.TurmaAlunoHistorico(
+                            turmaHistoricoEol.Matricula,
+                            turma.Id,
+                            turmaHistoricoEol.AnoLetivo, 
+                            aluno.AlunoId, 
+                            turmaHistoricoEol.DataMatricula, 
+                            turmaHistoricoEol.DataSituacao))
+                        );
+                    }
+                    else
+                    {
+                        await mediator.Send(new TurmaAlunoHistoricoAlterarCommand(new Dominio.TurmaAlunoHistorico(
+                            turmaHistoricoSerao.Id, 
+                            turmaHistoricoEol.Matricula,
+                            turma.Id, 
+                            turmaHistoricoEol.AnoLetivo, 
+                            aluno.AlunoId, 
+                            turmaHistoricoEol.DataMatricula, 
+                            turmaHistoricoEol.DataSituacao))
+                        );
                     }
                 }
             }

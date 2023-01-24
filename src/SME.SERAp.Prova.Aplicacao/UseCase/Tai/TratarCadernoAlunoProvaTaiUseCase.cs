@@ -47,7 +47,7 @@ namespace SME.SERAp.Prova.Aplicacao
             var provaALuno = await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
 
             var primeiraQuestao = true;
-            foreach(var questao in itens.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
+            foreach (var questao in itens.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
             {
                 var questaoParaPersistir = new Questao(
                     questao.TextoBase,
@@ -75,7 +75,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 await TratarAudiosQuestao(questao, questaoId);
 
                 await TratarVideosQuestao(questao.ItemId, questaoId);
-                
+
                 await TratarQuestaoTri(questao, questaoId);
 
                 if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
@@ -100,11 +100,12 @@ namespace SME.SERAp.Prova.Aplicacao
                     throw new Exception($"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
 
                 var alternativaParaPersistir = new Alternativa(
-                alternativa.Ordem,
-                alternativa.Numeracao,
-                alternativa.Descricao,
-                questaoId,
-                alternativa.Correta);
+                    alternativa.AlternativaLegadoId,
+                    alternativa.Ordem,
+                    alternativa.Numeracao,
+                    alternativa.Descricao,
+                    questaoId,
+                    alternativa.Correta);
 
                 var alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
 
@@ -181,7 +182,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
             }
         }
-        
+
         private async Task TratarQuestaoTri(ItemAmostraTaiDto questaoSerap, long questaoId)
         {
             var questaoTriInserir = new QuestaoTri()

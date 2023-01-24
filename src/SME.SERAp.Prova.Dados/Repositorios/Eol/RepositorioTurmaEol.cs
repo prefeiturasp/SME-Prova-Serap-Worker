@@ -19,29 +19,24 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<TurmaEolDto>> ObterTurmasAlunoHistoricoPorAlunosRa(long[] alunosRa)
         {
-            var query = $@"select distinct
-							matricula.cd_aluno as alunoRa,
-							turesc.cd_turma_escola CodigoTurma,
-							turesc.an_letivo AnoLetivo,
-							se.sg_resumida_serie as ano_turma,
-							case when se.cd_etapa_ensino in (1, 10) or (turesc.cd_tipo_turma <> 1 and e.tp_escola in (10, 11, 12, 14, 15, 18, 26)) or (turesc.cd_tipo_turma <> 1 and e.tp_escola in (2, 17, 28, 30, 31)) then 1 --Infantil
-								 when se.cd_etapa_ensino in ( 2, 3, 7, 11 ) then 3 --eja
-								 when se.cd_etapa_ensino in ( 4, 5, 12, 13 ) then 5 --fundamental
-								 when se.cd_etapa_ensino in ( 6, 7, 8, 17, 14 ) then 6 --médio
-							else 0 end as Modalidade,
-							matricula.dt_status_matricula DataMatricula,
-							matrTurma.dt_situacao_aluno DataSituacao
-						from v_historico_matricula_cotic matricula
-						inner join v_aluno_cotic aluno on matricula.cd_aluno = aluno.cd_aluno
-						inner join historico_matricula_turma_escola matrTurma on matricula.cd_matricula = matrTurma.cd_matricula
-						inner join turma_escola turesc on matrTurma.cd_turma_escola = turesc.cd_turma_escola
-						inner join serie_turma_escola ste on ste.cd_turma_escola = turesc.cd_turma_escola
-						inner join escola e on turesc.cd_escola = e.cd_escola
-						inner join serie_ensino se on se.cd_serie_ensino = ste.cd_serie_ensino
-						where
-							matrTurma.cd_situacao_aluno in (1, 5, 6, 10, 13)
-							and matricula.cd_aluno in @alunosRa
-						order by matricula.cd_aluno, turesc.an_letivo";
+            var query = $@"select tb.CodigoMatricula as Matricula, 
+                                  tb.AlunoRa, 
+                                  tb.CodigoTurma, 
+                                  tb.AnoLetivo, 
+                                  tb.DataMatricula, 
+                                  tb.DataSituacao
+                           from (
+	                            select matricula.CodigoMatricula, 
+	                                   matricula.CodigoAluno as AlunoRa, 
+		                               matricula.CodigoTurma, 
+		                               matricula.AnoLetivo, 
+		                               min(matricula.DataSituacao) as DataMatricula, 
+		                               max(case when matricula.CodigoSituacaoMatricula <> 1 then matricula.DataSituacao else null end) as DataSituacao
+	                            from alunos_matriculas_norm matricula
+	                            where matricula.CodigoAluno in @alunosRa  
+	                              and matricula.AnoLetivo >= 2021 
+                                group by  matricula.CodigoMatricula, matricula.CodigoAluno, matricula.CodigoTurma, matricula.AnoLetivo ) tb
+                           order by tb.AnoLetivo, tb.DataMatricula";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
             return await conn.QueryAsync<TurmaEolDto>(query, new { alunosRa });

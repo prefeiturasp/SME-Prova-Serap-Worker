@@ -32,6 +32,19 @@ namespace SME.SERAp.Prova.Infra
             throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
         }
 
+        private static string ObterFilaImportarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)
+        {
+            switch (tipoResultado)
+            {
+                case TipoResultadoPsp.ResultadoAluno:
+                    return RotasRabbit.ImportarResultadoAlunoPsp;
+                case TipoResultadoPsp.ResultadoSme:
+                    return RotasRabbit.ImportarResultadoSmePsp;
+                default:
+                    return string.Empty;
+            }
+        }
+
         public static string ObterFilaTratarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)
         {
             switch (tipoResultado)

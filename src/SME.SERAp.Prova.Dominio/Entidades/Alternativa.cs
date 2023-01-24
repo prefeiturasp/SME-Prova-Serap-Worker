@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +6,7 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class Alternativa : EntidadeBase
     {
+        public long AlternativaLegadoId { get; set; }
         public int Ordem { get; set; }
         public string Numeracao { get; set; }
         public string Descricao { get; set; }
@@ -19,10 +19,10 @@ namespace SME.SERAp.Prova.Dominio
         {
 
         }
-        public Alternativa(int ordem,
-            string alternativa, string descricao, 
-            long questaoId, bool correta)
+
+        public Alternativa(long alternativaLegadoId, int ordem, string alternativa, string descricao, long questaoId, bool correta)
         {
+            AlternativaLegadoId = alternativaLegadoId;
             Ordem = ordem;
             Numeracao = alternativa;
             Descricao = descricao;

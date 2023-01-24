@@ -132,7 +132,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                                 AnoEscolar:{resultado.AnoEscolar}, Valor:{resultado.Valor}, 
                                 TotalAlunos:{resultado.TotalAlunos}, NivelProficienciaID:{resultado.NivelProficienciaID}
                                 PercentualAbaixoDoBasico:{resultado.PercentualAbaixoDoBasico}, PercentualBasico:{resultado.PercentualBasico}
-                                PercentualAdequado:{resultado.PercentualAdequado}, PercentualAvancado{resultado.PercentualAvancado}";
+                                PercentualAdequado:{resultado.PercentualAdequado}, PercentualAvancado:{resultado.PercentualAvancado}";
                 throw new Exception(log);
             }
             finally

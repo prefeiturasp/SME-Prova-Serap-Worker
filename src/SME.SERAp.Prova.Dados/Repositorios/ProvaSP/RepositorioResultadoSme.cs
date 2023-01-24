@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Data;
@@ -76,21 +77,21 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                 parametros.Add("@Edicao", resultado.Edicao, DbType.String, ParameterDirection.Input, 10);
                 parametros.Add("@AreaConhecimentoID", resultado.AreaConhecimentoID, DbType.Int16, ParameterDirection.Input);
                 parametros.Add("@AnoEscolar", resultado.AnoEscolar, DbType.String, ParameterDirection.Input, 3);
-                parametros.Add("@Valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input);
+                parametros.Add("@Valor", resultado.Valor.ObterStringDecimalPsp(), DbType.String, ParameterDirection.Input);
                 parametros.Add("@TotalAlunos", resultado.TotalAlunos, DbType.Int32, ParameterDirection.Input);
                 parametros.Add("@NivelProficienciaID", resultado.NivelProficienciaID, DbType.Int16, ParameterDirection.Input);
-                parametros.Add("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico, DbType.Decimal, ParameterDirection.Input);
-                parametros.Add("@PercentualBasico", resultado.PercentualBasico, DbType.Decimal, ParameterDirection.Input);
-                parametros.Add("@PercentualAdequado", resultado.PercentualAdequado, DbType.Decimal, ParameterDirection.Input);
-                parametros.Add("@PercentualAvancado", resultado.PercentualAvancado, DbType.Decimal, ParameterDirection.Input);
-                parametros.Add("@PercentualAlfabetizado", resultado.PercentualAlfabetizado, DbType.Decimal, ParameterDirection.Input);
+                parametros.Add("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico.ObterStringDecimalPsp(), DbType.String, ParameterDirection.Input);
+                parametros.Add("@PercentualBasico", resultado.PercentualBasico.ObterStringDecimalPsp(), DbType.String, ParameterDirection.Input);
+                parametros.Add("@PercentualAdequado", resultado.PercentualAdequado.ObterStringDecimalPsp(), DbType.String, ParameterDirection.Input);
+                parametros.Add("@PercentualAvancado", resultado.PercentualAvancado.ObterStringDecimalPsp(), DbType.String, ParameterDirection.Input);
+                parametros.Add("@PercentualAlfabetizado", resultado.PercentualAlfabetizado.ObterStringDecimalPsp(), DbType.String, ParameterDirection.Input);
 
                 return await conn.ExecuteAsync(query, parametros);
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
             finally
             {

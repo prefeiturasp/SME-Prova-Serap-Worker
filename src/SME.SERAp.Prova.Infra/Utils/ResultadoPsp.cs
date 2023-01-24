@@ -21,15 +21,21 @@ namespace SME.SERAp.Prova.Infra
             return new CsvReader(reader, config);
         }
 
-        public static decimal? ConverterStringPraDecimal(this string valor)
+        public static decimal? ConvertStringPraDecimalNullPsp(this string valor)
         {
             if (string.IsNullOrEmpty(valor)) return null;
             decimal dec_valor = 0;
             if (decimal.TryParse(valor.Trim(), out dec_valor))
             {
-                return dec_valor;
+                return Convert.ToDecimal(valor);
             }
             throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
+        }
+
+        public static string ObterStringDecimalPsp(this decimal? valor)
+        {
+            if (valor == null) return "0";
+            return valor.ToString().Replace(",", ".");
         }
 
         private static string ObterFilaImportarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)

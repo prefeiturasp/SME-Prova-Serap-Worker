@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Infra
             decimal dec_valor = 0;
             if (decimal.TryParse(valor.Trim(), out dec_valor))
             {
-                return Convert.ToDecimal(valor);
+                return Convert.ToDecimal(valor.Replace(",","."), CultureInfo.InvariantCulture);
             }
             throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
         }

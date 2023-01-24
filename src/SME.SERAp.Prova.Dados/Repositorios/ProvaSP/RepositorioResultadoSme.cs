@@ -1,15 +1,11 @@
 ﻿using Dapper;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SME.SERAp.Prova.Dados.Repositorios
 {

@@ -96,29 +96,29 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                 command.CommandType = CommandType.Text;
 
                 //var parametros = new List<SqlParameter>();
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@Edicao", Value = resultado.Edicao, SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@AreaConhecimentoID", Value = resultado.AreaConhecimentoID, SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@AnoEscolar", Value = resultado.AnoEscolar, SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@Valor", Value = resultado.Valor, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@TotalAlunos", Value = resultado.TotalAlunos, SqlDbType = SqlDbType.BigInt, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@NivelProficienciaID", Value = resultado.NivelProficienciaID, SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualAbaixoDoBasico", Value = resultado.PercentualAbaixoDoBasico, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualBasico", Value = resultado.PercentualBasico, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualAdequado", Value = resultado.PercentualAdequado, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualAvancado", Value = resultado.PercentualAvancado, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input });
-                //command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualAlfabetizado", Value = DBNull.Value, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@Edicao", Value = resultado.Edicao, SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@AreaConhecimentoID", Value = resultado.AreaConhecimentoID, SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Input });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@AnoEscolar", Value = resultado.AnoEscolar, SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@Valor", Value = resultado.Valor, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input, Precision = 3 });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@TotalAlunos", Value = resultado.TotalAlunos, SqlDbType = SqlDbType.BigInt, Direction = ParameterDirection.Input });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@NivelProficienciaID", Value = resultado.NivelProficienciaID, SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Input });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualAbaixoDoBasico", Value = resultado.PercentualAbaixoDoBasico, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input, Precision = 2 });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualBasico", Value = resultado.PercentualBasico, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input, Precision = 2 });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualAdequado", Value = resultado.PercentualAdequado, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input, Precision = 2 });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualAvancado", Value = resultado.PercentualAvancado, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input, Precision = 2 });
+                command.Parameters.Add(new SqlParameter { ParameterName = "@PercentualAlfabetizado", Value = DBNull.Value, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input, Precision = 2 });
 
-                command.Parameters.AddWithValue("@Edicao", resultado.Edicao);
-                command.Parameters.AddWithValue("@AreaConhecimentoID", resultado.AreaConhecimentoID);
-                command.Parameters.AddWithValue("@AnoEscolar", resultado.AnoEscolar);
-                command.Parameters.AddWithValue("@Valor", resultado.Valor);
-                command.Parameters.AddWithValue("@TotalAlunos", resultado.TotalAlunos);
-                command.Parameters.AddWithValue("@NivelProficienciaID", resultado.NivelProficienciaID);
-                command.Parameters.AddWithValue("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico);
-                command.Parameters.AddWithValue("@PercentualBasico", resultado.PercentualBasico);
-                command.Parameters.AddWithValue("@PercentualAdequado", resultado.PercentualAdequado);
-                command.Parameters.AddWithValue("@PercentualAvancado", resultado.PercentualAvancado);
-                command.Parameters.AddWithValue("@PercentualAlfabetizado", DBNull.Value);
+                //command.Parameters.AddWithValue("@Edicao", resultado.Edicao);
+                //command.Parameters.AddWithValue("@AreaConhecimentoID", resultado.AreaConhecimentoID);
+                //command.Parameters.AddWithValue("@AnoEscolar", resultado.AnoEscolar);
+                //command.Parameters.AddWithValue("@Valor", resultado.Valor);
+                //command.Parameters.AddWithValue("@TotalAlunos", resultado.TotalAlunos);
+                //command.Parameters.AddWithValue("@NivelProficienciaID", resultado.NivelProficienciaID);
+                //command.Parameters.AddWithValue("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico);
+                //command.Parameters.AddWithValue("@PercentualBasico", resultado.PercentualBasico);
+                //command.Parameters.AddWithValue("@PercentualAdequado", resultado.PercentualAdequado);
+                //command.Parameters.AddWithValue("@PercentualAvancado", resultado.PercentualAvancado);
+                //command.Parameters.AddWithValue("@PercentualAlfabetizado", DBNull.Value);
 
 
                 return await command.ExecuteNonQueryAsync();

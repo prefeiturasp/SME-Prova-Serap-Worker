@@ -38,16 +38,17 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (turma != null && aluno != null)
                 {
-                    var turmaHistoricoSerao = turmasHistoricoSerap.FirstOrDefault(t =>
+                    var turmaHistoricoSerao = turmasHistoricoSerap.FirstOrDefault(t => 
+                        t.Matricula == turmaHistoricoEol.Matricula && 
                         t.AlunoRa == turmaHistoricoEol.AlunoRa &&
                         t.TurmaId == turma.Id &&
-                        t.AnoLetivo == turmaHistoricoEol.AnoLetivo &&
-                        t.DataMatricula == turmaHistoricoEol.DataMatricula);
+                        t.AnoLetivo == turmaHistoricoEol.AnoLetivo);
 
                     if (turmaHistoricoSerao == null)
                     {
                         await mediator.Send(new TurmaAlunoHistoricoIncluirCommand(new Dominio.TurmaAlunoHistorico(
-                            turma.Id, 
+                            turmaHistoricoEol.Matricula,
+                            turma.Id,
                             turmaHistoricoEol.AnoLetivo, 
                             aluno.AlunoId, 
                             turmaHistoricoEol.DataMatricula, 
@@ -58,6 +59,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     {
                         await mediator.Send(new TurmaAlunoHistoricoAlterarCommand(new Dominio.TurmaAlunoHistorico(
                             turmaHistoricoSerao.Id, 
+                            turmaHistoricoEol.Matricula,
                             turma.Id, 
                             turmaHistoricoEol.AnoLetivo, 
                             aluno.AlunoId, 

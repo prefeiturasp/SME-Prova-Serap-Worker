@@ -36,11 +36,11 @@ namespace SME.SERAp.Prova.Infra
         public string _percentualAvancado { get; set; }
 
 
-        public decimal? Valor { get { return _valor.ConverterStringPraDecimal(); } }
-        public decimal? PercentualAbaixoDoBasico { get { return _percentualAbaixoDoBasico.ConverterStringPraDecimal(); } }
-        public decimal? PercentualBasico { get { return _percentualBasico.ConverterStringPraDecimal(); } }
-        public decimal? PercentualAdequado { get { return _percentualAdequado.ConverterStringPraDecimal(); } }
-        public decimal? PercentualAvancado { get { return _percentualAvancado.ConverterStringPraDecimal(); } }
+        public decimal? Valor { get { return _valor.ConvertStringPraDecimalNullPsp(); } }
+        public decimal? PercentualAbaixoDoBasico { get { return _percentualAbaixoDoBasico.ConvertStringPraDecimalNullPsp(); } }
+        public decimal? PercentualBasico { get { return _percentualBasico.ConvertStringPraDecimalNullPsp(); } }
+        public decimal? PercentualAdequado { get { return _percentualAdequado.ConvertStringPraDecimalNullPsp(); } }
+        public decimal? PercentualAvancado { get { return _percentualAvancado.ConvertStringPraDecimalNullPsp(); } }
 
     }
 }

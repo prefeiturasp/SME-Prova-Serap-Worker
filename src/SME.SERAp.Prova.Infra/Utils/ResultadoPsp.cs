@@ -43,6 +43,8 @@ namespace SME.SERAp.Prova.Infra
                     return RotasRabbit.ImportarResultadoAlunoPsp;
                 case TipoResultadoPsp.ResultadoSme:
                     return RotasRabbit.ImportarResultadoSmePsp;
+                case TipoResultadoPsp.ResultadoDre:
+                    return RotasRabbit.ImportarResultadoDrePsp;
                 default:
                     return string.Empty;
             }
@@ -56,6 +58,8 @@ namespace SME.SERAp.Prova.Infra
                     return RotasRabbit.TratarResultadoAlunoPsp;
                 case TipoResultadoPsp.ResultadoSme:
                     return RotasRabbit.TratarResultadoSmePsp;
+                case TipoResultadoPsp.ResultadoDre:
+                    return RotasRabbit.TratarResultadoDrePsp;
                 default:
                     return string.Empty;
             }

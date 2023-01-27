@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Dominio;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text.Json;
 
 namespace SME.SERAp.Prova.Infra
 {
@@ -21,7 +22,7 @@ namespace SME.SERAp.Prova.Infra
             return new CsvReader(reader, config);
         }
 
-        public static decimal? ConvertStringPraDecimalNullPsp(this string? valor)
+        public static decimal? ConvertStringPraDecimalNullPsp(this string valor)
         {
             if (string.IsNullOrEmpty(valor)) return null;
 
@@ -63,6 +64,15 @@ namespace SME.SERAp.Prova.Infra
                 default:
                     return string.Empty;
             }
+        }
+
+        public static string ObterJsonObjetoResultado(object resultado)
+        {
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            return JsonSerializer.Serialize(resultado, jsonSerializerOptions);
         }
     }
 }

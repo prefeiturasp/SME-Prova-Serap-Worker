@@ -35,7 +35,7 @@ namespace SME.SERAp.Prova.Dados
                             where Edicao = @edicao
                               and AreaConhecimentoID = @areaConhecimentoId
                               and AnoEscolar = @anoEscolar
-                              and esc_codigo = @esc_codigo
+                              and esc_codigo = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
 						order by Edicao desc";
 
             using var conn = ObterConexaoProvaSp();
@@ -85,11 +85,11 @@ namespace SME.SERAp.Prova.Dados
                 parametros.Add("@Valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input, null, 6, 3);
                 parametros.Add("@TotalAlunos", resultado.TotalAlunos, DbType.Int32, ParameterDirection.Input);
                 parametros.Add("@NivelProficienciaID", resultado.NivelProficienciaID, DbType.Int16, ParameterDirection.Input);
-                parametros.Add("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-                parametros.Add("@PercentualBasico", resultado.PercentualBasico, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-                parametros.Add("@PercentualAdequado", resultado.PercentualAdequado, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-                parametros.Add("@PercentualAvancado", resultado.PercentualAvancado, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-                parametros.Add("@PercentualAlfabetizado", resultado.PercentualAlfabetizado, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+                parametros.Add("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+                parametros.Add("@PercentualBasico", resultado.PercentualBasico?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+                parametros.Add("@PercentualAdequado", resultado.PercentualAdequado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+                parametros.Add("@PercentualAvancado", resultado.PercentualAvancado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+                parametros.Add("@PercentualAlfabetizado", resultado.PercentualAlfabetizado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
 
                 return await conn.ExecuteAsync(query, parametros);
 

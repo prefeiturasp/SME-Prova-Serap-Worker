@@ -12,20 +12,21 @@ namespace SME.SERAp.Prova.Aplicacao
     public class ImportarProficienciaDreUseCase : AbstractImportarProficienciaPspUseCase, IImportarProficienciaDreUseCase
     {
 
-        public ImportarProficienciaDreUseCase(IMediator mediator, 
-                                              IServicoLog servicoLog, 
-                                              PathOptions pathOptions) 
-                                            : base(mediator, servicoLog, pathOptions){}
+        private TipoResultadoPsp tipoResultadoProcesso = TipoResultadoPsp.ResultadoDre;
+
+        public ImportarProficienciaDreUseCase(IMediator mediator,
+                                              IServicoLog servicoLog,
+                                              PathOptions pathOptions)
+                                            : base(mediator, servicoLog, pathOptions) { }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             try
             {
                 var IdArquivoResultadoPsp = long.Parse(mensagemRabbit.Mensagem.ToString());
-                tipoResultadoProcesso = TipoResultadoPsp.ResultadoDre;
-
-                arquivoResultadoPsp = await mediator.Send(new ObterTipoResultadoPspQuery(IdArquivoResultadoPsp));
+                var arquivoResultadoPsp = await mediator.Send(new ObterTipoResultadoPspQuery(IdArquivoResultadoPsp));
                 if (arquivoResultadoPsp == null) return false;
+                PopularArquivoResultado(arquivoResultadoPsp);
 
                 await AtualizaStatusDoProcesso(IdArquivoResultadoPsp, StatusImportacao.EmAndamento);
 
@@ -35,7 +36,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     foreach (var objCsvResultado in listaCsvResultados)
                     {
                         var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);
-                        await publicarFilaTratar(dto);
+                        await publicarFilaTratar(dto, tipoResultadoProcesso);
                     }
                 }
                 return true;

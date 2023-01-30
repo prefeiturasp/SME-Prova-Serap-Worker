@@ -16,9 +16,10 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            registroProficienciaPsp = mensagemRabbit.ObterObjetoMensagem<RegistroProficienciaPspCsvDto>();
+            var registroProficienciaPsp = mensagemRabbit.ObterObjetoMensagem<RegistroProficienciaPspCsvDto>();
+            PopularRegistroProficienciaPsp(registroProficienciaPsp);
             var objResultadoCsv = registroProficienciaPsp.ObterObjetoRegistro<ResultadoDreDto>();
-            tipoResultadoProcesso = TipoResultadoPsp.ResultadoDre;
+            PopularTipoResultadoProcesso(TipoResultadoPsp.ResultadoDre);
             try
             {
                 var resultadoBanco = await ObterResultadoBanco(objResultadoCsv);

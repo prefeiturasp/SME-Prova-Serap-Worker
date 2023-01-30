@@ -94,6 +94,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoAluno, RepositorioResultadoAluno>();
             services.AddScoped<IRepositorioResultadoSme, RepositorioResultadoSme>();
             services.AddScoped<IRepositorioResultadoDre, RepositorioResultadoDre>();
+            services.AddScoped<IRepositorioResultadoEscola, RepositorioResultadoEscola>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -194,6 +195,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProficienciaSmeUseCase, TratarProficienciaSmeUseCase>();
             services.AddScoped<IImportarProficienciaDreUseCase, ImportarProficienciaDreUseCase>();
             services.AddScoped<ITratarProficienciaDreUseCase, TratarProficienciaDreUseCase>();
+            services.AddScoped<IImportarProficienciaEscolaUseCase, ImportarProficienciaEscolaUseCase>();
+            services.AddScoped<ITratarProficienciaEscolaUseCase, TratarProficienciaEscolaUseCase>();
         }
     }
 }

@@ -3,7 +3,6 @@ using SME.SERAp.Prova.Aplicaca;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Threading.Tasks;

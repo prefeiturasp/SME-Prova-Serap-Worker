@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Globalization;
 using System.IO;

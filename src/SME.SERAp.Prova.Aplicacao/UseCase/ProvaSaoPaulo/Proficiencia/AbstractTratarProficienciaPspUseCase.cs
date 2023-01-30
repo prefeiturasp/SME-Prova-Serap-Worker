@@ -17,14 +17,24 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IServicoLog servicoLog;
         private readonly IModel model;
 
-        public RegistroProficienciaPspCsvDto registroProficienciaPsp;
-        public TipoResultadoPsp tipoResultadoProcesso;
+        private RegistroProficienciaPspCsvDto registroProficienciaPsp;
+        private TipoResultadoPsp tipoResultadoProcesso;
 
         public AbstractTratarProficienciaPspUseCase(IMediator mediator, IServicoLog servicoLog, IModel model)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
             this.model = model ?? throw new ArgumentNullException(nameof(model));
+        }
+
+        public void PopularRegistroProficienciaPsp(RegistroProficienciaPspCsvDto registroProficiencia)
+        {
+            registroProficienciaPsp = registroProficiencia;
+        }
+
+        public void PopularTipoResultadoProcesso(TipoResultadoPsp tipoResultado)
+        {
+            tipoResultadoProcesso = tipoResultado;
         }
 
         public async Task<object> ObterResultadoBanco(object dto)

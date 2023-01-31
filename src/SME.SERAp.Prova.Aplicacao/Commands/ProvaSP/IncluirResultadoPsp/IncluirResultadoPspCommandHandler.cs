@@ -13,16 +13,19 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioResultadoSme repositorioResultadoSme;
         private readonly IRepositorioResultadoDre repositorioResultadoDre;
         private readonly IRepositorioResultadoEscola repositorioResultadoEscola;
+        private readonly IRepositorioResultadoTurma repositorioResultadoTurma;
 
         private ObjResultadoPspDto ObjResultado;
 
         public IncluirResultadoPspCommandHandler(IRepositorioResultadoSme repositorioResultadoSme,
                                                  IRepositorioResultadoDre repositorioResultadoDre,
-                                                 IRepositorioResultadoEscola repositorioResultadoEscola)
+                                                 IRepositorioResultadoEscola repositorioResultadoEscola,
+                                                 IRepositorioResultadoTurma repositorioResultadoTurma)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
-            this.repositorioResultadoEscola = repositorioResultadoEscola;
+            this.repositorioResultadoEscola = repositorioResultadoEscola ?? throw new System.ArgumentNullException(nameof(repositorioResultadoEscola));
+            this.repositorioResultadoTurma = repositorioResultadoTurma ?? throw new System.ArgumentNullException(nameof(repositorioResultadoTurma));
         }
 
         public async Task<bool> Handle(IncluirResultadoPspCommand request, CancellationToken cancellationToken)
@@ -36,6 +39,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await IncluirResultadoDre();
                 case TipoResultadoPsp.ResultadoEscola:
                     return await IncluirResultadoEscola();
+                case TipoResultadoPsp.ResultadoTurma:
+                    return await IncluirResultadoTurma();
                 default:
                     return false;
             }
@@ -59,6 +64,13 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var resultadoInserir = (ResultadoEscola)ObjResultado.Resultado;
             var result = await repositorioResultadoEscola.IncluirAsync(resultadoInserir);
+            return result > 0;
+        }
+
+        private async Task<bool> IncluirResultadoTurma()
+        {
+            var resultadoInserir = (ResultadoTurma)ObjResultado.Resultado;
+            var result = await repositorioResultadoTurma.IncluirAsync(resultadoInserir);
             return result > 0;
         }
     }

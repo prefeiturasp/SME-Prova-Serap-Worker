@@ -101,5 +101,10 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<long> AlterarAsync(ResultadoDre resultado)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

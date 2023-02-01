@@ -14,18 +14,21 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioResultadoDre repositorioResultadoDre;
         private readonly IRepositorioResultadoEscola repositorioResultadoEscola;
         private readonly IRepositorioResultadoTurma repositorioResultadoTurma;
+        private readonly IRepositorioResultadoAluno repositorioResultadoAluno;
 
         private ObjResultadoPspDto ObjResultado;
 
         public ObterObjResultadoPspQueryHandler(IRepositorioResultadoSme repositorioResultadoSme,
                                                 IRepositorioResultadoDre repositorioResultadoDre,
                                                 IRepositorioResultadoEscola repositorioResultadoEscola,
-                                                IRepositorioResultadoTurma repositorioResultadoTurma)
+                                                IRepositorioResultadoTurma repositorioResultadoTurma,
+                                                IRepositorioResultadoAluno repositorioResultadoAluno)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
             this.repositorioResultadoEscola = repositorioResultadoEscola ?? throw new System.ArgumentNullException(nameof(repositorioResultadoEscola));
             this.repositorioResultadoTurma = repositorioResultadoTurma ?? throw new System.ArgumentNullException(nameof(repositorioResultadoTurma));
+            this.repositorioResultadoAluno = repositorioResultadoAluno ?? throw new System.ArgumentNullException(nameof(repositorioResultadoAluno));
         }
 
         public async Task<ObjResultadoPspDto> Handle(ObterObjResultadoPspQuery request, CancellationToken cancellationToken)
@@ -40,6 +43,8 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             switch (ObjResultado.TipoResultado)
             {
+                case TipoResultadoPsp.ResultadoAluno:
+                    return await ObterResultadoAluno();
                 case TipoResultadoPsp.ResultadoSme:
                     return await ObterResultadoSME();
                 case TipoResultadoPsp.ResultadoDre:
@@ -51,6 +56,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 default:
                     return null;
             }
+        }
+
+        private async Task<ResultadoAluno> ObterResultadoAluno()
+        {
+            var resultadoBusca = (ResultadoAlunoDto)ObjResultado.Resultado;
+            return await repositorioResultadoAluno.ObterProficienciaAluno(resultadoBusca.Edicao, resultadoBusca.alu_matricula, resultadoBusca.tur_id, resultadoBusca.AreaConhecimentoID);
         }
 
         private async Task<ResultadoSme> ObterResultadoSME()

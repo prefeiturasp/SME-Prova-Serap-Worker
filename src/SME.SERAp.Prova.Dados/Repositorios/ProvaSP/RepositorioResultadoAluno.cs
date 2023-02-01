@@ -1,20 +1,18 @@
-﻿using SME.SERAp.Prova.Dados.Interfaces;
-using SME.SERAp.Prova.Dominio.Entidades;
+﻿using Dapper;
+using SME.SERAp.Prova.Dados.Interfaces;
+using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
-using System.Data.SqlClient;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados.Repositorios
 {
-    public class RepositorioResultadoAluno : IRepositorioResultadoAluno
+    public class RepositorioResultadoAluno : RepositorioProvaSpBase, IRepositorioResultadoAluno
     {
-        private readonly ConnectionStringOptions connectionStringOptions;
 
-        public RepositorioResultadoAluno(ConnectionStringOptions connectionStringOptions)
-        {
-            this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
-        }
+        public RepositorioResultadoAluno(ConnectionStringOptions connectionStringOptions) : base(connectionStringOptions) { }
 
         public async Task<ResultadoAluno> ObterProficienciaAluno(string edicao, string alunoMatricula, long turId, long areaConhecimentoId)
         {
@@ -27,7 +25,6 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                                   ,tur_id
                                   ,alu_matricula
                                   ,alu_nome
-                            --      ,ResultadoLegadoID
                                   ,NivelProficienciaID
                                   ,Valor
                               FROM ResultadoAluno
@@ -37,13 +34,13 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                                and  Edicao = @edicao
 						order by Edicao desc";
 
-            using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
+            using var conn = ObterConexaoProvaSp();
             return await conn.QueryFirstOrDefaultAsync<ResultadoAluno>(query, new { alunoMatricula, areaConhecimentoId, turId, edicao });
         }
 
         public async Task<long> IncluirAsync(ResultadoAluno resultado)
         {
-            using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
+            using var conn = ObterConexaoProvaSp();
             try
             {
                 var query = $@"INSERT INTO ResultadoAluno
@@ -69,26 +66,79 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              , @alu_matricula
                              , @alu_nome
                              , @NivelProficienciaID
-                             , CONVERT(decimal(6,3), '{resultado.Valor}'))";
+                             , @Valor)";
 
-                return await conn.ExecuteAsync(query, new
-                {
-                    resultado.Edicao,
-                    resultado.AreaConhecimentoID,
-                    resultado.uad_sigla,
-                    resultado.esc_codigo,
-                    resultado.AnoEscolar,
-                    resultado.tur_codigo,
-                    resultado.tur_id,
-                    resultado.alu_matricula,
-                    resultado.alu_nome,
-                    resultado.NivelProficienciaID,
-                    resultado.Valor
-                });
+                var parametros = new DynamicParameters();
+                parametros.Add("@Edicao", resultado.Edicao, DbType.String, ParameterDirection.Input, 10);
+                parametros.Add("@AreaConhecimentoID", resultado.AreaConhecimentoID, DbType.Int16, ParameterDirection.Input);
+                parametros.Add("@uad_sigla", resultado.uad_sigla, DbType.String, ParameterDirection.Input, 4);
+                parametros.Add("@esc_codigo", resultado.esc_codigo, DbType.String, ParameterDirection.Input, 20);
+                parametros.Add("@AnoEscolar", resultado.AnoEscolar, DbType.String, ParameterDirection.Input, 3);
+                parametros.Add("@tur_codigo", resultado.tur_codigo, DbType.String, ParameterDirection.Input, 20);
+                parametros.Add("@tur_id", resultado.tur_id, DbType.Int32, ParameterDirection.Input);
+                parametros.Add("@alu_matricula", resultado.alu_matricula, DbType.String, ParameterDirection.Input, 50);
+                parametros.Add("@alu_nome", resultado.alu_nome, DbType.String, ParameterDirection.Input, 200);
+                parametros.Add("@NivelProficienciaID", resultado.NivelProficienciaID, DbType.Int16, ParameterDirection.Input);
+                parametros.Add("@Valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input, null, 6, 3);
 
+                return await conn.ExecuteAsync(query, parametros);
 
             }
+            catch (Exception ex)
+            {
+                string log = $@"Inserir ResultadoAluno -- Erro:{ex.Message} ---- Objeto: {ResultadoPsp.ObterJsonObjetoResultado(resultado)}";
+                throw new Exception(log);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
 
+        public async Task<long> AlterarAsync(ResultadoAluno resultado)
+        {
+            using var conn = ObterConexaoProvaSp();
+            try
+            {
+                var query = $@"update ResultadoAluno set
+							  Edicao = @Edicao
+                             ,AreaConhecimentoID = @AreaConhecimentoID
+                      	     ,uad_sigla = @uad_sigla
+                             ,esc_codigo = @esc_codigo
+                             ,AnoEscolar = @AnoEscolar
+                             ,tur_codigo = @tur_codigo
+                             ,tur_id = @tur_id
+                             ,alu_matricula = @alu_matricula
+                             ,alu_nome = @alu_nome
+                             ,NivelProficienciaID = @NivelProficienciaID
+                             ,Valor = @Valor
+							 where alu_matricula = @alunoMatricula
+								and AreaConhecimentoID = @AreaConhecimentoId
+								and tur_id = @turId
+                                and  Edicao = @Edicao";
+
+                var parametros = new DynamicParameters();
+                parametros.Add("@Edicao", resultado.Edicao, DbType.String, ParameterDirection.Input, 10);
+                parametros.Add("@AreaConhecimentoID", resultado.AreaConhecimentoID, DbType.Int16, ParameterDirection.Input);
+                parametros.Add("@uad_sigla", resultado.uad_sigla, DbType.String, ParameterDirection.Input, 4);
+                parametros.Add("@esc_codigo", resultado.esc_codigo, DbType.String, ParameterDirection.Input, 20);
+                parametros.Add("@AnoEscolar", resultado.AnoEscolar, DbType.String, ParameterDirection.Input, 3);
+                parametros.Add("@tur_codigo", resultado.tur_codigo, DbType.String, ParameterDirection.Input, 20);
+                parametros.Add("@tur_id", resultado.tur_id, DbType.Int32, ParameterDirection.Input);
+                parametros.Add("@alu_matricula", resultado.alu_matricula, DbType.String, ParameterDirection.Input, 50);
+                parametros.Add("@alu_nome", resultado.alu_nome, DbType.String, ParameterDirection.Input, 200);
+                parametros.Add("@NivelProficienciaID", resultado.NivelProficienciaID, DbType.Int16, ParameterDirection.Input);
+                parametros.Add("@Valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input, null, 6, 3);
+
+                return await conn.ExecuteAsync(query, parametros);
+
+            }
+            catch (Exception ex)
+            {
+                string log = $@"Alterar ResultadoAluno -- Erro:{ex.Message} ---- Objeto: {ResultadoPsp.ObterJsonObjetoResultado(resultado)}";
+                throw new Exception(log);
+            }
             finally
             {
                 conn.Close();

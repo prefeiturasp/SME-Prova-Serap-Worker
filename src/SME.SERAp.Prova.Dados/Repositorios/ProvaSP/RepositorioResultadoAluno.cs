@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                                   ,alu_nome
                                   ,NivelProficienciaID
                                   ,Valor
-                              FROM ResultadoAluno
+                              FROM ResultadoAluno with (nolock)
 							where alu_matricula = @alunoMatricula
 								and AreaConhecimentoID = @areaConhecimentoId
 								and tur_id = @turId

@@ -10,7 +10,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarProficienciaAlunoUseCase : AbstractTratarProficienciaPspUseCase, ITratarProficienciaAlunoUseCase
     {
-        
+
         public TratarProficienciaAlunoUseCase(IMediator mediator,
                                                IServicoLog servicoLog,
                                                IModel model) : base(mediator, servicoLog, model) { }
@@ -25,24 +25,12 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var resultadoBanco = await ObterResultadoBanco(objResultadoCsv);
+                var resultadoEntidade = MapearParaEntidade(objResultadoCsv);
+
                 if (resultadoBanco == null)
-                {
-                    var resultadoEntidade = new ResultadoAluno()
-                    {
-                        Edicao = objResultadoCsv.Edicao,
-                        uad_sigla = objResultadoCsv.uad_sigla,
-                        esc_codigo = objResultadoCsv.esc_codigo,
-                        AnoEscolar = objResultadoCsv.AnoEscolar,
-                        tur_codigo = objResultadoCsv.tur_codigo,
-                        tur_id = objResultadoCsv.tur_id,
-                        alu_matricula = objResultadoCsv.alu_matricula,
-                        alu_nome = objResultadoCsv.alu_nome,
-                        NivelProficienciaID = objResultadoCsv.NivelProficienciaID,
-                        AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
-                        Valor = objResultadoCsv.Valor
-                    };
                     await Inserir(resultadoEntidade);
-                }
+                else
+                    await Alterar(resultadoEntidade);
 
                 await VerificaSeFinalizaProcesso();
 
@@ -54,7 +42,25 @@ namespace SME.SERAp.Prova.Aplicacao
                 await RegistrarErroEAtualizarStatusProcesso(GetType().Name, ex);
                 return false;
             }
-        }       
+        }
+
+        private ResultadoAluno MapearParaEntidade(ResultadoAlunoDto objResultadoCsv)
+        {
+            return new ResultadoAluno()
+            {
+                Edicao = objResultadoCsv.Edicao,
+                uad_sigla = objResultadoCsv.uad_sigla,
+                esc_codigo = objResultadoCsv.esc_codigo,
+                AnoEscolar = objResultadoCsv.AnoEscolar,
+                tur_codigo = objResultadoCsv.tur_codigo,
+                tur_id = objResultadoCsv.tur_id,
+                alu_matricula = objResultadoCsv.alu_matricula,
+                alu_nome = objResultadoCsv.alu_nome,
+                NivelProficienciaID = objResultadoCsv.NivelProficienciaID,
+                AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
+                Valor = objResultadoCsv.Valor
+            };
+        }
 
     }
 }

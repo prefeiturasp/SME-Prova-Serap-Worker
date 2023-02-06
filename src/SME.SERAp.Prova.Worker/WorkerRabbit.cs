@@ -108,9 +108,9 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 channel.QueueDeclare(fila, true, false, false, args);
                 channel.QueueBind(fila, ExchangeRabbit.SerapEstudante, fila, null);
 
-                var argsDlt = ObterArgumentoDaFilaDeadLetter(fila);
+                var argsDlq = ObterArgumentoDaFilaDeadLetter(fila);
                 var filaDeadLetter = $"{fila}.deadletter";
-                channel.QueueDeclare(filaDeadLetter, true, false, false, argsDlt);
+                channel.QueueDeclare(filaDeadLetter, true, false, false, argsDlq);
                 channel.QueueBind(filaDeadLetter, ExchangeRabbit.SerapEstudanteDeadLetter, fila, null);
 
                 var argsFinal = new Dictionary<string, object> { { "x-queue-mode", "lazy" } };
@@ -135,7 +135,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         private Dictionary<string, object> ObterArgumentoDaFilaDeadLetter(string fila)
         {
             var argsDlq = new Dictionary<string, object>();
-            var ttl = comandos.ContainsKey(fila) ? comandos[fila].Ttl : ExchangeRabbit.SgpDeadLetterTtl;
+            var ttl = comandos.ContainsKey(fila) ? comandos[fila].Ttl : ExchangeRabbit.SgpDeadLetterTtl10;
 
             argsDlq.Add("x-dead-letter-exchange", ExchangeRabbit.Serap);
             argsDlq.Add("x-message-ttl", ttl);

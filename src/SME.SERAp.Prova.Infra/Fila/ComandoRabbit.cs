@@ -26,8 +26,8 @@ namespace SME.SERAp.Prova.Infra
 
         public string NomeProcesso { get; }
         public Type TipoCasoUso { get; }
-        public ulong QuantidadeReprocessamentoDeadLetter { get; } = 3;
-        public int Ttl { get; } = 10 * 60 * 100;
+        public ulong QuantidadeReprocessamentoDeadLetter { get; }
+        public int Ttl { get; }
         public bool ModeLazy { get; }
     }
 }

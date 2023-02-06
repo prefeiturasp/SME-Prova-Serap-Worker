@@ -135,7 +135,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         private Dictionary<string, object> ObterArgumentoDaFilaDeadLetter(string fila)
         {
             var argsDlq = new Dictionary<string, object>();
-            var ttl = comandos.ContainsKey(fila) ? comandos[fila].Ttl : ExchangeRabbit.SgpDeadLetterTtl10;
+            var ttl = comandos.ContainsKey(fila) ? comandos[fila].Ttl : ExchangeRabbit.SgpDeadLetterTtl;
 
             argsDlq.Add("x-dead-letter-exchange", ExchangeRabbit.Serap);
             argsDlq.Add("x-message-ttl", ttl);

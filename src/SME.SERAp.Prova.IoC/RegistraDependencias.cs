@@ -144,9 +144,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase>();
 
-            services.AddScoped<IRabbitDeadletterSerapSyncUseCase, RabbitDeadletterSerapSyncUseCase>();
-            services.AddScoped<IRabbitDeadletterSerapTratarUseCase, RabbitDeadletterSerapTratarUseCase>();
-
             //sincronizar adesão das provas 
             services.AddScoped<ITratarAdesaoProvaUseCase, TratarAdesaoProvaUseCase>();
             services.AddScoped<ITratarAdesaoProvaAlunoUseCase, TratarAdesaoProvaAlunoUseCase>();

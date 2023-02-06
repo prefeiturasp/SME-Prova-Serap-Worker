@@ -224,9 +224,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.GrupoAbrangenciaExcluir, new ComandoRabbit("Busca abrangências por grupo para fila excluir", typeof(ITratarAbrangenciaGrupoExcluirUseCase)));
             comandos.Add(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, new ComandoRabbit("", typeof(ITratarAbrangenciaUsuarioGrupoExcluirUseCase)));
 
-            comandos.Add(RotasRabbit.FilaDeadletterTratar, new ComandoRabbit("Tratamento de fila Deadletter", typeof(IRabbitDeadletterSerapTratarUseCase)));
-            comandos.Add(RotasRabbit.FilaDeadletterSync, new ComandoRabbit("Sync de fila Deadletter", typeof(IRabbitDeadletterSerapSyncUseCase)));
-
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));
 
             comandos.Add(RotasRabbit.TratarCadernosProvaTai, new ComandoRabbit("Tratamento cadernos amostra TAI", typeof(ITratarCadernosProvaTaiUseCase)));

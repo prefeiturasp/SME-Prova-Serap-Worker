@@ -25,24 +25,12 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var resultadoBanco = await ObterResultadoBanco(objResultadoCsv);
+                var resultadoEntidade = MapearParaEntidade(objResultadoCsv);
+
                 if (resultadoBanco == null)
-                {
-                    var resultadoEntidade = new ResultadoSme()
-                    {
-                        Edicao = objResultadoCsv.Edicao,
-                        AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
-                        AnoEscolar = objResultadoCsv.AnoEscolar,
-                        Valor = objResultadoCsv.Valor,
-                        TotalAlunos = objResultadoCsv.TotalAlunos,
-                        NivelProficienciaID = objResultadoCsv.NivelProficienciaID,
-                        PercentualAbaixoDoBasico = objResultadoCsv.PercentualAbaixoDoBasico,
-                        PercentualBasico = objResultadoCsv.PercentualBasico,
-                        PercentualAdequado = objResultadoCsv.PercentualAdequado,
-                        PercentualAvancado = objResultadoCsv.PercentualAvancado,
-                        PercentualAlfabetizado = null
-                    };
                     await Inserir(resultadoEntidade);
-                }
+                else
+                    await Alterar(resultadoEntidade);
 
                 await VerificaSeFinalizaProcesso();
 
@@ -54,6 +42,23 @@ namespace SME.SERAp.Prova.Aplicacao
                 await RegistrarErroEAtualizarStatusProcesso(GetType().Name, ex);
                 return false;
             }
+        }
+        private ResultadoSme MapearParaEntidade(ResultadoSmeDto objResultadoCsv)
+        {
+            return new ResultadoSme()
+            {
+                Edicao = objResultadoCsv.Edicao,
+                AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
+                AnoEscolar = objResultadoCsv.AnoEscolar,
+                Valor = objResultadoCsv.Valor,
+                TotalAlunos = objResultadoCsv.TotalAlunos,
+                NivelProficienciaID = objResultadoCsv.NivelProficienciaID,
+                PercentualAbaixoDoBasico = objResultadoCsv.PercentualAbaixoDoBasico,
+                PercentualBasico = objResultadoCsv.PercentualBasico,
+                PercentualAdequado = objResultadoCsv.PercentualAdequado,
+                PercentualAvancado = objResultadoCsv.PercentualAvancado,
+                PercentualAlfabetizado = null
+            };
         }
     }
 }

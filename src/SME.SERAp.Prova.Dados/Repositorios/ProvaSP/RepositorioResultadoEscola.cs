@@ -31,7 +31,7 @@ namespace SME.SERAp.Prova.Dados
 								,PercentualAdequado
 								,PercentualAvancado
 								,PercentualAlfabetizado
-							from [dbo].[ResultadoEscola]
+							from [dbo].[ResultadoEscola] with (nolock)
                             where Edicao = @edicao
                               and AreaConhecimentoID = @areaConhecimentoId
                               and AnoEscolar = @anoEscolar
@@ -76,21 +76,7 @@ namespace SME.SERAp.Prova.Dados
 								,@PercentualAvancado
 								,@PercentualAlfabetizado)";
 
-                var parametros = new DynamicParameters();
-                parametros.Add("@Edicao", resultado.Edicao, DbType.String, ParameterDirection.Input, 10);
-                parametros.Add("@AreaConhecimentoID", resultado.AreaConhecimentoID, DbType.Int16, ParameterDirection.Input);
-                parametros.Add("@UadSigla", resultado.UadSigla, DbType.String, ParameterDirection.Input, 4);
-                parametros.Add("@EscCodigo", resultado.EscCodigo, DbType.String, ParameterDirection.Input, 20);
-                parametros.Add("@AnoEscolar", resultado.AnoEscolar, DbType.String, ParameterDirection.Input, 3);
-                parametros.Add("@Valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input, null, 6, 3);
-                parametros.Add("@TotalAlunos", resultado.TotalAlunos, DbType.Int32, ParameterDirection.Input);
-                parametros.Add("@NivelProficienciaID", resultado.NivelProficienciaID, DbType.Int16, ParameterDirection.Input);
-                parametros.Add("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-                parametros.Add("@PercentualBasico", resultado.PercentualBasico?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-                parametros.Add("@PercentualAdequado", resultado.PercentualAdequado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-                parametros.Add("@PercentualAvancado", resultado.PercentualAvancado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-                parametros.Add("@PercentualAlfabetizado", resultado.PercentualAlfabetizado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
-
+                var parametros = ObterParametros(resultado);
                 return await conn.ExecuteAsync(query, parametros);
 
             }
@@ -108,7 +94,57 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<long> AlterarAsync(ResultadoEscola resultado)
         {
-            throw new NotImplementedException();
+            using var conn = ObterConexaoProvaSp();
+            try
+            {
+                var query = $@"update [dbo].[ResultadoEscola] set								 
+									 uad_sigla = @UadSigla
+									,Valor = @Valor
+									,TotalAlunos = @TotalAlunos
+									,NivelProficienciaID = @NivelProficienciaID
+									,PercentualAbaixoDoBasico = @PercentualAbaixoDoBasico
+									,PercentualBasico = @PercentualBasico
+									,PercentualAdequado = @PercentualAdequado
+									,PercentualAvancado = @PercentualAvancado
+									,PercentualAlfabetizado = @PercentualAlfabetizado
+								where Edicao = @Edicao
+									and AreaConhecimentoID = @AreaConhecimentoID
+									and AnoEscolar = @AnoEscolar
+									and esc_codigo = REPLICATE('0', 6 - LEN(@EscCodigo)) + RTrim(@EscCodigo)";
+
+                var parametros = ObterParametros(resultado);
+                return await conn.ExecuteAsync(query, parametros);
+
+            }
+            catch (Exception ex)
+            {
+                string log = $@"Alterar {resultado.GetType().Name} -- Erro:{ex.Message} ---- Objeto: {ResultadoPsp.ObterJsonObjetoResultado(resultado)}";
+                throw new Exception(log);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        private DynamicParameters ObterParametros(ResultadoEscola resultado)
+        {
+            var parametros = new DynamicParameters();
+            parametros.Add("@Edicao", resultado.Edicao, DbType.String, ParameterDirection.Input, 10);
+            parametros.Add("@AreaConhecimentoID", resultado.AreaConhecimentoID, DbType.Int16, ParameterDirection.Input);
+            parametros.Add("@UadSigla", resultado.UadSigla, DbType.String, ParameterDirection.Input, 4);
+            parametros.Add("@EscCodigo", resultado.EscCodigo, DbType.String, ParameterDirection.Input, 20);
+            parametros.Add("@AnoEscolar", resultado.AnoEscolar, DbType.String, ParameterDirection.Input, 3);
+            parametros.Add("@Valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input, null, 6, 3);
+            parametros.Add("@TotalAlunos", resultado.TotalAlunos, DbType.Int32, ParameterDirection.Input);
+            parametros.Add("@NivelProficienciaID", resultado.NivelProficienciaID, DbType.Int16, ParameterDirection.Input);
+            parametros.Add("@PercentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+            parametros.Add("@PercentualBasico", resultado.PercentualBasico ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+            parametros.Add("@PercentualAdequado", resultado.PercentualAdequado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+            parametros.Add("@PercentualAvancado", resultado.PercentualAvancado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+            parametros.Add("@PercentualAlfabetizado", resultado.PercentualAlfabetizado ?? 0, DbType.Decimal, ParameterDirection.Input, null, 6, 2);
+            return parametros;
         }
     }
 }

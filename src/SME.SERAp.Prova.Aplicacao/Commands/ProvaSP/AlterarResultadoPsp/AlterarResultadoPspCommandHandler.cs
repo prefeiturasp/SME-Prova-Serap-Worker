@@ -58,14 +58,18 @@ namespace SME.SERAp.Prova.Aplicacao
             var result = await repositorioResultadoAluno.AlterarAsync(resultadoInserir);
             return result > 0;
         }
-
-        private async Task<bool> AlterarResultadoSME()
+        private async Task<bool> AlterarResultadoTurma()
         {
-            var resultadoInserir = (ResultadoSme)ObjResultado.Resultado;
-            var result = await repositorioResultadoSme.AlterarAsync(resultadoInserir);
+            var resultadoInserir = (ResultadoTurma)ObjResultado.Resultado;
+            var result = await repositorioResultadoTurma.AlterarAsync(resultadoInserir);
             return result > 0;
         }
-
+        private async Task<bool> AlterarResultadoEscola()
+        {
+            var resultadoInserir = (ResultadoEscola)ObjResultado.Resultado;
+            var result = await repositorioResultadoEscola.AlterarAsync(resultadoInserir);
+            return result > 0;
+        }
         private async Task<bool> AlterarResultadoDre()
         {
             var resultadoInserir = (ResultadoDre)ObjResultado.Resultado;
@@ -73,18 +77,11 @@ namespace SME.SERAp.Prova.Aplicacao
             return result > 0;
         }
 
-        private async Task<bool> AlterarResultadoEscola()
+        private async Task<bool> AlterarResultadoSME()
         {
-            var resultadoInserir = (ResultadoEscola)ObjResultado.Resultado;
-            var result = await repositorioResultadoEscola.AlterarAsync(resultadoInserir);
+            var resultadoInserir = (ResultadoSme)ObjResultado.Resultado;
+            var result = await repositorioResultadoSme.AlterarAsync(resultadoInserir);
             return result > 0;
-        }
-
-        private async Task<bool> AlterarResultadoTurma()
-        {
-            var resultadoInserir = (ResultadoTurma)ObjResultado.Resultado;
-            var result = await repositorioResultadoTurma.AlterarAsync(resultadoInserir);
-            return result > 0;
-        }
+        }   
     }
 }

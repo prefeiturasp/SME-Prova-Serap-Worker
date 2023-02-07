@@ -37,6 +37,8 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.ProvaComProficiencia).ToColumn("prova_com_proficiencia");
             Map(c => c.ApresentarResultados).ToColumn("apresentar_resultados");
             Map(c => c.ApresentarResultadosPorItem).ToColumn("apresentar_resultados_por_item");
+            Map(c => c.ExibirVideo).ToColumn("exibir_video");
+            Map(c => c.ExibirAudio).ToColumn("exibir_audio");
         }
     }
 }

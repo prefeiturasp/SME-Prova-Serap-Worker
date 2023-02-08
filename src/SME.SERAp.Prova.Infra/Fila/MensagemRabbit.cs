@@ -9,9 +9,9 @@ namespace SME.SERAp.Prova.Infra
             Mensagem = mensagem;
             CodigoCorrelacao = codigoCorrelacao;
         }
+        
         protected MensagemRabbit()
         {
-
         }
         
         public object Mensagem { get; set; }

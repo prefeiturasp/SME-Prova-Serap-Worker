@@ -14,6 +14,8 @@ namespace SME.SERAp.Prova.Infra
         {
             HasHeaderRecord = true,
             Delimiter = ";",
+            MissingFieldFound = null,
+            IgnoreBlankLines = true,
         };
 
         public static CsvReader ObterReaderArquivoResultadosPsp(PathOptions pathOptions, string nomeArquivo)

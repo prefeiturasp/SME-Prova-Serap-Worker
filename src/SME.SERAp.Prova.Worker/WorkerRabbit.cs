@@ -61,9 +61,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             channel.ExchangeDeclare(ExchangeRabbit.SerapEstudante, ExchangeType.Direct, true);
             channel.ExchangeDeclare(ExchangeRabbit.SerapEstudanteDeadLetter, ExchangeType.Direct, true);
 
-            DeclararFilas(channel);
-
             RegistrarUseCases();
+            DeclararFilas(channel);
 
             await InicializaConsumer(channel, stoppingToken);
 
@@ -116,7 +115,13 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 var argsFinal = new Dictionary<string, object> { { "x-queue-mode", "lazy" } };
                 var filaDeadLetterFinal = $"{fila}.deadletter.final";
                 
-                channel.QueueDeclare(filaDeadLetterFinal, true, false, false, argsFinal);
+                channel.QueueDeclare(
+                    queue: filaDeadLetterFinal, 
+                    durable: true, 
+                    exclusive: false, 
+                    autoDelete: false, 
+                    arguments: argsFinal);
+                
                 channel.QueueBind(filaDeadLetterFinal, ExchangeRabbit.SerapEstudanteDeadLetter, filaDeadLetterFinal, null);
             }
         }
@@ -307,20 +312,24 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception ex)
                 {
+                    servicoTelemetria.RegistrarExcecao(transacao, ex);
+                    
                     var rejeicoes = GetRetryCount(ea.BasicProperties);
 
                     if (++rejeicoes >= comandoRabbit.QuantidadeReprocessamentoDeadLetter)
                     {
-                        channel.BasicReject(ea.DeliveryTag, false);
+                        channel.BasicAck(ea.DeliveryTag, false);
                         
                         var filaFinal = $"{ea.RoutingKey}.deadletter.final";
-                        await servicoMensageria.Publicar(mensagemRabbit, filaFinal, ExchangeRabbit.SerapEstudanteDeadLetter,
+
+                        await servicoMensageria.Publicar(mensagemRabbit, filaFinal,
+                            ExchangeRabbit.SerapEstudanteDeadLetter,
                             "PublicarDeadLetter");
                     } else
                         channel.BasicReject(ea.DeliveryTag, false);
                     
                     servicolog.Registrar(LogNivel.Critico, $"Rota-- {ea.RoutingKey} -- Erros: {ex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem} --", ex.StackTrace);
-                    servicoTelemetria.RegistrarExcecao(transacao, ex);
+                    
                 }
                 finally
                 {

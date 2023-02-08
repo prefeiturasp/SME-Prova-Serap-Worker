@@ -58,7 +58,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              ( @Edicao  
                              , @AreaConhecimentoID
                              , @uad_sigla 
-                             , @esc_codigo
+                             , REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
                              , @AnoEscolar
                              , @tur_codigo
                              , @tur_id
@@ -88,21 +88,18 @@ namespace SME.SERAp.Prova.Dados.Repositorios
             using var conn = ObterConexaoProvaSp();
             try
             {
-                var query = $@"update ResultadoAluno set
-							  Edicao = @Edicao
-                             ,AreaConhecimentoID = @AreaConhecimentoID
-                      	     ,uad_sigla = @uad_sigla
-                             ,esc_codigo = @esc_codigo
+                var query = $@"update ResultadoAluno set							 
+                      	      uad_sigla = @uad_sigla
+                             ,esc_codigo = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
                              ,AnoEscolar = @AnoEscolar
                              ,tur_codigo = @tur_codigo
                              ,tur_id = @tur_id
-                             ,alu_matricula = @alu_matricula
                              ,alu_nome = @alu_nome
                              ,NivelProficienciaID = @NivelProficienciaID
                              ,Valor = @Valor
-							 where alu_matricula = @alunoMatricula
+							 where alu_matricula = @alu_matricula
 								and AreaConhecimentoID = @AreaConhecimentoId
-                                and  Edicao = @Edicao";
+                                and Edicao = @Edicao";
 
                 var parametros = ObterParametros(resultado);
                 return await conn.ExecuteAsync(query, parametros);

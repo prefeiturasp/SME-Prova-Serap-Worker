@@ -24,28 +24,12 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var resultadoBanco = await ObterResultadoBanco(objResultadoCsv);
+                var resultadoEntidade = MapearParaEntidade(objResultadoCsv);
+
                 if (resultadoBanco == null)
-                {
-                    var resultadoEntidade = new ResultadoTurma()
-                    {
-                        Edicao = objResultadoCsv.Edicao,
-                        AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
-                        UadSigla = objResultadoCsv.UadSigla,
-                        EscCodigo = objResultadoCsv.EscCodigo,
-                        AnoEscolar = objResultadoCsv.AnoEscolar,
-                        TurCodigo = objResultadoCsv.TurCodigo,
-                        TurId = objResultadoCsv.TurId,
-                        Valor = objResultadoCsv.Valor,
-                        TotalAlunos = objResultadoCsv.TotalAlunos,
-                        NivelProficienciaID = objResultadoCsv.NivelProficienciaID,
-                        PercentualAbaixoDoBasico = objResultadoCsv.PercentualAbaixoDoBasico,
-                        PercentualBasico = objResultadoCsv.PercentualBasico,
-                        PercentualAdequado = objResultadoCsv.PercentualAdequado,
-                        PercentualAvancado = objResultadoCsv.PercentualAvancado,
-                        PercentualAlfabetizado = null
-                    };
                     await Inserir(resultadoEntidade);
-                }
+                else
+                    await Alterar(resultadoEntidade);
 
                 await VerificaSeFinalizaProcesso();
 
@@ -57,6 +41,27 @@ namespace SME.SERAp.Prova.Aplicacao
                 await RegistrarErroEAtualizarStatusProcesso(GetType().Name, ex);
                 return false;
             }
+        }
+        private ResultadoTurma MapearParaEntidade(ResultadoTurmaDto objResultadoCsv)
+        {
+            return new ResultadoTurma()
+            {
+                Edicao = objResultadoCsv.Edicao,
+                AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
+                UadSigla = objResultadoCsv.UadSigla,
+                EscCodigo = objResultadoCsv.EscCodigo,
+                AnoEscolar = objResultadoCsv.AnoEscolar,
+                TurCodigo = objResultadoCsv.TurCodigo,
+                TurId = objResultadoCsv.TurId,
+                Valor = objResultadoCsv.Valor,
+                TotalAlunos = objResultadoCsv.TotalAlunos,
+                NivelProficienciaID = objResultadoCsv.NivelProficienciaID,
+                PercentualAbaixoDoBasico = objResultadoCsv.PercentualAbaixoDoBasico,
+                PercentualBasico = objResultadoCsv.PercentualBasico,
+                PercentualAdequado = objResultadoCsv.PercentualAdequado,
+                PercentualAvancado = objResultadoCsv.PercentualAvancado,
+                PercentualAlfabetizado = null
+            };
         }
     }
 }

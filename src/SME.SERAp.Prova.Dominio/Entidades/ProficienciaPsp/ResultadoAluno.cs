@@ -1,4 +1,4 @@
-﻿namespace SME.SERAp.Prova.Dominio.Entidades
+﻿namespace SME.SERAp.Prova.Dominio
 {
     public class ResultadoAluno
     {
@@ -13,6 +13,6 @@
         public string alu_matricula { get; set; }
         public string alu_nome { get; set; }
         public int NivelProficienciaID { get; set; }
-        public string Valor { get; set; }
+        public decimal? Valor { get; set; }
     }
 }

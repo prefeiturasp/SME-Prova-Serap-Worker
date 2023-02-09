@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TratarProficienciaSmeUseCase : AbstractTratarProficienciaPspUseCase, ITratarProficienciaSmeUseCase
+    public class TratarProficienciaAlunoUseCase : AbstractTratarProficienciaPspUseCase, ITratarProficienciaAlunoUseCase
     {
 
-        public TratarProficienciaSmeUseCase(IMediator mediator,
+        public TratarProficienciaAlunoUseCase(IMediator mediator,
                                                IServicoLog servicoLog,
                                                IModel model) : base(mediator, servicoLog, model) { }
 
@@ -19,8 +19,8 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var registroProficienciaPsp = mensagemRabbit.ObterObjetoMensagem<RegistroProficienciaPspCsvDto>();
             PopularRegistroProficienciaPsp(registroProficienciaPsp);
-            var objResultadoCsv = registroProficienciaPsp.ObterObjetoRegistro<ResultadoSmeDto>();
-            PopularTipoResultadoProcesso(TipoResultadoPsp.ResultadoSme);
+            var objResultadoCsv = registroProficienciaPsp.ObterObjetoRegistro<ResultadoAlunoDto>();
+            PopularTipoResultadoProcesso(TipoResultadoPsp.ResultadoAluno);
 
             try
             {
@@ -43,22 +43,24 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
         }
-        private ResultadoSme MapearParaEntidade(ResultadoSmeDto objResultadoCsv)
+
+        private ResultadoAluno MapearParaEntidade(ResultadoAlunoDto objResultadoCsv)
         {
-            return new ResultadoSme()
+            return new ResultadoAluno()
             {
                 Edicao = objResultadoCsv.Edicao,
-                AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
+                uad_sigla = objResultadoCsv.uad_sigla,
+                esc_codigo = objResultadoCsv.esc_codigo,
                 AnoEscolar = objResultadoCsv.AnoEscolar,
-                Valor = objResultadoCsv.Valor,
-                TotalAlunos = objResultadoCsv.TotalAlunos,
+                tur_codigo = objResultadoCsv.tur_codigo,
+                tur_id = objResultadoCsv.tur_id,
+                alu_matricula = objResultadoCsv.alu_matricula,
+                alu_nome = objResultadoCsv.alu_nome,
                 NivelProficienciaID = objResultadoCsv.NivelProficienciaID,
-                PercentualAbaixoDoBasico = objResultadoCsv.PercentualAbaixoDoBasico,
-                PercentualBasico = objResultadoCsv.PercentualBasico,
-                PercentualAdequado = objResultadoCsv.PercentualAdequado,
-                PercentualAvancado = objResultadoCsv.PercentualAvancado,
-                PercentualAlfabetizado = null
+                AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
+                Valor = objResultadoCsv.Valor
             };
         }
+
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Dapper.FluentMap.Dommel.Mapping;
-using SME.SERAp.Prova.Dominio.Entidades;
+using SME.SERAp.Prova.Dominio;
 using System;
 using System.Collections.Generic;
 using System.Text;

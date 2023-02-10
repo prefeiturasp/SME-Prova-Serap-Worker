@@ -163,6 +163,7 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(new ProvaRemoverCadernoAlunosPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAlternativasPorIdCommand(provaAtual.Id));
+            await mediator.Send(new ProvaRemoverQuestoesTriPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverQuestoesPorIdCommand(provaAtual.Id));
         }
 

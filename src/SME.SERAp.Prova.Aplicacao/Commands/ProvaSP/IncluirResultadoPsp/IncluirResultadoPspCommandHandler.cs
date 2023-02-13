@@ -12,38 +12,53 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         private readonly IRepositorioResultadoSme repositorioResultadoSme;
         private readonly IRepositorioResultadoDre repositorioResultadoDre;
+        private readonly IRepositorioResultadoEscola repositorioResultadoEscola;
+
+        private ObjResultadoPspDto ObjResultado;
 
         public IncluirResultadoPspCommandHandler(IRepositorioResultadoSme repositorioResultadoSme,
-                                                 IRepositorioResultadoDre repositorioResultadoDre)
+                                                 IRepositorioResultadoDre repositorioResultadoDre,
+                                                 IRepositorioResultadoEscola repositorioResultadoEscola)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
+            this.repositorioResultadoEscola = repositorioResultadoEscola;
         }
 
         public async Task<bool> Handle(IncluirResultadoPspCommand request, CancellationToken cancellationToken)
         {
+            ObjResultado = request.Resultado;
             switch (request.Resultado.TipoResultado)
-            {                
+            {
                 case TipoResultadoPsp.ResultadoSme:
-                    return await IncluirResultadoSME(request.Resultado);
+                    return await IncluirResultadoSME();
                 case TipoResultadoPsp.ResultadoDre:
-                    return await IncluirResultadoDre(request.Resultado);
+                    return await IncluirResultadoDre();
+                case TipoResultadoPsp.ResultadoEscola:
+                    return await IncluirResultadoEscola();
                 default:
                     return false;
             }
         }
 
-        private async Task<bool> IncluirResultadoSME(ObjResultadoPspDto resultado)
+        private async Task<bool> IncluirResultadoSME()
         {
-            var resultadoInserir = (ResultadoSme)resultado.Resultado;
+            var resultadoInserir = (ResultadoSme)ObjResultado.Resultado;
             var result = await repositorioResultadoSme.IncluirAsync(resultadoInserir);
             return result > 0;
         }
 
-        private async Task<bool> IncluirResultadoDre(ObjResultadoPspDto resultado)
+        private async Task<bool> IncluirResultadoDre()
         {
-            var resultadoInserir = (ResultadoDre)resultado.Resultado;
+            var resultadoInserir = (ResultadoDre)ObjResultado.Resultado;
             var result = await repositorioResultadoDre.IncluirAsync(resultadoInserir);
+            return result > 0;
+        }
+
+        private async Task<bool> IncluirResultadoEscola()
+        {
+            var resultadoInserir = (ResultadoEscola)ObjResultado.Resultado;
+            var result = await repositorioResultadoEscola.IncluirAsync(resultadoInserir);
             return result > 0;
         }
     }

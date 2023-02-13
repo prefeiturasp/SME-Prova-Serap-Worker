@@ -96,6 +96,8 @@
         public const string TratarResultadoSmePsp = "serap.resultados.psp.resultado.sme.tratar";
         public const string ImportarResultadoDrePsp = "serap.resultados.psp.resultado.dre";
         public const string TratarResultadoDrePsp = "serap.resultados.psp.resultado.dre.tratar";
+        public const string ImportarResultadoEscolaPsp = "serap.resultados.psp.resultado.escola";
+        public const string TratarResultadoEscolaPsp = "serap.resultados.psp.resultado.escola.tratar";
 
     }
 }

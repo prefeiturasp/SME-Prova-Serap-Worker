@@ -11,5 +11,7 @@ namespace SME.SERAp.Prova.Dados
         Task<bool> ExisteAsync(long alunoId, long provaId);
         Task<decimal> ObterUltimaProficienciaAlunoPorDisciplinaIdAsync(long alunoId, long? disciplinaId);
         Task<decimal> ObterProficienciaInicialAlunoPorProvaIdAsync(long provaId, long alunoId);
+        Task<AlunoProvaProficiencia> ObterProficienciaAlunoAsync(long provaId, long alunoId, AlunoProvaProficienciaTipo tipo, AlunoProvaProficienciaOrigem origem);
+        Task<bool> AtualizarValorProficienciaAluno(AlunoProvaProficiencia alunoProvaProficiencia);
     }
 }

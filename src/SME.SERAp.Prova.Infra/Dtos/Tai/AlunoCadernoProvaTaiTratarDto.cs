@@ -1,5 +1,4 @@
-﻿
-namespace SME.SERAp.Prova.Infra
+﻿namespace SME.SERAp.Prova.Infra
 {
     public class AlunoCadernoProvaTaiTratarDto : DtoBase
     {
@@ -14,5 +13,5 @@ namespace SME.SERAp.Prova.Infra
         public long AlunoId { get; set; }
         public long ProvaLegadoId { get; set; }
 
-    }    
+    }
 }

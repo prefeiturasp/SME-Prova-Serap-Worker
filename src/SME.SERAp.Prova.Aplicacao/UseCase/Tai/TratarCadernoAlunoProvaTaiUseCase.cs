@@ -46,14 +46,14 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var provaALuno = await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
 
-            var ordem = 0;
+            var primeiraQuestao = true;
             foreach(var questao in itens.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
             {
                 var questaoParaPersistir = new Questao(
                     questao.TextoBase,
                     questao.ItemId,
                     questao.Enunciado,
-                    ordem,
+                    primeiraQuestao ? 0 : 999,
                     alunoProva.ProvaId,
                     (QuestaoTipo)questao.TipoItem,
                     alunoProva.AlunoId.ToString(),
@@ -75,13 +75,15 @@ namespace SME.SERAp.Prova.Aplicacao
                 await TratarAudiosQuestao(questao, questaoId);
 
                 await TratarVideosQuestao(questao.ItemId, questaoId);
+                
+                await TratarQuestaoTri(questao, questaoId);
 
                 if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
                 {
                     await TratarAlternativasQuestao(questao, questaoId);
                 }
 
-                ordem++;
+                primeiraQuestao = false;
             }
 
             return true;
@@ -178,6 +180,19 @@ namespace SME.SERAp.Prova.Aplicacao
                     await mediator.Send(new QuestaoVideoPersistirCommand(questaoVideoInserir));
                 }
             }
+        }
+        
+        private async Task TratarQuestaoTri(ItemAmostraTaiDto questaoSerap, long questaoId)
+        {
+            var questaoTriInserir = new QuestaoTri()
+            {
+                QuestaoId = questaoId,
+                Discriminacao = questaoSerap.Discriminacao,
+                Dificuldade = questaoSerap.ProporcaoAcertos,
+                AcertoCasual = questaoSerap.AcertoCasual
+            };
+
+            await mediator.Send(new IncluirAtualizarQuestaoTriCommand(questaoTriInserir));
         }
     }
 }

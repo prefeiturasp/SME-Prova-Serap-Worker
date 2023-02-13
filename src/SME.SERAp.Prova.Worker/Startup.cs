@@ -142,6 +142,10 @@ namespace SME.SERAp.Prova.Worker
             var servicoTelemetria = new ServicoTelemetria(clientTelemetry, telemetriaOptions);
             services.AddSingleton<IServicoTelemetria>(servicoTelemetria);
             DapperExtensionMethods.Init(servicoTelemetria);
+
+            var apiROptions = new ApiROptions();
+            configuration.GetSection(ApiROptions.Secao).Bind(apiROptions, c => c.BindNonPublicProperties = true);
+            services.AddSingleton(apiROptions);
         }
     }
 }

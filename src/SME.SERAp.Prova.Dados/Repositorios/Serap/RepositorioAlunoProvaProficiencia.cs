@@ -118,5 +118,53 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+        public async Task<AlunoProvaProficiencia> ObterProficienciaAlunoAsync(long provaId, long alunoId, AlunoProvaProficienciaTipo tipo, AlunoProvaProficienciaOrigem origem)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+
+                var query = @"select id, prova_id as provaId, aluno_id as alunoId, disciplina_id as disciplinaId, 
+                                     proficiencia, ra, origem, tipo, ultima_atualizacao as UltimaAtualizacao  
+                              from aluno_prova_proficiencia app
+                              where app.tipo = @tipo
+                                and app.origem = @origem
+                                and app.aluno_id = @alunoId 
+                                and app.proficiencia > 0 
+                                and app.prova_id = @provaId";
+
+                return await conn.QueryFirstOrDefaultAsync<AlunoProvaProficiencia>(query, new { provaId, alunoId, tipo = (int)tipo, origem = (int)origem });
+
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<bool> AtualizarValorProficienciaAluno(AlunoProvaProficiencia alunoProvaProficiencia)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"update aluno_prova_proficiencia
+                                set proficiencia = @proficiencia,
+	                                ultima_atualizacao = @ultimaAtualizacao
+                                where id = @id";
+
+                await conn.ExecuteAsync(query, new { 
+                                                        id = alunoProvaProficiencia.Id, 
+                                                        proficiencia = alunoProvaProficiencia.Proficiencia, 
+                                                        ultimaAtualizacao = alunoProvaProficiencia.UltimaAtualizacao 
+                                                   });
+                return true;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

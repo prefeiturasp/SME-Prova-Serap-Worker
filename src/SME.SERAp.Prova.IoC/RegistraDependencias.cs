@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
+using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Dados.Interfaces;
+using SME.SERAp.Prova.Dados.Repositorios;
 using SME.SERAp.Prova.Dados.Repositorios.Serap;
-using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
 using SME.SERAp.Prova.Infra.Services;
 
@@ -50,7 +50,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioPreferenciasUsuario, RepositorioPreferenciasUsuario>();
             services.AddScoped<IRepositorioCache, RepositorioCache>();
             services.AddScoped<IRepositorioProvaAluno, RepositorioProvaAluno>();
-
             services.AddScoped<IRepositorioDreEntity, RepositorioDreEntity>();
             services.AddScoped<IRepositorioUeEntity, RepositorioUeEntity>();
             services.AddScoped<IRepositorioTurmaEntity, RepositorioTurmaEntity>();
@@ -90,10 +89,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioProvaAlunoReabertura, RepositorioProvaReabertura>();
             services.AddScoped<IRepositorioProvaGrupoPermissaoEntity, RepositorioProvaGrupoPermissaoEntity>();
             services.AddScoped<IRepositorioProvaGrupoPermissao, RepositorioProvaGrupoPermissao>();
-
-
-
-
+            services.AddScoped<IRepositorioQuestaoTri, RepositorioQuestaoTri>();
+            services.AddScoped<IRepositorioArquivoResultadoPsp, RepositorioArquivoResultadoPsp>();
+            services.AddScoped<IRepositorioResultadoAluno, RepositorioResultadoAluno>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -184,8 +182,15 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarReaberturaProvaAlunoUseCase, TratarReaberturaProvaAlunoUseCase>();
 
             services.AddScoped<IProvaGrupoPermissaoUseCase, ProvaGrupoPermissaoUseCase>();
+            services.AddScoped<ITratarOrdemQuestaoAlunoProvaTaiUseCase, TratarOrdemQuestaoAlunoProvaTaiUseCase>();
+            services.AddScoped<ITratarProficienciaAlunoProvaTaiUseCase, TratarProficienciaAlunoProvaTaiUseCase>();
 
+            services.AddScoped<IImportarProeficienciaAlunoUseCase, ImportarProficienciaAlunoUseCase>();
+
+            services.AddScoped<ITratarProeficienciaAlunoTratarUseCase, TratarProeficienciaAlunoTratarUseCase>();
             
+
+
         }
     }
 }

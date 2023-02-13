@@ -29,14 +29,7 @@ namespace SME.SERAp.Prova.Infra
         }
 
         private static void AjustarArquivo(string path)
-        {
-
-            var reader = new StreamReader(path, encoding: Encoding.UTF8);
-            var csv = new CsvReader(reader, config);
-            while (csv.Read())
-            {
-                
-            }
+        {            
 
             List<string> linhas = new List<string>();
             using var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite);

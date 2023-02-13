@@ -1,9 +1,11 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text.Json;
 
 namespace SME.SERAp.Prova.Infra
 {
@@ -21,7 +23,7 @@ namespace SME.SERAp.Prova.Infra
             return new CsvReader(reader, config);
         }
 
-        public static decimal? ConvertStringPraDecimalNullPsp(this string? valor)
+        public static decimal? ConvertStringPraDecimalNullPsp(this string valor)
         {
             if (string.IsNullOrEmpty(valor)) return null;
 
@@ -43,6 +45,8 @@ namespace SME.SERAp.Prova.Infra
                     return RotasRabbit.ImportarResultadoAlunoPsp;
                 case TipoResultadoPsp.ResultadoSme:
                     return RotasRabbit.ImportarResultadoSmePsp;
+                case TipoResultadoPsp.ResultadoDre:
+                    return RotasRabbit.ImportarResultadoDrePsp;
                 default:
                     return string.Empty;
             }
@@ -56,9 +60,20 @@ namespace SME.SERAp.Prova.Infra
                     return RotasRabbit.TratarResultadoAlunoPsp;
                 case TipoResultadoPsp.ResultadoSme:
                     return RotasRabbit.TratarResultadoSmePsp;
+                case TipoResultadoPsp.ResultadoDre:
+                    return RotasRabbit.TratarResultadoDrePsp;
                 default:
                     return string.Empty;
             }
+        }
+
+        public static string ObterJsonObjetoResultado(object resultado)
+        {
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            return JsonSerializer.Serialize(resultado, jsonSerializerOptions);
         }
     }
 }

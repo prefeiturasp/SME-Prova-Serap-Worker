@@ -1,7 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Globalization;
 using System.IO;
@@ -28,28 +27,15 @@ namespace SME.SERAp.Prova.Infra
             if (string.IsNullOrEmpty(valor)) return null;
 
             valor = valor.Replace(",", ".").Trim();
-            
+
+            if (valor == "NA") return null;
+
             if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec_valor))
             {
                 return dec_valor;
             }
 
             throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
-        }        
-
-        private static string ObterFilaImportarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)
-        {
-            switch (tipoResultado)
-            {
-                case TipoResultadoPsp.ResultadoAluno:
-                    return RotasRabbit.ImportarResultadoAlunoPsp;
-                case TipoResultadoPsp.ResultadoSme:
-                    return RotasRabbit.ImportarResultadoSmePsp;
-                case TipoResultadoPsp.ResultadoDre:
-                    return RotasRabbit.ImportarResultadoDrePsp;
-                default:
-                    return string.Empty;
-            }
         }
 
         public static string ObterFilaTratarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)
@@ -62,6 +48,8 @@ namespace SME.SERAp.Prova.Infra
                     return RotasRabbit.TratarResultadoSmePsp;
                 case TipoResultadoPsp.ResultadoDre:
                     return RotasRabbit.TratarResultadoDrePsp;
+                case TipoResultadoPsp.ResultadoEscola:
+                    return RotasRabbit.TratarResultadoEscolaPsp;
                 default:
                     return string.Empty;
             }

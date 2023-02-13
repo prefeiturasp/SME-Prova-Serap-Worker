@@ -1,11 +1,8 @@
 ﻿using SME.SERAp.Prova.Dados.Interfaces;
-using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Dominio.Entidades;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados.Repositorios
@@ -49,7 +46,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
             using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
             try
             {
-                var query = @"INSERT INTO ResultadoAluno
+                var query = $@"INSERT INTO ResultadoAluno
                              (Edicao
                              ,AreaConhecimentoID
                       	     ,uad_sigla
@@ -59,10 +56,8 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              ,tur_id
                              ,alu_matricula
                              ,alu_nome
-                           --  ,ResultadoLegadoID
                              ,NivelProficienciaID
                              ,Valor)
-                          
                               VALUES
                              ( @Edicao  
                              , @AreaConhecimentoID
@@ -73,9 +68,8 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              , @tur_id
                              , @alu_matricula
                              , @alu_nome
-                           --  , @ResultadoLegadoID
                              , @NivelProficienciaID
-                             , @Valor )";
+                             , CONVERT(decimal(6,3), '{resultado.Valor}'))";
 
                 return await conn.ExecuteAsync(query, new
                 {
@@ -88,7 +82,6 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                     resultado.tur_id,
                     resultado.alu_matricula,
                     resultado.alu_nome,
-                    //   resultado.ResultadoLegadoId,
                     resultado.NivelProficienciaID,
                     resultado.Valor
                 });

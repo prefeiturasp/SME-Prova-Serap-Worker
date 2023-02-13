@@ -45,7 +45,10 @@ namespace SME.SERAp.Prova.Dados.Repositorios.Serap
             using var conn = ObterConexao();
             try
             {
-                var query = @"UPDATE ArquivoResultadoPsp SET State = @state WHERE Id = @Id";
+                var query = @"UPDATE ArquivoResultadoPsp 
+                                    SET State = @state,
+                                        UpdateDate = getdate()
+                                WHERE Id = @Id";
                 await conn.ExecuteAsync(query, new { id, state });
             }
             finally

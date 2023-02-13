@@ -93,7 +93,7 @@ namespace SME.SERAp.Prova.Worker
             services.AddSingleton(conexaoRabbit);
 
             var pathOptions = new PathOptions();
-            configuration.GetSection("Path").Bind(rabbitOptions, c => c.BindNonPublicProperties = true);
+            configuration.GetSection("Path").Bind(pathOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(pathOptions);
 
             var telemetriaOptions = new TelemetriaOptions();

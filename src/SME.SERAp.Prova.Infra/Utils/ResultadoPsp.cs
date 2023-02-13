@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 
@@ -29,11 +30,18 @@ namespace SME.SERAp.Prova.Infra
 
         private static void AjustarArquivo(string path)
         {
+
+            var reader = new StreamReader(path, encoding: Encoding.UTF8);
+            var csv = new CsvReader(reader, config);
+            while (csv.Read())
+            {
+                
+            }
+
             List<string> linhas = new List<string>();
             using var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite);
             using var sr = new StreamReader(fs, Encoding.UTF8);
             string linhaAtual = String.Empty;
-            int cont = 1;
             bool reescreverArquivo = false;
 
             while (!sr.EndOfStream)
@@ -41,7 +49,6 @@ namespace SME.SERAp.Prova.Infra
                 linhaAtual = sr.ReadLine();
                 if (!string.IsNullOrEmpty(linhaAtual.Trim()))
                     linhas.Add(linhaAtual);
-                cont++;
                 reescreverArquivo = linhas.Count == 2;
                 if (linhas.Count > 2) break;
             }
@@ -50,15 +57,10 @@ namespace SME.SERAp.Prova.Infra
             sr.Close();
 
             if (reescreverArquivo)
-            {
-                using (StreamWriter sw = new StreamWriter(path))
-                {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (string linha in linhas)
-                        sb.AppendLine(linha);
-                    sb.AppendLine(linhas[linhas.Count - 1]);
-                    sw.Write(sb.ToString());
-                }
+            {                
+                List<string> novaLinha = new List<string>();
+                novaLinha.Add(linhas[linhas.Count - 1]);
+                File.AppendAllLines(path, novaLinha.AsEnumerable(), Encoding.UTF8);
             }
         }
 

@@ -50,6 +50,8 @@ namespace SME.SERAp.Prova.Infra
                     return RotasRabbit.TratarResultadoDrePsp;
                 case TipoResultadoPsp.ResultadoEscola:
                     return RotasRabbit.TratarResultadoEscolaPsp;
+                case TipoResultadoPsp.ResultadoTurma:
+                    return RotasRabbit.TratarResultadoTurmaPsp;
                 default:
                     return string.Empty;
             }

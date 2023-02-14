@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Dominio;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 
 namespace SME.SERAp.Prova.Infra
@@ -16,11 +17,23 @@ namespace SME.SERAp.Prova.Infra
             Delimiter = ";",
             MissingFieldFound = null,
             IgnoreBlankLines = true,
+            ShouldSkipRecord = records =>
+            {
+                var linha = records.Row.Parser.RawRecord.Replace(Environment.NewLine, string.Empty);
+                linha = linha.Trim().Replace("\r", string.Empty);
+                linha = linha.Trim().Replace("\n", string.Empty);
+                linha = linha.Trim().Replace("\0", string.Empty);
+                
+                var arrayLinha = records.Row.Parser.Record;
+                return string.IsNullOrEmpty(linha) || arrayLinha == null || arrayLinha.Length == 0 ||
+                       (arrayLinha.Length > 0 && string.IsNullOrEmpty(arrayLinha[0]));
+            }
         };
 
         public static CsvReader ObterReaderArquivoResultadosPsp(PathOptions pathOptions, string nomeArquivo)
         {
-            var reader = new StreamReader($"{pathOptions.PathArquivos}/{"ResultadoPsp"}/{nomeArquivo}");
+            string path = $"{pathOptions.PathArquivos}/{"ResultadoPsp"}/{nomeArquivo}";
+            var reader = new StreamReader(path, encoding: Encoding.UTF8);
             return new CsvReader(reader, config);
         }
 

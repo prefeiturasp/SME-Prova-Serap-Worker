@@ -2,10 +2,8 @@
 using CsvHelper.Configuration;
 using SME.SERAp.Prova.Dominio;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 
@@ -18,43 +16,22 @@ namespace SME.SERAp.Prova.Infra
             HasHeaderRecord = true,
             Delimiter = ";",
             MissingFieldFound = null,
+            IgnoreBlankLines = true,
+            ShouldSkipRecord = (records) =>
+            {
+                var linha = records.Row.Parser.RawRecord.Replace(Environment.NewLine, string.Empty);
+                linha = linha.Trim().Replace("\r", string.Empty);
+                linha = linha.Trim().Replace("\n", string.Empty);
+                var arrayLinha = records.Row.Parser.Record;
+                return string.IsNullOrEmpty(linha) || arrayLinha == null || arrayLinha?.Length == 0 || (arrayLinha?.Length > 0 && string.IsNullOrEmpty(arrayLinha?[0]));
+            }
         };
 
         public static CsvReader ObterReaderArquivoResultadosPsp(PathOptions pathOptions, string nomeArquivo)
         {
             string path = $"{pathOptions.PathArquivos}/{"ResultadoPsp"}/{nomeArquivo}";
-            AjustarArquivo(path);
             var reader = new StreamReader(path, encoding: Encoding.UTF8);
             return new CsvReader(reader, config);
-        }
-
-        private static void AjustarArquivo(string path)
-        {            
-
-            List<string> linhas = new List<string>();
-            using var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite);
-            using var sr = new StreamReader(fs, Encoding.UTF8);
-            string linhaAtual = String.Empty;
-            bool reescreverArquivo = false;
-
-            while (!sr.EndOfStream)
-            {
-                linhaAtual = sr.ReadLine();
-                if (!string.IsNullOrEmpty(linhaAtual.Trim()))
-                    linhas.Add(linhaAtual);
-                reescreverArquivo = linhas.Count == 2;
-                if (linhas.Count > 2) break;
-            }
-
-            fs.Close();
-            sr.Close();
-
-            if (reescreverArquivo)
-            {                
-                List<string> novaLinha = new List<string>();
-                novaLinha.Add(linhas[linhas.Count - 1]);
-                File.AppendAllLines(path, novaLinha.AsEnumerable(), Encoding.UTF8);
-            }
         }
 
         public static decimal? ConvertStringPraDecimalNullPsp(this string valor)

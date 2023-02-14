@@ -17,13 +17,16 @@ namespace SME.SERAp.Prova.Infra
             Delimiter = ";",
             MissingFieldFound = null,
             IgnoreBlankLines = true,
-            ShouldSkipRecord = (records) =>
+            ShouldSkipRecord = records =>
             {
                 var linha = records.Row.Parser.RawRecord.Replace(Environment.NewLine, string.Empty);
                 linha = linha.Trim().Replace("\r", string.Empty);
                 linha = linha.Trim().Replace("\n", string.Empty);
+                linha = linha.Trim().Replace("\0", string.Empty);
+                
                 var arrayLinha = records.Row.Parser.Record;
-                return string.IsNullOrEmpty(linha) || arrayLinha == null || arrayLinha?.Length == 0 || (arrayLinha?.Length > 0 && string.IsNullOrEmpty(arrayLinha?[0]));
+                return string.IsNullOrEmpty(linha) || arrayLinha == null || arrayLinha.Length == 0 ||
+                       (arrayLinha.Length > 0 && string.IsNullOrEmpty(arrayLinha[0]));
             }
         };
 

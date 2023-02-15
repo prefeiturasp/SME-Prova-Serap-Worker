@@ -97,8 +97,10 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     //-> Atualiza somente se for a ultima situação do aluno do ano letivo mais atual.
                     if (alunoAntigo != null &&
-                        alunoAntigo.DataAtualizacao <= alunoQuePodeAlterar.DataSituacao &&
-                        turmaFix.AnoLetivo <= turma.AnoLetivo)
+                        ((turmaFix.AnoLetivo < turma.AnoLetivo) ||
+                         (turmaFix.AnoLetivo == turma.AnoLetivo && alunoAntigo.DataAtualizacao <= alunoQuePodeAlterar.DataSituacao)
+                        )
+                       )
                     {
 
                         //-> Valida se existe alguma informação a ser alterada.

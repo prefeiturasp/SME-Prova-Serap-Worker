@@ -24,6 +24,7 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var resultadoBanco = await ObterResultadoBanco(objResultadoCsv);
+
                 if (resultadoBanco == null)
                 {
                     var resultadoEntidade = new ResultadoTurma()
@@ -44,13 +45,13 @@ namespace SME.SERAp.Prova.Aplicacao
                         PercentualAvancado = objResultadoCsv.PercentualAvancado,
                         PercentualAlfabetizado = null
                     };
+
                     await Inserir(resultadoEntidade);
                 }
 
                 await VerificaSeFinalizaProcesso();
 
                 return true;
-
             }
             catch (Exception ex)
             {

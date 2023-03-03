@@ -20,7 +20,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
 
         public async Task<ResultadoSme> ObterResultadoSme(string edicao, long areaConhecimentoId, string anoEscolar)
         {
-            var query = $@"select
+            var query = @"select
 								 Edicao
 								,AreaConhecimentoID
 								,AnoEscolar
@@ -32,7 +32,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
 								,PercentualAdequado
 								,PercentualAvancado
 								,PercentualAlfabetizado
-							from [dbo].[ResultadoSme]
+							from [dbo].[ResultadoSme] with (NOLOCK)
                             where Edicao = @edicao
                               and AreaConhecimentoID = @areaConhecimentoId
                               and AnoEscolar = @anoEscolar

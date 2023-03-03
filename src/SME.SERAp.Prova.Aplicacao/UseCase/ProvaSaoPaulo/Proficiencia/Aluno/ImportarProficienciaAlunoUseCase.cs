@@ -1,6 +1,4 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using MediatR;
+﻿using MediatR;
 using SME.SERAp.Prova.Aplicaca;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio.Enums;
@@ -8,8 +6,6 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
-using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia
@@ -17,11 +13,12 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia
     public class ImportarProficienciaAlunoUseCase : AbstractUseCase, IImportarProeficienciaAlunoUseCase
     {
         private readonly IServicoLog servicoLog;
+        private readonly PathOptions pathOptions;
 
-        public ImportarProficienciaAlunoUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
+        public ImportarProficienciaAlunoUseCase(IMediator mediator, IServicoLog servicoLog, PathOptions pathOptions) : base(mediator)
         {
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
-
+            this.pathOptions = pathOptions ?? throw new ArgumentNullException(nameof(pathOptions));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -30,37 +27,33 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia
 
             try
             {
-                var IdArquivoResultadoPsp = long.Parse(mensagemRabbit.Mensagem.ToString());
-                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(IdArquivoResultadoPsp, StatusImportacao.EmAndamento));
-                var arquivoResultadoPspDto = await mediator.Send(new ObterTipoResultadoPspQuery(IdArquivoResultadoPsp));
+                var idArquivoResultadoPsp = long.Parse(mensagemRabbit.Mensagem.ToString());
+                
+                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(idArquivoResultadoPsp, StatusImportacao.EmAndamento));
+                
+                var arquivoResultadoPspDto = await mediator.Send(new ObterTipoResultadoPspQuery(idArquivoResultadoPsp));
 
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                var registroProvaCsv = new RegistroProvaPspCVSDto
                 {
-                    HasHeaderRecord = true,
-                    Delimiter = ";"
+                    IdArquivo = arquivoResultadoPspDto.Id
                 };
-
-
-                var registroProvaCsv = new RegistroProvaPspCVSDto();
-                registroProvaCsv.IdArquivo = arquivoResultadoPspDto.Id;
+                
                 nomeArquivo = arquivoResultadoPspDto.NomeArquivo;
-
-                using (var reader = new StreamReader($"{Environment.GetEnvironmentVariable("PathArquivos")}/{"ResultadoPsp"}/{arquivoResultadoPspDto.NomeArquivo}"))
-                using (var csv = new CsvReader(reader, config))
+                
+                using var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(pathOptions, arquivoResultadoPspDto.NomeArquivo);
+                
+                var listaCsvResultadoAluno = csv.GetRecords<ArquivoProvaPspCVSDto>();
+                foreach (var objCsvResultadoAluno in listaCsvResultadoAluno)
                 {
-                    var listaCsvResultadoAluno = csv.GetRecords<ArquivoProvaPspCVSDto>();
-                    foreach (var objCsvResultadoAluno in listaCsvResultadoAluno)
-                    {
-                        registroProvaCsv.ArquivoProvaPspCVSDto = objCsvResultadoAluno;
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarResultadoAlunoPsp, registroProvaCsv));
-                    }
+                    registroProvaCsv.ArquivoProvaPspCVSDto = objCsvResultadoAluno;
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarResultadoAlunoPsp, registroProvaCsv));
                 }
             }
             catch (Exception ex)
             {
-                var IdAquivo = long.Parse(mensagemRabbit.Mensagem.ToString());
+                var idAquivo = long.Parse(mensagemRabbit.Mensagem.ToString());
                 servicoLog.Registrar($"Fila ImportarProficienciaAlunoUseCase Id: {mensagemRabbit.Mensagem.ToString()} --- Mensagem -- {mensagemRabbit}-- Erro ao processar o arquivo  {nomeArquivo} ", ex);
-                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(IdAquivo, StatusImportacao.Erro));
+                await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(idAquivo, StatusImportacao.Erro));
                 return false;
             }
             return true;

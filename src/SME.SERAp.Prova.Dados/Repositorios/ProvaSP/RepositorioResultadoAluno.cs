@@ -62,7 +62,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios
                              ( @Edicao  
                              , @AreaConhecimentoID
                              , @uad_sigla 
-                             , @esc_codigo
+                             , REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
                              , @AnoEscolar
                              , @tur_codigo
                              , @tur_id

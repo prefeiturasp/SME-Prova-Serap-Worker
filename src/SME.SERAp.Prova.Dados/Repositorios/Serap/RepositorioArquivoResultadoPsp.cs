@@ -1,4 +1,5 @@
 ﻿using SME.SERAp.Prova.Dados.Interfaces;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Dominio.Entidades;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
@@ -50,6 +51,31 @@ namespace SME.SERAp.Prova.Dados.Repositorios.Serap
                                         UpdateDate = getdate()
                                 WHERE Id = @Id";
                 await conn.ExecuteAsync(query, new { id, state });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task FinalizarProcessosPorTipo(TipoResultadoPsp tipoResultadoProcesso)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"UPDATE ArquivoResultadoPsp 
+                                    SET State = @state,
+                                        UpdateDate = getdate()
+                                WHERE CodigoTipoResultado = @tipoResultadoProcesso
+								and State = @statusFiltro";
+
+                await conn.ExecuteAsync(query, new
+                {
+                    tipoResultadoProcesso,
+                    state = StatusImportacao.Processado,
+                    statusFiltro = StatusImportacao.EmAndamento
+                });
             }
             finally
             {

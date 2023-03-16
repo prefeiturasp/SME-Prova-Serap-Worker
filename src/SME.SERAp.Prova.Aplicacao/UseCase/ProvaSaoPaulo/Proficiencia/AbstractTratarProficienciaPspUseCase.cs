@@ -64,6 +64,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var arquivoResultadoPspDto = await mediator.Send(new ObterTipoResultadoPspQuery(registroProficienciaPsp.ProcessoId));
                 if (arquivoResultadoPspDto.State != (long)StatusImportacao.Erro)
                     await AtualizaStatusDoProcesso(StatusImportacao.Processado);
+                await mediator.Send(new FinalizarProcessosPorTipoCommand(tipoResultadoProcesso));
             }
         }
 

@@ -16,6 +16,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioResultadoEscola repositorioResultadoEscola;
         private readonly IRepositorioResultadoTurma repositorioResultadoTurma;
         private readonly IRepositorioResultadoAluno repositorioResultadoAluno;
+        private readonly IRepositorioParticipacaoTurma repositorioParticipacaoTurma;
 
         private ObjResultadoPspDto ObjResultado;
 
@@ -47,6 +48,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await AlterarResultadoEscola();
                 case TipoResultadoPsp.ResultadoTurma:
                     return await AlterarResultadoTurma();
+                case TipoResultadoPsp.ResultadoParticipacaoTurma:
+                    return await AlterarParticipacaoTurma();
                 default:
                     return false;
             }
@@ -82,6 +85,13 @@ namespace SME.SERAp.Prova.Aplicacao
             var resultadoInserir = (ResultadoSme)ObjResultado.Resultado;
             var result = await repositorioResultadoSme.AlterarAsync(resultadoInserir);
             return result > 0;
-        }   
+        }
+
+        private async Task<bool> AlterarParticipacaoTurma()
+        {
+            var participacaoTurma = (ParticipacaoTurma)ObjResultado.Resultado;
+            var result = await repositorioParticipacaoTurma.AlterarAsync(participacaoTurma);
+            return result > 0;
+        }
     }
 }

@@ -264,6 +264,9 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoEscolaPsp, new ComandoRabbit("Tratar resgistros arquivo csv proficiencia escola", typeof(ITratarProficienciaEscolaUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoTurmaPsp, new ComandoRabbit("Importa dados arquivo csv proficiencia turma", typeof(IImportarProficienciaTurmaUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoTurmaPsp, new ComandoRabbit("Tratar resgistros arquivo csv proficiencia turma", typeof(ITratarProficienciaTurmaUseCase)));
+
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoTurma, new ComandoRabbit("Importa dados arquivo csv participação turma", typeof(IImportarResultadoParticipacaoTurmaUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoTurma, new ComandoRabbit("Tratar registros arquivo csv participação turma", typeof(ITratarResultadoParticipacaoTurmaUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

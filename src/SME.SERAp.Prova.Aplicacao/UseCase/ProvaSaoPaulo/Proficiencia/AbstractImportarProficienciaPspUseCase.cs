@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class AbstractImportarProficienciaPspUseCase
+    public class  AbstractImportarProficienciaPspUseCase
     {
 
         protected readonly IMediator mediator;

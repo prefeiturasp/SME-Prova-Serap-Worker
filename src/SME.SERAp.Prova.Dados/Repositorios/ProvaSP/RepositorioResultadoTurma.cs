@@ -33,7 +33,7 @@ namespace SME.SERAp.Prova.Dados
 								,PercentualAdequado
 								,PercentualAvancado
 								,PercentualAlfabetizado
-							from [dbo].[ResultadoTurma] with (nolock)
+							from [dbo].[ResultadoTurma] with (NOLOCK)
                             where Edicao = @edicao
                               and AreaConhecimentoID = @areaConhecimentoId
                               and tur_codigo = @tur_codigo

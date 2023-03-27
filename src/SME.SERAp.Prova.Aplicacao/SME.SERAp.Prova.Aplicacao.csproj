@@ -21,4 +21,8 @@
     <ProjectReference Include="..\SME.SERAp.Prova.Infra\SME.SERAp.Prova.Infra.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="UseCase\ProvaSaoPaulo\Proficiencia\Aluno\TratarProeficienciaAlunoTratarUseCase.cs" />
+  </ItemGroup>
+
 </Project>

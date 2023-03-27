@@ -1,11 +1,8 @@
 ﻿using CsvHelper.Configuration.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SME.SERAp.Prova.Infra.Dtos
+namespace SME.SERAp.Prova.Infra
 {
-    public class ArquivoProvaPspCVSDto
+    public class ResultadoAlunoDto
     {
 
         [Name("Edicao")]
@@ -30,7 +27,8 @@ namespace SME.SERAp.Prova.Infra.Dtos
         [Name("NivelProficienciaID")]
         public int NivelProficienciaID { get; set; }
         [Name("Valor")]
-        public string Valor { get; set; }
+        public string _valor { get; set; }
+        public decimal? Valor { get { return _valor.ConvertStringPraDecimalNullPsp(); } }
         [Name("REDQ1")]
         public string REDQ1 { get; set; }
         [Name("REDQ2")]

@@ -51,6 +51,12 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(new IncluirResultadoPspCommand(objResultadoInserir));
         }
 
+        public async Task Alterar(object resultado)
+        {
+            var objResultadoAlterar = new ObjResultadoPspDto(tipoResultadoProcesso, resultado);
+            await mediator.Send(new AlterarResultadoPspCommand(objResultadoAlterar));
+        }
+
         public async Task AtualizaStatusDoProcesso(StatusImportacao status)
         {
             await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProficienciaPsp.ProcessoId, status));

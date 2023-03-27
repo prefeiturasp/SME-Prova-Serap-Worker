@@ -2,7 +2,6 @@
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
-using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Dados.Interfaces;
@@ -24,9 +23,8 @@ namespace SME.SERAp.Prova.IoC
             RegistrarServicos(services);
             RegistrarCasosDeUso(services);
             RegistrarMapeamentos.Registrar();
-
-
         }
+
         private static void RegistrarRepositorios(IServiceCollection services)
         {
             services.AddScoped<IRepositorioProvaLegado, RepositorioProvaLegado>();
@@ -101,6 +99,7 @@ namespace SME.SERAp.Prova.IoC
         private static void RegistrarServicos(IServiceCollection services)
         {
             services.AddSingleton<IServicoLog, ServicoLog>();
+            services.AddSingleton<IServicoMensageria, ServicoMensageria>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
@@ -144,9 +143,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase>();
 
-            services.AddScoped<IRabbitDeadletterSerapSyncUseCase, RabbitDeadletterSerapSyncUseCase>();
-            services.AddScoped<IRabbitDeadletterSerapTratarUseCase, RabbitDeadletterSerapTratarUseCase>();
-
             //sincronizar adesão das provas 
             services.AddScoped<ITratarAdesaoProvaUseCase, TratarAdesaoProvaUseCase>();
             services.AddScoped<ITratarAdesaoProvaAlunoUseCase, TratarAdesaoProvaAlunoUseCase>();
@@ -189,9 +185,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarOrdemQuestaoAlunoProvaTaiUseCase, TratarOrdemQuestaoAlunoProvaTaiUseCase>();
             services.AddScoped<ITratarProficienciaAlunoProvaTaiUseCase, TratarProficienciaAlunoProvaTaiUseCase>();
 
-            services.AddScoped<IImportarProeficienciaAlunoUseCase, ImportarProficienciaAlunoUseCase>();
-
-            services.AddScoped<ITratarProeficienciaAlunoTratarUseCase, TratarProeficienciaAlunoTratarUseCase>();
+            services.AddScoped<IImportarProficienciaAlunoUseCase, ImportarProficienciaAlunoUseCase>();
+            services.AddScoped<ITratarProficienciaAlunoUseCase, TratarProficienciaAlunoUseCase>();
             services.AddScoped<IImportarProficienciaSmeUseCase, ImportarProficienciaSmeUseCase>();
             services.AddScoped<ITratarProficienciaSmeUseCase, TratarProficienciaSmeUseCase>();
             services.AddScoped<IImportarProficienciaDreUseCase, ImportarProficienciaDreUseCase>();

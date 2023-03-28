@@ -95,38 +95,42 @@ namespace SME.SERAp.Prova.Aplicacao
                         alunoQuePodeAlterar.TurmaCodigo = long.Parse(turmaAntigaDoAluno.Codigo);
                     }
 
-                    //TODO: Normalizar com uma entidade AlunoEol
-                    if (alunoAntigo != null && 
-                        alunoAntigo.DataAtualizacao < alunoQuePodeAlterar.DataSituacao && 
-                        (alunoAntigo.Nome != alunoQuePodeAlterar.Nome ||
-                        alunoAntigo.Situacao != alunoQuePodeAlterar.SituacaoAluno ||
-                        long.Parse(turmaAntigaDoAluno.Codigo) != alunoQuePodeAlterar.TurmaCodigo ||
-                        alunoAntigo.DataNascimento.Date != alunoQuePodeAlterar.DataNascimento.Date ||
-                        alunoAntigo.NomeSocial != alunoQuePodeAlterar.NomeSocial ||
-                        alunoAntigo.Sexo != alunoQuePodeAlterar.Sexo))
+                    //-> Atualiza somente se for a ultima situação do aluno do ano letivo mais atual.
+                    if (alunoAntigo != null &&
+                        ((turmaFix.AnoLetivo < turma.AnoLetivo) ||
+                         (turmaFix.AnoLetivo == turma.AnoLetivo && alunoAntigo.DataAtualizacao <= alunoQuePodeAlterar.DataSituacao)
+                        )
+                       )
                     {
 
-                        var turmaId = alunoAntigo.TurmaId;
-                        if (long.Parse(turmaAntigaDoAluno.Codigo) != alunoQuePodeAlterar.TurmaCodigo)
+                        //-> Valida se existe alguma informação a ser alterada.
+                        if (alunoAntigo.Nome != alunoQuePodeAlterar.Nome ||
+                            alunoAntigo.Situacao != alunoQuePodeAlterar.SituacaoAluno ||
+                            alunoAntigo.DataNascimento.Date != alunoQuePodeAlterar.DataNascimento.Date ||
+                            alunoAntigo.NomeSocial != alunoQuePodeAlterar.NomeSocial ||
+                            alunoAntigo.Sexo != alunoQuePodeAlterar.Sexo ||
+                            turmaAntigaDoAluno.Codigo != alunoQuePodeAlterar.TurmaCodigo.ToString())
                         {
-                            var turmaCodigoParaBuscar = alunoQuePodeAlterar.TurmaCodigo.ToString();
-                            turmaId = turma.Id;
+                            var turmaId = alunoAntigo.TurmaId;
+                            if (turmaAntigaDoAluno.Codigo != alunoQuePodeAlterar.TurmaCodigo.ToString())
+                            {
+                                turmaId = turma.Id;
+                                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, new long[] { alunoQuePodeAlterar.CodigoAluno }));
+                            }
 
-                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, new long[] { alunoQuePodeAlterar.CodigoAluno }));
+                            listaParaAlterar.Add(new Aluno()
+                            {
+                                Id = alunoAntigo.Id,
+                                Nome = alunoQuePodeAlterar.Nome,
+                                RA = alunoQuePodeAlterar.CodigoAluno,
+                                Situacao = alunoQuePodeAlterar.SituacaoAluno,
+                                NomeSocial = alunoQuePodeAlterar.NomeSocial,
+                                Sexo = alunoQuePodeAlterar.Sexo,
+                                DataAtualizacao = alunoQuePodeAlterar.DataSituacao,
+                                DataNascimento = alunoQuePodeAlterar.DataNascimento,
+                                TurmaId = turmaId
+                            });
                         }
-
-                        listaParaAlterar.Add(new Aluno()
-                        {
-                            Id = alunoAntigo.Id,
-                            Nome = alunoQuePodeAlterar.Nome,
-                            RA = alunoQuePodeAlterar.CodigoAluno,
-                            Situacao = alunoQuePodeAlterar.SituacaoAluno,
-                            NomeSocial = alunoQuePodeAlterar.NomeSocial,
-                            Sexo = alunoQuePodeAlterar.Sexo,
-                            DataAtualizacao = alunoQuePodeAlterar.DataSituacao,
-                            DataNascimento = alunoQuePodeAlterar.DataNascimento,
-                            TurmaId = turmaId
-                        });
                     }
                 }
 

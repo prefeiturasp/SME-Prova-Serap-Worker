@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class IncluirResultadoPspCommandHandler : IRequestHandler<IncluirResultadoPspCommand, bool>
+    public class AlterarResultadoPspCommandHandler : IRequestHandler<AlterarResultadoPspCommand, bool>
     {
+
         private readonly IRepositorioResultadoSme repositorioResultadoSme;
         private readonly IRepositorioResultadoDre repositorioResultadoDre;
         private readonly IRepositorioResultadoEscola repositorioResultadoEscola;
@@ -18,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private ObjResultadoPspDto ObjResultado;
 
-        public IncluirResultadoPspCommandHandler(IRepositorioResultadoSme repositorioResultadoSme,
+        public AlterarResultadoPspCommandHandler(IRepositorioResultadoSme repositorioResultadoSme,
                                                  IRepositorioResultadoDre repositorioResultadoDre,
                                                  IRepositorioResultadoEscola repositorioResultadoEscola,
                                                  IRepositorioResultadoTurma repositorioResultadoTurma,
@@ -31,59 +32,56 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioResultadoAluno = repositorioResultadoAluno ?? throw new System.ArgumentNullException(nameof(repositorioResultadoAluno));
         }
 
-        public async Task<bool> Handle(IncluirResultadoPspCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(AlterarResultadoPspCommand request, CancellationToken cancellationToken)
         {
             ObjResultado = request.Resultado;
             switch (request.Resultado.TipoResultado)
             {
                 case TipoResultadoPsp.ResultadoAluno:
-                    return await IncluirResultadoAluno();
+                    return await AlterarResultadoAluno();
                 case TipoResultadoPsp.ResultadoSme:
-                    return await IncluirResultadoSME();
+                    return await AlterarResultadoSME();
                 case TipoResultadoPsp.ResultadoDre:
-                    return await IncluirResultadoDre();
+                    return await AlterarResultadoDre();
                 case TipoResultadoPsp.ResultadoEscola:
-                    return await IncluirResultadoEscola();
+                    return await AlterarResultadoEscola();
                 case TipoResultadoPsp.ResultadoTurma:
-                    return await IncluirResultadoTurma();
+                    return await AlterarResultadoTurma();
                 default:
                     return false;
             }
         }
 
-        private async Task<bool> IncluirResultadoAluno()
+        private async Task<bool> AlterarResultadoAluno()
         {
             var resultadoInserir = (ResultadoAluno)ObjResultado.Resultado;
-            var result = await repositorioResultadoAluno.IncluirAsync(resultadoInserir);
+            var result = await repositorioResultadoAluno.AlterarAsync(resultadoInserir);
             return result > 0;
         }
-
-        private async Task<bool> IncluirResultadoSME()
-        {
-            var resultadoInserir = (ResultadoSme)ObjResultado.Resultado;
-            var result = await repositorioResultadoSme.IncluirAsync(resultadoInserir);
-            return result > 0;
-        }
-
-        private async Task<bool> IncluirResultadoDre()
-        {
-            var resultadoInserir = (ResultadoDre)ObjResultado.Resultado;
-            var result = await repositorioResultadoDre.IncluirAsync(resultadoInserir);
-            return result > 0;
-        }
-
-        private async Task<bool> IncluirResultadoEscola()
-        {
-            var resultadoInserir = (ResultadoEscola)ObjResultado.Resultado;
-            var result = await repositorioResultadoEscola.IncluirAsync(resultadoInserir);
-            return result > 0;
-        }
-
-        private async Task<bool> IncluirResultadoTurma()
+        private async Task<bool> AlterarResultadoTurma()
         {
             var resultadoInserir = (ResultadoTurma)ObjResultado.Resultado;
-            var result = await repositorioResultadoTurma.IncluirAsync(resultadoInserir);
+            var result = await repositorioResultadoTurma.AlterarAsync(resultadoInserir);
             return result > 0;
         }
+        private async Task<bool> AlterarResultadoEscola()
+        {
+            var resultadoInserir = (ResultadoEscola)ObjResultado.Resultado;
+            var result = await repositorioResultadoEscola.AlterarAsync(resultadoInserir);
+            return result > 0;
+        }
+        private async Task<bool> AlterarResultadoDre()
+        {
+            var resultadoInserir = (ResultadoDre)ObjResultado.Resultado;
+            var result = await repositorioResultadoDre.AlterarAsync(resultadoInserir);
+            return result > 0;
+        }
+
+        private async Task<bool> AlterarResultadoSME()
+        {
+            var resultadoInserir = (ResultadoSme)ObjResultado.Resultado;
+            var result = await repositorioResultadoSme.AlterarAsync(resultadoInserir);
+            return result > 0;
+        }   
     }
 }

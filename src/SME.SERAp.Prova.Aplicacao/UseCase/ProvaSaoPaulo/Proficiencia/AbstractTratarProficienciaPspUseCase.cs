@@ -51,6 +51,12 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(new IncluirResultadoPspCommand(objResultadoInserir));
         }
 
+        public async Task Alterar(object resultado)
+        {
+            var objResultadoAlterar = new ObjResultadoPspDto(tipoResultadoProcesso, resultado);
+            await mediator.Send(new AlterarResultadoPspCommand(objResultadoAlterar));
+        }
+
         public async Task AtualizaStatusDoProcesso(StatusImportacao status)
         {
             await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(registroProficienciaPsp.ProcessoId, status));
@@ -64,6 +70,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var arquivoResultadoPspDto = await mediator.Send(new ObterTipoResultadoPspQuery(registroProficienciaPsp.ProcessoId));
                 if (arquivoResultadoPspDto.State != (long)StatusImportacao.Erro)
                     await AtualizaStatusDoProcesso(StatusImportacao.Processado);
+                await mediator.Send(new FinalizarProcessosPorTipoCommand(tipoResultadoProcesso));
             }
         }
 

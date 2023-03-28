@@ -32,5 +32,23 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<bool> RemoverPorProvaIdAsync(long id)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"delete from questao_tri qt where exists(select 1 from questao q where q.id = qt.questao_id and q.prova_id = @id limit 1);";
+
+                await conn.ExecuteAsync(query, new { id });
+
+                return true;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

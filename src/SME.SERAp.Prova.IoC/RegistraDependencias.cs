@@ -2,7 +2,6 @@
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
-using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Proeficiencia;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Dados.Interfaces;
@@ -189,9 +188,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarOrdemQuestaoAlunoProvaTaiUseCase, TratarOrdemQuestaoAlunoProvaTaiUseCase>();
             services.AddScoped<ITratarProficienciaAlunoProvaTaiUseCase, TratarProficienciaAlunoProvaTaiUseCase>();
 
-            services.AddScoped<IImportarProeficienciaAlunoUseCase, ImportarProficienciaAlunoUseCase>();
-
-            services.AddScoped<ITratarProeficienciaAlunoTratarUseCase, TratarProeficienciaAlunoTratarUseCase>();
+            services.AddScoped<IImportarProficienciaAlunoUseCase, ImportarProficienciaAlunoUseCase>();
+            services.AddScoped<ITratarProficienciaAlunoUseCase, TratarProficienciaAlunoUseCase>();
             services.AddScoped<IImportarProficienciaSmeUseCase, ImportarProficienciaSmeUseCase>();
             services.AddScoped<ITratarProficienciaSmeUseCase, TratarProficienciaSmeUseCase>();
             services.AddScoped<IImportarProficienciaDreUseCase, ImportarProficienciaDreUseCase>();

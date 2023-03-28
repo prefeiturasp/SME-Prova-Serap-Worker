@@ -7,6 +7,6 @@ namespace SME.SERAp.Prova.Infra.Dtos
     public class RegistroProvaPspCVSDto
     {
         public long IdArquivo { get; set; }
-        public ArquivoProvaPspCVSDto ArquivoProvaPspCVSDto { get; set; }
+        public ResultadoAlunoDto ArquivoProvaPspCVSDto { get; set; }
     }
 }

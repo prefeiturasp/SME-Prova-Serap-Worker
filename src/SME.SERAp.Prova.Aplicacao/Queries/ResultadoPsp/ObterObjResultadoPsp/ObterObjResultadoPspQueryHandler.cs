@@ -14,18 +14,21 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioResultadoDre repositorioResultadoDre;
         private readonly IRepositorioResultadoEscola repositorioResultadoEscola;
         private readonly IRepositorioResultadoTurma repositorioResultadoTurma;
+        private readonly IRepositorioResultadoAluno repositorioResultadoAluno;
 
         private ObjResultadoPspDto ObjResultado;
 
         public ObterObjResultadoPspQueryHandler(IRepositorioResultadoSme repositorioResultadoSme,
                                                 IRepositorioResultadoDre repositorioResultadoDre,
                                                 IRepositorioResultadoEscola repositorioResultadoEscola,
-                                                IRepositorioResultadoTurma repositorioResultadoTurma)
+                                                IRepositorioResultadoTurma repositorioResultadoTurma,
+                                                IRepositorioResultadoAluno repositorioResultadoAluno)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
             this.repositorioResultadoEscola = repositorioResultadoEscola ?? throw new System.ArgumentNullException(nameof(repositorioResultadoEscola));
             this.repositorioResultadoTurma = repositorioResultadoTurma ?? throw new System.ArgumentNullException(nameof(repositorioResultadoTurma));
+            this.repositorioResultadoAluno = repositorioResultadoAluno ?? throw new System.ArgumentNullException(nameof(repositorioResultadoAluno));
         }
 
         public async Task<ObjResultadoPspDto> Handle(ObterObjResultadoPspQuery request, CancellationToken cancellationToken)
@@ -40,6 +43,8 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             switch (ObjResultado.TipoResultado)
             {
+                case TipoResultadoPsp.ResultadoAluno:
+                    return await ObterResultadoAluno();
                 case TipoResultadoPsp.ResultadoSme:
                     return await ObterResultadoSME();
                 case TipoResultadoPsp.ResultadoDre:
@@ -53,28 +58,31 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task<ResultadoSme> ObterResultadoSME()
+        private async Task<ResultadoAluno> ObterResultadoAluno()
         {
-            var resultadoBusca = (ResultadoSmeDto)ObjResultado.Resultado;
-            return await repositorioResultadoSme.ObterResultadoSme(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.AnoEscolar);
+            var resultadoBusca = (ResultadoAlunoDto)ObjResultado.Resultado;
+            return await repositorioResultadoAluno.ObterProficienciaAluno(resultadoBusca.Edicao, resultadoBusca.alu_matricula, resultadoBusca.AreaConhecimentoID);
         }
-
+        private async Task<ResultadoTurma> ObterResultadoTurma()
+        {
+            var resultadoBusca = (ResultadoTurmaDto)ObjResultado.Resultado;
+            return await repositorioResultadoTurma.ObterResultadoTurma(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.EscCodigo, resultadoBusca.TurCodigo);
+        }
+        private async Task<ResultadoEscola> ObterResultadoEscola()
+        {
+            var resultadoBusca = (ResultadoEscolaDto)ObjResultado.Resultado;
+            return await repositorioResultadoEscola.ObterResultadoEscola(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.EscCodigo, resultadoBusca.AnoEscolar);
+        }
         private async Task<ResultadoDre> ObterResultadoDre()
         {
             var resultadoBusca = (ResultadoDreDto)ObjResultado.Resultado;
             return await repositorioResultadoDre.ObterResultadoDre(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.UadSigla, resultadoBusca.AnoEscolar);
         }
 
-        private async Task<ResultadoEscola> ObterResultadoEscola()
+        private async Task<ResultadoSme> ObterResultadoSME()
         {
-            var resultadoBusca = (ResultadoEscolaDto)ObjResultado.Resultado;
-            return await repositorioResultadoEscola.ObterResultadoEscola(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.EscCodigo, resultadoBusca.AnoEscolar);
-        }
-
-        private async Task<ResultadoTurma> ObterResultadoTurma()
-        {
-            var resultadoBusca = (ResultadoTurmaDto)ObjResultado.Resultado;
-            return await repositorioResultadoTurma.ObterResultadoTurma(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.EscCodigo, resultadoBusca.TurCodigo);
-        }
+            var resultadoBusca = (ResultadoSmeDto)ObjResultado.Resultado;
+            return await repositorioResultadoSme.ObterResultadoSme(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.AnoEscolar);
+        }   
     }
 }

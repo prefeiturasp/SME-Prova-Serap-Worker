@@ -7,5 +7,6 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<ResultadoTurma> ObterResultadoTurma(string edicao, long areaConhecimentoId, string esc_codigo, string tur_codigo);
         Task<long> IncluirAsync(ResultadoTurma resultado);
+        Task<long> AlterarAsync(ResultadoTurma resultado);
     }
 }

@@ -30,7 +30,7 @@ namespace SME.SERAp.Prova.Dados
                                   ,[TotalPrevisto]
                                   ,[TotalPresente]
                                   ,[PercentualParticipacao]
-                              FROM [ProvaSP].[dbo].[ParticipacaoTurmaAreaConhecimento]
+                              FROM [ProvaSP].[dbo].[ParticipacaoTurmaAreaConhecimento] WITH (NOLOCK)
                             where Edicao = @edicao
                               and uad_sigla = @uad_sigla     
                               and esc_codigo = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)

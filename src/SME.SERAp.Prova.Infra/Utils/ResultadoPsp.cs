@@ -69,6 +69,9 @@ namespace SME.SERAp.Prova.Infra
                     return RotasRabbit.TratarResultadoTurmaPsp;
                 case TipoResultadoPsp.ResultadoParticipacaoTurma:
                     return RotasRabbit.TratarResultadoParticipacaoTurma;
+                case TipoResultadoPsp.ParticipacaoTurmaAreaConhecimento:
+                    return RotasRabbit.TratarParticipacaoTurmaAreaConhecimento;
+
                 default:
                     return string.Empty;
             }

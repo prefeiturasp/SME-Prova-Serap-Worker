@@ -10,9 +10,9 @@ using RabbitMQ.Client;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TratarResultadoParticipacaoTurmaUseCase : AbstractTratarProficienciaPspUseCase, ITratarResultadoParticipacaoTurmaUseCase
+    public class TratarParticipacaoTurmaAreaConhecimentoUseCase : AbstractTratarProficienciaPspUseCase, ITratarParticipacaoTurmaAreaConhecimentoUseCase
     {
-        public TratarResultadoParticipacaoTurmaUseCase(IMediator mediator,
+        public TratarParticipacaoTurmaAreaConhecimentoUseCase(IMediator mediator,
                                             IServicoLog servicoLog,
                                             IModel model) : base(mediator, servicoLog, model) { }
 
@@ -20,8 +20,8 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var registroProficienciaPsp = mensagemRabbit.ObterObjetoMensagem<RegistroProficienciaPspCsvDto>();
             PopularRegistroProficienciaPsp(registroProficienciaPsp);
-            var objResultadoCsv = registroProficienciaPsp.ObterObjetoRegistro<ParticipacaoTurmaDto>();
-            PopularTipoResultadoProcesso(TipoResultadoPsp.ResultadoParticipacaoTurma);
+            var objResultadoCsv = registroProficienciaPsp.ObterObjetoRegistro<ParticipacaoTurmaAreaConhecimentoDto>();
+            PopularTipoResultadoProcesso(TipoResultadoPsp.ParticipacaoTurmaAreaConhecimento);
 
             try
             {
@@ -44,20 +44,22 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
         }
-        private ParticipacaoTurma MapearParaEntidade(ParticipacaoTurmaDto objResultadoCsv)
+        private ParticipacaoTurmaAreaConhecimento MapearParaEntidade(ParticipacaoTurmaAreaConhecimentoDto objResultadoCsv)
         {
-            return new ParticipacaoTurma()
+            return new ParticipacaoTurmaAreaConhecimento()
             {
                 Edicao = objResultadoCsv.Edicao,
+                AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
                 EscCodigo = objResultadoCsv.esc_codigo,
                 UadSigla = objResultadoCsv.uad_sigla,
-                 TurId = objResultadoCsv.tur_id,
+                TurId = objResultadoCsv.tur_id,
                 AnoEscolar = objResultadoCsv.AnoEscolar,
                 TurCodigo = objResultadoCsv.tur_codigo,
                 PercentualParticipacao = objResultadoCsv.PercentualParticipacao,
-                TotalPresente= objResultadoCsv.TotalPresente,
-                 TotalPrevisto = objResultadoCsv.TotalPrevisto
+                TotalPresente = objResultadoCsv.TotalPresente,
+                TotalPrevisto = objResultadoCsv.TotalPrevisto
             };
         }
     }
 }
+

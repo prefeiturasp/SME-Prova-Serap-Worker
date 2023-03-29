@@ -11,16 +11,17 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
 {
-    public class RepositorioParticipacaoTurma : RepositorioProvaSpBase, IRepositorioParticipacaoTurma
+    public class RepositorioParticipacaoTurmaAreaConhecimento : RepositorioProvaSpBase, IRepositorioParticipacaoTurmaAreaConhecimento
     {
-        public RepositorioParticipacaoTurma(ConnectionStringOptions connectionStringOptions) : base(connectionStringOptions)
+        public RepositorioParticipacaoTurmaAreaConhecimento(ConnectionStringOptions connectionStringOptions) : base(connectionStringOptions)
         {
 
         }
 
-        public async Task<ParticipacaoTurma> ObterParticipacaoTurma(string edicao, string uad_sigla, string esc_codigo, string anoEscolar, string tur_codigo)
+        public async Task<ParticipacaoTurmaAreaConhecimento> ObterParticipacaoTurmaAreaConhecimento(string edicao, string uad_sigla, int areaConhecimentoId, string esc_codigo, string anoEscolar, string tur_codigo)
         {
             var query = $@"SELECT  [Edicao]
+                                  ,[AreaConhecimentoID]
                                   ,[uad_sigla]
                                   ,[esc_codigo]
                                   ,[AnoEscolar]
@@ -29,24 +30,26 @@ namespace SME.SERAp.Prova.Dados
                                   ,[TotalPrevisto]
                                   ,[TotalPresente]
                                   ,[PercentualParticipacao]
-                              FROM [ProvaSP].[dbo].[ParticipacaoTurma]
+                              FROM [ProvaSP].[dbo].[ParticipacaoTurmaAreaConhecimento]
                             where Edicao = @edicao
                               and uad_sigla = @uad_sigla     
                               and esc_codigo = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
 						      and AnoEscolar = @anoEscolar
                               and tur_codigo = @tur_codigo
+                              and AreaConhecimentoID = @areaConhecimentoId
                              order by Edicao desc";
 
             using var conn = ObterConexaoProvaSp();
-            return await conn.QueryFirstOrDefaultAsync<ParticipacaoTurma>(query, new { edicao, uad_sigla, esc_codigo, anoEscolar, tur_codigo });
+            return await conn.QueryFirstOrDefaultAsync<ParticipacaoTurmaAreaConhecimento>(query, new { edicao, areaConhecimentoId, uad_sigla, esc_codigo, anoEscolar, tur_codigo });
         }
-        public async Task<long> IncluirAsync(ParticipacaoTurma participacao)
+        public async Task<long> IncluirAsync(ParticipacaoTurmaAreaConhecimento participacao)
         {
             using var conn = ObterConexaoProvaSp();
             try
             {
-                var query = $@"INSERT INTO [dbo].[ParticipacaoTurma]
+                var query = $@"INSERT INTO [dbo].[ParticipacaoTurmaAreaConhecimento]
                                                   ([Edicao]
+                                                  ,[AreaConhecimentoID]
                                                   ,[uad_sigla]
                                                   ,[esc_codigo]
                                                   ,[AnoEscolar]
@@ -57,6 +60,7 @@ namespace SME.SERAp.Prova.Dados
                                                   ,[PercentualParticipacao])
 				                    			VALUES
 				                    				(@Edicao
+                                                    ,@AreaConhecimentoID
 				                    				,@uad_sigla
                                                     ,REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
 				                    				,@AnoEscolar
@@ -81,28 +85,30 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-        public async Task<long> AlterarAsync(ParticipacaoTurma participacao)
+        public async Task<long> AlterarAsync(ParticipacaoTurmaAreaConhecimento participacao)
         {
             using var conn = ObterConexaoProvaSp();
             try
             {
-                var query = @" UPDATE [dbo].[ParticipacaoTurma]
-                                 SET [uad_sigla] =  @uad_sigla
-                                    ,[esc_codigo] = @esc_codigo
-                                    ,[AnoEscolar] = @AnoEscolar
-                                    ,[tur_codigo] = @tur_codigo
-                                    ,[tur_id] =  @tur_id 
-                                    ,[TotalPrevisto] = @TotalPrevisto
-                                    ,[TotalPresente] = @TotalPresente
-                                    ,[PercentualParticipacao] = @PercentualParticipacao
-                               WHERE
-                              Edicao = @Edicao
-                               and uad_sigla = @uad_sigla
-                               and esc_codigo = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
-                               and anoEscolar = @AnoEscolar
-                               and tur_codigo = @tur_codigo";
+                var query = $@"
+                                UPDATE [dbo].[ParticipacaoTurmaAreaConhecimento]
+                                   SET [AreaConhecimentoID] =  @AreaConhecimentoID
+                                      ,[uad_sigla] =  @uad_sigla
+                                      ,[esc_codigo] = @esc_codigo
+                                      ,[AnoEscolar] = @AnoEscolar
+                                      ,[tur_codigo] = @tur_codigo
+                                      ,[tur_id] =  @tur_id 
+                                      ,[TotalPrevisto] = @TotalPrevisto
+                                      ,[TotalPresente] = @TotalPresente
+                                      ,[PercentualParticipacao] = @PercentualParticipacao
+                                 WHERE
+								 Edicao = @Edicao
+                                 and AreaConhecimentoID = @AreaConhecimentoID
+                                 and uad_sigla = @uad_sigla
+                                 and esc_codigo = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
+                                 and anoEscolar = @AnoEscolar
+                                 and tur_codigo = @tur_codigo";
 
-                
                 var parametros = ObterParametros(participacao);
                 return await conn.ExecuteAsync(query, parametros);
 
@@ -118,19 +124,19 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-        private DynamicParameters ObterParametros(ParticipacaoTurma participacao)
+        private DynamicParameters ObterParametros(ParticipacaoTurmaAreaConhecimento participacao)
         {
             var parametros = new DynamicParameters();
             parametros.Add("@Edicao", participacao.Edicao, DbType.String, ParameterDirection.Input, 10);
-            parametros.Add("@uad_sigla", participacao.UadSigla, DbType.String, ParameterDirection.Input,4);
+            parametros.Add("@AreaConhecimentoID", participacao.AreaConhecimentoID, DbType.Int32, ParameterDirection.Input,3);
+            parametros.Add("@uad_sigla", participacao.UadSigla, DbType.String, ParameterDirection.Input, 4);
             parametros.Add("@esc_codigo", participacao.EscCodigo, DbType.String, ParameterDirection.Input, 20);
             parametros.Add("@AnoEscolar", participacao.AnoEscolar, DbType.String, ParameterDirection.Input, 3);
             parametros.Add("@tur_codigo", participacao.TurCodigo, DbType.String, ParameterDirection.Input, 20);
-            parametros.Add("@tur_id", participacao.TurId, DbType.Int64, ParameterDirection.Input, null);;
-            parametros.Add("@TotalPrevisto", participacao.TotalPrevisto, DbType.Int32, ParameterDirection.Input ,null);
+            parametros.Add("@tur_id", participacao.TurId, DbType.Int64, ParameterDirection.Input, null); ;
+            parametros.Add("@TotalPrevisto", participacao.TotalPrevisto, DbType.Int32, ParameterDirection.Input, null);
             parametros.Add("@TotalPresente", participacao.TotalPresente, DbType.Int32, ParameterDirection.Input, null);
-            parametros.Add("@PercentualParticipacao", participacao.PercentualParticipacao, DbType.Decimal, ParameterDirection.Input, null, 6, 2); ;
-       
+            parametros.Add("@PercentualParticipacao", participacao.PercentualParticipacao, DbType.Decimal, ParameterDirection.Input, null, 6, 2); 
             return parametros;
         }
     }

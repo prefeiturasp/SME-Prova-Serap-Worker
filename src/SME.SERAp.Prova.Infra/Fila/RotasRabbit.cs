@@ -82,11 +82,11 @@
         public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";
 
 
-        public const string ImportarProeficienciaCsvProvaSp= "serap.provaSp.importarCsv.proeficiencia";
+        public const string ImportarProeficienciaCsvProvaSp = "serap.provaSp.importarCsv.proeficiencia";
         public const string TratarProeficienciaCsvProvaSp = "serap.provaSp.importarCsv.proeficiencia.tratar";
 
-      
-        public const string ImportarResultadoAlunoPsp  = "serap.resultados.psp.resultado.aluno";
+
+        public const string ImportarResultadoAlunoPsp = "serap.resultados.psp.resultado.aluno";
         public const string TratarResultadoAlunoPsp = "serap.resultados.psp.resultado.aluno.tratar";
         public const string ImportarResultadoSmePsp = "serap.resultados.psp.resultado.sme";
         public const string TratarResultadoSmePsp = "serap.resultados.psp.resultado.sme.tratar";
@@ -96,6 +96,9 @@
         public const string TratarResultadoEscolaPsp = "serap.resultados.psp.resultado.escola.tratar";
         public const string ImportarResultadoTurmaPsp = "serap.resultados.psp.resultado.turma";
         public const string TratarResultadoTurmaPsp = "serap.resultados.psp.resultado.turma.tratar";
+
+        public const string ImportarResultadoParticipacaoTurma = "serap.resultados.psp.participacao.turma";
+        public const string TratarResultadoParticipacaoTurma = "serap.resultados.psp.participacao.turma.tratar";
 
     }
 }

@@ -15,6 +15,8 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioResultadoEscola repositorioResultadoEscola;
         private readonly IRepositorioResultadoTurma repositorioResultadoTurma;
         private readonly IRepositorioResultadoAluno repositorioResultadoAluno;
+        private readonly IRepositorioParticipacaoTurma repositorioParticipacaoTurma;
+
 
         private ObjResultadoPspDto ObjResultado;
 
@@ -22,13 +24,15 @@ namespace SME.SERAp.Prova.Aplicacao
                                                  IRepositorioResultadoDre repositorioResultadoDre,
                                                  IRepositorioResultadoEscola repositorioResultadoEscola,
                                                  IRepositorioResultadoTurma repositorioResultadoTurma,
-                                                 IRepositorioResultadoAluno repositorioResultadoAluno)
+                                                 IRepositorioResultadoAluno repositorioResultadoAluno,
+                                                 IRepositorioParticipacaoTurma repositorioParticipacaoTurma)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
             this.repositorioResultadoEscola = repositorioResultadoEscola ?? throw new System.ArgumentNullException(nameof(repositorioResultadoEscola));
             this.repositorioResultadoTurma = repositorioResultadoTurma ?? throw new System.ArgumentNullException(nameof(repositorioResultadoTurma));
             this.repositorioResultadoAluno = repositorioResultadoAluno ?? throw new System.ArgumentNullException(nameof(repositorioResultadoAluno));
+            this.repositorioParticipacaoTurma = repositorioParticipacaoTurma ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoTurma));
         }
 
         public async Task<bool> Handle(IncluirResultadoPspCommand request, CancellationToken cancellationToken)
@@ -46,9 +50,18 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await IncluirResultadoEscola();
                 case TipoResultadoPsp.ResultadoTurma:
                     return await IncluirResultadoTurma();
+                case TipoResultadoPsp.ResultadoParticipacaoTurma:
+                    return await IncluirParticipacaoTurma();
                 default:
                     return false;
             }
+        }
+
+        private async Task<bool> IncluirParticipacaoTurma()
+        {
+            var participacaoInserir = (ParticipacaoTurma)ObjResultado.Resultado;
+            var result = await repositorioParticipacaoTurma.IncluirAsync(participacaoInserir);
+            return result > 0;
         }
 
         private async Task<bool> IncluirResultadoAluno()

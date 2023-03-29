@@ -15,7 +15,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioResultadoEscola repositorioResultadoEscola;
         private readonly IRepositorioResultadoTurma repositorioResultadoTurma;
         private readonly IRepositorioResultadoAluno repositorioResultadoAluno;
-
+        private readonly IRepositorioParticipacaoTurma repositorioParticipacaoTurma;
         private ObjResultadoPspDto ObjResultado;
 
         public ObterObjResultadoPspQueryHandler(IRepositorioResultadoSme repositorioResultadoSme,
@@ -53,9 +53,17 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await ObterResultadoEscola();
                 case TipoResultadoPsp.ResultadoTurma:
                     return await ObterResultadoTurma();
-                default:
+                case TipoResultadoPsp.ResultadoParticipacaoTurma:
+                    return await ObterParticipacaoTurma();
+                default: 
                     return null;
             }
+        }
+
+        private async Task<ParticipacaoTurma> ObterParticipacaoTurma()
+        {
+            var participacaoTurma = (ParticipacaoTurmaDto)ObjResultado.Resultado;
+            return await repositorioParticipacaoTurma.ObterParticipacaoTurma(participacaoTurma.Edicao, participacaoTurma.uad_sigla, participacaoTurma.esc_codigo, participacaoTurma.AnoEscolar,  participacaoTurma.tur_codigo);
         }
 
         private async Task<ResultadoAluno> ObterResultadoAluno()

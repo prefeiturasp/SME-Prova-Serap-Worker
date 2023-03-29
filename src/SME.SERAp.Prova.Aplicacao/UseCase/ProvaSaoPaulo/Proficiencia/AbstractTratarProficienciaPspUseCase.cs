@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class AbstractTratarProficienciaPspUseCase
+    public abstract  class AbstractTratarProficienciaPspUseCase
     {
 
         protected readonly IMediator mediator;

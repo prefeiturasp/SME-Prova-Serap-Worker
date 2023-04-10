@@ -96,6 +96,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoTurma, RepositorioResultadoTurma>();
             services.AddScoped<IRepositorioParticipacaoTurma, RepositorioParticipacaoTurma>();
             services.AddScoped<IRepositorioParticipacaoTurmaAreaConhecimento, RepositorioParticipacaoTurmaAreaConhecimento>();
+            services.AddScoped<IRepositorioParticipacaoUe, RepositorioParticipacaoUe>();
+            services.AddScoped<IRepositorioParticipacaoUeAreaConhecimento, RepositorioParticipacaoUeAreaConhecimento>();
 
         }
 
@@ -202,6 +204,10 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarResultadoParticipacaoTurmaUseCase, TratarResultadoParticipacaoTurmaUseCase>();
             services.AddScoped<IImportarParticipacaoTurmaAreaConhecimentoUseCase, ImportarParticipacaoTurmaAreaConhecimentoUseCase>();
             services.AddScoped<ITratarParticipacaoTurmaAreaConhecimentoUseCase, TratarParticipacaoTurmaAreaConhecimentoUseCase>();
+            services.AddScoped<IImportarResultadoParticipacaoUeUseCase, ImportarResultadoParticipacaoUeUseCase>();
+            services.AddScoped<ITratarResultadoParticipacaoUeUseCase, TratarResultadoParticipacaoUeUseCase>();
+            services.AddScoped<IImportarParticipacaoUeAreaConhecimentoUseCase, ImportarParticipacaoUeAreaConhecimentoUseCase>();
+            services.AddScoped<ITratarParticipacaoUeAreaConhecimentoUseCase, TratarParticipacaoUeAreaConhecimentoUseCase>();
         }
     }
 }

@@ -270,6 +270,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.ImportarParticipacaoTurmaAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação turma e area conhecimento", typeof(IImportarParticipacaoTurmaAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.TratarParticipacaoTurmaAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação turma e area conhecimento", typeof(ITratarParticipacaoTurmaAreaConhecimentoUseCase)));
 
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoUe, new ComandoRabbit("Importa dados arquivo csv participação Ue", typeof(IImportarResultadoParticipacaoUeUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoUe, new ComandoRabbit("Tratar registros arquivo csv participação Ue", typeof(ITratarResultadoParticipacaoUeUseCase)));
+            comandos.Add(RotasRabbit.ImportarParticipacaoUeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Ue e area conhecimento", typeof(IImportarParticipacaoUeAreaConhecimentoUseCase)));
+            comandos.Add(RotasRabbit.TratarParticipacaoUeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Ue e area conhecimento", typeof(ITratarParticipacaoUeAreaConhecimentoUseCase)));
+
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

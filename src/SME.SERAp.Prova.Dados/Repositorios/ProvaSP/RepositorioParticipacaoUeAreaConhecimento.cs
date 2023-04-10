@@ -47,9 +47,7 @@ namespace SME.SERAp.Prova.Dados
                                                   ,[AreaConhecimentoID]
                                                   ,[uad_sigla]
                                                   ,[esc_codigo]
-                                                  ,[AnoEscolar]
-                                                  ,[tur_codigo]
-                                                  ,[tur_id]
+                                                  ,[AnoEscolar]                                                  
                                                   ,[TotalPrevisto]
                                                   ,[TotalPresente]
                                                   ,[PercentualParticipacao])
@@ -58,9 +56,7 @@ namespace SME.SERAp.Prova.Dados
                                                     ,@AreaConhecimentoID
 				                    				,@uad_sigla
                                                     ,REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
-				                    				,@AnoEscolar
-                                                    ,@tur_codigo
-                                                    ,@tur_id
+				                    				,@AnoEscolar                                                    
 				                    				,@TotalPrevisto
 				                    				,@TotalPresente
 				                    				,@PercentualParticipacao)";
@@ -91,9 +87,7 @@ namespace SME.SERAp.Prova.Dados
                                    SET [AreaConhecimentoID] =  @AreaConhecimentoID
                                       ,[uad_sigla] =  @uad_sigla
                                       ,[esc_codigo] = @esc_codigo
-                                      ,[AnoEscolar] = @AnoEscolar
-                                      ,[tur_codigo] = @tur_codigo
-                                      ,[tur_id] =  @tur_id 
+                                      ,[AnoEscolar] = @AnoEscolar                                      
                                       ,[TotalPrevisto] = @TotalPrevisto
                                       ,[TotalPresente] = @TotalPresente
                                       ,[PercentualParticipacao] = @PercentualParticipacao

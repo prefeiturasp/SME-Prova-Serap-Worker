@@ -26,10 +26,10 @@ namespace SME.SERAp.Prova.Dominio
         ParticipacaoTurmaAreaConhecimento = 7,
 
         [Description("ResultadoParticipacaoUe")]
-        ResultadoParticipacaoUe = 8,
+        ResultadoParticipacaoUe = 15,
 
         [Description("ParticipacaoUeAreaConhecimento")]
-        ParticipacaoUeAreaConhecimento = 9,
+        ParticipacaoUeAreaConhecimento = 16,
 
     }
 }

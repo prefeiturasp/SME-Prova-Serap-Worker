@@ -51,12 +51,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 Edicao = objResultadoCsv.Edicao,
                 EscCodigo = objResultadoCsv.esc_codigo,
                 UadSigla = objResultadoCsv.uad_sigla,
-                 TurId = objResultadoCsv.tur_id,
+                TurId = objResultadoCsv.tur_id,
                 AnoEscolar = objResultadoCsv.AnoEscolar,
                 TurCodigo = objResultadoCsv.tur_codigo,
                 PercentualParticipacao = objResultadoCsv.PercentualParticipacao,
-                TotalPresente= objResultadoCsv.TotalPresente,
-                 TotalPrevisto = objResultadoCsv.TotalPrevisto
+                TotalPresente = objResultadoCsv.TotalPresente,
+                TotalPrevisto = objResultadoCsv.TotalPrevisto
             };
         }
     }

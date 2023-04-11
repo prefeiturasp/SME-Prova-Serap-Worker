@@ -23,6 +23,8 @@ namespace SME.SERAp.Prova.Infra
         public int TotalPresente { get; set; }
 
         [Name("PercentualParticipacao")]
-        public decimal PercentualParticipacao { get; set; }
+        public string _percentualParticipacao { get; set; }
+
+        public decimal? PercentualParticipacao { get { return _percentualParticipacao.ConvertStringPraDecimalNullPsp(); } }
     }
 }

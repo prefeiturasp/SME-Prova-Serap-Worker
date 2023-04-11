@@ -88,7 +88,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @" UPDATE [dbo].[ParticipacaoTurma]
                                  SET [uad_sigla] =  @uad_sigla
-                                    ,[esc_codigo] = @esc_codigo
+                                    ,[esc_codigo] = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
                                     ,[AnoEscolar] = @AnoEscolar
                                     ,[tur_codigo] = @tur_codigo
                                     ,[tur_id] =  @tur_id 

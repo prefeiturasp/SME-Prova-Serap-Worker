@@ -96,8 +96,7 @@ namespace SME.SERAp.Prova.Dados
                                  and AreaConhecimentoID = @AreaConhecimentoID
                                  and uad_sigla = @uad_sigla
                                  and esc_codigo = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
-                                 and anoEscolar = @AnoEscolar
-                                 and tur_codigo = @tur_codigo";
+                                 and anoEscolar = @AnoEscolar";
 
                 var parametros = ObterParametros(participacao);
                 return await conn.ExecuteAsync(query, parametros);

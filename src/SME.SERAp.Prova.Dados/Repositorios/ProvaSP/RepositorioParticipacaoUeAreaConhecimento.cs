@@ -86,7 +86,7 @@ namespace SME.SERAp.Prova.Dados
                                 UPDATE [dbo].[ParticipacaoEscolaAreaConhecimento]
                                    SET [AreaConhecimentoID] =  @AreaConhecimentoID
                                       ,[uad_sigla] =  @uad_sigla
-                                      ,[esc_codigo] = @esc_codigo
+                                      ,[esc_codigo] = REPLICATE('0', 6 - LEN(@esc_codigo)) + RTrim(@esc_codigo)
                                       ,[AnoEscolar] = @AnoEscolar                                      
                                       ,[TotalPrevisto] = @TotalPrevisto
                                       ,[TotalPresente] = @TotalPresente

@@ -32,7 +32,7 @@ namespace SME.SERAp.Prova.Dados
                              order by Edicao desc";
 
             using var conn = ObterConexaoProvaSp();
-            return await conn.QueryFirstOrDefaultAsync<ParticipacaoUe>(query, new { edicao, uad_sigla, esc_codigo });
+            return await conn.QueryFirstOrDefaultAsync<ParticipacaoUe>(query, new { edicao, uad_sigla, esc_codigo, anoEscolar });
         }
 
         public async Task<long> IncluirAsync(ParticipacaoUe participacao)

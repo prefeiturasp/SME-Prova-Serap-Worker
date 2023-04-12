@@ -19,6 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioParticipacaoTurmaAreaConhecimento repositorioParticipacaoTurmaAreaConhecimento;
         private readonly IRepositorioParticipacaoUe repositorioParticipacaoUe;
         private readonly IRepositorioParticipacaoUeAreaConhecimento repositorioParticipacaoUeAreaConhecimento;
+        private readonly IRepositorioParticipacaoDre repositorioParticipacaoDre;
         private ObjResultadoPspDto ObjResultado;
 
         public ObterObjResultadoPspQueryHandler(IRepositorioResultadoSme repositorioResultadoSme,
@@ -29,7 +30,8 @@ namespace SME.SERAp.Prova.Aplicacao
                                                 IRepositorioParticipacaoTurma repositorioParticipacaoTurma,
                                                 IRepositorioParticipacaoTurmaAreaConhecimento repositorioParticipacaoTurmaAreaConhecimento,
                                                 IRepositorioParticipacaoUe repositorioParticipacaoUe,
-                                                IRepositorioParticipacaoUeAreaConhecimento repositorioParticipacaoUeAreaConhecimento)
+                                                IRepositorioParticipacaoUeAreaConhecimento repositorioParticipacaoUeAreaConhecimento,
+                                                IRepositorioParticipacaoDre repositorioParticipacaoDre)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
@@ -40,6 +42,7 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioParticipacaoTurmaAreaConhecimento = repositorioParticipacaoTurmaAreaConhecimento ?? throw new System.ArgumentException(nameof(repositorioParticipacaoTurmaAreaConhecimento));
             this.repositorioParticipacaoUe = repositorioParticipacaoUe ?? throw new System.ArgumentException(nameof(repositorioParticipacaoUe));
             this.repositorioParticipacaoUeAreaConhecimento = repositorioParticipacaoUeAreaConhecimento ?? throw new System.ArgumentException(nameof(repositorioParticipacaoUeAreaConhecimento));
+            this.repositorioParticipacaoDre = repositorioParticipacaoDre ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoDre));
         }
 
         public async Task<ObjResultadoPspDto> Handle(ObterObjResultadoPspQuery request, CancellationToken cancellationToken)
@@ -72,6 +75,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await ObterParticipacaoUe();
                 case TipoResultadoPsp.ParticipacaoUeAreaConhecimento:
                     return await ObterParticipacaoUeAreaConhecimento();
+                case TipoResultadoPsp.ParticipacaoDre:
+                    return await ObterParticipacaoDre();
                 default:
                     return null;
             }
@@ -125,19 +130,25 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task<ParticipacaoUe> ObterParticipacaoUeAreaConhecimento()
         {
-            var participacaoTurma = (ParticipacaoUeAreaConhecimentoDto)ObjResultado.Resultado;
+            var participacao = (ParticipacaoUeAreaConhecimentoDto)ObjResultado.Resultado;
             return await repositorioParticipacaoUeAreaConhecimento.
-                ObterParticipacaoUeAreaConhecimento(participacaoTurma.Edicao,
-                                                       participacaoTurma.uad_sigla,
-                                                       participacaoTurma.AreaConhecimentoID,
-                                                       participacaoTurma.esc_codigo,
-                                                       participacaoTurma.AnoEscolar);
+                ObterParticipacaoUeAreaConhecimento(participacao.Edicao,
+                                                       participacao.uad_sigla,
+                                                       participacao.AreaConhecimentoID,
+                                                       participacao.esc_codigo,
+                                                       participacao.AnoEscolar);
         }
 
         private async Task<ParticipacaoUe> ObterParticipacaoUe()
         {
-            var participacaoTurma = (ParticipacaoUeDto)ObjResultado.Resultado;
-            return await repositorioParticipacaoUe.ObterParticipacaoUe(participacaoTurma.Edicao, participacaoTurma.uad_sigla, participacaoTurma.esc_codigo, participacaoTurma.AnoEscolar);
+            var participacao = (ParticipacaoUeDto)ObjResultado.Resultado;
+            return await repositorioParticipacaoUe.ObterParticipacaoUe(participacao.Edicao, participacao.uad_sigla, participacao.esc_codigo, participacao.AnoEscolar);
+        }
+
+        private async Task<ParticipacaoDre> ObterParticipacaoDre()
+        {
+            var participacao = (ParticipacaoDreDto)ObjResultado.Resultado;
+            return await repositorioParticipacaoDre.ObterParticipacaoDre(participacao.Edicao, participacao.uad_sigla, participacao.AnoEscolar);
         }
     }
 }

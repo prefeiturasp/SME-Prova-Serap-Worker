@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ImportarResultadoParticipacaoTurmaUseCase : AbstractImportarProficienciaPspUseCase, IImportarResultadoParticipacaoTurmaUseCase
+    public class ImportarParticipacaoUeAreaConhecimentoUseCase : AbstractImportarProficienciaPspUseCase, IImportarParticipacaoUeAreaConhecimentoUseCase
     {
-        private TipoResultadoPsp tipoResultadoProcesso = TipoResultadoPsp.ResultadoParticipacaoTurma;
 
-        public ImportarResultadoParticipacaoTurmaUseCase(IMediator mediator,
+        private TipoResultadoPsp tipoResultadoProcesso = TipoResultadoPsp.ParticipacaoUeAreaConhecimento;
+
+        public ImportarParticipacaoUeAreaConhecimentoUseCase(IMediator mediator,
                                                  IServicoLog servicoLog,
                                                  PathOptions pathOptions)
                                                  : base(mediator, servicoLog, pathOptions) { }
@@ -31,7 +32,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(pathOptions, arquivoResultadoPsp.NomeArquivo))
                 {
-                    var listaCsvResultados = csv.GetRecords<ParticipacaoTurmaDto>().ToList();
+                    var listaCsvResultados = csv.GetRecords<ParticipacaoUeAreaConhecimentoDto>().ToList();
                     foreach (var objCsvResultado in listaCsvResultados)
                     {
                         var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);

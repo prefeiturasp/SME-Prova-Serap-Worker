@@ -102,5 +102,8 @@
 
         public const string ImportarParticipacaoTurmaAreaConhecimento = "serap.resultados.psp.participacao.turma.area.conhecimento";
         public const string TratarParticipacaoTurmaAreaConhecimento = "serap.resultados.psp.participacao.turma.area.conhecimento.tratar";
+
+        public const string ImportarParticipacaoEscola = "serap.resultados.psp.participacao.escola";
+        public const string TratarParticipacaoEscola = "serap.resultados.psp.participacao.escola.tratar";
     }
 }

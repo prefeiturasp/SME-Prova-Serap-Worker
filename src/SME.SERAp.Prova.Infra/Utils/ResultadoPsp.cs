@@ -50,7 +50,7 @@ namespace SME.SERAp.Prova.Infra
                 return dec_valor;
             }
 
-            throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
+            throw new Exception($"não foi possível converter o valor para decimal: {valor}");
         }
 
         public static string ObterFilaTratarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)

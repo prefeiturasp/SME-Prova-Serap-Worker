@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Entidades;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
@@ -39,6 +40,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         await publicarFilaTratar(dto, tipoResultadoProcesso);
                     }
                 }
+                await publicarFilaTratarStatusProcesso(IdArquivoResultadoPsp);
                 return true;
             }
             catch (Exception ex)

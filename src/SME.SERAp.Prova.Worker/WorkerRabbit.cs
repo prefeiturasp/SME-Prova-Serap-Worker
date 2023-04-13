@@ -254,6 +254,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));
 
+            comandos.Add(RotasRabbit.TratarStatusProcessoResultado, new ComandoRabbit("Tratar status do processo", typeof(ITratarStatusProcessoResultadoPspUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoAlunoPsp, new ComandoRabbit("Importa arquivo csv proeficiencia aluno", typeof(IImportarProficienciaAlunoUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoAlunoPsp, new ComandoRabbit("Tratar resgistros arquivo csv proeficiencia aluno", typeof(ITratarProficienciaAlunoUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoSmePsp, new ComandoRabbit("Importa dados arquivo csv proficiencia sme", typeof(IImportarProficienciaSmeUseCase)));

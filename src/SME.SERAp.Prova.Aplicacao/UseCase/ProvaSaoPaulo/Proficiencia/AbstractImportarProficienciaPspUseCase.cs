@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Aplicaca;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Entidades;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
@@ -30,6 +31,11 @@ namespace SME.SERAp.Prova.Aplicacao
             string fila = ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp(tipoResultado);
             if (!string.IsNullOrEmpty(fila))
                 await mediator.Send(new PublicaFilaRabbitCommand(fila, dto));
+        }
+
+        public async Task publicarFilaTratarStatusProcesso(long processoId)
+        {
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarStatusProcessoResultado, processoId));
         }
 
         public async Task AtualizaStatusDoProcesso(long processoId, StatusImportacao status)

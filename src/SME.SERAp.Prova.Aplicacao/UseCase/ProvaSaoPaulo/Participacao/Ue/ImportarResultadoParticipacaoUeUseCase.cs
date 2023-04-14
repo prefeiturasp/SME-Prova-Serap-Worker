@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Dominio.Entidades;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
@@ -37,6 +36,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     foreach (var objCsvResultado in listaCsvResultados)
                     {
                         var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);
+                        objCsvResultado.ValidarCampos();
                         await publicarFilaTratar(dto, tipoResultadoProcesso);
                     }
                 }

@@ -2,6 +2,7 @@
 using CsvHelper.Configuration;
 using SME.SERAp.Prova.Dominio;
 using System;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -51,6 +52,37 @@ namespace SME.SERAp.Prova.Infra
             }
 
             throw new Exception($"não foi possível converter o valor para decimal: {valor}");
+        }
+
+        public static bool AnoEdicaoValido(string edicao)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(edicao)) return false;
+                if (int.TryParse(edicao, NumberStyles.Number, CultureInfo.InvariantCulture, out int ano_edicao))
+                {
+                    return ano_edicao > 2000 && ano_edicao < 3000;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }        
+        }
+
+        public static bool DecimalNullValido(decimal? valor)
+        {
+            try
+            {
+                if (valor == null) return true;
+                decimal dec_valor = (decimal)valor;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public static string ObterFilaTratarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)

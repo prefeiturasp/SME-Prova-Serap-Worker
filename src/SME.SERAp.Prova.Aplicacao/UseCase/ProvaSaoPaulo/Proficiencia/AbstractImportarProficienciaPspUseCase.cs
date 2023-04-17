@@ -53,5 +53,11 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             arquivoResultadoPsp = dto;
         }
+
+        public void ValidarAnoEdicao(string edicao)
+        {
+            if (!ResultadoPsp.AnoEdicaoValido(edicao))
+                throw new Exception($"Edição: {edicao} inválido.");
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using CsvHelper.Configuration.Attributes;
+﻿using System;
+using CsvHelper.Configuration.Attributes;
 
 namespace SME.SERAp.Prova.Infra
 {
@@ -30,13 +31,13 @@ namespace SME.SERAp.Prova.Infra
         public void ValidarCampos()
         {
             try
-            {
-                if (!(ResultadoPsp.AnoEdicaoValido(this.Edicao) && ResultadoPsp.DecimalNullValido(this.PercentualParticipacao)))
-                    throw new System.Exception($"Edição: {this.Edicao} ou PercentualParticipacao: {this.PercentualParticipacao?.ToString()} inválido.");
+            {                
+                if (!ResultadoPsp.DecimalNullValido(this.PercentualParticipacao))
+                    throw new Exception($"PercentualParticipacao: {this.PercentualParticipacao?.ToString()} inválido.");
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw new System.Exception("Dados inválidos");
+                throw new Exception($"Dados inválidos -- {ex.Message} -- {ex.StackTrace}");
             }
         }
     }

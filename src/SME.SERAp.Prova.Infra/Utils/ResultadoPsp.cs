@@ -5,6 +5,7 @@ using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 
@@ -24,7 +25,7 @@ namespace SME.SERAp.Prova.Infra
                 linha = linha.Trim().Replace("\r", string.Empty);
                 linha = linha.Trim().Replace("\n", string.Empty);
                 linha = linha.Trim().Replace("\0", string.Empty);
-                
+
                 var arrayLinha = records.Row.Parser.Record;
                 return string.IsNullOrEmpty(linha) || arrayLinha == null || arrayLinha.Length == 0 ||
                        (arrayLinha.Length > 0 && string.IsNullOrEmpty(arrayLinha[0]));
@@ -40,18 +41,24 @@ namespace SME.SERAp.Prova.Infra
 
         public static decimal? ConvertStringPraDecimalNullPsp(this string valor)
         {
-            if (string.IsNullOrEmpty(valor)) return null;
-
-            valor = valor.Replace(",", ".").Trim();
-
-            if (valor == "NA") return null;
-
-            if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec_valor))
+            try
             {
-                return dec_valor;
-            }
+                if (string.IsNullOrEmpty(valor)) return null;
 
-            throw new Exception($"não foi possível converter o valor para decimal: {valor}");
+                valor = valor.Replace(",", ".").Trim();
+
+                if (valor.ToUpper() == "NA") return null;
+
+                if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec_valor))
+                {
+                    return dec_valor;
+                }
+                throw new Exception();
+            }
+            catch (Exception)
+            {
+                throw new Exception($"não foi possível converter o valor para decimal: {valor}");
+            }
         }
 
         public static bool AnoEdicaoValido(string edicao)
@@ -68,7 +75,7 @@ namespace SME.SERAp.Prova.Infra
             catch (Exception)
             {
                 return false;
-            }        
+            }
         }
 
         public static bool DecimalNullValido(decimal? valor)
@@ -82,6 +89,20 @@ namespace SME.SERAp.Prova.Infra
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        public static void ValidarAreaConhecimentoId(int areaConhecimentoId)
+        {
+            try
+            {
+                var listaAreaConhecimentoId = Enum.GetValues(typeof(AreaConhecimentoProvaSp)).Cast<AreaConhecimentoProvaSp>().ToList();
+                if (!listaAreaConhecimentoId.Any(x => x == (AreaConhecimentoProvaSp)areaConhecimentoId))
+                    throw new Exception();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"AreaConhecimentoId: {areaConhecimentoId}, inválido -- {ex.Message} -- {ex.StackTrace}");
             }
         }
 

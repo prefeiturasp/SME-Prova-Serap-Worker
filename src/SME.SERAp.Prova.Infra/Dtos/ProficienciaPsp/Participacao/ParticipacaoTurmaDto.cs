@@ -1,5 +1,5 @@
 ﻿using CsvHelper.Configuration.Attributes;
-
+using System;
 
 namespace SME.SERAp.Prova.Infra
 {
@@ -26,6 +26,17 @@ namespace SME.SERAp.Prova.Infra
 
         public decimal? PercentualParticipacao { get { return _percentualParticipacao.ConvertStringPraDecimalNullPsp(); } }
 
-
+        public void ValidarCampos()
+        {
+            try
+            {
+                if (!ResultadoPsp.DecimalNullValido(this.PercentualParticipacao))
+                    throw new Exception($"PercentualParticipacao: {this.PercentualParticipacao?.ToString()} inválido.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Dados inválidos -- {ex.Message} -- {ex.StackTrace}");
+            }
+        }
     }
 }

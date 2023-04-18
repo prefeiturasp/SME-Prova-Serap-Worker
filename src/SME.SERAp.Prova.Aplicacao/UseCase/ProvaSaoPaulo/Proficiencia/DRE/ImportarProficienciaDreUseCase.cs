@@ -39,6 +39,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         await publicarFilaTratar(dto, tipoResultadoProcesso);
                     }
                 }
+                await publicarFilaTratarStatusProcesso(IdArquivoResultadoPsp);
                 return true;
             }
             catch (Exception ex)

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Aplicaca;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Entidades;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
@@ -32,6 +33,11 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new PublicaFilaRabbitCommand(fila, dto));
         }
 
+        public async Task publicarFilaTratarStatusProcesso(long processoId)
+        {
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarStatusProcessoResultado, processoId));
+        }
+
         public async Task AtualizaStatusDoProcesso(long processoId, StatusImportacao status)
         {
             await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(processoId, status));
@@ -46,6 +52,12 @@ namespace SME.SERAp.Prova.Aplicacao
         public void PopularArquivoResultado(ArquivoResultadoPspDto dto)
         {
             arquivoResultadoPsp = dto;
+        }
+
+        public void ValidarAnoEdicao(string edicao)
+        {
+            if (!ResultadoPsp.AnoEdicaoValido(edicao))
+                throw new Exception($"Edição: {edicao} inválido.");
         }
     }
 }

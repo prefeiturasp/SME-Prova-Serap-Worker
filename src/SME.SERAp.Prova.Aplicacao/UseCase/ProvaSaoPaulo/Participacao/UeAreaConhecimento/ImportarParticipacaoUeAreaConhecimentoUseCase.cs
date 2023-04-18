@@ -36,9 +36,13 @@ namespace SME.SERAp.Prova.Aplicacao
                     foreach (var objCsvResultado in listaCsvResultados)
                     {
                         var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);
+                        ValidarAnoEdicao(objCsvResultado.Edicao);
+                        ResultadoPsp.ValidarAreaConhecimentoId(objCsvResultado.AreaConhecimentoID);
+                        objCsvResultado.ValidarCampos();
                         await publicarFilaTratar(dto, tipoResultadoProcesso);
                     }
                 }
+                await publicarFilaTratarStatusProcesso(IdArquivoResultadoPsp);
                 return true;
             }
             catch (Exception ex)

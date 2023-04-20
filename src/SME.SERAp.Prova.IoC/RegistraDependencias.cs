@@ -99,6 +99,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioParticipacaoUe, RepositorioParticipacaoUe>();
             services.AddScoped<IRepositorioParticipacaoUeAreaConhecimento, RepositorioParticipacaoUeAreaConhecimento>();
             services.AddScoped<IRepositorioParticipacaoDre, RepositorioParticipacaoDre>();
+            services.AddScoped<IRepositorioParticipacaoSme, RepositorioParticipacaoSme>();
 
         }
 
@@ -212,6 +213,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarParticipacaoUeAreaConhecimentoUseCase, TratarParticipacaoUeAreaConhecimentoUseCase>();
             services.AddScoped<IImportarResultadoParticipacaoDreUseCase, ImportarResultadoParticipacaoDreUseCase>();
             services.AddScoped<ITratarResultadoParticipacaoDreUseCase, TratarResultadoParticipacaoDreUseCase>();
+            services.AddScoped<IImportarResultadoParticipacaoSmeUseCase, ImportarResultadoParticipacaoSmeUseCase>();
+            services.AddScoped<ITratarResultadoParticipacaoSmeUseCase, TratarResultadoParticipacaoSmeUseCase>();
         }
     }
 }

@@ -21,6 +21,7 @@ namespace SME.SERAp.Prova.Dominio
 
         [Description("ResultadoParticipacaoTurma")]
         ResultadoParticipacaoTurma = 13,
+
         [Description("ParticipacaoTurmaAreaConhecimento")]
         ParticipacaoTurmaAreaConhecimento = 14,
 
@@ -32,6 +33,12 @@ namespace SME.SERAp.Prova.Dominio
 
         [Description("ParticipacaoDre")]
         ParticipacaoDre = 17,
+
+        [Description("ParticipacaoDreAreaConhecimento")]
+        ParticipacaoDreAreaConhecimento = 18,
+
+        [Description("ParticipacaoSme")]
+        ParticipacaoSme = 19,
 
     }
 }

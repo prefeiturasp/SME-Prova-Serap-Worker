@@ -109,5 +109,9 @@
         public const string TratarParticipacaoUeAreaConhecimento = "serap.resultados.psp.participacao.ue.area.conhecimento.tratar";
         public const string ImportarResultadoParticipacaoDre = "serap.resultados.psp.participacao.dre";
         public const string TratarResultadoParticipacaoDre = "serap.resultados.psp.participacao.dre.tratar";
+        public const string ImportarResultadoParticipacaoDreAreaConhecimento = "serap.resultados.psp.participacao.dre.area.conhecimento";
+        public const string TratarResultadoParticipacaoDreAreaConhecimento = "serap.resultados.psp.participacao.dre.area.conhecimento.tratar";
+        public const string ImportarResultadoParticipacaoSme = "serap.resultados.psp.participacao.sme";
+        public const string TratarResultadoParticipacaoSme = "serap.resultados.psp.participacao.sme.tratar";
     }
 }

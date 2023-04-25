@@ -21,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioParticipacaoUeAreaConhecimento repositorioParticipacaoUeAreaConhecimento;
         private readonly IRepositorioParticipacaoDre repositorioParticipacaoDre;
         private readonly IRepositorioParticipacaoSme repositorioParticipacaoSme;
-
+        private readonly IRepositorioParticipacaoDreAreaConhecimento repositorioParticipacaoDreAreaConhecimento;
 
         private ObjResultadoPspDto ObjResultado;
 
@@ -35,7 +35,8 @@ namespace SME.SERAp.Prova.Aplicacao
                                                  IRepositorioParticipacaoUe repositorioParticipacaoUe,
                                                  IRepositorioParticipacaoUeAreaConhecimento repositorioParticipacaoUeAreaConhecimento,
                                                  IRepositorioParticipacaoDre repositorioParticipacaoDre,
-                                                 IRepositorioParticipacaoSme repositorioParticipacaoSme)
+                                                 IRepositorioParticipacaoSme repositorioParticipacaoSme,
+                                                 IRepositorioParticipacaoDreAreaConhecimento repositorioParticipacaoDreAreaConhecimento)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
@@ -48,6 +49,7 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioParticipacaoUeAreaConhecimento = repositorioParticipacaoUeAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoUeAreaConhecimento));
             this.repositorioParticipacaoDre = repositorioParticipacaoDre ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoDre));
             this.repositorioParticipacaoSme = repositorioParticipacaoSme ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoSme));
+            this.repositorioParticipacaoDreAreaConhecimento = repositorioParticipacaoDreAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoDreAreaConhecimento));
         }
 
         public async Task<bool> Handle(IncluirResultadoPspCommand request, CancellationToken cancellationToken)
@@ -75,6 +77,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await IncluirParticipacaoUeAreaConhecimento();
                 case TipoResultadoPsp.ParticipacaoDre:
                     return await IncluirParticipacaoDre();
+                case TipoResultadoPsp.ParticipacaoDreAreaConhecimento:
+                    return await IncluirParticipacaoDreAreaConhecimento();
                 case TipoResultadoPsp.ParticipacaoSme:
                     return await IncluirParticipacaoSme();
                 default:
@@ -149,6 +153,13 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var participacaoInserir = (ParticipacaoDre)ObjResultado.Resultado;
             var result = await repositorioParticipacaoDre.IncluirAsync(participacaoInserir);
+            return result > 0;
+        }
+
+        private async Task<bool> IncluirParticipacaoDreAreaConhecimento()
+        {
+            var participacaoInserir = (ParticipacaoDreAreaConhecimento)ObjResultado.Resultado;
+            var result = await repositorioParticipacaoDreAreaConhecimento.IncluirAsync(participacaoInserir);
             return result > 0;
         }
 

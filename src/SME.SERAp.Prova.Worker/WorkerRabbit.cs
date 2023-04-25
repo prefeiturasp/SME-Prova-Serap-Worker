@@ -277,6 +277,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarParticipacaoUeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Ue e area conhecimento", typeof(ITratarParticipacaoUeAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoDre, new ComandoRabbit("Importa dados arquivo csv participação Dre", typeof(IImportarResultadoParticipacaoDreUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoDre, new ComandoRabbit("Tratar registros arquivo csv participação Dre", typeof(ITratarResultadoParticipacaoDreUseCase)));
+
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoDreAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Dre AreaConhecimento", typeof(ImportResultParticipDreAreaUseCaseUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoDreAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Dre AreaConhecimento", typeof(ITratarResultadoParticipacaoDreUseCase)));
+
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSme, new ComandoRabbit("Importa dados arquivo csv participação Sme", typeof(IImportarResultadoParticipacaoSmeUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSme, new ComandoRabbit("Tratar registros arquivo csv participação Sme", typeof(ITratarResultadoParticipacaoSmeUseCase)));
 

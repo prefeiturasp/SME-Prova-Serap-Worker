@@ -1,12 +1,10 @@
 ﻿using Dapper;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados

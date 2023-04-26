@@ -44,7 +44,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
         }
-        private ParticipacaoDre MapearParaEntidade(ParticipacaoDreAreaConhecimentoDto objResultadoCsv)
+        private ParticipacaoDreAreaConhecimento MapearParaEntidade(ParticipacaoDreAreaConhecimentoDto objResultadoCsv)
         {
             return new ParticipacaoDreAreaConhecimento()
             {

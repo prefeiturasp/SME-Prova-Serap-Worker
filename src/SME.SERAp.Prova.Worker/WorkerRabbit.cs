@@ -265,24 +265,22 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoEscolaPsp, new ComandoRabbit("Tratar resgistros arquivo csv proficiencia escola", typeof(ITratarProficienciaEscolaUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoTurmaPsp, new ComandoRabbit("Importa dados arquivo csv proficiencia turma", typeof(IImportarProficienciaTurmaUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoTurmaPsp, new ComandoRabbit("Tratar resgistros arquivo csv proficiencia turma", typeof(ITratarProficienciaTurmaUseCase)));
-
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoTurma, new ComandoRabbit("Importa dados arquivo csv participação turma", typeof(IImportarResultadoParticipacaoTurmaUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoTurma, new ComandoRabbit("Tratar registros arquivo csv participação turma", typeof(ITratarResultadoParticipacaoTurmaUseCase)));
             comandos.Add(RotasRabbit.ImportarParticipacaoTurmaAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação turma e area conhecimento", typeof(IImportarParticipacaoTurmaAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.TratarParticipacaoTurmaAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação turma e area conhecimento", typeof(ITratarParticipacaoTurmaAreaConhecimentoUseCase)));
-
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoUe, new ComandoRabbit("Importa dados arquivo csv participação Ue", typeof(IImportarResultadoParticipacaoUeUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoUe, new ComandoRabbit("Tratar registros arquivo csv participação Ue", typeof(ITratarResultadoParticipacaoUeUseCase)));
             comandos.Add(RotasRabbit.ImportarParticipacaoUeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Ue e area conhecimento", typeof(IImportarParticipacaoUeAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.TratarParticipacaoUeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Ue e area conhecimento", typeof(ITratarParticipacaoUeAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoDre, new ComandoRabbit("Importa dados arquivo csv participação Dre", typeof(IImportarResultadoParticipacaoDreUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoDre, new ComandoRabbit("Tratar registros arquivo csv participação Dre", typeof(ITratarResultadoParticipacaoDreUseCase)));
-
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoDreAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Dre AreaConhecimento", typeof(IImportResultParticipDreAreaUseCaseUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoDreAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Dre AreaConhecimento", typeof(ITratarResultParticipDreAreaUseCase)));
-
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSme, new ComandoRabbit("Importa dados arquivo csv participação Sme", typeof(IImportarResultadoParticipacaoSmeUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSme, new ComandoRabbit("Tratar registros arquivo csv participação Sme", typeof(ITratarResultadoParticipacaoSmeUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Sme AreaConhecimento", typeof(IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Sme AreaConhecimento", typeof(ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
 
         }
 

@@ -20,6 +20,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioParticipacaoTurmaAreaConhecimento repositorioParticipacaoTurmaAreaConhecimento;
         private readonly IRepositorioParticipacaoUe repositorioParticipacaoUe;
         private readonly IRepositorioParticipacaoUeAreaConhecimento repositorioParticipacaoUeAreaConhecimento;
+        private readonly IRepositorioParticipacaoDre repositorioParticipacaoDre;
 
         private ObjResultadoPspDto ObjResultado;
 
@@ -31,7 +32,8 @@ namespace SME.SERAp.Prova.Aplicacao
                                                  IRepositorioParticipacaoTurma repositorioParticipacaoTurma,
                                                  IRepositorioParticipacaoTurmaAreaConhecimento repositorioParticipacaoTurmaAreaConhecimento,
                                                  IRepositorioParticipacaoUe repositorioParticipacaoUe,
-                                                 IRepositorioParticipacaoUeAreaConhecimento repositorioParticipacaoUeAreaConhecimento)
+                                                 IRepositorioParticipacaoUeAreaConhecimento repositorioParticipacaoUeAreaConhecimento,
+                                                 IRepositorioParticipacaoDre repositorioParticipacaoDre)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
@@ -42,6 +44,7 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioParticipacaoTurmaAreaConhecimento = repositorioParticipacaoTurmaAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoTurmaAreaConhecimento));
             this.repositorioParticipacaoUe = repositorioParticipacaoUe ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoUe));
             this.repositorioParticipacaoUeAreaConhecimento = repositorioParticipacaoUeAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoUeAreaConhecimento));
+            this.repositorioParticipacaoDre = repositorioParticipacaoDre ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoDre));
         }
 
         public async Task<bool> Handle(AlterarResultadoPspCommand request, CancellationToken cancellationToken)
@@ -67,6 +70,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await AlterarParticipacaoUe();
                 case TipoResultadoPsp.ParticipacaoUeAreaConhecimento:
                     return await AlterarParticipacaoUeAreaConhecimento();
+                case TipoResultadoPsp.ParticipacaoDre:
+                    return await AlterarParticipacaoDre();
                 default:
                     return false;
             }
@@ -74,61 +79,68 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task<bool> AlterarResultadoAluno()
         {
-            var resultadoInserir = (ResultadoAluno)ObjResultado.Resultado;
-            var result = await repositorioResultadoAluno.AlterarAsync(resultadoInserir);
+            var resultado = (ResultadoAluno)ObjResultado.Resultado;
+            var result = await repositorioResultadoAluno.AlterarAsync(resultado);
             return result > 0;
         }
         private async Task<bool> AlterarResultadoTurma()
         {
-            var resultadoInserir = (ResultadoTurma)ObjResultado.Resultado;
-            var result = await repositorioResultadoTurma.AlterarAsync(resultadoInserir);
+            var resultado = (ResultadoTurma)ObjResultado.Resultado;
+            var result = await repositorioResultadoTurma.AlterarAsync(resultado);
             return result > 0;
         }
         private async Task<bool> AlterarResultadoEscola()
         {
-            var resultadoInserir = (ResultadoEscola)ObjResultado.Resultado;
-            var result = await repositorioResultadoEscola.AlterarAsync(resultadoInserir);
+            var resultado = (ResultadoEscola)ObjResultado.Resultado;
+            var result = await repositorioResultadoEscola.AlterarAsync(resultado);
             return result > 0;
         }
         private async Task<bool> AlterarResultadoDre()
         {
-            var resultadoInserir = (ResultadoDre)ObjResultado.Resultado;
-            var result = await repositorioResultadoDre.AlterarAsync(resultadoInserir);
+            var resultado = (ResultadoDre)ObjResultado.Resultado;
+            var result = await repositorioResultadoDre.AlterarAsync(resultado);
             return result > 0;
         }
 
         private async Task<bool> AlterarResultadoSME()
         {
-            var resultadoInserir = (ResultadoSme)ObjResultado.Resultado;
-            var result = await repositorioResultadoSme.AlterarAsync(resultadoInserir);
+            var resultado = (ResultadoSme)ObjResultado.Resultado;
+            var result = await repositorioResultadoSme.AlterarAsync(resultado);
             return result > 0;
         }
 
         private async Task<bool> AlterarParticipacaoTurma()
         {
-            var participacaoTurma = (ParticipacaoTurma)ObjResultado.Resultado;
-            var result = await repositorioParticipacaoTurma.AlterarAsync(participacaoTurma);
+            var participacao = (ParticipacaoTurma)ObjResultado.Resultado;
+            var result = await repositorioParticipacaoTurma.AlterarAsync(participacao);
             return result > 0;
         }
 
         private async Task<bool> AlterarParticipacaoTurmaAreaConhecimento()
         {
-            var participacaoTurma = (ParticipacaoTurmaAreaConhecimento)ObjResultado.Resultado;
-            var result = await repositorioParticipacaoTurmaAreaConhecimento.AlterarAsync(participacaoTurma);
+            var participacao = (ParticipacaoTurmaAreaConhecimento)ObjResultado.Resultado;
+            var result = await repositorioParticipacaoTurmaAreaConhecimento.AlterarAsync(participacao);
             return result > 0;
         }
 
         private async Task<bool> AlterarParticipacaoUe()
         {
-            var participacaoTurma = (ParticipacaoUe)ObjResultado.Resultado;
-            var result = await repositorioParticipacaoUe.AlterarAsync(participacaoTurma);
+            var participacao = (ParticipacaoUe)ObjResultado.Resultado;
+            var result = await repositorioParticipacaoUe.AlterarAsync(participacao);
             return result > 0;
         }
 
         private async Task<bool> AlterarParticipacaoUeAreaConhecimento()
         {
-            var participacaoTurma = (ParticipacaoUeAreaConhecimento)ObjResultado.Resultado;
-            var result = await repositorioParticipacaoUeAreaConhecimento.AlterarAsync(participacaoTurma);
+            var participacao = (ParticipacaoUeAreaConhecimento)ObjResultado.Resultado;
+            var result = await repositorioParticipacaoUeAreaConhecimento.AlterarAsync(participacao);
+            return result > 0;
+        }
+
+        private async Task<bool> AlterarParticipacaoDre()
+        {
+            var participacao = (ParticipacaoDre)ObjResultado.Resultado;
+            var result = await repositorioParticipacaoDre.AlterarAsync(participacao);
             return result > 0;
         }
     }

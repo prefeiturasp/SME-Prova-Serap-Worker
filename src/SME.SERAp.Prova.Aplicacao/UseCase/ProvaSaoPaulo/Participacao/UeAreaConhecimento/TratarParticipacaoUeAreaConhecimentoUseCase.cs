@@ -1,18 +1,18 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra.Interfaces;
-using SME.SERAp.Prova.Infra;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using RabbitMQ.Client;
+using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Interfaces;
+using System;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TratarResultadoParticipacaoTurmaUseCase : AbstractTratarProficienciaPspUseCase, ITratarResultadoParticipacaoTurmaUseCase
+    public class TratarParticipacaoUeAreaConhecimentoUseCase : AbstractTratarProficienciaPspUseCase, ITratarParticipacaoUeAreaConhecimentoUseCase
     {
-        public TratarResultadoParticipacaoTurmaUseCase(IMediator mediator,
+        private TipoResultadoPsp tipoResultadoProcesso = TipoResultadoPsp.ParticipacaoUeAreaConhecimento;
+
+        public TratarParticipacaoUeAreaConhecimentoUseCase(IMediator mediator,
                                             IServicoLog servicoLog,
                                             IModel model) : base(mediator, servicoLog, model) { }
 
@@ -20,8 +20,8 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var registroProficienciaPsp = mensagemRabbit.ObterObjetoMensagem<RegistroProficienciaPspCsvDto>();
             PopularRegistroProficienciaPsp(registroProficienciaPsp);
-            var objResultadoCsv = registroProficienciaPsp.ObterObjetoRegistro<ParticipacaoTurmaDto>();
-            PopularTipoResultadoProcesso(TipoResultadoPsp.ResultadoParticipacaoTurma);
+            var objResultadoCsv = registroProficienciaPsp.ObterObjetoRegistro<ParticipacaoUeAreaConhecimentoDto>();
+            PopularTipoResultadoProcesso(tipoResultadoProcesso);
 
             try
             {
@@ -44,19 +44,19 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
         }
-        private ParticipacaoTurma MapearParaEntidade(ParticipacaoTurmaDto objResultadoCsv)
+
+        private ParticipacaoUe MapearParaEntidade(ParticipacaoUeAreaConhecimentoDto objResultadoCsv)
         {
-            return new ParticipacaoTurma()
+            return new ParticipacaoUeAreaConhecimento()
             {
                 Edicao = objResultadoCsv.Edicao,
                 EscCodigo = objResultadoCsv.esc_codigo,
                 UadSigla = objResultadoCsv.uad_sigla,
-                TurId = objResultadoCsv.tur_id,
                 AnoEscolar = objResultadoCsv.AnoEscolar,
-                TurCodigo = objResultadoCsv.tur_codigo,
                 PercentualParticipacao = objResultadoCsv.PercentualParticipacao,
                 TotalPresente = objResultadoCsv.TotalPresente,
-                TotalPrevisto = objResultadoCsv.TotalPrevisto
+                TotalPrevisto = objResultadoCsv.TotalPrevisto,
+                AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
             };
         }
     }

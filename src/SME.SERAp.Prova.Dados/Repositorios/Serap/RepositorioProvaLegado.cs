@@ -187,7 +187,9 @@ namespace SME.SERAp.Prova.Dados
 				nit.BackToPreviousItem as  PermiteVoltarAoItemAnterior,
                 t.ProvaComProficiencia,
                 t.ApresentarResultados,
-                t.ApresentarResultadosPorItem
+                t.ApresentarResultadosPorItem,
+                t.showVideoFiles as ExibirVideo, 
+                t.ShowAudioFiles as ExibirAudio
             FROM
 	            Test t 
 	            INNER JOIN TestCurriculumGrade tcg ON

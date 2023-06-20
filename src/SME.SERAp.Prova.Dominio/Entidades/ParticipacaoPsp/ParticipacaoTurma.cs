@@ -11,6 +11,6 @@ namespace SME.SERAp.Prova.Dominio
         public long TurId { get; set; }
         public int TotalPrevisto { get; set; }
         public int TotalPresente { get; set; }
-        public decimal PercentualParticipacao { get; set; }
+        public decimal? PercentualParticipacao { get; set; }
     }
 }

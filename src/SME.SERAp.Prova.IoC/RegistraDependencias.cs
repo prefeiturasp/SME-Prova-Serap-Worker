@@ -23,9 +23,8 @@ namespace SME.SERAp.Prova.IoC
             RegistrarServicos(services);
             RegistrarCasosDeUso(services);
             RegistrarMapeamentos.Registrar();
-
-
         }
+
         private static void RegistrarRepositorios(IServiceCollection services)
         {
             services.AddScoped<IRepositorioProvaLegado, RepositorioProvaLegado>();
@@ -100,6 +99,7 @@ namespace SME.SERAp.Prova.IoC
         private static void RegistrarServicos(IServiceCollection services)
         {
             services.AddSingleton<IServicoLog, ServicoLog>();
+            services.AddSingleton<IServicoMensageria, ServicoMensageria>();
         }
 
         private static void RegistrarCasosDeUso(IServiceCollection services)
@@ -142,9 +142,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IExecutarSincronizacaoInstitucionalAlunoTratarUseCase, ExecutarSincronizacaoInstitucionalAlunoTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase>();
-
-            services.AddScoped<IRabbitDeadletterSerapSyncUseCase, RabbitDeadletterSerapSyncUseCase>();
-            services.AddScoped<IRabbitDeadletterSerapTratarUseCase, RabbitDeadletterSerapTratarUseCase>();
 
             //sincronizar adesão das provas 
             services.AddScoped<ITratarAdesaoProvaUseCase, TratarAdesaoProvaUseCase>();

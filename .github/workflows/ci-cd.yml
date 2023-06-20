@@ -3,7 +3,7 @@ name: Docker Image CI
 on:
 
   push:
-    branches: [ release, master ]
+    branches: [ release, master, release-r2 ]
     paths-ignore:
     - ".github/workflows/**"  
   
@@ -43,7 +43,23 @@ jobs:
           RANCHER_TOKEN: ${{ secrets.RANCHER_TOKEN }}
           WORKLOAD: sme-prova-serap-worker
           NAMESPACE: sme-serap-estudante
-          
+
+  deploy-release-r2:
+  
+    runs-on: master
+    if: ${{ github.ref == 'refs/heads/release-r2' }}
+    needs: [ build ]    
+    environment:
+      name: release
+    steps:
+      - name: Redeploy
+        uses: luizhpriotto/action_images@kubectl-v1.0
+        env: 
+          RANCHER_URL: ${{ secrets.RANCHER_URL }}
+          RANCHER_TOKEN: ${{ secrets.RANCHER_TOKEN }}
+          WORKLOAD: sme-prova-serap-worker
+          NAMESPACE: sme-serap-estudante-r2
+
   deploy-master:
   
     runs-on: master

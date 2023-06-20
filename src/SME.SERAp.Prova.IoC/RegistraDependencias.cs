@@ -191,6 +191,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarOrdemQuestaoAlunoProvaTaiUseCase, TratarOrdemQuestaoAlunoProvaTaiUseCase>();
             services.AddScoped<ITratarProficienciaAlunoProvaTaiUseCase, TratarProficienciaAlunoProvaTaiUseCase>();
 
+            services.AddScoped<ITratarStatusProcessoResultadoPspUseCase, TratarStatusProcessoResultadoPspUseCase>();
             services.AddScoped<IImportarProficienciaAlunoUseCase, ImportarProficienciaAlunoUseCase>();
             services.AddScoped<ITratarProficienciaAlunoUseCase, TratarProficienciaAlunoUseCase>();
             services.AddScoped<IImportarProficienciaSmeUseCase, ImportarProficienciaSmeUseCase>();

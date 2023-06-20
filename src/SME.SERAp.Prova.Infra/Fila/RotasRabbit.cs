@@ -56,10 +56,6 @@
         public const string GrupoAbrangenciaExcluir = "serap.estudante.grupo.abrangencia.excluir";
         public const string UsuarioGrupoAbrangenciaExcluirTratar = "serap.estudante.usuario.grupo.abrangencia.excluir.tratar";
 
-        public const string FilaDeadletterTratar = "serap.deadletter.tratar";
-        public const string FilaDeadletterSync = "serap.deadletter.sync";
-
-
         public const string QuestaoCompletaSync = "serap.estudante.questao.completa.legado.sync";
         public const string QuestaoCompletaTratar = "serap.estudante.questao.completa.legado.tratar";
 
@@ -86,11 +82,11 @@
         public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";
 
 
-        public const string ImportarProeficienciaCsvProvaSp= "serap.provaSp.importarCsv.proeficiencia";
+        public const string ImportarProeficienciaCsvProvaSp = "serap.provaSp.importarCsv.proeficiencia";
         public const string TratarProeficienciaCsvProvaSp = "serap.provaSp.importarCsv.proeficiencia.tratar";
 
-      
-        public const string ImportarResultadoAlunoPsp  = "serap.resultados.psp.resultado.aluno";
+        public const string TratarStatusProcessoResultado = "serap.resultados.psp.status.processo.tratar";
+        public const string ImportarResultadoAlunoPsp = "serap.resultados.psp.resultado.aluno";
         public const string TratarResultadoAlunoPsp = "serap.resultados.psp.resultado.aluno.tratar";
         public const string ImportarResultadoSmePsp = "serap.resultados.psp.resultado.sme";
         public const string TratarResultadoSmePsp = "serap.resultados.psp.resultado.sme.tratar";
@@ -101,5 +97,24 @@
         public const string ImportarResultadoTurmaPsp = "serap.resultados.psp.resultado.turma";
         public const string TratarResultadoTurmaPsp = "serap.resultados.psp.resultado.turma.tratar";
 
+        public const string ImportarResultadoParticipacaoTurma = "serap.resultados.psp.participacao.turma";
+        public const string TratarResultadoParticipacaoTurma = "serap.resultados.psp.participacao.turma.tratar";
+
+        public const string ImportarParticipacaoTurmaAreaConhecimento = "serap.resultados.psp.participacao.turma.area.conhecimento";
+        public const string TratarParticipacaoTurmaAreaConhecimento = "serap.resultados.psp.participacao.turma.area.conhecimento.tratar";
+
+        public const string ImportarResultadoParticipacaoUe = "serap.resultados.psp.participacao.ue";
+        public const string TratarResultadoParticipacaoUe = "serap.resultados.psp.participacao.ue.tratar";
+        public const string ImportarParticipacaoUeAreaConhecimento = "serap.resultados.psp.participacao.ue.area.conhecimento";
+        public const string TratarParticipacaoUeAreaConhecimento = "serap.resultados.psp.participacao.ue.area.conhecimento.tratar";
+        public const string ImportarResultadoParticipacaoDre = "serap.resultados.psp.participacao.dre";
+        public const string TratarResultadoParticipacaoDre = "serap.resultados.psp.participacao.dre.tratar";
+        public const string ImportarResultadoParticipacaoDreAreaConhecimento = "serap.resultados.psp.participacao.dre.area.conhecimento";
+        public const string TratarResultadoParticipacaoDreAreaConhecimento = "serap.resultados.psp.participacao.dre.area.conhecimento.tratar";
+        public const string ImportarResultadoParticipacaoSme = "serap.resultados.psp.participacao.sme";
+        public const string TratarResultadoParticipacaoSme = "serap.resultados.psp.participacao.sme.tratar";
+
+        public const string ImportarResultadoParticipacaoSmeAreaConhecimento = "serap.resultados.psp.participacao.sme.area.conhecimento";
+        public const string TratarResultadoParticipacaoSmeAreaConhecimento = "serap.resultados.psp.participacao.sme.area.conhecimento.tratar";
     }
 }

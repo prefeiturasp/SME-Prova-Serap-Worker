@@ -20,47 +20,49 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 {
     public class WorkerRabbit : BackgroundService
     {
-        private readonly ILogger<WorkerRabbit> _logger;
+        private readonly ILogger<WorkerRabbit> logger;
         private readonly RabbitOptions rabbitOptions;
         private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly ConnectionFactory connectionFactory;
         private readonly IServicoLog servicolog;
         private readonly IServicoTelemetria servicoTelemetria;
+        private readonly IServicoMensageria servicoMensageria;
         private readonly Dictionary<string, ComandoRabbit> comandos;
+        
         public WorkerRabbit(
             ILogger<WorkerRabbit> logger,
             RabbitOptions rabbitOptions,
             IServiceScopeFactory serviceScopeFactory,
             ConnectionFactory connectionFactory,
             IServicoLog servicolog,
-            IServicoTelemetria servicoTelemetria
-           )
+            IServicoTelemetria servicoTelemetria,
+            IServicoMensageria servicoMensageria)
         {
-            _logger = logger;
+            this.logger = logger;
             this.rabbitOptions = rabbitOptions ?? throw new ArgumentNullException(nameof(rabbitOptions));
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
             this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             this.servicolog = servicolog ?? throw new ArgumentNullException(nameof(servicolog));
             this.servicoTelemetria = servicoTelemetria ?? throw new ArgumentNullException(nameof(servicoTelemetria));
+            this.servicoMensageria = servicoMensageria ?? throw new ArgumentNullException(nameof(servicoMensageria));
             comandos = new Dictionary<string, ComandoRabbit>();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             using var conexaoRabbit = connectionFactory.CreateConnection();
-            using IModel channel = conexaoRabbit.CreateModel();
+            using var channel = conexaoRabbit.CreateModel();
 
             var props = channel.CreateBasicProperties();
             props.Persistent = true;
 
             channel.BasicQos(0, rabbitOptions.LimiteDeMensagensPorExecucao, false);
 
-            channel.ExchangeDeclare(ExchangeRabbit.SerapEstudante, ExchangeType.Direct, true, false);
-            channel.ExchangeDeclare(ExchangeRabbit.SerapEstudanteDeadLetter, ExchangeType.Direct, true, false);
-
-            DeclararFilas(channel);
+            channel.ExchangeDeclare(ExchangeRabbit.SerapEstudante, ExchangeType.Direct, true);
+            channel.ExchangeDeclare(ExchangeRabbit.SerapEstudanteDeadLetter, ExchangeType.Direct, true);
 
             RegistrarUseCases();
+            DeclararFilas(channel);
 
             await InicializaConsumer(channel, stoppingToken);
 
@@ -86,37 +88,86 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation(
-                    $"Worker ativo em: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                logger.LogInformation("Worker ativo em: {Now}", DateTime.Now);
                 await Task.Delay(10000, stoppingToken);
             }
         }
+        
         private static void RegistrarConsumer(EventingBasicConsumer consumer, IModel channel)
         {
             foreach (var fila in typeof(RotasRabbit).ObterConstantesPublicas<string>())
                 channel.BasicConsume(fila, false, consumer);
         }
-        private static void DeclararFilas(IModel channel)
+        
+        private void DeclararFilas(IModel channel)
         {
             foreach (var fila in typeof(RotasRabbit).ObterConstantesPublicas<string>())
             {
-                var args = new Dictionary<string, object>()
-                    {
-                        { "x-dead-letter-exchange", ExchangeRabbit.SerapEstudanteDeadLetter }
-                    };
-
+                var filaDeadLetter = $"{fila}.deadletter";
+                var filaDeadLetterFinal = $"{fila}.deadletter.final";
+                
+                if (rabbitOptions.ForcarRecriarFilas)
+                {
+                    channel.QueueDelete(fila, ifEmpty: true);
+                    channel.QueueDelete(filaDeadLetter, ifEmpty: true);
+                    channel.QueueDelete(filaDeadLetterFinal, ifEmpty: true);
+                }                
+                
+                var args = ObterArgumentoDaFila(fila);
                 channel.QueueDeclare(fila, true, false, false, args);
                 channel.QueueBind(fila, ExchangeRabbit.SerapEstudante, fila, null);
 
-                var filaDeadLetter = $"{fila}.deadletter";
-                channel.QueueDeclare(filaDeadLetter, true, false, false, null);
+                var argsDlq = ObterArgumentoDaFilaDeadLetter(fila);
+                channel.QueueDeclare(filaDeadLetter, true, false, false, argsDlq);
                 channel.QueueBind(filaDeadLetter, ExchangeRabbit.SerapEstudanteDeadLetter, fila, null);
 
-                var filaDeadLetterFinal = $"{fila}.deadletter.final";
-                channel.QueueDeclare(filaDeadLetterFinal, true, false, false, null);
+                var argsFinal = new Dictionary<string, object> { { "x-queue-mode", "lazy" } };
+                
+                channel.QueueDeclare(
+                    queue: filaDeadLetterFinal, 
+                    durable: true, 
+                    exclusive: false, 
+                    autoDelete: false, 
+                    arguments: argsFinal);
+                
                 channel.QueueBind(filaDeadLetterFinal, ExchangeRabbit.SerapEstudanteDeadLetter, filaDeadLetterFinal, null);
             }
         }
+        
+        private Dictionary<string, object> ObterArgumentoDaFila(string fila)
+        {
+            var args = new Dictionary<string, object>
+                { { "x-dead-letter-exchange", ExchangeRabbit.SerapEstudanteDeadLetter } };
+
+            if (comandos.ContainsKey(fila) && comandos[fila].ModeLazy)
+                args.Add("x-queue-mode", "lazy");
+            
+            return args;
+        }
+        
+        private Dictionary<string, object> ObterArgumentoDaFilaDeadLetter(string fila)
+        {
+            var argsDlq = new Dictionary<string, object>();
+            var ttl = comandos.ContainsKey(fila) ? comandos[fila].Ttl : ExchangeRabbit.SerapDeadLetterTtl;
+
+            argsDlq.Add("x-dead-letter-exchange", ExchangeRabbit.SerapEstudante);
+            argsDlq.Add("x-message-ttl", ttl);
+            argsDlq.Add("x-queue-mode", "lazy");
+
+            return argsDlq;
+        }
+        
+        private ulong GetRetryCount(IBasicProperties properties)
+        {
+            if (properties.Headers == null || !properties.Headers.ContainsKey("x-death"))
+                return 0;
+            
+            var deathProperties = (List<object>)properties.Headers["x-death"];
+            var lastRetry = (Dictionary<string, object>)deathProperties[0];
+            var count = lastRetry["count"];
+            
+            return (ulong) Convert.ToInt64(count);
+        }        
 
         private void RegistrarUseCases()
         {
@@ -186,9 +237,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.GrupoAbrangenciaExcluir, new ComandoRabbit("Busca abrangências por grupo para fila excluir", typeof(ITratarAbrangenciaGrupoExcluirUseCase)));
             comandos.Add(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, new ComandoRabbit("", typeof(ITratarAbrangenciaUsuarioGrupoExcluirUseCase)));
 
-            comandos.Add(RotasRabbit.FilaDeadletterTratar, new ComandoRabbit("Tratamento de fila Deadletter", typeof(IRabbitDeadletterSerapTratarUseCase)));
-            comandos.Add(RotasRabbit.FilaDeadletterSync, new ComandoRabbit("Sync de fila Deadletter", typeof(IRabbitDeadletterSerapSyncUseCase)));
-
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));
 
             comandos.Add(RotasRabbit.TratarCadernosProvaTai, new ComandoRabbit("Tratamento cadernos amostra TAI", typeof(ITratarCadernosProvaTaiUseCase)));
@@ -206,6 +254,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));
 
+            comandos.Add(RotasRabbit.TratarStatusProcessoResultado, new ComandoRabbit("Tratar status do processo", typeof(ITratarStatusProcessoResultadoPspUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoAlunoPsp, new ComandoRabbit("Importa arquivo csv proeficiencia aluno", typeof(IImportarProficienciaAlunoUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoAlunoPsp, new ComandoRabbit("Tratar resgistros arquivo csv proeficiencia aluno", typeof(ITratarProficienciaAlunoUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoSmePsp, new ComandoRabbit("Importa dados arquivo csv proficiencia sme", typeof(IImportarProficienciaSmeUseCase)));
@@ -216,20 +265,38 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoEscolaPsp, new ComandoRabbit("Tratar resgistros arquivo csv proficiencia escola", typeof(ITratarProficienciaEscolaUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoTurmaPsp, new ComandoRabbit("Importa dados arquivo csv proficiencia turma", typeof(IImportarProficienciaTurmaUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoTurmaPsp, new ComandoRabbit("Tratar resgistros arquivo csv proficiencia turma", typeof(ITratarProficienciaTurmaUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoTurma, new ComandoRabbit("Importa dados arquivo csv participação turma", typeof(IImportarResultadoParticipacaoTurmaUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoTurma, new ComandoRabbit("Tratar registros arquivo csv participação turma", typeof(ITratarResultadoParticipacaoTurmaUseCase)));
+            comandos.Add(RotasRabbit.ImportarParticipacaoTurmaAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação turma e area conhecimento", typeof(IImportarParticipacaoTurmaAreaConhecimentoUseCase)));
+            comandos.Add(RotasRabbit.TratarParticipacaoTurmaAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação turma e area conhecimento", typeof(ITratarParticipacaoTurmaAreaConhecimentoUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoUe, new ComandoRabbit("Importa dados arquivo csv participação Ue", typeof(IImportarResultadoParticipacaoUeUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoUe, new ComandoRabbit("Tratar registros arquivo csv participação Ue", typeof(ITratarResultadoParticipacaoUeUseCase)));
+            comandos.Add(RotasRabbit.ImportarParticipacaoUeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Ue e area conhecimento", typeof(IImportarParticipacaoUeAreaConhecimentoUseCase)));
+            comandos.Add(RotasRabbit.TratarParticipacaoUeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Ue e area conhecimento", typeof(ITratarParticipacaoUeAreaConhecimentoUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoDre, new ComandoRabbit("Importa dados arquivo csv participação Dre", typeof(IImportarResultadoParticipacaoDreUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoDre, new ComandoRabbit("Tratar registros arquivo csv participação Dre", typeof(ITratarResultadoParticipacaoDreUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoDreAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Dre AreaConhecimento", typeof(IImportResultParticipDreAreaUseCaseUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoDreAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Dre AreaConhecimento", typeof(ITratarResultParticipDreAreaUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSme, new ComandoRabbit("Importa dados arquivo csv participação Sme", typeof(IImportarResultadoParticipacaoSmeUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoSme, new ComandoRabbit("Tratar registros arquivo csv participação Sme", typeof(ITratarResultadoParticipacaoSmeUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Sme AreaConhecimento", typeof(IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Sme AreaConhecimento", typeof(ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
+
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)
         {
             var executar = objType.GetMethod(method);
 
-            if (executar == null)
+            if (executar != null) 
+                return executar;
+            
+            foreach (var itf in objType.GetInterfaces())
             {
-                foreach (var itf in objType.GetInterfaces())
-                {
-                    executar = ObterMetodo(itf, method);
-                    if (executar != null)
-                        break;
-                }
+                executar = ObterMetodo(itf, method);
+
+                if (executar != null)
+                    break;
             }
 
             return executar;
@@ -239,9 +306,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         {
             var mensagem = Encoding.UTF8.GetString(ea.Body.Span);
             var rota = ea.RoutingKey;
+
             if (comandos.ContainsKey(rota))
             {
-                _logger.LogInformation($"Worker rota: {rota}");
+                logger.LogInformation("Worker rota: {Rota}", rota);
                 var transacao = servicoTelemetria.IniciarTransacao(rota);
 
                 var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
@@ -252,7 +320,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                     using var scope = serviceScopeFactory.CreateScope();
                     var casoDeUso = scope.ServiceProvider.GetService(comandoRabbit.TipoCasoUso);
 
-                    await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, new object[] { mensagemRabbit });
+                    await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, mensagemRabbit);
 
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
@@ -270,9 +338,24 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception ex)
                 {
-                    channel.BasicReject(ea.DeliveryTag, false);
-                    servicolog.Registrar(LogNivel.Critico, $"Rota-- {ea.RoutingKey} -- Erros: {ex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem} --", ex.StackTrace);
                     servicoTelemetria.RegistrarExcecao(transacao, ex);
+                    
+                    var rejeicoes = GetRetryCount(ea.BasicProperties);
+
+                    if (++rejeicoes >= comandoRabbit.QuantidadeReprocessamentoDeadLetter)
+                    {
+                        channel.BasicAck(ea.DeliveryTag, false);
+                        
+                        var filaFinal = $"{ea.RoutingKey}.deadletter.final";
+
+                        await servicoMensageria.Publicar(mensagemRabbit, filaFinal,
+                            ExchangeRabbit.SerapEstudanteDeadLetter,
+                            "PublicarDeadLetter");
+                    } else
+                        channel.BasicReject(ea.DeliveryTag, false);
+                    
+                    servicolog.Registrar(LogNivel.Critico, $"Rota-- {ea.RoutingKey} -- Erros: {ex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem} --", ex.StackTrace);
+                    
                 }
                 finally
                 {

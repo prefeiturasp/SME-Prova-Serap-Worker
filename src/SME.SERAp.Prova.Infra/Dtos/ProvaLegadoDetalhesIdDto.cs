@@ -32,16 +32,14 @@ namespace SME.SERAp.Prova.Infra
         public bool Multidisciplinar { get; set; }
         public int TipoProva { get; set; }
         public bool FormatoTai { get; set; }
-
         public bool PermiteAvancarSemResponder { get; set; }
-
         public bool PermiteVoltarAoItemAnterior { get; set; }
-
         public int? QtdItensSincronizacaoRespostas { get; set; }
-
         public bool ProvaComProficiencia { get; set; }
         public bool ApresentarResultados { get; set; }
         public bool ApresentarResultadosPorItem { get; set; }
+        public bool ExibirVideo { get; set; }
+        public bool ExibirAudio { get; set; }
 
         public void AddAno(string ano)
         {

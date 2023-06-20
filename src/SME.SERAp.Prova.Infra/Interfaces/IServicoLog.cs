@@ -1,5 +1,4 @@
-﻿using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Dominio.Enums;
+﻿using SME.SERAp.Prova.Dominio.Enums;
 using System;
 
 namespace SME.SERAp.Prova.Infra.Interfaces

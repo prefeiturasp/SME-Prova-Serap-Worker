@@ -73,6 +73,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.ProvaComProficiencia = provaParaTratar.ProvaComProficiencia;
                 provaAtual.ApresentarResultados = provaParaTratar.ApresentarResultados;
                 provaAtual.ApresentarResultadosPorItem = provaParaTratar.ApresentarResultadosPorItem;
+                provaAtual.ExibirAudio = provaParaTratar.ExibirAudio;
+                provaAtual.ExibirVideo = provaParaTratar.ExibirVideo;
 
                 var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
                 if (verificaSePossuiRespostas)
@@ -130,7 +132,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
                 provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, provaFormatoTaiItem,
-                provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem);
+                provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem,
+                provaLegado.ExibirAudio, provaLegado.ExibirVideo);
         }
 
         private Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

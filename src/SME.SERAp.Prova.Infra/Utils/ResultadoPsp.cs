@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Dominio;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 
@@ -23,7 +24,7 @@ namespace SME.SERAp.Prova.Infra
                 linha = linha.Trim().Replace("\r", string.Empty);
                 linha = linha.Trim().Replace("\n", string.Empty);
                 linha = linha.Trim().Replace("\0", string.Empty);
-                
+
                 var arrayLinha = records.Row.Parser.Record;
                 return string.IsNullOrEmpty(linha) || arrayLinha == null || arrayLinha.Length == 0 ||
                        (arrayLinha.Length > 0 && string.IsNullOrEmpty(arrayLinha[0]));
@@ -39,18 +40,69 @@ namespace SME.SERAp.Prova.Infra
 
         public static decimal? ConvertStringPraDecimalNullPsp(this string valor)
         {
-            if (string.IsNullOrEmpty(valor)) return null;
-
-            valor = valor.Replace(",", ".").Trim();
-
-            if (valor == "NA") return null;
-
-            if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec_valor))
+            try
             {
-                return dec_valor;
-            }
+                if (string.IsNullOrEmpty(valor)) return null;
 
-            throw new ArgumentException($"não foi possível converter o valor para decimal: {valor}");
+                valor = valor.Replace(",", ".").Trim();
+
+                if (valor.ToUpper() == "NA") return null;
+
+                if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec_valor))
+                {
+                    return dec_valor;
+                }
+                throw new Exception();
+            }
+            catch (Exception)
+            {
+                throw new Exception($"não foi possível converter o valor para decimal: {valor}");
+            }
+        }
+
+        public static bool AnoEdicaoValido(string edicao)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(edicao)) return false;
+                if (int.TryParse(edicao, NumberStyles.Number, CultureInfo.InvariantCulture, out int ano_edicao))
+                {
+                    return ano_edicao > 2000 && ano_edicao < 3000;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static bool DecimalNullValido(decimal? valor)
+        {
+            try
+            {
+                if (valor == null) return true;
+                decimal dec_valor = (decimal)valor;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static void ValidarAreaConhecimentoId(int areaConhecimentoId)
+        {
+            try
+            {
+                var listaAreaConhecimentoId = Enum.GetValues(typeof(AreaConhecimentoProvaSp)).Cast<AreaConhecimentoProvaSp>().ToList();
+                if (!listaAreaConhecimentoId.Any(x => x == (AreaConhecimentoProvaSp)areaConhecimentoId))
+                    throw new Exception();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"AreaConhecimentoId: {areaConhecimentoId}, inválido -- {ex.Message} -- {ex.StackTrace}");
+            }
         }
 
         public static string ObterFilaTratarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)
@@ -67,6 +119,23 @@ namespace SME.SERAp.Prova.Infra
                     return RotasRabbit.TratarResultadoEscolaPsp;
                 case TipoResultadoPsp.ResultadoTurma:
                     return RotasRabbit.TratarResultadoTurmaPsp;
+                case TipoResultadoPsp.ResultadoParticipacaoTurma:
+                    return RotasRabbit.TratarResultadoParticipacaoTurma;
+                case TipoResultadoPsp.ParticipacaoTurmaAreaConhecimento:
+                    return RotasRabbit.TratarParticipacaoTurmaAreaConhecimento;
+                case TipoResultadoPsp.ResultadoParticipacaoUe:
+                    return RotasRabbit.TratarResultadoParticipacaoUe;
+                case TipoResultadoPsp.ParticipacaoUeAreaConhecimento:
+                    return RotasRabbit.TratarParticipacaoUeAreaConhecimento;
+                case TipoResultadoPsp.ParticipacaoDre:
+                    return RotasRabbit.TratarResultadoParticipacaoDre;
+                case TipoResultadoPsp.ParticipacaoDreAreaConhecimento:
+                    return RotasRabbit.TratarResultadoParticipacaoDreAreaConhecimento;
+                case TipoResultadoPsp.ParticipacaoSme:
+                    return RotasRabbit.TratarResultadoParticipacaoSme;
+                case TipoResultadoPsp.ParticipacaoSmeAreaConhecimento:
+                    return RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento;
+
                 default:
                     return string.Empty;
             }

@@ -10,8 +10,8 @@ namespace SME.SERAp.Prova.Dominio
         }
         public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB,
             int totalCadernos, Modalidade modalidade, long? disciplinaId, string disciplina, bool ocultarProva, bool aderirTodos, bool multidisciplinar, int tipoProvaId, bool formatoTai,
-            int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, bool permiteAvancarSemResponderTai = false, 
-            bool permiteVoltarItemAnteriorTai = false, bool provaComProficiencia = false, bool apresentarResultados = false, bool apresentarResultadosPorItem = false)
+            int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, bool permiteAvancarSemResponderTai = false,
+            bool permiteVoltarItemAnteriorTai = false, bool provaComProficiencia = false, bool apresentarResultados = false, bool apresentarResultadosPorItem = false, bool exibirAudio = false, bool exibirVideo = false)
         {
             Id = id;
             Descricao = descricao;
@@ -41,6 +41,8 @@ namespace SME.SERAp.Prova.Dominio
             ProvaComProficiencia = provaComProficiencia;
             ApresentarResultados = apresentarResultados;
             ApresentarResultadosPorItem = apresentarResultadosPorItem;
+            ExibirAudio = exibirAudio;
+            ExibirVideo = exibirVideo;
         }
 
         public string Descricao { get; set; }
@@ -71,5 +73,7 @@ namespace SME.SERAp.Prova.Dominio
         public bool ProvaComProficiencia { get; set; }
         public bool ApresentarResultados { get; set; }
         public bool ApresentarResultadosPorItem { get; set; }
+        public bool ExibirVideo { get; set; }
+        public bool ExibirAudio { get; set; }
     }
 }

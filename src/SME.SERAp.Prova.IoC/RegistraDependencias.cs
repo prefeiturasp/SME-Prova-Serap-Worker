@@ -6,6 +6,7 @@ using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dados.Repositorios;
+using SME.SERAp.Prova.Dados.Repositorios.ProvaSP;
 using SME.SERAp.Prova.Dados.Repositorios.Serap;
 using SME.SERAp.Prova.Infra.Interfaces;
 using SME.SERAp.Prova.Infra.Services;
@@ -99,6 +100,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioParticipacaoUe, RepositorioParticipacaoUe>();
             services.AddScoped<IRepositorioParticipacaoUeAreaConhecimento, RepositorioParticipacaoUeAreaConhecimento>();
             services.AddScoped<IRepositorioParticipacaoDre, RepositorioParticipacaoDre>();
+            services.AddScoped<IRepositorioParticipacaoDreAreaConhecimento, RepositorioParticipacaoDreAreaConhecimento>();
             services.AddScoped<IRepositorioParticipacaoSme, RepositorioParticipacaoSme>();
 
         }
@@ -213,6 +215,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarParticipacaoUeAreaConhecimentoUseCase, TratarParticipacaoUeAreaConhecimentoUseCase>();
             services.AddScoped<IImportarResultadoParticipacaoDreUseCase, ImportarResultadoParticipacaoDreUseCase>();
             services.AddScoped<ITratarResultadoParticipacaoDreUseCase, TratarResultadoParticipacaoDreUseCase>();
+            services.AddScoped<IImportResultParticipDreAreaUseCaseUseCase, ImportResultParticipDreAreaUseCaseUseCase>();
+            services.AddScoped<ITratarResultParticipDreAreaUseCase, TratarResultParticipDreAreaUseCase>();
             services.AddScoped<IImportarResultadoParticipacaoSmeUseCase, ImportarResultadoParticipacaoSmeUseCase>();
             services.AddScoped<ITratarResultadoParticipacaoSmeUseCase, TratarResultadoParticipacaoSmeUseCase>();
         }

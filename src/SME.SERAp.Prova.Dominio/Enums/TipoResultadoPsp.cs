@@ -19,7 +19,9 @@ namespace SME.SERAp.Prova.Dominio
         [Description("ResultadoSme")]
         ResultadoSme = 5,
         [Description("ResultadoParticipacaoTurma")]
-        ResultadoParticipacaoTurma = 6,
+        ResultadoParticipacaoTurma = 13,
+        [Description("ParticipacaoTurmaAreaConhecimento")]
+        ParticipacaoTurmaAreaConhecimento = 14,
 
 
     }

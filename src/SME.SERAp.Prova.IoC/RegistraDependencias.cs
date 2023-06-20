@@ -94,6 +94,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoDre, RepositorioResultadoDre>();
             services.AddScoped<IRepositorioResultadoEscola, RepositorioResultadoEscola>();
             services.AddScoped<IRepositorioResultadoTurma, RepositorioResultadoTurma>();
+            services.AddScoped<IRepositorioParticipacaoTurma, RepositorioParticipacaoTurma>();
+            services.AddScoped<IRepositorioParticipacaoTurmaAreaConhecimento, RepositorioParticipacaoTurmaAreaConhecimento>();
+
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -195,6 +198,10 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProficienciaEscolaUseCase, TratarProficienciaEscolaUseCase>();
             services.AddScoped<IImportarProficienciaTurmaUseCase, ImportarProficienciaTurmaUseCase>();
             services.AddScoped<ITratarProficienciaTurmaUseCase, TratarProficienciaTurmaUseCase>();
+            services.AddScoped<IImportarResultadoParticipacaoTurmaUseCase, ImportarResultadoParticipacaoTurmaUseCase>();
+            services.AddScoped<ITratarResultadoParticipacaoTurmaUseCase, TratarResultadoParticipacaoTurmaUseCase>();
+            services.AddScoped<IImportarParticipacaoTurmaAreaConhecimentoUseCase, ImportarParticipacaoTurmaAreaConhecimentoUseCase>();
+            services.AddScoped<ITratarParticipacaoTurmaAreaConhecimentoUseCase, TratarParticipacaoTurmaAreaConhecimentoUseCase>();
         }
     }
 }

@@ -2,7 +2,6 @@
 using CsvHelper.Configuration;
 using SME.SERAp.Prova.Dominio;
 using System;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;

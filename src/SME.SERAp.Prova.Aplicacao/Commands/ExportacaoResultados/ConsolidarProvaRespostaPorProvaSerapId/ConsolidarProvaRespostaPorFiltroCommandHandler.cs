@@ -20,8 +20,8 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 foreach (string ueId in request.UeEolIds)
                 {
-                    await repositorioProva.LimparDadosConsolidadosPorFiltros(request.ProvaId, request.DreEolId, ueId, request.TurmaEolIds[0]);
-                    await repositorioProva.ConsolidarProvaRespostasPorFiltros(request.ProvaId, request.DreEolId, ueId, request.TurmaEolIds[0]);
+                    //await repositorioProva.LimparDadosConsolidadosPorFiltros(request.ProvaId, request.DreEolId, ueId, request.TurmaEolIds[0]);
+                    //await repositorioProva.ConsolidarProvaRespostasPorFiltros(request.ProvaId, request.DreEolId, ueId, request.TurmaEolIds[0]);
                 }
                 return true;
             }

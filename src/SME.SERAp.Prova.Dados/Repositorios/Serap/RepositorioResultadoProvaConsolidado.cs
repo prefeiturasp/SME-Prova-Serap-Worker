@@ -55,7 +55,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol, string ueCodigoEol, string[] turmasCodigosEol = null)
+        public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaRespostaQuery(long provaSerapId, int take, int skip)
         {
             using var conn = ObterConexaoLeitura();
             try
@@ -94,16 +94,13 @@ namespace SME.SERAp.Prova.Dados
                                 and rpc.ue_codigo_eol = @ueCodigoEol 
                                  ";
 
-                if (turmasCodigosEol != null)
-                    where += " and rpc.turma_codigo = any(@turmasCodigosEol) ";
-
                 query += where;
 
-                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaSerapId, dreCodigoEol, ueCodigoEol, turmasCodigosEol }, commandTimeout: 9000);
+                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaSerapId, take, skip }, commandTimeout: 9000);
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Extrair dados para CSV. ProvaId:{provaSerapId}, CodigoDre:{dreCodigoEol}, CodigoUe:{ueCodigoEol} -- Erro: {ex.Message}");
+                throw new ArgumentException($"Extrair dados para CSV. ProvaId:{provaSerapId} -- Erro: {ex.Message}");
             }
             finally
             {

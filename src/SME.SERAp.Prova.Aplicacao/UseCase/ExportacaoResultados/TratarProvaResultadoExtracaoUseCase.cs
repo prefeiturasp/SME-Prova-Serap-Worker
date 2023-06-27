@@ -12,7 +12,7 @@ using static SME.SERAp.Prova.Infra.Utils.Paginacao;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TratarProvaResultadoExtracaoUseCase : ITratarProvaResultadoExtracaoUseCase
+    public class TratarProvaResultadoExtracaoUseCase : IExtracaoProvaResultadoUseCase
     {
         private readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
@@ -87,7 +87,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
                     {
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
+                        //await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
                     }
                 }
                 return true;

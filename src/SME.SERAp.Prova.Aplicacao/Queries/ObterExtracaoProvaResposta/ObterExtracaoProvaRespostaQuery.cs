@@ -7,19 +7,14 @@ namespace SME.SERAp.Prova.Aplicacao
     public class ObterExtracaoProvaRespostaQuery : IRequest<IEnumerable<ConsolidadoProvaRespostaDto>>
     {
         public long ProvaSerapId { get; set; }
+        public int Take { get; set; }
+        public int Skip { get; set; }
 
-        public string DreCodigoEol { get; set; }
-
-        public string UeCodigoEol { get; set; }
-
-        public string[] TurmasCodigosEol { get; set; }
-
-        public ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol, string ueCodigoEol, string[] turmasCodigosEol = null)
+        public ObterExtracaoProvaRespostaQuery(long provaSerapId, int take, int skip)
         {
             ProvaSerapId = provaSerapId;
-            DreCodigoEol = dreCodigoEol;
-            UeCodigoEol = ueCodigoEol;
-            TurmasCodigosEol = turmasCodigosEol;
+            Take = take;
+            Skip = skip;
         }
     }
 }

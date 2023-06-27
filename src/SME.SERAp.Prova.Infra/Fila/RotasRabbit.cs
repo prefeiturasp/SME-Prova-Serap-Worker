@@ -17,12 +17,10 @@
         public const string IncluirRespostaAluno = "serap.estudante.resposta.aluno.incluir";
         public const string IncluirPreferenciasAluno = "serap.estudante.preferencias.aluno.incluir";
         public const string AtualizarFrequenciaAlunoProvaSync = "serap.estudante.atualizar.frequencia.sync";
-        public const string AtualizarFrequenciaAlunoProvaTratar = "serap.estudante.atualizar.frequencia.tratar";
-        public const string ExtrairResultadosProva = "serap.estudante.prova.resultados.aluno.extrair";
-        public const string ExtrairResultadosProvaFiltro = "serap.estudante.prova.resultados.aluno.extrair.filtro";
+        public const string AtualizarFrequenciaAlunoProvaTratar = "serap.estudante.atualizar.frequencia.tratar";        
+        public const string ExcluirDadosConsolidado = "serap.estudante.prova.resultados.excluir";
         public const string ConsolidarProvaResultado = "serap.estudante.prova.resultados.consolidar";
-        public const string ConsolidarProvaResultadoFiltro = "serap.estudante.prova.resultados.consolidar.filtro";
-        public const string ConsolidarProvaResultadoFiltroTurma = "serap.estudante.prova.resultados.consolidar.filtro.turma";
+        public const string ExtrairResultadosProva = "serap.estudante.prova.resultados.aluno.extrair";
         public const string TratarAdesaoProva = "serap.estudante.prova.adesao.tratar";
         public const string TratarAdesaoProvaAluno = "serap.estudante.prova.aluno.adesao.tratar";
         public const string TratarTipoProvaDeficiencia = "serap.estudante.prova.tipo.prova.deficiencia.tratar";

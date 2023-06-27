@@ -13,13 +13,11 @@ namespace SME.SERAp.Prova.Dados
         Task<bool> VerificaSeExistePorProvaSerapId(long provaId);
         Task<long?> ObterProvaOrigemCadernoAsync(long provaId);
         Task CriarProvaRespostasExtracao(long provaId);
-        Task ConsolidarProvaRespostasPorProvaSerapId(long provaId);
-        Task LimparDadosConsolidadosPorProvaSerapId(long provaId);
-        Task ConsolidarProvaRespostasPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo);
         Task<IEnumerable<ProvaBIBSyncDto>> ObterProvasBibAsync();
-        Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo);
         Task<IEnumerable<ResultadoProvaConsolidado>> ObterDadosPorUeId(long provaId, string dreId, string ueId);
         Task<bool> FinalizarProvaAsync(ProvaParaAtualizarDto provaParaAtualizar);
         Task<IEnumerable<ProvaAlunoDto>> ObterProvasIniciadasPorModalidadeAsync(int modalidade);
+        Task<int> ExcluirDadosConsolidadoPaginado(long provaLegadoId, int take, int skip);
+        Task<int> ConsolidarDadosPaginado(long provaLegadoId, bool aderirTodos, bool paraEstudanteComDeficiencia, int take, int skip);
     }
 }

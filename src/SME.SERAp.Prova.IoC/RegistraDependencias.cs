@@ -130,11 +130,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarFrequenciaAlunoProvaUseCase, TratarFrequenciaAlunoProvaUseCase>();
             services.AddScoped<ITratarFrequenciaAlunoProvaSyncUseCase, TratarFrequenciaAlunoProvaSyncUseCase>();
 
-            services.AddScoped<ITratarProvaResultadoExtracaoUseCase, TratarProvaResultadoExtracaoUseCase>();
-            services.AddScoped<ITratarProvaResultadoExtracaoFiltroUseCase, TratarProvaResultadoExtracaoFiltroUseCase>();
+            services.AddScoped<IExtracaoProvaResultadoUseCase, TratarProvaResultadoExtracaoUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
-            services.AddScoped<IConsolidarProvaRespostaPorFiltroUseCase, ConsolidarProvaRespostaPorFiltroUseCase>();
-            services.AddScoped<IConsolidarProvaRespostaPorFiltroTurmaUseCase, ConsolidarProvaRespostaPorFiltroTurmaUseCase>();
 
             services.AddScoped<IIniciarProcessoFinalizarProvasAutomaticamenteUseCase, IniciarProcessoFinalizarProvasAutomaticamenteUseCase>();
             services.AddScoped<IFinalizarProvaAutomaticamenteUseCase, FinalizarProvaAutomaticamenteUseCase>();

@@ -24,6 +24,44 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
+            serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));
+
+            try
+            {
+                if (exportacaoResultado is null)
+                    throw new NegocioException("A exportação não foi encontrada");
+
+                var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
+
+                if (!checarProvaExiste)
+                    throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
+
+                if (exportacaoResultado.Status == ExportacaoResultadoStatus.Erro || exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) return false;
+
+                var linhasAfetadas = await mediator.Send(new ConsolidarProvaRespostaCommand(extracao.ProvaSerapId, extracao.AderirTodos, extracao.ParaEstudanteComDeficiencia, extracao.Take, extracao.Skip));
+                if (linhasAfetadas > 0)
+                {
+                    extracao.Skip += extracao.Take;
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultado, extracao));
+                    return true;
+                }
+
+                extracao.Skip = 0;
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
+                serviceLog.Registrar(LogNivel.Critico, $"Erro -- Consolidar os dados da prova. msg: {mensagemRabbit.Mensagem}", ex.Message, ex.StackTrace);
+                return false;
+            }
+        }
+
+        public async Task<bool> Executar_hold(MensagemRabbit mensagemRabbit)
+        {
+            var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
 
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
 
@@ -65,10 +103,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     return false;
                 }
 
-                foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
-                {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
-                }
+                //foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
+                //{
+                //    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
+                //}
             }
             catch (Exception ex)
             {

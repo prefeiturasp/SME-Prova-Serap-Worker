@@ -22,7 +22,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> Handle(ObterExtracaoProvaRespostaQuery request, CancellationToken cancellationToken)
         {
-            var resultado = await repositorioResultadoProvaConsolidado.ObterExtracaoProvaRespostaQuery(request.ProvaSerapId, request.DreCodigoEol, request.UeCodigoEol, request.TurmasCodigosEol);
+            var resultado = await repositorioResultadoProvaConsolidado.ObterExtracaoProvaRespostaQuery(request.ProvaSerapId, request.Take, request.Skip);
             var alunos = resultado.Select(a => a.AlunoCodigoEol).Distinct();
 
             var resultadoRetorno = new List<ConsolidadoProvaRespostaDto>();

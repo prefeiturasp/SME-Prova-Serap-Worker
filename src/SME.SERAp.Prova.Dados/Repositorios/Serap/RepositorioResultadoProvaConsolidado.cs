@@ -85,16 +85,10 @@ namespace SME.SERAp.Prova.Dados
 	                            rpc.questao_id as QuestaoId, 
 	                            rpc.questao_ordem as QuestaoOrdem,
 	                            rpc.resposta as Resposta
-                              from resultado_prova_consolidado rpc 
-                                 ";                
-
-                string where = " where 1=1 ";
-                where += @"     and rpc.prova_serap_id = @provaSerapId
-                                and rpc.dre_codigo_eol = @dreCodigoEol
-                                and rpc.ue_codigo_eol = @ueCodigoEol 
-                                 ";
-
-                query += where;
+                              from resultado_prova_consolidado rpc
+                                where rpc.prova_serap_id = @provaSerapId
+                                 limit @take 
+                                 offset @skip";
 
                 return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaSerapId, take, skip }, commandTimeout: 9000);
             }

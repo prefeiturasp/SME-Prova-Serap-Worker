@@ -45,8 +45,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
 
                 string fila = string.Empty;
-                var linhasAfetadas = await mediator.Send(new ExcluirDadosConsolidadoCommand(extracao.ProvaSerapId, extracao.Take, extracao.Skip));
-                if (linhasAfetadas > 0)
+                await mediator.Send(new ExcluirDadosConsolidadoCommand(extracao.ProvaSerapId, extracao.Take, extracao.Skip));
+                var existeDadosConsolidado = await mediator.Send(new VerificaResultadoExtracaoProvaExisteQuery(extracao.ProvaSerapId));
+                if (existeDadosConsolidado)
                 {
                     extracao.Skip += extracao.Take;
                     fila = RotasRabbit.ExcluirDadosConsolidado;

@@ -39,16 +39,20 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (exportacaoResultado.Status == ExportacaoResultadoStatus.Erro || exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) return false;
 
+                string fila = string.Empty;
                 var linhasAfetadas = await mediator.Send(new ConsolidarProvaRespostaCommand(extracao.ProvaSerapId, extracao.AderirTodos, extracao.ParaEstudanteComDeficiencia, extracao.Take, extracao.Skip));
                 if (linhasAfetadas > 0)
                 {
                     extracao.Skip += extracao.Take;
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultado, extracao));
-                    return true;
+                    fila = RotasRabbit.ConsolidarProvaResultado;
+                }
+                else
+                {
+                    extracao.Skip = 0;
+                    fila = RotasRabbit.ExtrairResultadosProva;
                 }
 
-                extracao.Skip = 0;
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                await mediator.Send(new PublicaFilaRabbitCommand(fila, extracao));
                 return true;
             }
             catch (Exception ex)
@@ -83,7 +87,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 foreach (Dre dre in dres)
                 {
                     var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
-                    if(ues != null && ues.Any())
+                    if (ues != null && ues.Any())
                     {
                         foreach (Ue ue in ues)
                         {
@@ -93,7 +97,7 @@ namespace SME.SERAp.Prova.Aplicacao
                             var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
                             filtrosParaPublicar.Add(filtro);
                         }
-                    }                    
+                    }
                 }
 
                 if (!filtrosParaPublicar.Any())
@@ -116,7 +120,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
             return true;
-        }        
+        }
 
     }
 }

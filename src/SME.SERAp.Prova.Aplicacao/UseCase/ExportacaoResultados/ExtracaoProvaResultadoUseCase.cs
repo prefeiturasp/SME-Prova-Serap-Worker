@@ -48,7 +48,6 @@ namespace SME.SERAp.Prova.Aplicacao
                         throw new NegocioException($"Arquivo não foi encontrado: {extracao.CaminhoArquivo}");
 
                     var resultado = await mediator.Send(new ObterExtracaoProvaRespostaQuery(extracao.ProvaSerapId, extracao.Take, extracao.Skip));
-
                     if (resultado != null && resultado.Any())
                     {
                         await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultado, extracao.CaminhoArquivo));

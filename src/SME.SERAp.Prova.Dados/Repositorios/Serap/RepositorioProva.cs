@@ -73,7 +73,17 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = $@"";
+                var query = $@"WITH tb AS (
+                                    select prova_serap_id, aluno_codigo_eol  
+                                        from resultado_prova_consolidado r
+                                        where r.prova_serap_id = @provaLegadoId
+                                    limit @take 
+                                    offset @skip
+                                    )
+                                DELETE FROM resultado_prova_consolidado r
+                                    USING tb WHERE r.prova_serap_id = tb.prova_serap_id
+                                        and r.aluno_codigo_eol = tb.aluno_codigo_eol;";
+
                 return await conn.ExecuteAsync(query, new { provaLegadoId, take, skip }, commandTimeout: 50000);
             }
             catch (System.Exception ex)

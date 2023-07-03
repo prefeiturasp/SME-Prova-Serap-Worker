@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public interface ITratarAlunoProvaProficienciaAsyncUseCase
+    public interface ITratarAlunoProvaProficienciaSyncUseCase
     {
         Task<bool> Executar(MensagemRabbit mensagemRabbit);
     }

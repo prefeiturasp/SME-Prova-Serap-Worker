@@ -70,7 +70,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
 
                     if (provaSerap.FormatoTai)
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaAsync, provaSerap.Id));
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.AlunoProvaProficienciaPorProvaSync, provaSerap.Id));
                 }
 
             }

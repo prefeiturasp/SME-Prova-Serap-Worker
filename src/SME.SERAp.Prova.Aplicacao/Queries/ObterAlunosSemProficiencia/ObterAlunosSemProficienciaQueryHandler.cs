@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<IEnumerable<AlunoProvaDto>> Handle(ObterAlunosSemProficienciaQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioAlunoProvaProficiencia.ObterAlunosSemProficienciaAsync(request.ProvaId);
+            return await repositorioAlunoProvaProficiencia.ObterAlunosSemProficienciaAsync();
         }
     }
 }

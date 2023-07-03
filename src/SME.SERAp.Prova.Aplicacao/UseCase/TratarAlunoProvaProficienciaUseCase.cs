@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Infra;
 using System;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Dominio;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -19,22 +20,24 @@ namespace SME.SERAp.Prova.Aplicacao
             var alunoProvaDto = mensagemRabbit.ObterObjetoMensagem<AlunoProvaDto>();
 
             var existeProficiencia = await mediator.Send(new VerificaAlunoProvaProficienciaExisteQuery(alunoProvaDto.AlunoId, alunoProvaDto.ProvaId));
-            if (!existeProficiencia)
-            {
-                var ultimaProficiencia = await mediator.Send(new ObterUltimaProficienciaAlunoPorDisciplinaIdQuery(alunoProvaDto.AlunoRa, alunoProvaDto.DisciplinaId));
+            
+            if (existeProficiencia)
+                return true;
+            
+            var ultimaProficiencia = await mediator.Send(new ObterUltimaProficienciaAlunoPorDisciplinaIdQuery(alunoProvaDto.AlunoRa, alunoProvaDto.DisciplinaId));
+            var disciplinaId = alunoProvaDto.DisciplinaId ?? 0;
 
-                await mediator.Send(new IncluirAlunoProvaProficienciaCommand(new Dominio.AlunoProvaProficiencia()
-                {
-                    AlunoId = alunoProvaDto.AlunoId,
-                    Ra = alunoProvaDto.AlunoRa,
-                    ProvaId = alunoProvaDto.ProvaId,
-                    DisciplinaId = alunoProvaDto.DisciplinaId.GetValueOrDefault() > 0 ? (long)alunoProvaDto.DisciplinaId.Value : (long?)null,
-                    Origem = ultimaProficiencia.origem,
-                    Tipo = Dominio.AlunoProvaProficienciaTipo.Inicial,
-                    Proficiencia = ultimaProficiencia.proficiencia,
-                    UltimaAtualizacao = alunoProvaDto.UltimaAtualizacao
-                }));
-            }
+            await mediator.Send(new IncluirAlunoProvaProficienciaCommand(new AlunoProvaProficiencia
+            {
+                AlunoId = alunoProvaDto.AlunoId,
+                Ra = alunoProvaDto.AlunoRa,
+                ProvaId = alunoProvaDto.ProvaId,
+                DisciplinaId = disciplinaId,
+                Origem = ultimaProficiencia.origem,
+                Tipo = Dominio.AlunoProvaProficienciaTipo.Inicial,
+                Proficiencia = ultimaProficiencia.proficiencia,
+                UltimaAtualizacao = alunoProvaDto.UltimaAtualizacao
+            }));
 
             return true;
         }

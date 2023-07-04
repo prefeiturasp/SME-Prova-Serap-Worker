@@ -34,7 +34,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     await mediator.Send(new PublicaFilaRabbitCommand(
                         RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar,
-                        new AlunoParaSincronizacaoInstitucionalDto(alunoTurma.RA, alunoTurma.TurmaId),
+                        new AlunoParaSincronizacaoInstitucionalDto(alunoTurma.Id, alunoTurma.RA, alunoTurma.TurmaId),
                         mensagemRabbit.CodigoCorrelacao));
                 }
             

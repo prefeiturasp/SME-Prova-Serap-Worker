@@ -50,7 +50,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         turmaHistoricoEol.Matricula,
                         turma.Id,
                         turmaHistoricoEol.AnoLetivo, 
-                        aluno.AlunoCodigo, 
+                        aluno.Id, 
                         turmaHistoricoEol.DataMatricula, 
                         turmaHistoricoEol.DataSituacao))
                     );                    
@@ -62,7 +62,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         turmaHistoricoEol.Matricula,
                         turma.Id, 
                         turmaHistoricoEol.AnoLetivo, 
-                        aluno.AlunoCodigo, 
+                        aluno.Id, 
                         turmaHistoricoEol.DataMatricula, 
                         turmaHistoricoEol.DataSituacao))
                     );                    

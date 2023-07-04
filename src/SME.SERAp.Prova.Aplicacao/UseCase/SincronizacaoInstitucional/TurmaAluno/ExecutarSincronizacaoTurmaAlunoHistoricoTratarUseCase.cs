@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Dominio;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -16,57 +16,56 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var alunosRa = mensagemRabbit.ObterObjetoMensagem<long[]>();
+            var aluno = mensagemRabbit.ObterObjetoMensagem<AlunoParaSincronizacaoInstitucionalDto>();
+            
+            if (aluno == null)
+                throw new NegocioException("Não foi possível localizar aluno para sincronizar o histórico.");
 
-            if (alunosRa == null)
-            {
-                var mensagem = $"Não foi possível fazer parse da mensagem para tratar turmas histórico dos alunos. {mensagemRabbit.Mensagem}.";
-                throw new NegocioException(mensagem);
-            }
+            var turmasHistoricoEol = (await mediator.Send(new ObterTurmaAlunoHistoricoEolPorAlunosRaQuery(new[] { aluno.AlunoCodigo }))).ToList();
 
-            var turmasHistoricoEol = await mediator.Send(new ObterTurmaAlunoHistoricoEolPorAlunosRaQuery(alunosRa));
+            if (!turmasHistoricoEol.Any())
+                return true;
 
-            var turmasCodigo = turmasHistoricoEol.Select(t => t.CodigoTurma.ToString()).Distinct().ToArray();
-            var turmas = await mediator.Send(new ObterTurmaPorCodigosQuery(turmasCodigo));
+            var codigosTrumas = turmasHistoricoEol.Select(c => c.CodigoTurma.ToString()).Distinct().ToArray();
+            var turmas = (await mediator.Send(new ObterTurmaPorCodigosQuery(codigosTrumas))).ToList();
 
-            var turmasHistoricoSerap = await mediator.Send(new ObterTurmaAlunoHistoricoSerapPorAlunosRaQuery(alunosRa));
+            var turmasHistoricoSerap = (await mediator.Send(new ObterTurmaAlunoHistoricoSerapPorAlunosRaQuery(new[] { aluno.AlunoCodigo }))).ToList();
 
             foreach (var turmaHistoricoEol in turmasHistoricoEol)
             {
-                var turma = turmas.FirstOrDefault(t => t.Codigo == turmaHistoricoEol.CodigoTurma.ToString());
-                var aluno = turmasHistoricoSerap.FirstOrDefault(t => t.AlunoRa == turmaHistoricoEol.AlunoRa);
+                var turma = turmas.FirstOrDefault(c => c.Codigo == turmaHistoricoEol.CodigoTurma.ToString());
+                
+                if (turma == null)
+                    continue;
 
-                if (turma != null && aluno != null)
+                var turmaHistoricoSerap = turmasHistoricoSerap.FirstOrDefault(c =>
+                    c.Matricula == turmaHistoricoEol.Matricula &&
+                    c.AlunoRa == aluno.AlunoCodigo &&
+                    c.TurmaId == turma.Id &&
+                    c.AnoLetivo == turmaHistoricoEol.AnoLetivo);
+
+                if (turmaHistoricoSerap == null)
                 {
-                    var turmaHistoricoSerao = turmasHistoricoSerap.FirstOrDefault(t => 
-                        t.Matricula == turmaHistoricoEol.Matricula && 
-                        t.AlunoRa == turmaHistoricoEol.AlunoRa &&
-                        t.TurmaId == turma.Id &&
-                        t.AnoLetivo == turmaHistoricoEol.AnoLetivo);
-
-                    if (turmaHistoricoSerao == null)
-                    {
-                        await mediator.Send(new TurmaAlunoHistoricoIncluirCommand(new Dominio.TurmaAlunoHistorico(
-                            turmaHistoricoEol.Matricula,
-                            turma.Id,
-                            turmaHistoricoEol.AnoLetivo, 
-                            aluno.AlunoId, 
-                            turmaHistoricoEol.DataMatricula, 
-                            turmaHistoricoEol.DataSituacao))
-                        );
-                    }
-                    else
-                    {
-                        await mediator.Send(new TurmaAlunoHistoricoAlterarCommand(new Dominio.TurmaAlunoHistorico(
-                            turmaHistoricoSerao.Id, 
-                            turmaHistoricoEol.Matricula,
-                            turma.Id, 
-                            turmaHistoricoEol.AnoLetivo, 
-                            aluno.AlunoId, 
-                            turmaHistoricoEol.DataMatricula, 
-                            turmaHistoricoEol.DataSituacao))
-                        );
-                    }
+                    await mediator.Send(new TurmaAlunoHistoricoIncluirCommand(new TurmaAlunoHistorico(
+                        turmaHistoricoEol.Matricula,
+                        turma.Id,
+                        turmaHistoricoEol.AnoLetivo, 
+                        aluno.AlunoCodigo, 
+                        turmaHistoricoEol.DataMatricula, 
+                        turmaHistoricoEol.DataSituacao))
+                    );                    
+                }
+                else
+                {
+                    await mediator.Send(new TurmaAlunoHistoricoAlterarCommand(new TurmaAlunoHistorico(
+                        turmaHistoricoSerap.Id, 
+                        turmaHistoricoEol.Matricula,
+                        turma.Id, 
+                        turmaHistoricoEol.AnoLetivo, 
+                        aluno.AlunoCodigo, 
+                        turmaHistoricoEol.DataMatricula, 
+                        turmaHistoricoEol.DataSituacao))
+                    );                    
                 }
             }
 

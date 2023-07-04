@@ -1,7 +1,7 @@
 ﻿using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra.Dtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Dados
 {

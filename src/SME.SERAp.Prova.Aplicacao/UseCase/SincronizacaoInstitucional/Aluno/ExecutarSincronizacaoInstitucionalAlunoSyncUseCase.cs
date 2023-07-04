@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
@@ -14,7 +13,8 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExecutarSincronizacaoInstitucionalAlunoSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalAlunoSyncUseCase
     {
-       private readonly IServicoLog servicoLog;
+        private readonly IServicoLog servicoLog;
+        
         public ExecutarSincronizacaoInstitucionalAlunoSyncUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
         {
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
@@ -22,25 +22,172 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var dre = mensagemRabbit.ObterObjetoMensagem<DreParaSincronizacaoInstitucionalDto>();
-
-            if (dre == null)
+            try
             {
-                var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
-                throw new NegocioException(mensagem);
-            }
+                var turma = mensagemRabbit.ObterObjetoMensagem<TurmaParaSincronizacaoInstitucionalDto>();
+            
+                if (turma == null)
+                    throw new NegocioException("Não foi possível localizar a Turma para sincronizar os alunos.");
 
-            var turmasDaDre = await mediator.Send(new ObterTurmasSerapPorDreCodigoQuery(dre.DreCodigo));
-            if (turmasDaDre != null && turmasDaDre.Any())
-            {
-                foreach (var turma in turmasDaDre)
-                {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, turma));
-                }
+                var todosAlunosTurmaEol = (await mediator.Send(new ObterAlunosEolPorTurmasCodigoQuery(new[] { long.Parse(turma.Codigo) }))).ToList();
+            
+                if (todosAlunosTurmaEol == null || !todosAlunosTurmaEol.Any())
+                    throw new NegocioException("Não foi possível localizar os alunos no Eol para a sincronização instituicional.");
+            
+                var alunosEolParaTratarCodigos = todosAlunosTurmaEol.Select(a => a.CodigoAluno).Distinct().ToList();
+                var todosAlunosSerap = (await mediator.Send(new ObterAlunosSerapPorCodigosQuery(alunosEolParaTratarCodigos.ToArray()))).ToList();
+
+                await TratarInclusao(todosAlunosTurmaEol, todosAlunosSerap, turma.Id);
+                await TratarAlteracao(todosAlunosTurmaEol, todosAlunosSerap, turma);
+                await TratarInativo(todosAlunosTurmaEol, turma.Id);
+
+                await Tratar(mensagemRabbit, new[] { long.Parse(turma.Codigo) });
             }
-            else throw new NegocioException($"Não foi possível localizar as turmas da Dre {dre.DreCodigo} para fazer sync dos alunos.");
+            catch (Exception e)
+            {
+                servicoLog.Registrar($"Erro ao sincronizar os Alunos: {mensagemRabbit.Mensagem}", e);
+                throw;
+            }
 
             return true;
+        }
+
+        private async Task TratarInclusao(IList<AlunoEolDto> todosAlunosEol, IEnumerable<Aluno> todosAlunosSerap,
+            long turmaId)
+        {
+            var todosAlunosEolCodigo = todosAlunosEol.Select(c => c.CodigoAluno);
+            var todosAlunosSerapCodigo = todosAlunosSerap.Select(c => c.RA);
+            
+            var alunosNovosCodigos = todosAlunosEolCodigo.Where(a => !todosAlunosSerapCodigo.Contains(a)).ToList();
+
+            if (alunosNovosCodigos.Any())
+            {
+                var alunosNovosParaIncluir = todosAlunosEol.Where(a => alunosNovosCodigos.Contains(a.CodigoAluno)).ToList();
+
+                if (alunosNovosParaIncluir.Any())
+                {
+                    var alunosNovosParaIncluirNormalizada = alunosNovosParaIncluir.Select(a => new Aluno
+                    {
+                        Nome = a.Nome,
+                        RA = a.CodigoAluno,
+                        Situacao = a.SituacaoAluno,
+                        NomeSocial = a.NomeSocial,
+                        Sexo = a.Sexo,
+                        DataNascimento = a.DataNascimento,
+                        TurmaId = turmaId,
+                        DataAtualizacao = a.DataSituacao
+                    }).ToList();
+
+                    await mediator.Send(new InserirAlunosCommand(alunosNovosParaIncluirNormalizada));
+                }
+            }            
+        }
+        
+        private async Task TratarAlteracao(IList<AlunoEolDto> todosAlunosEol, IList<Aluno> todosAlunosSerap,
+            TurmaParaSincronizacaoInstitucionalDto turma)
+        {
+            var todosAlunosEolCodigo = todosAlunosEol.Select(c => c.CodigoAluno);
+            var todosAlunosSerapCodigo = todosAlunosSerap.Select(c => c.RA);            
+            
+            var alunosParaAlterarCodigos = todosAlunosEolCodigo.Where(a => todosAlunosSerapCodigo.Contains(a)).ToList();
+
+            if (alunosParaAlterarCodigos.Any())
+            {
+                var alunosQuePodemAlterar = todosAlunosEol.Where(a => alunosParaAlterarCodigos.Contains(a.CodigoAluno)).ToList();
+                
+                var listaParaAlterar = new List<Aluno>();
+
+                foreach (var alunoQuePodeAlterar in alunosQuePodemAlterar)
+                {
+                    var alunoAntigo = todosAlunosSerap.FirstOrDefault(a => a.RA == alunoQuePodeAlterar.CodigoAluno);
+                    
+                    if (alunoAntigo == null)
+                        continue;
+
+                    var turmaFix = await mediator.Send(new ObterTurmaSerapPorIdQuery(alunoAntigo.TurmaId));
+                    var turmaAntigaDoAluno = new TurmaSgpDto { Id = turmaFix.Id, Codigo = turmaFix.Codigo };
+
+                    if (turmaFix.ModalidadeCodigo == (int)Modalidade.EJA && turma.ModalidadeCodigo ==
+                                                                         (int)Modalidade.EJA
+                                                                         && turmaFix.Semestre > turma.Semestre
+                                                                         && turmaFix.AnoLetivo == turma.AnoLetivo
+                                                                         && turmaFix.Codigo != turma.Codigo)
+                    {
+                        alunoQuePodeAlterar.TurmaCodigo = long.Parse(turmaAntigaDoAluno.Codigo);
+                    }
+
+                    //-> Atualiza somente se for a ultima situação do aluno do ano letivo mais atual.
+                    if (turmaFix.AnoLetivo >= turma.AnoLetivo &&
+                        (turmaFix.AnoLetivo != turma.AnoLetivo ||
+                         alunoAntigo.DataAtualizacao > alunoQuePodeAlterar.DataSituacao))
+                    {
+                        continue;
+                    }
+
+                    //-> Valida se existe alguma informação a ser alterada.
+                    if (alunoAntigo.Nome == alunoQuePodeAlterar.Nome &&
+                        alunoAntigo.Situacao == alunoQuePodeAlterar.SituacaoAluno &&
+                        alunoAntigo.DataNascimento.Date == alunoQuePodeAlterar.DataNascimento.Date &&
+                        alunoAntigo.NomeSocial == alunoQuePodeAlterar.NomeSocial &&
+                        alunoAntigo.Sexo == alunoQuePodeAlterar.Sexo &&
+                        turmaAntigaDoAluno.Codigo == alunoQuePodeAlterar.TurmaCodigo.ToString())
+                    {
+                        continue;
+                    }
+
+                    var turmaId = alunoAntigo.TurmaId;
+                    
+                    if (turmaAntigaDoAluno.Codigo != alunoQuePodeAlterar.TurmaCodigo.ToString())
+                        turmaId = turma.Id;
+
+                    listaParaAlterar.Add(new Aluno
+                    {
+                        Id = alunoAntigo.Id,
+                        Nome = alunoQuePodeAlterar.Nome,
+                        RA = alunoQuePodeAlterar.CodigoAluno,
+                        Situacao = alunoQuePodeAlterar.SituacaoAluno,
+                        NomeSocial = alunoQuePodeAlterar.NomeSocial,
+                        Sexo = alunoQuePodeAlterar.Sexo,
+                        DataAtualizacao = alunoQuePodeAlterar.DataSituacao,
+                        DataNascimento = alunoQuePodeAlterar.DataNascimento,
+                        TurmaId = turmaId
+                    });
+                }
+
+                if (listaParaAlterar.Any())
+                {
+                    await mediator.Send(new AlterarAlunosCommand(listaParaAlterar));
+                    await mediator.Send(new RemoverAlunosCacheCommand(listaParaAlterar.Select(x => x.RA).ToArray()));
+                }
+            }
+        }
+        
+        private async Task TratarInativo(IEnumerable<AlunoEolDto> todosAlunosEol, long turmaId)
+        {
+            var alunosTurma = (await mediator.Send(new ObterAlunosPorTurmaIdQuery(turmaId))).ToList();
+            
+            if (alunosTurma.Any())
+            {
+                var alunosInativos = alunosTurma.Where(t => todosAlunosEol.All(x => x.CodigoAluno != t.RA)).ToList();
+                
+                if (alunosInativos.Any())
+                {
+                    await mediator.Send(new InativarAlunosCommand(turmaId, alunosInativos));
+                    await mediator.Send(new RemoverAlunosCacheCommand(alunosInativos.Select(x => x.RA).ToArray()));
+                }
+            }
+        }
+
+        private async Task Tratar(MensagemRabbit mensagemRabbit, long[] turmasCodigo)
+        {
+            var todosAlunosSerap = await mediator.Send(new ObterAlunosSerapPorTurmasCodigoQuery(turmasCodigo)); 
+            
+            foreach (var aluno in todosAlunosSerap)
+            {
+                await mediator.Send(new PublicaFilaRabbitCommand(
+                    RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar,
+                    new AlunoParaSincronizacaoInstitucionalDto(aluno.RA, aluno.TurmaId), mensagemRabbit.CodigoCorrelacao));
+            }            
         }
     }
 }

@@ -3,8 +3,7 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public interface IAjustarUeTurmasUseCase : IUseCase<MensagemRabbit, bool>
+    public interface IAjustarUeTurmaUseCase : IUseCase<MensagemRabbit, bool>
     {
-
     }
 }

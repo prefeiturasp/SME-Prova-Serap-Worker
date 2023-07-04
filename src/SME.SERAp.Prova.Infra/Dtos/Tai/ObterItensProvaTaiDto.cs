@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SME.SERAp.Prova.Infra.Dtos
+namespace SME.SERAp.Prova.Infra
 {
     public class ObterItensProvaTaiDto
     {

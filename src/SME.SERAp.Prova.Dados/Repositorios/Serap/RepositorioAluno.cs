@@ -102,14 +102,14 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<Aluno>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo)
+        public async Task<IEnumerable<Aluno>> ObterAlunosPorTurmasIdsAsync(long[] turmasIds)
         {
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select id, nome, turma_id as TurmaId, ra, Situacao from aluno where turma_id = ANY(@turmasCodigo)";
+                var query = @"select id, nome, turma_id as TurmaId, ra, Situacao from aluno where turma_id = ANY(@turmasIds)";
 
-                return await conn.QueryAsync<Aluno>(query, new { turmasCodigo });
+                return await conn.QueryAsync<Aluno>(query, new { turmasIds });
             }
             finally
             {

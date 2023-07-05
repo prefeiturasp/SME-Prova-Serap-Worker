@@ -23,9 +23,6 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, turmas,
                 param.CodigoCorrelacao));
             
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync, turmas,
-                param.CodigoCorrelacao));
-            
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, turmas,
                 param.CodigoCorrelacao));
 

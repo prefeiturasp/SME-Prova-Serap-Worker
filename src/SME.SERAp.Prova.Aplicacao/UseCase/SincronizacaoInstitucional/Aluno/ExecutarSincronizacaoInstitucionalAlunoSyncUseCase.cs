@@ -37,15 +37,18 @@ namespace SME.SERAp.Prova.Aplicacao
             
                 var alunosEolParaTratarCodigos = todosAlunosTurmaEol.Select(a => a.CodigoAluno).Distinct().ToList();
                 var todosAlunosSerap = (await mediator.Send(new ObterAlunosSerapPorCodigosQuery(alunosEolParaTratarCodigos.ToArray()))).ToList();
-
+                
                 foreach (var turma in turmas)
                 {
-                    await TratarInclusao(todosAlunosTurmaEol, todosAlunosSerap, turma.Id);
-                    await TratarAlteracao(todosAlunosTurmaEol, todosAlunosSerap, turma);
-                    await TratarInativo(todosAlunosTurmaEol, turma.Id);
+                    var alunosTurmaEol = todosAlunosTurmaEol.Where(c => c.TurmaCodigo.ToString() == turma.Codigo).ToList();
+                    var alunosTurmaSerap = todosAlunosSerap.Where(c => c.TurmaId == turma.Id).ToList();
+                    
+                    await TratarInclusao(alunosTurmaEol, alunosTurmaSerap, turma.Id);
+                    await TratarAlteracao(alunosTurmaEol, alunosTurmaSerap, turma);
+                    await TratarInativo(alunosTurmaEol, alunosTurmaSerap, turma.Id);
                 }
 
-                var turmasIds = turmas.Select(c => c.Id).ToArray();
+                var turmasIds = turmas.Select(c => c.Id).Distinct().ToArray();
                 await Tratar(mensagemRabbit, turmasIds);
             }
             catch (Exception e)
@@ -57,17 +60,17 @@ namespace SME.SERAp.Prova.Aplicacao
             return true;
         }
 
-        private async Task TratarInclusao(IList<AlunoEolDto> todosAlunosEol, IEnumerable<Aluno> todosAlunosSerap,
+        private async Task TratarInclusao(IList<AlunoEolDto> alunosTurmaEol, IEnumerable<Aluno> alunosTurmaSerap,
             long turmaId)
         {
-            var todosAlunosEolCodigo = todosAlunosEol.Select(c => c.CodigoAluno).Distinct();
-            var todosAlunosSerapCodigo = todosAlunosSerap.Select(c => c.RA).Distinct();
+            var alunosTurmaEolCodigo = alunosTurmaEol.Select(c => c.CodigoAluno).Distinct();
+            var alunosTurmaSerapCodigo = alunosTurmaSerap.Select(c => c.RA).Distinct();
             
-            var alunosNovosCodigos = todosAlunosEolCodigo.Where(a => !todosAlunosSerapCodigo.Contains(a)).ToList();
+            var alunosNovosCodigos = alunosTurmaEolCodigo.Where(a => !alunosTurmaSerapCodigo.Contains(a)).ToList();
 
             if (alunosNovosCodigos.Any())
             {
-                var alunosNovosParaIncluir = todosAlunosEol.Where(a => alunosNovosCodigos.Contains(a.CodigoAluno)).ToList();
+                var alunosNovosParaIncluir = alunosTurmaEol.Where(a => alunosNovosCodigos.Contains(a.CodigoAluno)).ToList();
 
                 if (alunosNovosParaIncluir.Any())
                 {
@@ -88,32 +91,35 @@ namespace SME.SERAp.Prova.Aplicacao
             }            
         }
         
-        private async Task TratarAlteracao(IList<AlunoEolDto> todosAlunosEol, IList<Aluno> todosAlunosSerap,
+        private async Task TratarAlteracao(IList<AlunoEolDto> alunosTurmaEol, IList<Aluno> alunosTurmaSerap,
             TurmaParaSincronizacaoInstitucionalDto turma)
         {
-            var todosAlunosEolCodigo = todosAlunosEol.Select(c => c.CodigoAluno).Distinct();
-            var todosAlunosSerapCodigo = todosAlunosSerap.Select(c => c.RA).Distinct();            
+            var alunosTurmaEolCodigo = alunosTurmaEol.Select(c => c.CodigoAluno).Distinct();
+            var alunosTurmaSerapCodigo = alunosTurmaSerap.Select(c => c.RA).Distinct();            
             
-            var alunosParaAlterarCodigos = todosAlunosEolCodigo.Where(a => todosAlunosSerapCodigo.Contains(a)).ToList();
+            var alunosParaAlterarCodigos = alunosTurmaEolCodigo.Where(a => alunosTurmaSerapCodigo.Contains(a)).ToList();
 
             if (alunosParaAlterarCodigos.Any())
             {
-                var alunosQuePodemAlterar = todosAlunosEol.Where(a => alunosParaAlterarCodigos.Contains(a.CodigoAluno)).ToList();
+                var alunosQuePodemAlterar = alunosTurmaEol.Where(a => alunosParaAlterarCodigos.Contains(a.CodigoAluno)).ToList();
                 
                 var listaParaAlterar = new List<Aluno>();
 
                 foreach (var alunoQuePodeAlterar in alunosQuePodemAlterar)
                 {
-                    var alunoAntigo = todosAlunosSerap.FirstOrDefault(a => a.RA == alunoQuePodeAlterar.CodigoAluno);
+                    var alunoAntigo = alunosTurmaSerap.FirstOrDefault(a => a.RA == alunoQuePodeAlterar.CodigoAluno);
 
                     if (alunoAntigo == null)
                         continue;
 
                     var turmaFix = await mediator.Send(new ObterTurmaSerapPorIdQuery(alunoAntigo.TurmaId));
+                    
+                    if (turmaFix == null)
+                        continue;
+                    
                     var turmaAntigaDoAluno = new TurmaSgpDto { Id = turmaFix.Id, Codigo = turmaFix.Codigo };
 
-                    if (turmaFix.ModalidadeCodigo == (int)Modalidade.EJA && turma.ModalidadeCodigo ==
-                                                                         (int)Modalidade.EJA
+                    if (turmaFix.ModalidadeCodigo == (int)Modalidade.EJA && turma.ModalidadeCodigo == (int)Modalidade.EJA
                                                                          && turmaFix.Semestre > turma.Semestre
                                                                          && turmaFix.AnoLetivo == turma.AnoLetivo
                                                                          && turmaFix.Codigo != turma.Codigo)
@@ -141,9 +147,15 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
 
                     var turmaId = alunoAntigo.TurmaId;
-                    
+
                     if (turmaAntigaDoAluno.Codigo != alunoQuePodeAlterar.TurmaCodigo.ToString())
+                    {
                         turmaId = turma.Id;
+                        
+                        await mediator.Send(new PublicaFilaRabbitCommand(
+                            RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar,
+                            new[] { alunoQuePodeAlterar.CodigoAluno }));
+                    }
 
                     listaParaAlterar.Add(new Aluno
                     {
@@ -167,13 +179,11 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
         
-        private async Task TratarInativo(IEnumerable<AlunoEolDto> todosAlunosEol, long turmaId)
+        private async Task TratarInativo(IEnumerable<AlunoEolDto> alunosTurmaEol, IList<Aluno> alunosTurmaSerap, long turmaId)
         {
-            var alunosTurma = (await mediator.Send(new ObterAlunosPorTurmaIdQuery(turmaId))).ToList();
-            
-            if (alunosTurma.Any())
+            if (alunosTurmaSerap.Any())
             {
-                var alunosInativos = alunosTurma.Where(t => todosAlunosEol.All(x => x.CodigoAluno != t.RA)).ToList();
+                var alunosInativos = alunosTurmaSerap.Where(t => alunosTurmaEol.All(x => x.CodigoAluno != t.RA)).ToList();
                 
                 if (alunosInativos.Any())
                 {
@@ -183,9 +193,9 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task Tratar(MensagemRabbit mensagemRabbit, long[] turmasCodigo)
+        private async Task Tratar(MensagemRabbit mensagemRabbit, long[] turmasIds)
         {
-            var todosAlunosSerap = await mediator.Send(new ObterAlunosSerapPorTurmasCodigoQuery(turmasCodigo)); 
+            var todosAlunosSerap = await mediator.Send(new ObterAlunosSerapPorTurmasIdsQuery(turmasIds)); 
             
             foreach (var aluno in todosAlunosSerap)
             {

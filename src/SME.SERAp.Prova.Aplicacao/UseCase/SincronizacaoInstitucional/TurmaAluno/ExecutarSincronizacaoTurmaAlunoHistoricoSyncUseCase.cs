@@ -29,7 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     throw new NegocioException("Não foi possível localizar as turmas para sincronizar históricos dos alunos.");
 
                 var turmasIds = turmas.Select(c => c.Id).ToArray();
-                var todosAlunosTurmaSerap = await mediator.Send(new ObterAlunosSerapPorTurmasCodigoQuery(turmasIds));
+                var todosAlunosTurmaSerap = await mediator.Send(new ObterAlunosSerapPorTurmasIdsQuery(turmasIds));
 
                 var alunosParaSincronizacaoInstitucional = todosAlunosTurmaSerap.Select(alunoTurma =>
                         new AlunoParaSincronizacaoInstitucionalDto(alunoTurma.Id, alunoTurma.RA, alunoTurma.TurmaId))

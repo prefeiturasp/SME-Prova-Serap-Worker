@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MediatR;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Infra;
@@ -14,19 +15,19 @@ namespace SME.SERAp.Prova.Aplicacao
         
         public async Task<bool> Executar(MensagemRabbit param)
         {
-            var turma = param.ObterObjetoMensagem<TurmaParaSincronizacaoInstitucionalDto>();
-
-            if (turma == null)
-                throw new NegocioException("Não foi possível localizar a turma para sincronizar os alunos e atualizar a ue da turma.");
+            var turmas = param.ObterObjetoMensagem<List<TurmaParaSincronizacaoInstitucionalDto>>();
             
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, turma,
-                param.CodigoCorrelacao));
-
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync, turma,
+            if (turmas == null)
+                throw new NegocioException("Não foi possível localizar as turmas para sincronizar os alunos e atualizar a ue das turmas.");
+            
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, turmas,
                 param.CodigoCorrelacao));
             
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, turma,
-                param.CodigoCorrelacao));            
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync, turmas,
+                param.CodigoCorrelacao));
+            
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, turmas,
+                param.CodigoCorrelacao));
 
             return true;
         }

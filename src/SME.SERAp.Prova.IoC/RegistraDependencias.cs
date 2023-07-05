@@ -171,7 +171,7 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<ITratarQuestaoCompletaSyncUseCase, TratarQuestaoCompletaSyncUseCase>();
             services.AddScoped<ITratarQuestaoCompletaUseCase, TratarQuestaoCompletaUseCase>();         
-            services.AddScoped<IAjustarUeTurmaUseCase, AjustarUeTurmaUseCase>();
+            services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasesUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaSyncUseCase, TratarAlunoProvaProficienciaSyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaPorProvaIdSyncUseCase, TratarAlunoProvaProficienciaPorProvaIdSyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaUseCase, TratarAlunoProvaProficienciaUseCase>();

@@ -11,6 +11,6 @@ namespace SME.SERAp.Prova.Aplicacao
             TurmasCodigo = turmasCodigo;
         }
 
-        public long[] TurmasCodigo { get; set; }
+        public long[] TurmasCodigo { get; }
     }
 }

@@ -23,21 +23,28 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-                var turma = mensagemRabbit.ObterObjetoMensagem<TurmaParaSincronizacaoInstitucionalDto>();
-            
-                if (turma == null)
-                    throw new NegocioException("Não foi possível localizar a turma para sincronizar históricos dos alunos.");
+                var turmas = mensagemRabbit.ObterObjetoMensagem<List<TurmaParaSincronizacaoInstitucionalDto>>();
+                
+                if (turmas == null)
+                    throw new NegocioException("Não foi possível localizar as turmas para sincronizar históricos dos alunos.");
 
-                var todosAlunosTurmaSerap = await mediator.Send(new ObterAlunosSerapPorTurmasCodigoQuery(new [] { turma.Id }));
+                var turmasIds = turmas.Select(c => c.Id).ToArray();
+                var todosAlunosTurmaSerap = await mediator.Send(new ObterAlunosSerapPorTurmasCodigoQuery(turmasIds));
 
-                foreach (var alunoTurma in todosAlunosTurmaSerap)
+                var alunosParaSincronizacaoInstitucional = todosAlunosTurmaSerap.Select(alunoTurma =>
+                        new AlunoParaSincronizacaoInstitucionalDto(alunoTurma.Id, alunoTurma.RA, alunoTurma.TurmaId))
+                    .ToList();
+
+                for (var i = 0; i < alunosParaSincronizacaoInstitucional.Count; i+= 10)
                 {
+                    var alunosParaTratar = alunosParaSincronizacaoInstitucional.Skip(i).Take(10);
+                    
                     await mediator.Send(new PublicaFilaRabbitCommand(
                         RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar,
-                        new AlunoParaSincronizacaoInstitucionalDto(alunoTurma.Id, alunoTurma.RA, alunoTurma.TurmaId),
+                        alunosParaTratar,
                         mensagemRabbit.CodigoCorrelacao));
                 }
-            
+
                 return true;
             }
             catch (Exception e)

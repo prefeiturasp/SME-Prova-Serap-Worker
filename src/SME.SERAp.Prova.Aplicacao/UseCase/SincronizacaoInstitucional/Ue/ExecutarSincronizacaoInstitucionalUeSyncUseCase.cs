@@ -52,8 +52,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task TratarAlteracao(IList<Ue> todasUesSgp, IList<Ue> todasUesSerap)
         {
-            var todasUesSgpCodigo = todasUesSgp.Select(c => c.CodigoUe);
-            var todasUesSerapCodigo = todasUesSerap.Select(c => c.CodigoUe);
+            var todasUesSgpCodigo = todasUesSgp.Select(c => c.CodigoUe).Distinct();
+            var todasUesSerapCodigo = todasUesSerap.Select(c => c.CodigoUe).Distinct();
             
             var uesParaAlterarCodigos = todasUesSgpCodigo.Where(a => todasUesSerapCodigo.Contains(a)).ToList();
 
@@ -81,8 +81,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task TratarInclusao(IList<Ue> todasUesSgp, IEnumerable<Ue> todasUesSerap, long dreIdSerap)
         {
-            var todasUesSgpCodigo = todasUesSgp.Select(c => c.CodigoUe);
-            var todasUesSerapCodigo = todasUesSerap.Select(c => c.CodigoUe);            
+            var todasUesSgpCodigo = todasUesSgp.Select(c => c.CodigoUe).Distinct();
+            var todasUesSerapCodigo = todasUesSerap.Select(c => c.CodigoUe).Distinct();            
             
             var uesNovasCodigos = todasUesSgpCodigo.Where(a => !todasUesSerapCodigo.Contains(a)).ToList();
 

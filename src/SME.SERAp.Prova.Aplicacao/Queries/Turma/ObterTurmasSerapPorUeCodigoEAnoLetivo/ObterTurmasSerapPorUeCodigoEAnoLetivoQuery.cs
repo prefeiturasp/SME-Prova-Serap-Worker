@@ -13,8 +13,8 @@ namespace SME.SERAp.Prova.Aplicacao
             AnoLetivo = anoLetivo;
         }
 
-        public string UeCodigo { get; set; }
-        public int AnoLetivo { get; set; }
+        public string UeCodigo { get; }
+        public int AnoLetivo { get; }
     }
 
     public class ObterTurmasSerapPorUeCodigoEAnoLetivoQueryValidator : AbstractValidator<ObterTurmasSerapPorUeCodigoEAnoLetivoQuery>

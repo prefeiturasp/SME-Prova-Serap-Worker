@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Collections.Generic;
+using MediatR;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System.Linq;
@@ -11,17 +12,17 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         public ExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase(IMediator mediator) : base(mediator)
         {
-
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var aluno = mensagemRabbit.ObterObjetoMensagem<AlunoParaSincronizacaoInstitucionalDto>();
+            var alunos = mensagemRabbit.ObterObjetoMensagem<List<AlunoParaSincronizacaoInstitucionalDto>>();
             
-            if (aluno == null)
-                throw new NegocioException("Não foi possível localizar aluno para sincronizar o histórico.");
+            if (alunos == null)
+                throw new NegocioException("Não foi possível localizar os alunos para sincronizar os históricos.");
 
-            var turmasHistoricoEol = (await mediator.Send(new ObterTurmaAlunoHistoricoEolPorAlunosRaQuery(new[] { aluno.AlunoCodigo }))).ToList();
+            var alunosCodigos = alunos.Select(c => c.AlunoCodigo).ToArray();
+            var turmasHistoricoEol = (await mediator.Send(new ObterTurmaAlunoHistoricoEolPorAlunosRaQuery(alunosCodigos))).ToList();
 
             if (!turmasHistoricoEol.Any())
                 return true;
@@ -29,7 +30,7 @@ namespace SME.SERAp.Prova.Aplicacao
             var codigosTrumas = turmasHistoricoEol.Select(c => c.CodigoTurma.ToString()).Distinct().ToArray();
             var turmas = (await mediator.Send(new ObterTurmaPorCodigosQuery(codigosTrumas))).ToList();
 
-            var turmasHistoricoSerap = (await mediator.Send(new ObterTurmaAlunoHistoricoSerapPorAlunosRaQuery(new[] { aluno.AlunoCodigo }))).ToList();
+            var turmasHistoricoSerap = (await mediator.Send(new ObterTurmaAlunoHistoricoSerapPorAlunosRaQuery(alunosCodigos))).ToList();
 
             foreach (var turmaHistoricoEol in turmasHistoricoEol)
             {
@@ -38,9 +39,14 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (turma == null)
                     continue;
 
+                var aluno = alunos.FirstOrDefault(c => c.AlunoCodigo == turmaHistoricoEol.AlunoRa);
+                
+                if (aluno == null)
+                    continue;
+
                 var turmaHistoricoSerap = turmasHistoricoSerap.FirstOrDefault(c =>
                     c.Matricula == turmaHistoricoEol.Matricula &&
-                    c.AlunoRa == aluno.AlunoCodigo &&
+                    c.AlunoRa == turmaHistoricoEol.AlunoRa &&
                     c.TurmaId == turma.Id &&
                     c.AnoLetivo == turmaHistoricoEol.AnoLetivo);
 

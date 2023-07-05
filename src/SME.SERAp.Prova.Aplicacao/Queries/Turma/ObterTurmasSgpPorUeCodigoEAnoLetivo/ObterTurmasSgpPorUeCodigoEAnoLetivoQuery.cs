@@ -14,9 +14,9 @@ namespace SME.SERAp.Prova.Aplicacao
             Historica = historica;
         }
 
-        public string UeCodigo { get; set; }
-        public int AnoLetivo { get; set; }
-        public bool Historica { get; set; }
+        public string UeCodigo { get; }
+        public int AnoLetivo { get; }
+        public bool Historica { get; }
     }
 
     public class ObterTurmasSgpPorUeCodigoEAnoLetivoQueryValidator : AbstractValidator<ObterTurmasSgpPorUeCodigoEAnoLetivoQuery>

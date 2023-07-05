@@ -66,8 +66,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task TratarInclusao(IList<TurmaSgpDto> todasTurmasSgp, IEnumerable<TurmaSgpDto> todasTurmasSerap, long ueId)
         {
-            var todasTurmasSgpCodigo = todasTurmasSgp.Select(c => c.Codigo);
-            var todasTurmasSerapCodigo = todasTurmasSerap.Select(c => c.Codigo);
+            var todasTurmasSgpCodigo = todasTurmasSgp.Select(c => c.Codigo).Distinct();
+            var todasTurmasSerapCodigo = todasTurmasSerap.Select(c => c.Codigo).Distinct();
             
             var turmasNovasCodigos = todasTurmasSgpCodigo.Where(a => !todasTurmasSerapCodigo.Contains(a)).ToList();
 
@@ -97,8 +97,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task TratarAlteracao(IList<TurmaSgpDto> todasTurmasSgp, IList<TurmaSgpDto> todasTurmasSerap)
         {
-            var todasTurmasSgpCodigo = todasTurmasSgp.Select(c => c.Codigo);
-            var todasTurmasSerapCodigo = todasTurmasSerap.Select(c => c.Codigo);
+            var todasTurmasSgpCodigo = todasTurmasSgp.Select(c => c.Codigo).Distinct();
+            var todasTurmasSerapCodigo = todasTurmasSerap.Select(c => c.Codigo).Distinct();
             
             var turmasParaAlterarCodigos = todasTurmasSgpCodigo.Where(a => todasTurmasSerapCodigo.Contains(a)).ToList();
 
@@ -138,16 +138,16 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task Tratar(MensagemRabbit mensagemRabbit, UeParaSincronizacaoInstitucionalDto ue, int anoLetivo)
         {
-            var todasTurmasSerap = await mediator.Send(new ObterTurmasSerapPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo));
+            var todasTurmasSerap = (await mediator.Send(new ObterTurmasSerapPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo))).ToList();
 
-            foreach (var turma in todasTurmasSerap)
-            {
-                await mediator.Send(new PublicaFilaRabbitCommand(
-                    RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar,
-                    new TurmaParaSincronizacaoInstitucionalDto(turma.Id, turma.AnoLetivo, turma.Codigo,
-                        turma.ModalidadeCodigo, turma.Semestre, ue.Id, ue.UeCodigo),
-                    mensagemRabbit.CodigoCorrelacao));
-            }
+            var turmasParaSincronizacaoInstitucional = todasTurmasSerap.Select(turma =>
+                new TurmaParaSincronizacaoInstitucionalDto(turma.Id, turma.AnoLetivo, turma.Codigo,
+                    turma.ModalidadeCodigo, turma.Semestre, ue.Id, ue.UeCodigo)).ToList();
+            
+            await mediator.Send(new PublicaFilaRabbitCommand(
+                RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar,
+                turmasParaSincronizacaoInstitucional,
+                mensagemRabbit.CodigoCorrelacao));            
         }
     }
 }

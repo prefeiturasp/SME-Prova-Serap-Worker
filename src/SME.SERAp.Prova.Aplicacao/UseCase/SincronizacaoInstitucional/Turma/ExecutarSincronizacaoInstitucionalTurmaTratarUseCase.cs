@@ -20,11 +20,9 @@ namespace SME.SERAp.Prova.Aplicacao
             if (turmas == null)
                 throw new NegocioException("Não foi possível localizar as turmas para sincronizar os alunos e atualizar a ue das turmas.");
             
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, turmas,
-                param.CodigoCorrelacao));
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, turmas));
             
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, turmas,
-                param.CodigoCorrelacao));
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, turmas));
 
             return true;
         }

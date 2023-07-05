@@ -18,8 +18,7 @@ namespace SME.SERAp.Prova.Aplicacao
             if (aluno == null)
                 throw new NegocioException("Não foi possível localizar o aluno para sincronizar.");
 
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAlunoDeficiencia, aluno.AlunoCodigo,
-                mensagemRabbit.CodigoCorrelacao));
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAlunoDeficiencia, aluno.AlunoCodigo));
 
             return true;
         }

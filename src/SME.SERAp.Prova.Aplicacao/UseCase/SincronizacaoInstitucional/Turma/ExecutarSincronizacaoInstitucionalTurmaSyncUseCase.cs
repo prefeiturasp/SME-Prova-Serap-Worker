@@ -58,7 +58,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 await TratarInclusao(todasTurmasSgp, todasTurmasSerap, ue.Id);
                 await TratarAlteracao(todasTurmasSgp, todasTurmasSerap);
 
-                await Tratar(mensagemRabbit, ue, anoLetivo);
+                await Tratar(ue, anoLetivo);
             }
 
             return true;
@@ -136,7 +136,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task Tratar(MensagemRabbit mensagemRabbit, UeParaSincronizacaoInstitucionalDto ue, int anoLetivo)
+        private async Task Tratar(UeParaSincronizacaoInstitucionalDto ue, int anoLetivo)
         {
             var todasTurmasSerap = (await mediator.Send(new ObterTurmasSerapPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo))).ToList();
 
@@ -146,8 +146,7 @@ namespace SME.SERAp.Prova.Aplicacao
             
             await mediator.Send(new PublicaFilaRabbitCommand(
                 RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar,
-                turmasParaSincronizacaoInstitucional,
-                mensagemRabbit.CodigoCorrelacao));            
+                turmasParaSincronizacaoInstitucional));            
         }
     }
 }

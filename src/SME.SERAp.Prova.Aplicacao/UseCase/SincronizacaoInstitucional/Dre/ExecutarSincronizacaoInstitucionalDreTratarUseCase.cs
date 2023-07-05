@@ -19,8 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
             if (dre == null)
                 throw new NegocioException("Não foi possível localizar a Dre para sincronizar as Ues.");
             
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, dre,
-                param.CodigoCorrelacao));
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, dre));
 
             return true;
         }

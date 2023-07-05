@@ -39,7 +39,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 await TratarInclusao(uesSgp, uesSerap, dre.Id);
                 await TratarAlteracao(uesSgp, uesSerap);
             
-                await Tratar(mensagemRabbit, dre);
+                await Tratar(dre);
             
                 return true;
             }
@@ -102,15 +102,14 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
         
-        private async Task Tratar(MensagemRabbit mensagemRabbit, DreParaSincronizacaoInstitucionalDto dre)
+        private async Task Tratar(DreParaSincronizacaoInstitucionalDto dre)
         {
             var todasUesSerap = (await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.DreCodigo))).ToList();
 
             foreach (var ue in todasUesSerap)
             {
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalUeTratar,
-                    new UeParaSincronizacaoInstitucionalDto(ue.Id, ue.CodigoUe, dre.Id, dre.DreCodigo),
-                    mensagemRabbit.CodigoCorrelacao));
+                    new UeParaSincronizacaoInstitucionalDto(ue.Id, ue.CodigoUe, dre.Id, dre.DreCodigo)));
             }
         }
     }

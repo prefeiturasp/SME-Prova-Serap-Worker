@@ -49,7 +49,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
 
                 var turmasIds = turmas.Select(c => c.Id).Distinct().ToArray();
-                await Tratar(mensagemRabbit, turmasIds);
+                await Tratar(turmasIds);
             }
             catch (Exception e)
             {
@@ -193,7 +193,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task Tratar(MensagemRabbit mensagemRabbit, long[] turmasIds)
+        private async Task Tratar(long[] turmasIds)
         {
             var todosAlunosSerap = await mediator.Send(new ObterAlunosSerapPorTurmasIdsQuery(turmasIds)); 
             
@@ -201,7 +201,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 await mediator.Send(new PublicaFilaRabbitCommand(
                     RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar,
-                    new AlunoParaSincronizacaoInstitucionalDto(aluno.Id, aluno.RA, aluno.TurmaId), mensagemRabbit.CodigoCorrelacao));
+                    new AlunoParaSincronizacaoInstitucionalDto(aluno.Id, aluno.RA, aluno.TurmaId)));
             }            
         }
     }

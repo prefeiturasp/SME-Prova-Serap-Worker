@@ -1,49 +1,56 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra.Interfaces;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase : AbstractUseCase, IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase
     {
-        public ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase(IMediator mediator) : base(mediator)
+        private readonly IServicoLog servicoLog;
+        
+        public ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
         {
-
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var dreCodigo = mensagemRabbit.Mensagem.ToString();
-
-            if (dreCodigo == null)
+            try
             {
-                var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas histórico dos alunos da dre {mensagemRabbit.Mensagem}.";
-                throw new NegocioException(mensagem);
-            }
+                var turmas = mensagemRabbit.ObterObjetoMensagem<List<TurmaParaSincronizacaoInstitucionalDto>>();
+                
+                if (turmas == null)
+                    throw new NegocioException("Não foi possível localizar as turmas para sincronizar históricos dos alunos.");
 
-            var turmasDaDre = await mediator.Send(new ObterTurmasSerapPorDreCodigoQuery(dreCodigo));
+                var turmasIds = turmas.Select(c => c.Id).ToArray();
+                var todosAlunosTurmaSerap = await mediator.Send(new ObterAlunosSerapPorTurmasIdsQuery(turmasIds));
 
-            if (turmasDaDre != null && turmasDaDre.Any())
-            {
-                var turmasDaDreId = turmasDaDre.Select(a => a.Id).Distinct().ToArray();
+                var alunosParaSincronizacaoInstitucional = todosAlunosTurmaSerap.Select(alunoTurma =>
+                        new AlunoParaSincronizacaoInstitucionalDto(alunoTurma.Id, alunoTurma.RA, alunoTurma.TurmaId))
+                    .ToList();
 
-                var alunosSerap = await mediator.Send(new ObterAlunosSerapPorTurmasCodigoQuery(turmasDaDreId));
-
-                for (int i = 0; i < alunosSerap.Count(); i += 10)
+                for (var i = 0; i < alunosParaSincronizacaoInstitucional.Count; i+= 10)
                 {
-                    var alunosAgrupadosParaTratar = alunosSerap.Skip(i).Take(10);
-                    var alunosSerapRa = alunosAgrupadosParaTratar.Select(a => a.RA).Distinct().ToList();
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, alunosSerapRa.ToArray()));
+                    var alunosParaTratar = alunosParaSincronizacaoInstitucional.Skip(i).Take(10);
+                    
+                    await mediator.Send(new PublicaFilaRabbitCommand(
+                        RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar,
+                        alunosParaTratar));
                 }
+
+                return true;
             }
-            else throw new NegocioException($"Não foi possível localizar as turmas da Dre {dreCodigo} para fazer sync de turmas histórico dos alunos.");
-
-            return true;
-
+            catch (Exception e)
+            {
+                servicoLog.Registrar($"Erro ao sincronizar as Turmas Alunos Históricos: {mensagemRabbit.Mensagem}", e);
+                throw;
+            }
         }
     }
 }

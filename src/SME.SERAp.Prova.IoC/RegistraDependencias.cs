@@ -144,10 +144,11 @@ namespace SME.SERAp.Prova.IoC
 
             // sincronização institucional 
             services.AddScoped<IExecutarSincronizacaoInstitucionalDreSyncUseCase, ExecutarSincronizacaoInstitucionalDreSyncUseCase>();
-            //services.AddScoped<IExecutarSincronizacaoInstitucionalDreTratarUseCase, ExecutarSincronizacaoInstitucionalDreTratarUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalDreTratarUseCase, ExecutarSincronizacaoInstitucionalDreTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeSyncUseCase, ExecutarSincronizacaoInstitucionalUeSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeTratarUseCase, ExecutarSincronizacaoInstitucionalUeTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaSyncUseCase, ExecutarSincronizacaoInstitucionalTurmaSyncUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaTratarUseCase, ExecutarSincronizacaoInstitucionalTurmaTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalAlunoSyncUseCase, ExecutarSincronizacaoInstitucionalAlunoSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalAlunoTratarUseCase, ExecutarSincronizacaoInstitucionalAlunoTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase>();
@@ -170,7 +171,7 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<ITratarQuestaoCompletaSyncUseCase, TratarQuestaoCompletaSyncUseCase>();
             services.AddScoped<ITratarQuestaoCompletaUseCase, TratarQuestaoCompletaUseCase>();         
-            services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasUseCase>();
+            services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasesUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaSyncUseCase, TratarAlunoProvaProficienciaSyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaPorProvaIdSyncUseCase, TratarAlunoProvaProficienciaPorProvaIdSyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaUseCase, TratarAlunoProvaProficienciaUseCase>();

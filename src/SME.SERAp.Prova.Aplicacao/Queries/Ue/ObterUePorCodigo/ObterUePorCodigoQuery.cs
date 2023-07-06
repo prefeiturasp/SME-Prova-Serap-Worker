@@ -11,7 +11,7 @@ namespace SME.SERAp.Prova.Aplicacao
             UeCodigo = ueCodigo;
         }
 
-        public string UeCodigo { get; set; }
+        public string UeCodigo { get; }
     }
     public class ObterUePorCodigoQueryValidator : AbstractValidator<ObterUePorCodigoQuery>
     {

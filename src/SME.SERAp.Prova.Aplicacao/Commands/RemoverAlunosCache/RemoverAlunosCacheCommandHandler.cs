@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Infra;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Handle(RemoverAlunosCacheCommand request, CancellationToken cancellationToken)
         {
-            foreach (var ra in request.AlunosRA)
+            foreach (var ra in request.AlunosRA.Distinct())
             {
                 await repositorioCache.RemoverRedisAsync(string.Format(CacheChave.MeusDados, ra));
                 await repositorioCache.RemoverRedisAsync(string.Format(CacheChave.Aluno, ra));

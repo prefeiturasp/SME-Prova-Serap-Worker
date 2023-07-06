@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Infra.Dtos;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Globalization;

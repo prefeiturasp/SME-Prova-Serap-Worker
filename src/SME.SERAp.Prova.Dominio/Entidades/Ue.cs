@@ -8,6 +8,7 @@ namespace SME.SERAp.Prova.Dominio
         {
             DataAtualizacao = DateTime.Now;
         }
+
         public string CodigoUe { get; set; }
         public DateTime DataAtualizacao { get; set; }
         public Dre Dre { get; set; }
@@ -17,11 +18,11 @@ namespace SME.SERAp.Prova.Dominio
 
         public void AdicionarDre(Dre dre)
         {
-            if (dre != null)
-            {
-                Dre = dre;
-                DreId = dre.Id;
-            }
+            if (dre == null) 
+                return;
+            
+            Dre = dre;
+            DreId = dre.Id;
         }
 
         public bool EhUnidadeInfantil()
@@ -33,14 +34,16 @@ namespace SME.SERAp.Prova.Dominio
 
         public bool DeveAtualizar(Ue ueAtualizada)
         {
-            return Nome != ueAtualizada.Nome || TipoEscola != ueAtualizada.TipoEscola;
+            return Nome.Trim() != ueAtualizada.Nome.Trim() || TipoEscola != ueAtualizada.TipoEscola;
         }
 
         public void AtualizarCampos(Ue ueAtualizada)
         {
+            CodigoUe = ueAtualizada.CodigoUe;
             Nome = ueAtualizada.Nome;
             TipoEscola = ueAtualizada.TipoEscola;
             DataAtualizacao = DateTime.Now;
+            DreId = ueAtualizada.DreId;
         }
     }
 }

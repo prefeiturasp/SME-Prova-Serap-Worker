@@ -15,6 +15,7 @@ namespace SME.SERAp.Prova.Aplicacao
     public class ExecutarSincronizacaoInstitucionalTurmaSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalTurmaSyncUseCase
     {
         private readonly IServicoLog servicoLog;
+
         public ExecutarSincronizacaoInstitucionalTurmaSyncUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
         {
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
@@ -22,64 +23,60 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var dre = mensagemRabbit.ObterObjetoMensagem<DreParaSincronizacaoInstitucionalDto>();
+            var ue = mensagemRabbit.ObterObjetoMensagem<UeParaSincronizacaoInstitucionalDto>();
+            
+            if (ue == null)
+                throw new NegocioException("Não foi possível localizar a Ue para sincronizar as turmas.");
+            
+            var anoAtual = DateTime.Now.Year;
 
-            if (dre == null)
-            {
-                var mensagem = $"Não foi possível fazer parse da mensagem para sync de turmas da dre {mensagemRabbit.Mensagem}.";
-                throw new NegocioException(mensagem);
-            }
-
-            long anoAtual = DateTime.Now.Year;
-
-            for (long anoLetivo = (long)ParametrosSistema.AnoInicioSerapEstudantes; anoLetivo <= anoAtual; anoLetivo++)
+            for (var anoLetivo = (int)ParametrosSistema.AnoInicioSerapEstudantes; anoLetivo <= anoAtual; anoLetivo++)
             {
                 var todasTurmasSgp = new List<TurmaSgpDto>();
-
+                
                 if (anoLetivo < anoAtual)
                 {
-                    var turmasSgpHistoricas = await mediator.Send(new ObterTurmasSgpPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo, true));
-                    if (turmasSgpHistoricas != null && turmasSgpHistoricas.Any())
+                    var turmasSgpHistoricas = (await mediator.Send(new ObterTurmasSgpPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo, true))).ToList();
+                    
+                    if (turmasSgpHistoricas.Any())
                         todasTurmasSgp.AddRange(turmasSgpHistoricas);
-                }
+                }                
+                
+                var turmasSgpNaoHistoricas = (await mediator.Send(new ObterTurmasSgpPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo, false))).ToList();
 
-                var turmasSgpNaoHistoricas = await mediator.Send(new ObterTurmasSgpPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo, false));
-                if (turmasSgpNaoHistoricas != null && turmasSgpNaoHistoricas.Any())
+                if (turmasSgpNaoHistoricas.Any())
                     todasTurmasSgp.AddRange(turmasSgpNaoHistoricas);
 
-                var turmasSgp = todasTurmasSgp.AsEnumerable();
-                if (turmasSgp == null || !turmasSgp.Any())
+                if (!todasTurmasSgp.Any())
                 {
-                    servicoLog.Registrar(LogNivel.Critico, $"Dre: {dre.DreCodigo}, AnoLetivo: {anoLetivo} -- Não foi possível localizar as Turmas no Sgp para a sincronização instituicional.");
+                    servicoLog.Registrar(LogNivel.Critico, $"Dre: {ue.DreCodigo}, Ue: {ue.UeCodigo}, AnoLetivo: {anoLetivo} -- Não foi possível localizar as Turmas no Sgp para a sincronização instituicional.");
                     continue;
                 }
+                
+                var todasTurmasSerap = (await mediator.Send(new ObterTurmasSerapPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo))).ToList();
 
-                var turmasSgpCodigo = turmasSgp.Select(a => a.Codigo).Distinct().ToList();
+                await TratarInclusao(todasTurmasSgp, todasTurmasSerap, ue.Id);
+                await TratarAlteracao(todasTurmasSgp, todasTurmasSerap);
 
-                var turmasSerap = await mediator.Send(new ObterTurmasSerapPorDreCodigoEAnoLetivoQuery(dre.DreCodigo, anoLetivo));
-                var turmasSerapCodigo = turmasSerap.Select(a => a.Codigo).Distinct().ToList();
-
-                await TratarInclusao(turmasSgp, turmasSgpCodigo, turmasSerapCodigo, dre.DreCodigo);
-
-                await TratarAlteracao(turmasSgp, turmasSgpCodigo, turmasSerap, turmasSerapCodigo);
+                await Tratar(ue, anoLetivo);
             }
-
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new DreParaSincronizacaoInstitucionalDto(dre.Id, dre.DreCodigo)));
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, dre));
 
             return true;
         }
-        private async Task TratarInclusao(IEnumerable<TurmaSgpDto> todasTurmasSgp, List<string> todasTurmasSgpCodigo, List<string> todasTurmasSerapCodigo, string dreCodigo)
+
+        private async Task TratarInclusao(IList<TurmaSgpDto> todasTurmasSgp, IEnumerable<TurmaSgpDto> todasTurmasSerap, long ueId)
         {
+            var todasTurmasSgpCodigo = todasTurmasSgp.Select(c => c.Codigo).Distinct();
+            var todasTurmasSerapCodigo = todasTurmasSerap.Select(c => c.Codigo).Distinct();
+            
             var turmasNovasCodigos = todasTurmasSgpCodigo.Where(a => !todasTurmasSerapCodigo.Contains(a)).ToList();
 
-            if (turmasNovasCodigos != null && turmasNovasCodigos.Any())
+            if (turmasNovasCodigos.Any())
             {
-                var uesSerap = await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dreCodigo));
+                var turmasNovasParaIncluir = todasTurmasSgp
+                    .Where(a => turmasNovasCodigos.Contains(a.Codigo)).ToList();
 
-                var turmasNovasParaIncluir = todasTurmasSgp.Where(a => turmasNovasCodigos.Contains(a.Codigo)).ToList();
-
-                var turmasNovasParaIncluirNormalizada = turmasNovasParaIncluir.Select(a => new Turma()
+                var turmasNovasParaIncluirNormalizada = turmasNovasParaIncluir.Select(a => new Turma
                 {
                     Ano = a.NomeTurma.StartsWith("S") ? "S" : a.Ano,
                     AnoLetivo = a.AnoLetivo,
@@ -88,7 +85,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     NomeTurma = a.NomeTurma,
                     TipoTurma = a.TipoTurma,
                     TipoTurno = a.TipoTurno,
-                    UeId = uesSerap.FirstOrDefault(a => a.CodigoUe == a.CodigoUe).Id,
+                    UeId = ueId,
                     Semestre = a.Semestre,
                     EtapaEja = a.EtapaEja,
                     SerieEnsino = a.SerieEnsino
@@ -97,11 +94,15 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new InserirTurmasCommand(turmasNovasParaIncluirNormalizada));
             }
         }
-        private async Task TratarAlteracao(IEnumerable<TurmaSgpDto> todasTurmasSgp, List<string> todasTurmasSgpCodigo, IEnumerable<TurmaSgpDto> todasTurmasSerap, List<string> todasTurmasSerapCodigo)
+
+        private async Task TratarAlteracao(IList<TurmaSgpDto> todasTurmasSgp, IList<TurmaSgpDto> todasTurmasSerap)
         {
+            var todasTurmasSgpCodigo = todasTurmasSgp.Select(c => c.Codigo).Distinct();
+            var todasTurmasSerapCodigo = todasTurmasSerap.Select(c => c.Codigo).Distinct();
+            
             var turmasParaAlterarCodigos = todasTurmasSgpCodigo.Where(a => todasTurmasSerapCodigo.Contains(a)).ToList();
 
-            if (turmasParaAlterarCodigos != null && turmasParaAlterarCodigos.Any())
+            if (turmasParaAlterarCodigos.Any())
             {
                 var turmasQuePodemAlterar = todasTurmasSgp.Where(a => turmasParaAlterarCodigos.Contains(a.Codigo)).ToList();
                 var listaParaAlterar = new List<Turma>();
@@ -109,9 +110,10 @@ namespace SME.SERAp.Prova.Aplicacao
                 foreach (var turmaQuePodeAlterar in turmasQuePodemAlterar)
                 {
                     var turmaAntiga = todasTurmasSerap.FirstOrDefault(a => a.Codigo == turmaQuePodeAlterar.Codigo);
+                    
                     if (turmaAntiga != null && turmaAntiga.DeveAtualizar(turmaQuePodeAlterar))
                     {
-                        listaParaAlterar.Add(new Turma()
+                        listaParaAlterar.Add(new Turma
                         {
                             Ano = turmaQuePodeAlterar.NomeTurma.StartsWith("S") ? "S" : turmaQuePodeAlterar.Ano,
                             AnoLetivo = turmaQuePodeAlterar.AnoLetivo,
@@ -132,6 +134,19 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (listaParaAlterar.Any())
                     await mediator.Send(new AlterarTurmasCommand(listaParaAlterar));
             }
+        }
+
+        private async Task Tratar(UeParaSincronizacaoInstitucionalDto ue, int anoLetivo)
+        {
+            var todasTurmasSerap = (await mediator.Send(new ObterTurmasSerapPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo))).ToList();
+
+            var turmasParaSincronizacaoInstitucional = todasTurmasSerap.Select(turma =>
+                new TurmaParaSincronizacaoInstitucionalDto(turma.Id, turma.AnoLetivo, turma.Codigo,
+                    turma.ModalidadeCodigo, turma.Semestre, ue.Id, ue.UeCodigo)).ToList();
+            
+            await mediator.Send(new PublicaFilaRabbitCommand(
+                RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar,
+                turmasParaSincronizacaoInstitucional));            
         }
     }
 }

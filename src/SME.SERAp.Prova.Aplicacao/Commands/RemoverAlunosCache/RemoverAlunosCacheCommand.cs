@@ -9,6 +9,6 @@ namespace SME.SERAp.Prova.Aplicacao
             AlunosRA = alunosRA;
         }
 
-        public long[] AlunosRA { get; set; }
+        public long[] AlunosRA { get; }
     }
 }

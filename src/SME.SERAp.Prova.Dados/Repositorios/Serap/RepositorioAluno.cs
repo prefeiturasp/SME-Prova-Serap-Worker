@@ -169,10 +169,7 @@ namespace SME.SERAp.Prova.Dados
                                                   from caderno_aluno ca 
                                                   where	ca.prova_id = f.prova_id 
                                                     and ca.aluno_id = f.aluno_id)
-                                order by f.prova_id
-                                          ";
-
-
+                                order by f.prova_id";
 
                 return await conn.QueryAsync<ProvaAlunoTaiSemCadernoDto>(query, new { provaId });
             }
@@ -197,10 +194,7 @@ namespace SME.SERAp.Prova.Dados
                                                   from caderno_aluno ca 
                                                   where	ca.prova_id = f.prova_id 
                                                     and ca.aluno_id = f.aluno_id)
-                                order by f.prova_id
-                                          ";
-
-
+                                order by f.prova_id";
 
                 return await conn.QueryAsync<ProvaAlunoTaiSemCadernoDto>(query);
             }

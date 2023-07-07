@@ -50,7 +50,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         throw new NegocioException($"Os resultados da prova {extracao.ProvaSerapId} ainda não foram gerados");
 
                     exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoPorIdQuery(exportacaoResultado.Id));
-                    var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(exportacaoResultado.ProvaSerapId));
+                    var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));
 
                     string caminhoCompletoArquivo = ObterCaminhoCompletoArquivo(exportacaoResultado.NomeArquivo);
                     VerificarERemoverArquivoExistente(caminhoCompletoArquivo);

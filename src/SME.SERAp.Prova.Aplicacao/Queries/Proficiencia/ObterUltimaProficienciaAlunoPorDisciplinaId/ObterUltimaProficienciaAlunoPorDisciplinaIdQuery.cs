@@ -11,7 +11,7 @@ namespace SME.SERAp.Prova.Aplicacao
             DisciplinaId = disciplinaId;
         }
 
-        public long AlunoRa { get; set; }
-        public long? DisciplinaId { get; set; }
+        public long AlunoRa { get; }
+        public long? DisciplinaId { get; }
     }
 }

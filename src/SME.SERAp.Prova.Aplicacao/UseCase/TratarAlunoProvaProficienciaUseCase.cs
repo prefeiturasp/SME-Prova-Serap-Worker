@@ -34,7 +34,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 ProvaId = alunoProvaDto.ProvaId,
                 DisciplinaId = disciplinaId,
                 Origem = ultimaProficiencia.origem,
-                Tipo = Dominio.AlunoProvaProficienciaTipo.Inicial,
+                Tipo = AlunoProvaProficienciaTipo.Inicial,
                 Proficiencia = ultimaProficiencia.proficiencia,
                 UltimaAtualizacao = alunoProvaDto.UltimaAtualizacao
             }));

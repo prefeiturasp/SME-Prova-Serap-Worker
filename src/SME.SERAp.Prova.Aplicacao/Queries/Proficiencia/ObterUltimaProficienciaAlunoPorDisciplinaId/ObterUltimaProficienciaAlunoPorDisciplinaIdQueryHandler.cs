@@ -34,7 +34,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<(decimal proficiencia, AlunoProvaProficienciaOrigem origem)> Handle(ObterUltimaProficienciaAlunoPorDisciplinaIdQuery request, CancellationToken cancellationToken)
         {
-
             var areaConhecimentoSerap = await repositorioGeralSerapLegado.ObterAreaConhecimentoSerapPorDisciplinaId((long)request.DisciplinaId);
             var areaConhecimentoProvaSp = ObterAreaConhecimentoProvaSp(areaConhecimentoSerap);
 
@@ -54,12 +53,11 @@ namespace SME.SERAp.Prova.Aplicacao
                 return (mediaProficienciaEscolaAluno, AlunoProvaProficienciaOrigem.PSP_ano_escolar);
 
             var dre = await repositorioDre.ObterPorIdAsync(escola.DreId);
-            string dreSigla = dre.Abreviacao.Replace("DRE - ", "");
+            var dreSigla = dre.Abreviacao.Replace("DRE - ", "");
+            
+            // TODO: VERIFICAR A DRE
             var mediaProficienciaDreAluno = await repositorioProficienciaProvaSP.ObterMediaProficienciaDre(dreSigla, turma.Ano, (long)areaConhecimentoProvaSp);
-            if (mediaProficienciaDreAluno > 0)
-                return (mediaProficienciaDreAluno, AlunoProvaProficienciaOrigem.PSP_Dre);
-
-            return (0, AlunoProvaProficienciaOrigem.TAI_estudante);
+            return mediaProficienciaDreAluno > 0 ? (mediaProficienciaDreAluno, AlunoProvaProficienciaOrigem.PSP_Dre) : (0, AlunoProvaProficienciaOrigem.TAI_estudante);
         }
 
         private AreaConhecimentoProvaSp ObterAreaConhecimentoProvaSp(AreaConhecimentoSerap areaConhecimentoSerap)

@@ -33,46 +33,26 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<decimal> ObterMediaProficienciaEscolaAluno(string alunoRa, long areaConhecimentoId)
         {
-            var query = $@"declare @anoEscolar int, @edicao int, 
-							@soma_esc decimal, @qtdeAlunosEsc bigint,
-							@escCodigo varchar(10)
+	        const string query = @"with edicao_aluno as (
+										select top 1 AnoEscolar, Edicao, esc_codigo, AreaConhecimentoID
+										from ResultadoAluno
+										where alu_matricula = @alunoRa
+										and AreaConhecimentoID = @areaConhecimentoId
+										and Valor is not null
+										order by Edicao desc
+									), total_aluno as (
+										select (SUM(ISNULL(ra.Valor,0)) / count(ra.alu_matricula)) as media
+										from ResultadoAluno ra
+										inner join edicao_aluno ea on ea.Edicao = ra.Edicao
+	  										and ea.AreaConhecimentoID = ra.AreaConhecimentoID
+	  										and ea.AnoEscolar = ra.AnoEscolar
+	  										and ea.esc_codigo = ra.esc_codigo
+										where Valor is not null
+									)
+									select COALESCE(media, 0) as media
+									from total_aluno";
 
-							select 
-							   top 1 @anoEscolar = AnoEscolar, @edicao = Edicao,
-								   @escCodigo = esc_codigo
-							  from ResultadoAluno 
-							 where alu_matricula = @alunoRa
-							   and AreaConhecimentoID = @areaConhecimentoId
-							   and Valor is not null
-							order by Edicao desc
-
-							;with soma_esc as (
-							select esc_codigo,
-								   SUM(ISNULL(Valor,0)) soma
-							  from ResultadoAluno 
-							 where Edicao = @edicao
-							   and AreaConhecimentoID = @areaConhecimentoId
-							   and AnoEscolar = @anoEscolar
-							   and esc_codigo = @escCodigo
-							group by esc_codigo)
-							,qtde_esc as (
-							select esc_codigo,
-								   count(alu_matricula) qtde
-							  from ResultadoAluno 
-							 where Edicao = @edicao
-							   and AreaConhecimentoID = @areaConhecimentoId
-							   and AnoEscolar = @anoEscolar
-							   and esc_codigo = @escCodigo
-							   and Valor is not null
-							group by esc_codigo)
-
-								select (s.soma / q.qtde) media
-								  from soma_esc s
-							inner join qtde_esc q on s.esc_codigo = q.esc_codigo
-								 where s.soma is not null
-								   and q.qtde is not null";
-
-            using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
+	        await using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
             return await conn.QueryFirstOrDefaultAsync<decimal>(query, new { alunoRa, areaConhecimentoId });
         }
 

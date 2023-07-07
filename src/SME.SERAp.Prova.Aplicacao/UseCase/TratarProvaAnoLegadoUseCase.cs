@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
 
                 var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
-                var provaAtual = await mediator.Send(new ObterProvaDetalhesPorIdQuery(provaId));
+                var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(provaId));
 
                 if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
                 {

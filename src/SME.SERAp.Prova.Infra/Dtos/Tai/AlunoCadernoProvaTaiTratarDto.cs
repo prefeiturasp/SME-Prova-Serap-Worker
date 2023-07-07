@@ -9,9 +9,9 @@
             ProvaLegadoId = provaLegadoId;
         }
 
-        public long ProvaId { get; set; }
-        public long AlunoId { get; set; }
-        public long ProvaLegadoId { get; set; }
+        public long ProvaId { get; }
+        public long AlunoId { get; }
+        public long ProvaLegadoId { get; }
 
     }
 }

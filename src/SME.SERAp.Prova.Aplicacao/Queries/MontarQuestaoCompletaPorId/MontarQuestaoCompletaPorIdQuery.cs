@@ -10,6 +10,6 @@ namespace SME.SERAp.Prova.Aplicacao
             QuestaoId = questaoId;
         }
 
-        public long QuestaoId { get; set; }
+        public long QuestaoId { get; }
     }
 }

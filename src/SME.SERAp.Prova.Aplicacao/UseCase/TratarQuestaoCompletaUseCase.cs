@@ -23,16 +23,17 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var questaoCompleta = await mediator.Send(new MontarQuestaoCompletaPorIdQuery(questaoAtualizada.Id));
 
-            if (questaoCompleta != null)
-            {
-                if (questaoCompleta.QuantidadeAlternativas != questaoCompleta.Alternativas.Count())
-                    throw new NegocioException($"Total de alternativas diferente do informado na questão {questaoAtualizada.Id}");
+            if (questaoCompleta == null || questaoCompleta.Id <= 0) 
+                return true;
+            
+            if (questaoCompleta.QuantidadeAlternativas != questaoCompleta.Alternativas.Count())
+                throw new NegocioException($"Total de alternativas diferente do informado na questão {questaoAtualizada.Id}");
 
-                var json = JsonSerializer.Serialize(questaoCompleta, new JsonSerializerOptions() { IgnoreNullValues = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            var json = JsonSerializer.Serialize(questaoCompleta, new JsonSerializerOptions
+                { IgnoreNullValues = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-                await mediator.Send(new QuestaoCompletaIncluirCommand(questaoAtualizada.Id, questaoCompleta.QuestaoLegadoId, json, questaoAtualizada.UltimaAtualizacao));
-                await mediator.Send(new RemoverQuestaoCacheCommand(questaoAtualizada.Id, questaoCompleta.QuestaoLegadoId));
-            }
+            await mediator.Send(new QuestaoCompletaIncluirCommand(questaoAtualizada.Id, questaoCompleta.QuestaoLegadoId, json, questaoAtualizada.UltimaAtualizacao));
+            await mediator.Send(new RemoverQuestaoCacheCommand(questaoAtualizada.Id, questaoCompleta.QuestaoLegadoId));
 
             return true;
         }

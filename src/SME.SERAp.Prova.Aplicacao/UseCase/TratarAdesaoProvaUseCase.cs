@@ -29,7 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (prova is null)
                     return default;
 
-                var provaSerap = await mediator.Send(new ObterProvaDetalhesPorIdQuery(prova.ProvaLegadoId));
+                var provaSerap = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(prova.ProvaLegadoId));
                 await mediator.Send(new ExcluirAdesaoPorProvaIdCommand(prova.ProvaId));
 
                 if (!prova.AderirTodos)

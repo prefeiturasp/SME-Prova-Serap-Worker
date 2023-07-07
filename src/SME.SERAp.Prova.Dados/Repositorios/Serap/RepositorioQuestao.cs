@@ -53,6 +53,7 @@ namespace SME.SERAp.Prova.Dados
         public async Task<QuestaoCompletaDto> MontarQuestaoCompletaPorIdAsync(long id)
         {
             using var conn = ObterConexaoLeitura();
+
             try
             {
                 var query = new StringBuilder();
@@ -102,26 +103,27 @@ namespace SME.SERAp.Prova.Dados
                 query.AppendLine(" join arquivo ar on ar.id = aa.arquivo_id ");
                 query.AppendLine(" where q.id = @id; ");
 
-                using (var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id }))
-                {
-                    var questaoCompleta = await sqlMapper.ReadFirstAsync<QuestaoCompletaDto>();
+                using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id });
+                var questaoCompleta = await sqlMapper.ReadFirstOrDefaultAsync<QuestaoCompletaDto>();
 
-                    questaoCompleta.Arquivos = sqlMapper.Read<ArquivoDto>();
-                    questaoCompleta.Audios = sqlMapper.Read<ArquivoDto>();
-                    questaoCompleta.Videos = sqlMapper.Read<ArquivoVideoDto>();
-                    questaoCompleta.Alternativas = sqlMapper.Read<AlternativaDto>();
-
-                    var arquivosAlternativas = sqlMapper.Read<ArquivoDto>();
-
-                    if (arquivosAlternativas.Any())
-                    {
-                        var arquivosQuestao = questaoCompleta.Arquivos.ToList();
-                        arquivosQuestao.AddRange(arquivosAlternativas);
-                        questaoCompleta.Arquivos = arquivosQuestao;
-                    }
-
+                if (questaoCompleta.Id <= 0)
                     return questaoCompleta;
-                }
+
+                questaoCompleta.Arquivos = sqlMapper.Read<ArquivoDto>();
+                questaoCompleta.Audios = sqlMapper.Read<ArquivoDto>();
+                questaoCompleta.Videos = sqlMapper.Read<ArquivoVideoDto>();
+                questaoCompleta.Alternativas = sqlMapper.Read<AlternativaDto>();
+
+                var arquivosAlternativas = sqlMapper.Read<ArquivoDto>().ToList();
+
+                if (!arquivosAlternativas.Any()) 
+                    return questaoCompleta;
+                
+                var arquivosQuestao = questaoCompleta.Arquivos.ToList();
+                arquivosQuestao.AddRange(arquivosAlternativas);
+                questaoCompleta.Arquivos = arquivosQuestao;
+
+                return questaoCompleta;
             }
             finally
             {

@@ -18,7 +18,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var alunos = mensagemRabbit.ObterObjetoMensagem<List<AlunoParaSincronizacaoInstitucionalDto>>();
             
-            if (alunos == null)
+            if (alunos == null || !alunos.Any())
                 throw new NegocioException("Não foi possível localizar os alunos para sincronizar os históricos.");
 
             var alunosCodigos = alunos.Select(c => c.AlunoCodigo).ToArray();

@@ -106,7 +106,7 @@ namespace SME.SERAp.Prova.Dados
                 using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id });
                 var questaoCompleta = await sqlMapper.ReadFirstOrDefaultAsync<QuestaoCompletaDto>();
 
-                if (questaoCompleta.Id <= 0)
+                if (questaoCompleta == null || questaoCompleta.Id <= 0)
                     return questaoCompleta;
 
                 questaoCompleta.Arquivos = sqlMapper.Read<ArquivoDto>();

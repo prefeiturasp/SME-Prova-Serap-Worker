@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var turmas = mensagemRabbit.ObterObjetoMensagem<List<TurmaParaSincronizacaoInstitucionalDto>>();
             
-            if (turmas == null)
+            if (turmas == null || !turmas.Any())
                 throw new NegocioException("Não foi possível localizar as turmas para atualizar as ues.");
 
             var listaParaAlterar = new List<Turma>();

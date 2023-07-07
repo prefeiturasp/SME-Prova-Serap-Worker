@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
@@ -17,7 +18,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var turmas = param.ObterObjetoMensagem<List<TurmaParaSincronizacaoInstitucionalDto>>();
             
-            if (turmas == null)
+            if (turmas == null || !turmas.Any())
                 throw new NegocioException("Não foi possível localizar as turmas para sincronizar os alunos e atualizar a ue das turmas.");
             
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, turmas));

@@ -281,7 +281,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSme, new ComandoRabbit("Tratar registros arquivo csv participação Sme", typeof(ITratarResultadoParticipacaoSmeUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Sme AreaConhecimento", typeof(IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Sme AreaConhecimento", typeof(ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
-
+            comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSmeCiclo, new ComandoRabbit("Importa dados arquivo csv participação Sme Ciclo", typeof(IImportarResultadoParticipacaoSmeCicloUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoParticipacaoSmeCiclo, new ComandoRabbit("Tratar registros arquivo csv participação Sme Ciclo", typeof(ITratarResultadoParticipacaoSmeCicloUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

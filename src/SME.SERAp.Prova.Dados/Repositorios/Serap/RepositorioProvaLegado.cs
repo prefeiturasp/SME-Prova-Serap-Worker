@@ -457,12 +457,10 @@ namespace SME.SERAp.Prova.Dados
 
                 var dados = await conn.QueryMultipleAsync(query, new { provaId });
 
-                //if (dados. == null) return null;
+                var amostraProvaTai = await dados.ReadSingleOrDefaultAsync<AmostraProvaTaiDto>();
+                var configItens = (await dados.ReadAsync<ConfigAnoItensProvaTaiDto>()).ToList();
 
-                var amostraProvaTai = await dados.ReadSingleAsync<AmostraProvaTaiDto>();
-                var configItens = await dados.ReadAsync<ConfigAnoItensProvaTaiDto>();
-
-                if (configItens != null)
+                if (configItens.Any())
                     amostraProvaTai.ListaConfigItens = configItens.ToList();
 
                 return amostraProvaTai;

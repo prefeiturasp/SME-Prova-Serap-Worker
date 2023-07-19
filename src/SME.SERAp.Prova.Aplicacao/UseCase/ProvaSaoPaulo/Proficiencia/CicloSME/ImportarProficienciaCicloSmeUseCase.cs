@@ -9,9 +9,9 @@ using SME.SERAp.Prova.Infra.Interfaces;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ImportarResultadoParticipacaoSmeCicloUseCase : AbstractImportarProficienciaPspUseCase, IImportarResultadoParticipacaoSmeCicloUseCase
+    public class ImportarProficienciaCicloSmeUseCase : AbstractImportarProficienciaPspUseCase, IImportarProficienciaCicloSmeUseCase
     {
-        public ImportarResultadoParticipacaoSmeCicloUseCase(IMediator mediator, IServicoLog servicoLog,
+        public ImportarProficienciaCicloSmeUseCase(IMediator mediator, IServicoLog servicoLog,
             PathOptions pathOptions) : base(mediator, servicoLog, pathOptions)
         {
         }
@@ -46,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         
                         objCsvResultado.ValidarCamposBase();
                         
-                        await PublicarFilaTratar(dto, TipoResultadoPsp.ParticipacaoSmeCiclo);
+                        await PublicarFilaTratar(dto, TipoResultadoPsp.ResultadoCicloSme);
                     }
                 }
 

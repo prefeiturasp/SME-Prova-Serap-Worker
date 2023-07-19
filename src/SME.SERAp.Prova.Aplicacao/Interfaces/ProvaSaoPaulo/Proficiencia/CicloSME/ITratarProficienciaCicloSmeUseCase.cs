@@ -3,7 +3,7 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public interface ITratarResultadoParticipacaoSmeCicloUseCase : IUseCase<MensagemRabbit, bool>
+    public interface ITratarProficienciaCicloSmeUseCase : IUseCase<MensagemRabbit, bool>
     {
         
     }

@@ -122,7 +122,7 @@ namespace SME.SERAp.Prova.Infra
                 TipoResultadoPsp.ParticipacaoDreAreaConhecimento => RotasRabbit.TratarResultadoParticipacaoDreAreaConhecimento,
                 TipoResultadoPsp.ParticipacaoSme => RotasRabbit.TratarResultadoParticipacaoSme,
                 TipoResultadoPsp.ParticipacaoSmeAreaConhecimento => RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento,
-                TipoResultadoPsp.ParticipacaoSmeCiclo => RotasRabbit.TratarResultadoParticipacaoSmeCiclo,
+                TipoResultadoPsp.ResultadoCicloSme => RotasRabbit.TratarResultadoCicloSme,
                 _ => string.Empty
             };
         }

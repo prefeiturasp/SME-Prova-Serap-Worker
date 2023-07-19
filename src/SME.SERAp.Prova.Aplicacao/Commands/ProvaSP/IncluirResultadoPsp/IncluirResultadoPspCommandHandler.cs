@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dominio;
@@ -23,8 +24,9 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioParticipacaoDreAreaConhecimento repositorioParticipacaoDreAreaConhecimento;
         private readonly IRepositorioParticipacaoSme repositorioParticipacaoSme;
         private readonly IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento;
+        private readonly IRepositorioResultadoCicloSme repositorioResultadoCicloSme;
 
-        private ObjResultadoPspDto ObjResultado;
+        private ObjResultadoPspDto objResultado;
 
         public IncluirResultadoPspCommandHandler(IRepositorioResultadoSme repositorioResultadoSme,
                                                  IRepositorioResultadoDre repositorioResultadoDre,
@@ -38,147 +40,144 @@ namespace SME.SERAp.Prova.Aplicacao
                                                  IRepositorioParticipacaoDre repositorioParticipacaoDre,
                                                  IRepositorioParticipacaoDreAreaConhecimento repositorioParticipacaoDreAreaConhecimento,
                                                  IRepositorioParticipacaoSme repositorioParticipacaoSme,
-                                                 IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento)
+                                                 IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento,
+                                                 IRepositorioResultadoCicloSme repositorioResultadoCicloSme)
         {
-            this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
-            this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
-            this.repositorioResultadoEscola = repositorioResultadoEscola ?? throw new System.ArgumentNullException(nameof(repositorioResultadoEscola));
-            this.repositorioResultadoTurma = repositorioResultadoTurma ?? throw new System.ArgumentNullException(nameof(repositorioResultadoTurma));
-            this.repositorioResultadoAluno = repositorioResultadoAluno ?? throw new System.ArgumentNullException(nameof(repositorioResultadoAluno));
-            this.repositorioParticipacaoTurma = repositorioParticipacaoTurma ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoTurma));
-            this.repositorioParticipacaoTurmaAreaConhecimento = repositorioParticipacaoTurmaAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoTurmaAreaConhecimento));
-            this.repositorioParticipacaoUe = repositorioParticipacaoUe ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoUe));
-            this.repositorioParticipacaoUeAreaConhecimento = repositorioParticipacaoUeAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoUeAreaConhecimento));
-            this.repositorioParticipacaoDre = repositorioParticipacaoDre ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoDre));
-            this.repositorioParticipacaoDreAreaConhecimento = repositorioParticipacaoDreAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoDreAreaConhecimento));
-            this.repositorioParticipacaoSme = repositorioParticipacaoSme ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoSme));
-            this.repositorioParticipacaoSmeAreaConhecimento = repositorioParticipacaoSmeAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoSmeAreaConhecimento));
+            this.repositorioResultadoSme = repositorioResultadoSme ?? throw new ArgumentNullException(nameof(repositorioResultadoSme));
+            this.repositorioResultadoDre = repositorioResultadoDre ?? throw new ArgumentNullException(nameof(repositorioResultadoDre));
+            this.repositorioResultadoEscola = repositorioResultadoEscola ?? throw new ArgumentNullException(nameof(repositorioResultadoEscola));
+            this.repositorioResultadoTurma = repositorioResultadoTurma ?? throw new ArgumentNullException(nameof(repositorioResultadoTurma));
+            this.repositorioResultadoAluno = repositorioResultadoAluno ?? throw new ArgumentNullException(nameof(repositorioResultadoAluno));
+            this.repositorioParticipacaoTurma = repositorioParticipacaoTurma ?? throw new ArgumentNullException(nameof(repositorioParticipacaoTurma));
+            this.repositorioParticipacaoTurmaAreaConhecimento = repositorioParticipacaoTurmaAreaConhecimento ?? throw new ArgumentNullException(nameof(repositorioParticipacaoTurmaAreaConhecimento));
+            this.repositorioParticipacaoUe = repositorioParticipacaoUe ?? throw new ArgumentNullException(nameof(repositorioParticipacaoUe));
+            this.repositorioParticipacaoUeAreaConhecimento = repositorioParticipacaoUeAreaConhecimento ?? throw new ArgumentNullException(nameof(repositorioParticipacaoUeAreaConhecimento));
+            this.repositorioParticipacaoDre = repositorioParticipacaoDre ?? throw new ArgumentNullException(nameof(repositorioParticipacaoDre));
+            this.repositorioParticipacaoDreAreaConhecimento = repositorioParticipacaoDreAreaConhecimento ?? throw new ArgumentNullException(nameof(repositorioParticipacaoDreAreaConhecimento));
+            this.repositorioParticipacaoSme = repositorioParticipacaoSme ?? throw new ArgumentNullException(nameof(repositorioParticipacaoSme));
+            this.repositorioParticipacaoSmeAreaConhecimento = repositorioParticipacaoSmeAreaConhecimento ?? throw new ArgumentNullException(nameof(repositorioParticipacaoSmeAreaConhecimento));
+            this.repositorioResultadoCicloSme = repositorioResultadoCicloSme ?? throw new ArgumentNullException(nameof(repositorioResultadoCicloSme));
         }
 
         public async Task<bool> Handle(IncluirResultadoPspCommand request, CancellationToken cancellationToken)
         {
-            ObjResultado = request.Resultado;
-            switch (request.Resultado.TipoResultado)
+            objResultado = request.Resultado;
+
+            return request.Resultado.TipoResultado switch
             {
-                case TipoResultadoPsp.ResultadoAluno:
-                    return await IncluirResultadoAluno();
-                case TipoResultadoPsp.ResultadoSme:
-                    return await IncluirResultadoSME();
-                case TipoResultadoPsp.ResultadoDre:
-                    return await IncluirResultadoDre();
-                case TipoResultadoPsp.ResultadoEscola:
-                    return await IncluirResultadoEscola();
-                case TipoResultadoPsp.ResultadoTurma:
-                    return await IncluirResultadoTurma();
-                case TipoResultadoPsp.ResultadoParticipacaoTurma:
-                    return await IncluirParticipacaoTurma();
-                case TipoResultadoPsp.ParticipacaoTurmaAreaConhecimento:
-                    return await IncluirParticipacaoTurmaAreaConhecimento();
-                case TipoResultadoPsp.ResultadoParticipacaoUe:
-                    return await IncluirParticipacaoUe();
-                case TipoResultadoPsp.ParticipacaoUeAreaConhecimento:
-                    return await IncluirParticipacaoUeAreaConhecimento();
-                case TipoResultadoPsp.ParticipacaoDre:
-                    return await IncluirParticipacaoDre();
-                case TipoResultadoPsp.ParticipacaoDreAreaConhecimento:
-                    return await IncluirParticipacaoDreAreaConhecimento();
-                case TipoResultadoPsp.ParticipacaoSme:
-                    return await IncluirParticipacaoSme();
-                case TipoResultadoPsp.ParticipacaoSmeAreaConhecimento:
-                    return await IncluirParticipacaoSmeAreaConhecimento();
-                default:
-                    return false;
-            }
+                TipoResultadoPsp.ResultadoAluno => await IncluirResultadoAluno(),
+                TipoResultadoPsp.ResultadoSme => await IncluirResultadoSme(),
+                TipoResultadoPsp.ResultadoDre => await IncluirResultadoDre(),
+                TipoResultadoPsp.ResultadoEscola => await IncluirResultadoEscola(),
+                TipoResultadoPsp.ResultadoTurma => await IncluirResultadoTurma(),
+                TipoResultadoPsp.ResultadoParticipacaoTurma => await IncluirParticipacaoTurma(),
+                TipoResultadoPsp.ParticipacaoTurmaAreaConhecimento => await IncluirParticipacaoTurmaAreaConhecimento(),
+                TipoResultadoPsp.ResultadoParticipacaoUe => await IncluirParticipacaoUe(),
+                TipoResultadoPsp.ParticipacaoUeAreaConhecimento => await IncluirParticipacaoUeAreaConhecimento(),
+                TipoResultadoPsp.ParticipacaoDre => await IncluirParticipacaoDre(),
+                TipoResultadoPsp.ParticipacaoDreAreaConhecimento => await IncluirParticipacaoDreAreaConhecimento(),
+                TipoResultadoPsp.ParticipacaoSme => await IncluirParticipacaoSme(),
+                TipoResultadoPsp.ParticipacaoSmeAreaConhecimento => await IncluirParticipacaoSmeAreaConhecimento(),
+                TipoResultadoPsp.ResultadoCicloSme => await IncluirResultadoCicloSme(),
+                _ => false
+            };
         }
 
         private async Task<bool> IncluirParticipacaoTurma()
         {
-            var participacaoInserir = (ParticipacaoTurma)ObjResultado.Resultado;
+            var participacaoInserir = (ParticipacaoTurma)objResultado.Resultado;
             var result = await repositorioParticipacaoTurma.IncluirAsync(participacaoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirParticipacaoTurmaAreaConhecimento()
         {
-            var participacaoInserir = (ParticipacaoTurmaAreaConhecimento)ObjResultado.Resultado;
+            var participacaoInserir = (ParticipacaoTurmaAreaConhecimento)objResultado.Resultado;
             var result = await repositorioParticipacaoTurmaAreaConhecimento.IncluirAsync(participacaoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirResultadoAluno()
         {
-            var resultadoInserir = (ResultadoAluno)ObjResultado.Resultado;
+            var resultadoInserir = (ResultadoAluno)objResultado.Resultado;
             var result = await repositorioResultadoAluno.IncluirAsync(resultadoInserir);
             return result > 0;
         }
 
-        private async Task<bool> IncluirResultadoSME()
+        private async Task<bool> IncluirResultadoSme()
         {
-            var resultadoInserir = (ResultadoSme)ObjResultado.Resultado;
+            var resultadoInserir = (ResultadoSme)objResultado.Resultado;
             var result = await repositorioResultadoSme.IncluirAsync(resultadoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirResultadoDre()
         {
-            var resultadoInserir = (ResultadoDre)ObjResultado.Resultado;
+            var resultadoInserir = (ResultadoDre)objResultado.Resultado;
             var result = await repositorioResultadoDre.IncluirAsync(resultadoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirResultadoEscola()
         {
-            var resultadoInserir = (ResultadoEscola)ObjResultado.Resultado;
+            var resultadoInserir = (ResultadoEscola)objResultado.Resultado;
             var result = await repositorioResultadoEscola.IncluirAsync(resultadoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirResultadoTurma()
         {
-            var resultadoInserir = (ResultadoTurma)ObjResultado.Resultado;
+            var resultadoInserir = (ResultadoTurma)objResultado.Resultado;
             var result = await repositorioResultadoTurma.IncluirAsync(resultadoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirParticipacaoUe()
         {
-            var participacaoInserir = (ParticipacaoUe)ObjResultado.Resultado;
+            var participacaoInserir = (ParticipacaoUe)objResultado.Resultado;
             var result = await repositorioParticipacaoUe.IncluirAsync(participacaoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirParticipacaoUeAreaConhecimento()
         {
-            var participacaoInserir = (ParticipacaoUeAreaConhecimento)ObjResultado.Resultado;
+            var participacaoInserir = (ParticipacaoUeAreaConhecimento)objResultado.Resultado;
             var result = await repositorioParticipacaoUeAreaConhecimento.IncluirAsync(participacaoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirParticipacaoDre()
         {
-            var participacaoInserir = (ParticipacaoDre)ObjResultado.Resultado;
+            var participacaoInserir = (ParticipacaoDre)objResultado.Resultado;
             var result = await repositorioParticipacaoDre.IncluirAsync(participacaoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirParticipacaoDreAreaConhecimento()
         {
-            var participacaoInserir = (ParticipacaoDreAreaConhecimento)ObjResultado.Resultado;
+            var participacaoInserir = (ParticipacaoDreAreaConhecimento)objResultado.Resultado;
             var result = await repositorioParticipacaoDreAreaConhecimento.IncluirAsync(participacaoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirParticipacaoSme()
         {
-            var participacaoInserir = (ParticipacaoSme)ObjResultado.Resultado;
+            var participacaoInserir = (ParticipacaoSme)objResultado.Resultado;
             var result = await repositorioParticipacaoSme.IncluirAsync(participacaoInserir);
             return result > 0;
         }
 
         private async Task<bool> IncluirParticipacaoSmeAreaConhecimento()
         {
-            var participacaoInserir = (ParticipacaoSmeAreaConhecimento)ObjResultado.Resultado;
+            var participacaoInserir = (ParticipacaoSmeAreaConhecimento)objResultado.Resultado;
             var result = await repositorioParticipacaoSmeAreaConhecimento.IncluirAsync(participacaoInserir);
+            return result > 0;
+        }
+
+        private async Task<bool> IncluirResultadoCicloSme()
+        {
+            var resultadoInserir = (ResultadoCicloSme)objResultado.Resultado;
+            var result = await repositorioResultadoCicloSme.IncluirAsync(resultadoInserir);
             return result > 0;
         }
     }

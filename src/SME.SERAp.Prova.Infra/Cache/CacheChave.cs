@@ -98,5 +98,12 @@
         /// 1 - Código ra do aluno
         /// </summary>
         public const string AlunoProva = "al-prova-{0}-{1}";
+        
+        /// <summary>
+        /// Questões Amostra Tai Aluno
+        /// 0 - Código ra do aluno
+        /// 1 - Código da Prova
+        /// </summary>
+        public const string QuestaoAmostraTaiAluno = "al-q-tai-prova-{0}-{1}";        
     }
 }

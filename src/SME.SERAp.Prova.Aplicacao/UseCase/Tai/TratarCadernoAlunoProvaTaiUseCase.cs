@@ -3,6 +3,7 @@ using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -36,7 +37,12 @@ namespace SME.SERAp.Prova.Aplicacao
             var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(provaAtual.Id, alunoProva.AlunoId));
 
             //Chamar Api TAI
-            var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId, proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra));
+            var textInfo = new CultureInfo("pt-BR", false).TextInfo;
+            
+            var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
+                proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra,
+                textInfo.ToTitleCase(provaAtual.Disciplina.ToLower())));
+            
             var cadernoAluno = new CadernoAluno(
                     alunoProva.AlunoId,
                     provaAtual.Id,
@@ -82,6 +88,9 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 primeiraQuestao = false;
             }
+            
+            // todo: verificar essa remoção. Se deve ficar aqui.
+            await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);            
 
             return true;
         }
@@ -200,6 +209,12 @@ namespace SME.SERAp.Prova.Aplicacao
             };
 
             await mediator.Send(new IncluirAtualizarQuestaoTriCommand(questaoTriInserir));
+        }
+
+        private async Task RemoverQuestaoAmostraTaiAlunoCache(long alunoRa, long provaId)
+        {
+            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoAmostraTaiAluno,
+                alunoRa, provaId)));            
         }
     }
 }

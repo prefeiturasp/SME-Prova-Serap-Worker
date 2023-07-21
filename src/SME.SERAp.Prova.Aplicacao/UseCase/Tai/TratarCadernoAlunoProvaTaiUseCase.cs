@@ -89,8 +89,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 primeiraQuestao = false;
             }
             
-            // todo: verificar essa remoção. Se deve ficar aqui.
-            await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);            
+            //-> Limpar o cache
+            await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
+            await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
 
             return true;
         }
@@ -216,5 +217,11 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoAmostraTaiAluno,
                 alunoRa, provaId)));            
         }
+        
+        private async Task RemoverRespostaAmostraTaiAlunoCache(long alunoRa, long provaId)
+        {
+            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.RespostaAmostraTaiAluno,
+                alunoRa, provaId)));            
+        }        
     }
 }

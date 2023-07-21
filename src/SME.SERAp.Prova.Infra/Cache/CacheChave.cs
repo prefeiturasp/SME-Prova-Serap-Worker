@@ -104,6 +104,13 @@
         /// 0 - Código ra do aluno
         /// 1 - Código da Prova
         /// </summary>
-        public const string QuestaoAmostraTaiAluno = "al-q-tai-prova-{0}-{1}";        
+        public const string QuestaoAmostraTaiAluno = "al-q-tai-prova-{0}-{1}";
+        
+        /// <summary>
+        /// Resposta Amostra Tai Aluno
+        /// 0 - Código ra do aluno
+        /// 1 - Código da Prova
+        /// </summary>
+        public const string RespostaAmostraTaiAluno = "al-q-tai-prova-resposta-{0}-{1}";        
     }
 }

@@ -183,7 +183,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task<ResultadoCicloSme> ObterResultadoCicloSme()
         {
-            var resultado = (ResultadoCicloSme)objResultado.Resultado;
+            var resultado = (ResultadoCicloSmeDto)objResultado.Resultado;
             return await repositorioResultadoCicloSme.ObterResultadoCicloSme(resultado.Edicao,
                 resultado.AreaConhecimentoId, resultado.CicloId);
         }

@@ -36,15 +36,13 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(PathOptions, arquivoResultadoPsp.NomeArquivo))
                 {
-                    var listaCsvResultados = csv.GetRecords<ParticipacaoSmeAreaConhecimentoDto>().ToList();
+                    var listaCsvResultados = csv.GetRecords<ResultadoCicloSmeDto>().ToList();
                     
                     foreach (var objCsvResultado in listaCsvResultados)
                     {
                         var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);
                         
                         ValidarAnoEdicao(objCsvResultado.Edicao);
-                        
-                        objCsvResultado.ValidarCamposBase();
                         
                         await PublicarFilaTratar(dto, TipoResultadoPsp.ResultadoCicloSme);
                     }

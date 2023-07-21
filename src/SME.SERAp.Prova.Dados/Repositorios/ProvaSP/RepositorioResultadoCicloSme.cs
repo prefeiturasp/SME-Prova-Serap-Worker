@@ -91,15 +91,15 @@ namespace SME.SERAp.Prova.Dados
             var parametros = new DynamicParameters();
             parametros.Add("@edicao", resultado.Edicao, DbType.String, ParameterDirection.Input, 10);
             parametros.Add("@areaConhecimentoId", resultado.AreaConhecimentoId, DbType.Int16, ParameterDirection.Input);
-            parametros.Add("@cicloId", resultado.CicloId, DbType.Int16, ParameterDirection.Input, 4);
-            parametros.Add("@valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input, null,5, 3);
-            parametros.Add("@totalAlunos", resultado.TotalAlunos, DbType.Int16, ParameterDirection.Input, 4);
+            parametros.Add("@cicloId", resultado.CicloId, DbType.Int32, ParameterDirection.Input, 4);
+            parametros.Add("@valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input, 5,6, 3);
+            parametros.Add("@totalAlunos", resultado.TotalAlunos, DbType.Int32, ParameterDirection.Input, 4);
             parametros.Add("@nivelProficienciaId", resultado.NivelProficienciaId, DbType.Int16, ParameterDirection.Input);
-            parametros.Add("@percentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico, DbType.Decimal, ParameterDirection.Input, null,5, 2);
-            parametros.Add("@percentualBasico", resultado.PercentualBasico, DbType.Decimal, ParameterDirection.Input, null,5, 2);
-            parametros.Add("@percentualAdequado", resultado.PercentualAdequado, DbType.Decimal, ParameterDirection.Input, null,5, 2);
-            parametros.Add("@percentualAvancado", resultado.PercentualAvancado, DbType.Decimal, ParameterDirection.Input, null,5, 2);
-            parametros.Add("@percentualAlfabetizado", resultado.PercentualAlfabetizado, DbType.Decimal, ParameterDirection.Input, null,5, 2);
+            parametros.Add("@percentualAbaixoDoBasico", resultado.PercentualAbaixoDoBasico, DbType.Decimal, ParameterDirection.Input, 5,6, 2);
+            parametros.Add("@percentualBasico", resultado.PercentualBasico, DbType.Decimal, ParameterDirection.Input, 5,6, 2);
+            parametros.Add("@percentualAdequado", resultado.PercentualAdequado, DbType.Decimal, ParameterDirection.Input, 5,6, 2);
+            parametros.Add("@percentualAvancado", resultado.PercentualAvancado, DbType.Decimal, ParameterDirection.Input, 5,6, 2);
+            parametros.Add("@percentualAlfabetizado", resultado.PercentualAlfabetizado, DbType.Decimal, ParameterDirection.Input, 5,6, 2);
             return parametros;
         }
     }

@@ -25,7 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var alunosProvaTaiSemCaderno = await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaId));
 
                 foreach (var item in alunosProvaTaiSemCaderno.Where(a => a.Ativo()))
-                    await PublicarFilaTratarCadernoAluno(item.ProvaId, item.AlunoId, item.ProvaLegadoId);
+                    await PublicarFilaTratarCadernoAluno(item.ProvaId, item.AlunoId, item.ProvaLegadoId, item.AlunoRa);
                 
                 return true;
             }
@@ -35,9 +35,9 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task PublicarFilaTratarCadernoAluno(long provaId, long alunoId, long provaLegadoId)
+        private async Task PublicarFilaTratarCadernoAluno(long provaId, long alunoId, long provaLegadoId, long alunoRa)
         {
-            var msg = new AlunoCadernoProvaTaiTratarDto(provaId, alunoId, provaLegadoId);
+            var msg = new AlunoCadernoProvaTaiTratarDto(provaId, alunoId, provaLegadoId, alunoRa);
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernoAlunoProvaTai, msg));
         }
     }

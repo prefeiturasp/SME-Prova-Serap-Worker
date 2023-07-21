@@ -62,23 +62,16 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private AreaConhecimentoProvaSp ObterAreaConhecimentoProvaSp(AreaConhecimentoSerap areaConhecimentoSerap)
         {
-            switch (areaConhecimentoSerap)
+            return areaConhecimentoSerap switch
             {
-                case AreaConhecimentoSerap.CienciasHumanas:
-                    return AreaConhecimentoProvaSp.CienciasDaNatureza;
-                case AreaConhecimentoSerap.CienciasNatureza:
-                    return AreaConhecimentoProvaSp.CienciasDaNatureza;
-                case AreaConhecimentoSerap.CienciasNaturezaEM:
-                    return AreaConhecimentoProvaSp.CienciasDaNatureza;
-                case AreaConhecimentoSerap.NaturezaSociedade:
-                    return AreaConhecimentoProvaSp.CienciasDaNatureza;
-                case AreaConhecimentoSerap.LinguagensCodigos:
-                    return AreaConhecimentoProvaSp.LinguaPortuguesa;
-                case AreaConhecimentoSerap.Matematica:
-                    return AreaConhecimentoProvaSp.Matematica;
-                default:
-                    return AreaConhecimentoProvaSp.NaoCadastrado;
-            }
+                AreaConhecimentoSerap.CienciasHumanas => AreaConhecimentoProvaSp.CienciasDaNatureza,
+                AreaConhecimentoSerap.CienciasNatureza => AreaConhecimentoProvaSp.CienciasDaNatureza,
+                AreaConhecimentoSerap.CienciasNaturezaEM => AreaConhecimentoProvaSp.CienciasDaNatureza,
+                AreaConhecimentoSerap.NaturezaSociedade => AreaConhecimentoProvaSp.CienciasDaNatureza,
+                AreaConhecimentoSerap.LinguagensCodigos => AreaConhecimentoProvaSp.LinguaPortuguesa,
+                AreaConhecimentoSerap.Matematica => AreaConhecimentoProvaSp.Matematica,
+                _ => AreaConhecimentoProvaSp.NaoCadastrado
+            };
         }
     }
 }

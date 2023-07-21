@@ -36,7 +36,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 await VerificaSeFinalizaProcesso();
 
                 return true;
-
             }
             catch (Exception ex)
             {

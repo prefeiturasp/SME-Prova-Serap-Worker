@@ -43,6 +43,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);
                         
                         ValidarAnoEdicao(objCsvResultado.Edicao);
+                        objCsvResultado.ValidarCampos();
                         
                         await PublicarFilaTratar(dto, TipoResultadoPsp.ResultadoCicloSme);
                     }

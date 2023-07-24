@@ -48,10 +48,9 @@ namespace SME.SERAp.Prova.Infra
 
                 if (valor.ToUpper() == "NA") return null;
 
-                if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec_valor))
-                {
-                    return dec_valor;
-                }
+                if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out var decValor))
+                    return decValor;
+                
                 throw new Exception();
             }
             catch (Exception)
@@ -81,8 +80,11 @@ namespace SME.SERAp.Prova.Infra
         {
             try
             {
-                if (valor == null) return true;
-                decimal dec_valor = (decimal)valor;
+                if (valor == null) 
+                    return true;
+                
+                var dec_valor = (decimal)valor;
+                
                 return true;
             }
             catch (Exception)
@@ -96,7 +98,7 @@ namespace SME.SERAp.Prova.Infra
             try
             {
                 var listaAreaConhecimentoId = Enum.GetValues(typeof(AreaConhecimentoProvaSp)).Cast<AreaConhecimentoProvaSp>().ToList();
-                if (!listaAreaConhecimentoId.Any(x => x == (AreaConhecimentoProvaSp)areaConhecimentoId))
+                if (listaAreaConhecimentoId.All(x => x != (AreaConhecimentoProvaSp)areaConhecimentoId))
                     throw new Exception();
             }
             catch (Exception ex)
@@ -135,5 +137,26 @@ namespace SME.SERAp.Prova.Infra
             };
             return JsonSerializer.Serialize(resultado, jsonSerializerOptions);
         }
+        
+        public static int? ConvertStringPraIntNullPsp(this string valor)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(valor)) 
+                    return null;
+
+                if (valor.ToUpper() == "NA") 
+                    return null;
+
+                if (int.TryParse(valor, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intValor))
+                    return intValor;
+                
+                throw new Exception();
+            }
+            catch (Exception)
+            {
+                throw new Exception($"não foi possível converter o valor para inteiro: {valor}");
+            }
+        }        
     }
 }

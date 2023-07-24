@@ -1,4 +1,5 @@
-﻿using CsvHelper.Configuration.Attributes;
+﻿using System;
+using CsvHelper.Configuration.Attributes;
 
 namespace SME.SERAp.Prova.Infra
 {
@@ -17,10 +18,10 @@ namespace SME.SERAp.Prova.Infra
         public string SValor { get; set; }
 
         [Name("TotalAlunos")]
-        public int? TotalAlunos { get; set; }
+        public string STotalAlunos { get; set; }
         
         [Name("NivelProficienciaID")]
-        public int? NivelProficienciaId { get; set; }
+        public string SNivelProficienciaId { get; set; }
         
         [Name("PercentualAbaixoDoBasico")]
         public string SPercentualAbaixoDoBasico { get; set; }
@@ -37,11 +38,28 @@ namespace SME.SERAp.Prova.Infra
         [Name("PercentualAlfabetizado")]
         public string SPercentualAlfabetizado { get; set; }
 
+        public int? NivelProficienciaId => SNivelProficienciaId.ConvertStringPraIntNullPsp();
         public decimal? Valor => SValor.ConvertStringPraDecimalNullPsp();
+        public int? TotalAlunos => STotalAlunos.ConvertStringPraIntNullPsp();
         public decimal? PercentualAbaixoDoBasico => SPercentualAbaixoDoBasico.ConvertStringPraDecimalNullPsp();
         public decimal? PercentualBasico => SPercentualBasico.ConvertStringPraDecimalNullPsp();
         public decimal? PercentualAdequado => SPercentualAdequado.ConvertStringPraDecimalNullPsp();
         public decimal? PercentualAvancado => SPercentualAvancado.ConvertStringPraDecimalNullPsp();
         public decimal? PercentualAlfabetizado => SPercentualAlfabetizado.ConvertStringPraDecimalNullPsp();
+
+        public void ValidarCampos()
+        {
+            try
+            {
+                ResultadoPsp.ValidarAreaConhecimentoId(AreaConhecimentoId);
+                
+                if (CicloId <= 0)
+                    throw new Exception($"Ciclo {CicloId} inválido.");                
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Dados inválidos -- {ex.Message} -- {ex.StackTrace}");
+            }            
+        }
     }
 }

@@ -12,49 +12,56 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class  AbstractImportarProficienciaPspUseCase
     {
-
-        protected readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
-        protected readonly PathOptions pathOptions;
+        
+        protected readonly IMediator Mediator;
+        protected readonly PathOptions PathOptions;
 
-        private ArquivoResultadoPspDto arquivoResultadoPsp = null;
+        private ArquivoResultadoPspDto arquivoResultadoPsp;
 
-        public AbstractImportarProficienciaPspUseCase(IMediator mediator, IServicoLog servicoLog, PathOptions pathOptions)
+        protected AbstractImportarProficienciaPspUseCase(IMediator mediator, IServicoLog servicoLog, PathOptions pathOptions)
         {
-            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            this.pathOptions = pathOptions ?? throw new ArgumentNullException(nameof(pathOptions));
+            Mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            PathOptions = pathOptions ?? throw new ArgumentNullException(nameof(pathOptions));
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
-        public async Task publicarFilaTratar(RegistroProficienciaPspCsvDto dto, TipoResultadoPsp tipoResultado)
+        protected async Task PublicarFilaTratar(RegistroProficienciaPspCsvDto dto, TipoResultadoPsp tipoResultado)
         {
-            string fila = ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp(tipoResultado);
+            var fila = ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp(tipoResultado);
+            
             if (!string.IsNullOrEmpty(fila))
-                await mediator.Send(new PublicaFilaRabbitCommand(fila, dto));
+                await Mediator.Send(new PublicaFilaRabbitCommand(fila, dto));
         }
 
-        public async Task publicarFilaTratarStatusProcesso(long processoId)
+        protected async Task PublicarFilaTratarStatusProcesso(long processoId)
         {
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarStatusProcessoResultado, processoId));
+            await Mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarStatusProcessoResultado, processoId));
         }
 
-        public async Task AtualizaStatusDoProcesso(long processoId, StatusImportacao status)
+        protected async Task AtualizaStatusDoProcesso(long processoId, StatusImportacao status)
         {
-            await mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(processoId, status));
+            await Mediator.Send(new AtualizarStatusArquivoResultadoPspCommand(processoId, status));
         }
 
-        public async Task RegistrarErroEAtualizarStatusProcesso(string nomeUseCase, MensagemRabbit mensagemRabbit, Exception ex)
+        protected async Task RegistrarErroEAtualizarStatusProcesso(string nomeUseCase, MensagemRabbit mensagemRabbit, Exception ex)
         {
-            servicoLog.Registrar($"Fila {nomeUseCase} Id: {arquivoResultadoPsp?.Id} --- Mensagem -- {mensagemRabbit.Mensagem} -- Erro ao processar o arquivo  {arquivoResultadoPsp?.NomeOriginalArquivo} ", ex);
-            await AtualizaStatusDoProcesso((long)arquivoResultadoPsp?.Id, StatusImportacao.Erro);
+            servicoLog.Registrar(
+                $"Fila {nomeUseCase} Id: {arquivoResultadoPsp?.Id} --- Mensagem -- {mensagemRabbit.Mensagem} -- Erro ao processar o arquivo  {arquivoResultadoPsp?.NomeOriginalArquivo} ",
+                ex);
+            
+            if (arquivoResultadoPsp == null)
+                await AtualizaStatusDoProcesso(-1, StatusImportacao.Erro);
+            else
+                await AtualizaStatusDoProcesso(arquivoResultadoPsp.Id, StatusImportacao.Erro);
         }
 
-        public void PopularArquivoResultado(ArquivoResultadoPspDto dto)
+        protected void PopularArquivoResultado(ArquivoResultadoPspDto dto)
         {
             arquivoResultadoPsp = dto;
         }
 
-        public void ValidarAnoEdicao(string edicao)
+        protected void ValidarAnoEdicao(string edicao)
         {
             if (!ResultadoPsp.AnoEdicaoValido(edicao))
                 throw new Exception($"Edição: {edicao} inválido.");

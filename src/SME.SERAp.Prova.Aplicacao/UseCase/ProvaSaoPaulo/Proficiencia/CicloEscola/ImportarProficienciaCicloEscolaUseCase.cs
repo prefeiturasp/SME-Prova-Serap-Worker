@@ -11,7 +11,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ImportarProficienciaCicloEscolaUseCase : AbstractImportarProficienciaPspUseCase, IImportarProficienciaCicloEscolaUseCase
     {
-        protected ImportarProficienciaCicloEscolaUseCase(IMediator mediator, IServicoLog servicoLog,
+        public ImportarProficienciaCicloEscolaUseCase(IMediator mediator, IServicoLog servicoLog,
             PathOptions pathOptions) : base(mediator, servicoLog, pathOptions)
         {
         }

@@ -5,6 +5,5 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public interface IImportarProficienciaCicloEscolaUseCase : IUseCase<MensagemRabbit, bool>
     {
-        
     }
 }

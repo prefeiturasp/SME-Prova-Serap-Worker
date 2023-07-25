@@ -59,8 +59,14 @@ namespace SME.SERAp.Prova.Infra
             {
                 ResultadoPsp.ValidarAreaConhecimentoId(AreaConhecimentoId);
                 
+                if (string.IsNullOrEmpty(UadSigla) || UadSigla.ToUpper() == "NA")
+                    throw new Exception($"Sigla da unidade administrativa {UadSigla} inválida.");
+                
+                if (string.IsNullOrEmpty(EscCodigo) || EscCodigo.ToUpper() == "NA")
+                    throw new Exception($"Código da escola {EscCodigo} inválido.");                
+                
                 if (CicloId <= 0)
-                    throw new Exception($"Ciclo {CicloId} inválido.");                
+                    throw new Exception($"Ciclo {CicloId} inválido.");
             }
             catch (Exception ex)
             {

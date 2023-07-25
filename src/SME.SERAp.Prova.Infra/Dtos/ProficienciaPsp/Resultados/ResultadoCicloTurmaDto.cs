@@ -17,14 +17,14 @@ namespace SME.SERAp.Prova.Infra
         [Name("esc_codigo")]
         public string EscCodigo { get; set; }
         
-        [Name("CicloID")]
-        public string SCicloId { get; set; }        
-        
-        [Name("turma_codigo")]
+        [Name("tur_codigo")]
         public string TurmaCodigo { get; set; }
         
         [Name("tur_id")]
-        public string STurmaId { get; set; }
+        public string STurmaId { get; set; }        
+        
+        [Name("CicloID")]
+        public string SCicloId { get; set; }
 
         [Name("Valor")]
         public string SValor { get; set; }

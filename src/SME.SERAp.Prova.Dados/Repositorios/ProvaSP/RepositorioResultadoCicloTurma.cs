@@ -61,7 +61,7 @@ namespace SME.SERAp.Prova.Dados
         {
             const string query = @"update [dbo].[ResultadoCicloTurma]
                                     set CicloId = @cicloId,
-                                        TurmaId = @turmaId,
+                                        tur_id = @turmaId,
                                         Valor = @valor,
                                         NivelProficienciaID = @nivelProficienciaId,
                                         TotalAlunos = @totalAlunos,

@@ -26,6 +26,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento;
         private readonly IRepositorioResultadoCicloSme repositorioResultadoCicloSme;
         private readonly IRepositorioResultadoCicloEscola repositorioResultadoCicloEscola;        
+        private readonly IRepositorioResultadoCicloTurma repositorioResultadoCicloTurma;
 
         private ObjResultadoPspDto objResultado;
 
@@ -43,7 +44,8 @@ namespace SME.SERAp.Prova.Aplicacao
                                                  IRepositorioParticipacaoSme repositorioParticipacaoSme,
                                                  IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento,
                                                  IRepositorioResultadoCicloSme repositorioResultadoCicloSme,
-                                                 IRepositorioResultadoCicloEscola repositorioResultadoCicloEscola)
+                                                 IRepositorioResultadoCicloEscola repositorioResultadoCicloEscola,
+                                                 IRepositorioResultadoCicloTurma repositorioResultadoCicloTurma)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new ArgumentNullException(nameof(repositorioResultadoDre));
@@ -60,6 +62,7 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioParticipacaoSmeAreaConhecimento = repositorioParticipacaoSmeAreaConhecimento ?? throw new ArgumentNullException(nameof(repositorioParticipacaoSmeAreaConhecimento));
             this.repositorioResultadoCicloSme = repositorioResultadoCicloSme ?? throw new ArgumentNullException(nameof(repositorioResultadoCicloSme));
             this.repositorioResultadoCicloEscola = repositorioResultadoCicloEscola ?? throw new ArgumentNullException(nameof(repositorioResultadoCicloEscola));
+            this.repositorioResultadoCicloTurma = repositorioResultadoCicloTurma ?? throw new ArgumentNullException(nameof(repositorioResultadoCicloTurma));
         }
 
         public async Task<bool> Handle(IncluirResultadoPspCommand request, CancellationToken cancellationToken)
@@ -82,7 +85,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 TipoResultadoPsp.ParticipacaoSme => await IncluirParticipacaoSme(),
                 TipoResultadoPsp.ParticipacaoSmeAreaConhecimento => await IncluirParticipacaoSmeAreaConhecimento(),
                 TipoResultadoPsp.ResultadoCicloSme => await IncluirResultadoCicloSme(),
-                TipoResultadoPsp.ResultadoCicloEscola => await IncluirResultadoCicloEscola(),                
+                TipoResultadoPsp.ResultadoCicloEscola => await IncluirResultadoCicloEscola(),
+                TipoResultadoPsp.ResultadoCicloTurma => await IncluirResultadoCicloTurma(),
                 _ => false
             };
         }
@@ -189,6 +193,13 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var resultadoInserir = (ResultadoCicloEscola)objResultado.Resultado;
             var result = await repositorioResultadoCicloEscola.IncluirAsync(resultadoInserir);
+            return result > 0;
+        }
+        
+        private async Task<bool> IncluirResultadoCicloTurma()
+        {
+            var resultadoInserir = (ResultadoCicloTurma)objResultado.Resultado;
+            var result = await repositorioResultadoCicloTurma.IncluirAsync(resultadoInserir);
             return result > 0;
         }        
     }

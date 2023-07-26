@@ -100,7 +100,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 TipoResultadoPsp.ResultadoCicloSme => await ObterResultadoCicloSme(),
                 TipoResultadoPsp.ResultadoCicloEscola => await ObterResultadoCicloEscola(),
                 TipoResultadoPsp.ResultadoCicloTurma => await ObterResultadoCicloTurma(),
-                TipoResultadoPsp.ResultadoCicloDre = > await ObterResultadoDre(),
+                TipoResultadoPsp.ResultadoCicloDre => await ObterResultadoDre(),
                 _ => null
             };
         }
@@ -220,7 +220,7 @@ namespace SME.SERAp.Prova.Aplicacao
         }
         private async Task<ResultadoCicloDre> ObterResultadoCicloDre()
         {
-            var resultado = (ResultadoCicloDreDto)ObjResultado.Resultado;
+            var resultado = (ResultadoCicloDreDto)objResultado.Resultado;
             return await repositorioResultadoCicloDre.ObterResultadoCicloDre
                                                        (resultado.Edicao,
                                                        resultado.AreaConhecimentoId,

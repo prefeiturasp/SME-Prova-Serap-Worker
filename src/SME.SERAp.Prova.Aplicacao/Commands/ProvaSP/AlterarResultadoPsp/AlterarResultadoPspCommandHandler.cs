@@ -47,7 +47,7 @@ namespace SME.SERAp.Prova.Aplicacao
                                                  IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento,
                                                  IRepositorioResultadoCicloSme repositorioResultadoCicloSme,
                                                  IRepositorioResultadoCicloEscola repositorioResultadoCicloEscola,
-                                                 IRepositorioResultadoCicloTurma repositorioResultadoCicloTurma)
+                                                 IRepositorioResultadoCicloTurma repositorioResultadoCicloTurma,
                                                  IRepositorioResultadoCicloDre repositorioResultadoCicloDre)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new ArgumentNullException(nameof(repositorioResultadoSme));
@@ -91,7 +91,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 TipoResultadoPsp.ResultadoCicloSme => await AlterarResultadoCicloSme(),
                 TipoResultadoPsp.ResultadoCicloEscola => await AlterarResultadoCicloEscola(),
                 TipoResultadoPsp.ResultadoCicloTurma => await AlterarResultadoCicloTurma(),
-                TipoResultadoPsp.ResultadoCicloDre => await AlterarResultadoCicloDre();
+                TipoResultadoPsp.ResultadoCicloDre => await AlterarResultadoCicloDre(),
                    
         _ => false
             };
@@ -212,7 +212,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
     private async Task<bool> AlterarResultadoCicloDre()
     {
-        var participacao = (ResultadoCicloDre)ObjResultado.Resultado;
+        var participacao = (ResultadoCicloDre)objResultado.Resultado;
         var result = await repositorioResultadoCicloDre.AlterarAsync(participacao);
         return result > 0;
     }

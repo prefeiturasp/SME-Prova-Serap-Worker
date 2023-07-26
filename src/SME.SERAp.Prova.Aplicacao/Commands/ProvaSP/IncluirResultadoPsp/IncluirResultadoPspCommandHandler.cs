@@ -210,7 +210,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task<bool> IncluirResultadoCicloDre()
         {
-            var resultadoInserir = (ResultadoCicloDre)ObjResultado.Resultado;
+            var resultadoInserir = (ResultadoCicloDre)objResultado.Resultado;
             var result = await repositorioResultadoCicloDre.IncluirAsync(resultadoInserir);
             return result > 0;
         }

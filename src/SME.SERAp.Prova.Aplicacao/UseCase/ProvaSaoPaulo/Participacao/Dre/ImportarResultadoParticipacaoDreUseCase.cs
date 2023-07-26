@@ -24,13 +24,13 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var IdArquivoResultadoPsp = long.Parse(mensagemRabbit.Mensagem.ToString());
-                var arquivoResultadoPsp = await mediator.Send(new ObterTipoResultadoPspQuery(IdArquivoResultadoPsp));
+                var arquivoResultadoPsp = await Mediator.Send(new ObterTipoResultadoPspQuery(IdArquivoResultadoPsp));
                 if (arquivoResultadoPsp == null) return false;
                 PopularArquivoResultado(arquivoResultadoPsp);
 
                 await AtualizaStatusDoProcesso(IdArquivoResultadoPsp, StatusImportacao.EmAndamento);
 
-                using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(pathOptions, arquivoResultadoPsp.NomeArquivo))
+                using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(PathOptions, arquivoResultadoPsp.NomeArquivo))
                 {
                     var listaCsvResultados = csv.GetRecords<ParticipacaoDreDto>().ToList();
                     foreach (var objCsvResultado in listaCsvResultados)
@@ -38,10 +38,10 @@ namespace SME.SERAp.Prova.Aplicacao
                         var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);
                         ValidarAnoEdicao(objCsvResultado.Edicao);
                         objCsvResultado.ValidarCampos();
-                        await publicarFilaTratar(dto, tipoResultadoProcesso);
+                        await PublicarFilaTratar(dto, tipoResultadoProcesso);
                     }
                 }
-                await publicarFilaTratarStatusProcesso(IdArquivoResultadoPsp);
+                await PublicarFilaTratarStatusProcesso(IdArquivoResultadoPsp);
                 return true;
             }
             catch (Exception ex)

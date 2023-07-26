@@ -281,6 +281,12 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSme, new ComandoRabbit("Tratar registros arquivo csv participação Sme", typeof(ITratarResultadoParticipacaoSmeUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Sme AreaConhecimento", typeof(IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Sme AreaConhecimento", typeof(ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoCicloSme, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Sme ", typeof(IImportarProficienciaCicloSmeUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoCicloSme, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Sme", typeof(ITratarProficienciaCicloSmeUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoCicloEscola, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Escola ", typeof(IImportarProficienciaCicloEscolaUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoCicloEscola, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Escola", typeof(ITratarProficienciaCicloEscolaUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoCicloTurma, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Turma ", typeof(IImportarProficienciaCicloTurmaUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoCicloTurma, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Turma", typeof(ITratarProficienciaCicloTurmaUseCase)));            
             comandos.Add(RotasRabbit.ImportarResultadoCicloDrePsp, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Dre ", typeof(IImportarResultadoCicloDreUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoCicloDre, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Dre", typeof(ITratarResultadoCicloDreUseCase)));
         }

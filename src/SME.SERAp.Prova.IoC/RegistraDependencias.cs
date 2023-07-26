@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
+using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Participacao.CicloDre;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Dados.Interfaces;
@@ -103,6 +104,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioParticipacaoDreAreaConhecimento, RepositorioParticipacaoDreAreaConhecimento>();
             services.AddScoped<IRepositorioParticipacaoSme, RepositorioParticipacaoSme>();
             services.AddScoped<IRepositorioParticipacaoSmeAreaConhecimento, RepositorioParticipacaoSmeAreaConhecimento>();
+            services.AddScoped<IRepositorioResultadoCicloDre, RepositorioResultadoCicloDre>();
 
         }
 
@@ -222,6 +224,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarResultadoParticipacaoSmeUseCase, TratarResultadoParticipacaoSmeUseCase>();
             services.AddScoped<IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase, ImportarResultadoParticipacaoSmeAreaConhecimentoUseCase>();
             services.AddScoped<ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase, TratarResultadoParticipacaoSmeAreaConhecimentoUseCase>();
+            services.AddScoped<ITratarResultadoCicloDreUseCase, TratarResultadoCicloDreUseCase>();
+
         }
     }
 }

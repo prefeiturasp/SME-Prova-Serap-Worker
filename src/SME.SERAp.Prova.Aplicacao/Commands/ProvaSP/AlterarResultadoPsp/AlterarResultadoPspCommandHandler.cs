@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Entidades.ProficienciaPsp;
 using SME.SERAp.Prova.Infra;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,8 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioParticipacaoDre repositorioParticipacaoDre;
         private readonly IRepositorioParticipacaoDreAreaConhecimento repositorioParticipacaoDreAreaConhecimento;
         private readonly IRepositorioParticipacaoSme repositorioParticipacaoSme;
-        private readonly IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento;        
+        private readonly IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento;
+        private readonly IRepositorioResultadoCicloDre repositorioResultadoCicloDre;
 
         private ObjResultadoPspDto ObjResultado;
 
@@ -39,7 +41,8 @@ namespace SME.SERAp.Prova.Aplicacao
                                                  IRepositorioParticipacaoDre repositorioParticipacaoDre,
                                                  IRepositorioParticipacaoDreAreaConhecimento repositorioParticipacaoDreAreaConhecimento,
                                                  IRepositorioParticipacaoSme repositorioParticipacaoSme,
-                                                 IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento)
+                                                 IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento,
+                                                 IRepositorioResultadoCicloDre repositorioResultadoCicloDre)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
@@ -54,6 +57,7 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioParticipacaoDreAreaConhecimento = repositorioParticipacaoDreAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoDreAreaConhecimento));
             this.repositorioParticipacaoSme = repositorioParticipacaoSme ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoSme));
             this.repositorioParticipacaoSmeAreaConhecimento = repositorioParticipacaoSmeAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoSmeAreaConhecimento));
+            this.repositorioResultadoCicloDre = repositorioResultadoCicloDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoCicloDre));
         }
 
         public async Task<bool> Handle(AlterarResultadoPspCommand request, CancellationToken cancellationToken)
@@ -87,6 +91,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await AlterarParticipacaoSme();
                 case TipoResultadoPsp.ParticipacaoSmeAreaConhecimento:
                     return await AlterarParticipacaoSmeAreaConhecimento();
+                case TipoResultadoPsp.ResultadoCicloDre:
+                    return await AlterarResultadoCicloDre();
+
+
                 default:
                     return false;
             }
@@ -177,6 +185,13 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var participacao = (ParticipacaoSmeAreaConhecimento)ObjResultado.Resultado;
             var result = await repositorioParticipacaoSmeAreaConhecimento.AlterarAsync(participacao);
+            return result > 0;
+        }
+
+        private async Task<bool> AlterarResultadoCicloDre()
+        {
+            var participacao = (ResultadoCicloDre)ObjResultado.Resultado;
+            var result = await repositorioResultadoCicloDre.AlterarAsync(participacao);
             return result > 0;
         }
     }

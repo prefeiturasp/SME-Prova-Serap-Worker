@@ -2,7 +2,9 @@
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Entidades.ProficienciaPsp;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,6 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioParticipacaoDreAreaConhecimento repositorioParticipacaoDreAreaConhecimento;
         private readonly IRepositorioParticipacaoSme repositorioParticipacaoSme;
         private readonly IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento;
+        private readonly IRepositorioResultadoCicloDre repositorioResultadoCicloDre;
         private ObjResultadoPspDto ObjResultado;
 
         public ObterObjResultadoPspQueryHandler(IRepositorioResultadoSme repositorioResultadoSme,
@@ -37,7 +40,8 @@ namespace SME.SERAp.Prova.Aplicacao
                                                 IRepositorioParticipacaoDre repositorioParticipacaoDre,
                                                 IRepositorioParticipacaoDreAreaConhecimento repositorioParticipacaoDreAreaConhecimento,
                                                 IRepositorioParticipacaoSme repositorioParticipacaoSme,
-                                                IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento)
+                                                IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento,
+                                                IRepositorioResultadoCicloDre repositorioResultadoCicloDre)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new System.ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoDre));
@@ -52,6 +56,7 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioParticipacaoDreAreaConhecimento = repositorioParticipacaoDreAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoDreAreaConhecimento));
             this.repositorioParticipacaoSme = repositorioParticipacaoSme ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoSme));
             this.repositorioParticipacaoSmeAreaConhecimento = repositorioParticipacaoSmeAreaConhecimento ?? throw new System.ArgumentNullException(nameof(repositorioParticipacaoSmeAreaConhecimento));
+            this.repositorioResultadoCicloDre = repositorioResultadoCicloDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoCicloDre));
         }
 
         public async Task<ObjResultadoPspDto> Handle(ObterObjResultadoPspQuery request, CancellationToken cancellationToken)
@@ -92,6 +97,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     return await ObterParticipacaoSme();
                 case TipoResultadoPsp.ParticipacaoSmeAreaConhecimento:
                     return await ObterParticipacaoSmeAreaConhecimento();
+                case TipoResultadoPsp.ResultadoCicloDre:
+                    return await ObterResultadoCicloDre();
                 default:
                     return null;
             }
@@ -182,6 +189,16 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var participacao = (ParticipacaoSmeAreaConhecimentoDto)ObjResultado.Resultado;
             return await repositorioParticipacaoSmeAreaConhecimento.ObterParticipacaoSmeAreaConhecimento(participacao.Edicao, participacao.AreaConhecimentoID, participacao.AnoEscolar);
+        }
+
+        private async Task<ResultadoCicloDre> ObterResultadoCicloDre()
+        {
+            var resultado = (ResultadoCicloDreDto)ObjResultado.Resultado;
+            return await repositorioResultadoCicloDre.ObterResultadoCicloDre
+                                                       (resultado.Edicao,
+                                                       resultado.AreaConhecimentoId,
+                                                       resultado.DreSigla,
+                                                       resultado.CicloId);
         }
     }
 }

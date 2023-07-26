@@ -116,5 +116,8 @@
 
         public const string ImportarResultadoParticipacaoSmeAreaConhecimento = "serap.resultados.psp.participacao.sme.area.conhecimento";
         public const string TratarResultadoParticipacaoSmeAreaConhecimento = "serap.resultados.psp.participacao.sme.area.conhecimento.tratar";
+
+        public const string ImportarResultadoCicloDrePsp = "serap.resultados.psp.resultado.ciclo.dre";
+        public const string TratarResultadoCicloDre = "serap.resultados.psp.resultado.ciclo.dre.tratar";
     }
 }

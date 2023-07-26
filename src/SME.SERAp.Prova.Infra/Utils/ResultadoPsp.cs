@@ -126,6 +126,7 @@ namespace SME.SERAp.Prova.Infra
                 TipoResultadoPsp.ParticipacaoSmeAreaConhecimento => RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento,
                 TipoResultadoPsp.ResultadoCicloSme => RotasRabbit.TratarResultadoCicloSme,
                 TipoResultadoPsp.ResultadoCicloEscola => RotasRabbit.TratarResultadoCicloEscola,
+                TipoResultadoPsp.ResultadoCicloTurma => RotasRabbit.TratarResultadoCicloTurma,                
                 _ => string.Empty
             };
         }
@@ -157,6 +158,27 @@ namespace SME.SERAp.Prova.Infra
             catch (Exception)
             {
                 throw new Exception($"não foi possível converter o valor para inteiro: {valor}");
+            }
+        }
+        
+        public static long? ConvertStringPraLongNullPsp(this string valor)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(valor)) 
+                    return null;
+
+                if (valor.ToUpper() == "NA") 
+                    return null;
+
+                if (long.TryParse(valor, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intValor))
+                    return intValor;
+                
+                throw new Exception();
+            }
+            catch (Exception)
+            {
+                throw new Exception($"não foi possível converter o valor para long: {valor}");
             }
         }        
     }

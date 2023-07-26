@@ -122,5 +122,8 @@
         
         public const string ImportarResultadoCicloEscola = "serap.resultados.psp.resultado.ciclo.escola";
         public const string TratarResultadoCicloEscola = "serap.resultados.psp.resultado.ciclo.escola.tratar";
+        
+        public const string ImportarResultadoCicloTurma = "serap.resultados.psp.resultado.ciclo.turma";
+        public const string TratarResultadoCicloTurma = "serap.resultados.psp.resultado.ciclo.turma.tratar";        
     }
 }

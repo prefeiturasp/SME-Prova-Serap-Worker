@@ -20,7 +20,7 @@ namespace SME.SERAp.Prova.Dominio
         ResultadoSme = 5,
 
         [Description("ResultadoCicloDre")]
-        ResultadoCicloDre = 8,
+        ResultadoCicloDre = 10,
 
         [Description("ResultadoParticipacaoTurma")]
         ResultadoParticipacaoTurma = 13,
@@ -50,9 +50,9 @@ namespace SME.SERAp.Prova.Dominio
         ResultadoCicloSme = 11,
         
         [Description("ResultadoCicloEscola")]
-        ResultadoCicloEscola = 10,
+        ResultadoCicloEscola = 9,
         
         [Description("ResultadoCicloTurma")]
-        ResultadoCicloTurma = 12        
+        ResultadoCicloTurma = 8        
     }
 }

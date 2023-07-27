@@ -53,6 +53,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Participacao.CicloDre
             {
                 Edicao = objResultadoCsv.Edicao,
                 AreaConhecimentoId = objResultadoCsv.AreaConhecimentoId,
+                DreSigla = objResultadoCsv.DreSigla,
                 CicloId = objResultadoCsv.CicloId,
                 Valor = objResultadoCsv.Valor,
                 TotalAlunos = objResultadoCsv.TotalAlunos,

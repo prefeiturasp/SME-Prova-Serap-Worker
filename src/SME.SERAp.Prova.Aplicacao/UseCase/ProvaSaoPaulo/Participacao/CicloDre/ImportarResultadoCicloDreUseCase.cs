@@ -1,12 +1,12 @@
-﻿using MediatR;
-using SME.SERAp.Prova.Dominio.Enums;
-using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra.Interfaces;
-using SME.SERAp.Prova.Infra;
-using System.Threading.Tasks;
-using System;
-using SME.SERAp.Prova.Infra.Dtos;
+﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using MediatR;
+using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Enums;
+using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
+using SME.SERAp.Prova.Infra.Interfaces;
 
 namespace SME.SERAp.Prova.Aplicacao.UseCase
 {
@@ -24,23 +24,23 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             try
             {
                 var IdArquivoResultadoPsp = long.Parse(mensagemRabbit.Mensagem.ToString());
-                var arquivoResultadoPsp = await mediator.Send(new ObterTipoResultadoPspQuery(IdArquivoResultadoPsp));
+                var arquivoResultadoPsp = await Mediator.Send(new ObterTipoResultadoPspQuery(IdArquivoResultadoPsp));
                 if (arquivoResultadoPsp == null) return false;
                 PopularArquivoResultado(arquivoResultadoPsp);
 
                 await AtualizaStatusDoProcesso(IdArquivoResultadoPsp, StatusImportacao.EmAndamento);
 
-                using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(pathOptions, arquivoResultadoPsp.NomeArquivo))
+                using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(PathOptions, arquivoResultadoPsp.NomeArquivo))
                 {
                     var listaCsvResultados = csv.GetRecords<ResultadoCicloDreDto>().ToList();
                     foreach (var objCsvResultado in listaCsvResultados)
                     {
                         var dto = new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado);
                         ValidarAnoEdicao(objCsvResultado.Edicao);
-                        await publicarFilaTratar(dto, tipoResultadoProcesso);
+                        await PublicarFilaTratar(dto, tipoResultadoProcesso);
                     }
                 }
-                await publicarFilaTratarStatusProcesso(IdArquivoResultadoPsp);
+                await PublicarFilaTratarStatusProcesso(IdArquivoResultadoPsp);
                 return true;
             }
             catch (Exception ex)

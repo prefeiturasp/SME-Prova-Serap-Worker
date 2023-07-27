@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
+using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Participacao.CicloDre;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Dados.Interfaces;
@@ -106,6 +107,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoCicloSme, RepositorioResultadoCicloSme>();
             services.AddScoped<IRepositorioResultadoCicloEscola, RepositorioResultadoCicloEscola>();
             services.AddScoped<IRepositorioResultadoCicloTurma, RepositorioResultadoCicloTurma>();
+            services.AddScoped<IRepositorioResultadoCicloDre, RepositorioResultadoCicloDre>();
+
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -230,6 +233,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProficienciaCicloEscolaUseCase, TratarProficienciaCicloEscolaUseCase>();
             services.AddScoped<IImportarProficienciaCicloTurmaUseCase, ImportarProficienciaCicloTurmaUseCase>();
             services.AddScoped<ITratarProficienciaCicloTurmaUseCase, TratarProficienciaCicloTurmaUseCase>();            
+            services.AddScoped<ITratarResultadoCicloDreUseCase, TratarResultadoCicloDreUseCase>();
+
         }
     }
 }

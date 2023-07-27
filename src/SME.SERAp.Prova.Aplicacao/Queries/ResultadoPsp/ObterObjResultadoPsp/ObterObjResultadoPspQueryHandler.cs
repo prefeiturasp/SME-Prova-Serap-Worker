@@ -5,7 +5,11 @@ using MediatR;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Dominio.Entidades.ProficienciaPsp;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -25,9 +29,10 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioParticipacaoSme repositorioParticipacaoSme;
         private readonly IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento;
         private readonly IRepositorioResultadoCicloSme repositorioResultadoCicloSme;
-        private readonly IRepositorioResultadoCicloEscola repositorioResultadoCicloEscola;        
+        private readonly IRepositorioResultadoCicloEscola repositorioResultadoCicloEscola;
         private readonly IRepositorioResultadoCicloTurma repositorioResultadoCicloTurma;
-        
+        private readonly IRepositorioResultadoCicloDre repositorioResultadoCicloDre;
+
         private ObjResultadoPspDto objResultado;
 
         public ObterObjResultadoPspQueryHandler(IRepositorioResultadoSme repositorioResultadoSme,
@@ -45,7 +50,8 @@ namespace SME.SERAp.Prova.Aplicacao
                                                 IRepositorioParticipacaoSmeAreaConhecimento repositorioParticipacaoSmeAreaConhecimento,
                                                 IRepositorioResultadoCicloSme repositorioResultadoCicloSme,
                                                 IRepositorioResultadoCicloEscola repositorioResultadoCicloEscola,
-                                                IRepositorioResultadoCicloTurma repositorioResultadoCicloTurma)
+                                                IRepositorioResultadoCicloTurma repositorioResultadoCicloTurma,
+                                                IRepositorioResultadoCicloDre repositorioResultadoCicloDre)
         {
             this.repositorioResultadoSme = repositorioResultadoSme ?? throw new ArgumentNullException(nameof(repositorioResultadoSme));
             this.repositorioResultadoDre = repositorioResultadoDre ?? throw new ArgumentNullException(nameof(repositorioResultadoDre));
@@ -63,6 +69,8 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioResultadoCicloSme = repositorioResultadoCicloSme ?? throw new ArgumentNullException(nameof(repositorioResultadoCicloSme));
             this.repositorioResultadoCicloEscola = repositorioResultadoCicloEscola ?? throw new ArgumentNullException(nameof(repositorioResultadoCicloEscola));
             this.repositorioResultadoCicloTurma = repositorioResultadoCicloTurma ?? throw new ArgumentNullException(nameof(repositorioResultadoCicloTurma));
+            this.repositorioResultadoCicloDre = repositorioResultadoCicloDre ?? throw new System.ArgumentNullException(nameof(repositorioResultadoCicloDre));
+
         }
 
         public async Task<ObjResultadoPspDto> Handle(ObterObjResultadoPspQuery request, CancellationToken cancellationToken)
@@ -90,8 +98,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 TipoResultadoPsp.ParticipacaoSme => await ObterParticipacaoSme(),
                 TipoResultadoPsp.ParticipacaoSmeAreaConhecimento => await ObterParticipacaoSmeAreaConhecimento(),
                 TipoResultadoPsp.ResultadoCicloSme => await ObterResultadoCicloSme(),
-                TipoResultadoPsp.ResultadoCicloEscola => await ObterResultadoCicloEscola(),                
+                TipoResultadoPsp.ResultadoCicloEscola => await ObterResultadoCicloEscola(),
                 TipoResultadoPsp.ResultadoCicloTurma => await ObterResultadoCicloTurma(),
+                TipoResultadoPsp.ResultadoCicloDre => await ObterResultadoDre(),
                 _ => null
             };
         }
@@ -99,7 +108,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private async Task<ParticipacaoTurma> ObterParticipacaoTurmaAreaConhecimento()
         {
             var participacaoTurma = (ParticipacaoTurmaAreaConhecimentoDto)objResultado.Resultado;
-            
+
             return await repositorioParticipacaoTurmaAreaConhecimento.
                 ObterParticipacaoTurmaAreaConhecimento(participacaoTurma.Edicao,
                                                        participacaoTurma.uad_sigla,
@@ -123,19 +132,19 @@ namespace SME.SERAp.Prova.Aplicacao
             var resultadoBusca = (ResultadoAlunoDto)objResultado.Resultado;
             return await repositorioResultadoAluno.ObterProficienciaAluno(resultadoBusca.Edicao, resultadoBusca.alu_matricula, resultadoBusca.AreaConhecimentoID);
         }
-        
+
         private async Task<ResultadoTurma> ObterResultadoTurma()
         {
             var resultadoBusca = (ResultadoTurmaDto)objResultado.Resultado;
             return await repositorioResultadoTurma.ObterResultadoTurma(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.EscCodigo, resultadoBusca.TurCodigo);
         }
-        
+
         private async Task<ResultadoEscola> ObterResultadoEscola()
         {
             var resultadoBusca = (ResultadoEscolaDto)objResultado.Resultado;
             return await repositorioResultadoEscola.ObterResultadoEscola(resultadoBusca.Edicao, resultadoBusca.AreaConhecimentoID, resultadoBusca.EscCodigo, resultadoBusca.AnoEscolar);
         }
-        
+
         private async Task<ResultadoDre> ObterResultadoDre()
         {
             var resultadoBusca = (ResultadoDreDto)objResultado.Resultado;
@@ -195,19 +204,28 @@ namespace SME.SERAp.Prova.Aplicacao
             return await repositorioResultadoCicloSme.ObterResultadoCicloSme(resultado.Edicao,
                 resultado.AreaConhecimentoId, resultado.CicloId);
         }
-        
+
         private async Task<ResultadoCicloEscola> ObterResultadoCicloEscola()
         {
             var resultado = (ResultadoCicloEscolaDto)objResultado.Resultado;
             return await repositorioResultadoCicloEscola.ObterResultadoCicloEscola(resultado.Edicao,
                 resultado.AreaConhecimentoId, resultado.UadSigla, resultado.EscCodigo, resultado.CicloId);
         }
-        
+
         private async Task<ResultadoCicloTurma> ObterResultadoCicloTurma()
         {
             var resultado = (ResultadoCicloTurmaDto)objResultado.Resultado;
             return await repositorioResultadoCicloTurma.ObterResultadoCicloTurma(resultado.Edicao,
                 resultado.AreaConhecimentoId, resultado.UadSigla, resultado.EscCodigo, resultado.TurmaCodigo);
-        }        
+        }
+        private async Task<ResultadoCicloDre> ObterResultadoCicloDre()
+        {
+            var resultado = (ResultadoCicloDreDto)objResultado.Resultado;
+            return await repositorioResultadoCicloDre.ObterResultadoCicloDre
+                                                       (resultado.Edicao,
+                                                       resultado.AreaConhecimentoId,
+                                                       resultado.DreSigla,
+                                                       resultado.CicloId);
+        }
     }
 }

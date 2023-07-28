@@ -23,7 +23,7 @@ namespace SME.SERAp.Prova.Infra.Dtos
         public int? TotalAlunos { get; set; }
 
         [Name("NivelProficienciaID")]
-        public int? NivelProficienciaId { get; set; }
+        public string SNivelProficienciaId { get; set; }
 
         [Name("PercentualAbaixoDoBasico")]
         public string SPercentualAbaixoDoBasico { get; set; }
@@ -40,6 +40,8 @@ namespace SME.SERAp.Prova.Infra.Dtos
         [Name("PercentualAlfabetizado")]
         public string SPercentualAlfabetizado { get; set; }
 
+
+        public int? NivelProficienciaId => SNivelProficienciaId.ConvertStringPraIntNullPsp();
         public decimal? Valor => SValor.ConvertStringPraDecimalNullPsp();
         public decimal? PercentualAbaixoDoBasico => SPercentualAbaixoDoBasico.ConvertStringPraDecimalNullPsp();
         public decimal? PercentualBasico => SPercentualBasico.ConvertStringPraDecimalNullPsp();

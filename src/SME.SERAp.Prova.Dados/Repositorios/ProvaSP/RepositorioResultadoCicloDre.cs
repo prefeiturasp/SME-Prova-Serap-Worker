@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios.ProvaSP
 
             using var conn = ObterConexaoProvaSp();
             return await conn.QueryFirstOrDefaultAsync<ResultadoCicloDre>(query,
-                new { edicao, areaConhecimentoId, cicloId });
+                new { edicao, areaConhecimentoId, cicloId, dreSigla });
         }
 
         public async Task<long> IncluirAsync(ResultadoCicloDre resultado)
@@ -96,7 +96,7 @@ namespace SME.SERAp.Prova.Dados.Repositorios.ProvaSP
             var parametros = new DynamicParameters();
             parametros.Add("@edicao", resultado.Edicao, DbType.String, ParameterDirection.Input, 10);
             parametros.Add("@areaConhecimentoId", resultado.AreaConhecimentoId, DbType.Int16, ParameterDirection.Input);
-            parametros.Add("@uad_sigla", resultado.DreSigla, DbType.String, ParameterDirection.Input);
+            parametros.Add("@dreSigla", resultado.DreSigla, DbType.String, ParameterDirection.Input);
             parametros.Add("@cicloId", resultado.CicloId, DbType.Int32, ParameterDirection.Input, 4);
             parametros.Add("@valor", resultado.Valor, DbType.Decimal, ParameterDirection.Input, 5, 6, 3);
             parametros.Add("@totalAlunos", resultado.TotalAlunos, DbType.Int32, ParameterDirection.Input, 4);

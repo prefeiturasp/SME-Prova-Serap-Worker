@@ -232,7 +232,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IImportarProficienciaCicloEscolaUseCase, ImportarProficienciaCicloEscolaUseCase>();
             services.AddScoped<ITratarProficienciaCicloEscolaUseCase, TratarProficienciaCicloEscolaUseCase>();
             services.AddScoped<IImportarProficienciaCicloTurmaUseCase, ImportarProficienciaCicloTurmaUseCase>();
-            services.AddScoped<ITratarProficienciaCicloTurmaUseCase, TratarProficienciaCicloTurmaUseCase>();            
+            services.AddScoped<ITratarProficienciaCicloTurmaUseCase, TratarProficienciaCicloTurmaUseCase>();
+            services.AddScoped<IImportarResultadoCicloDreUseCase, ImportarResultadoCicloDreUseCase>();
             services.AddScoped<ITratarResultadoCicloDreUseCase, TratarResultadoCicloDreUseCase>();
 
         }

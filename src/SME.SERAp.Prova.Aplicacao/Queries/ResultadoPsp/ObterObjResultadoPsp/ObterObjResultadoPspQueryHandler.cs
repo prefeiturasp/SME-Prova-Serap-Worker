@@ -100,7 +100,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 TipoResultadoPsp.ResultadoCicloSme => await ObterResultadoCicloSme(),
                 TipoResultadoPsp.ResultadoCicloEscola => await ObterResultadoCicloEscola(),
                 TipoResultadoPsp.ResultadoCicloTurma => await ObterResultadoCicloTurma(),
-                TipoResultadoPsp.ResultadoCicloDre => await ObterResultadoDre(),
+                TipoResultadoPsp.ResultadoCicloDre => await ObterResultadoCicloDre(),
                 _ => null
             };
         }

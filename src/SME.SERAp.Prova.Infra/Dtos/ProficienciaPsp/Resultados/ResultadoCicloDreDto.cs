@@ -10,7 +10,7 @@ namespace SME.SERAp.Prova.Infra.Dtos
         [Name("AreaConhecimentoID")]
         public int AreaConhecimentoId { get; set; }
 
-        [Name("Uad_Sigla")]
+        [Name("uad_sigla")]
         public string  DreSigla { get; set; }
 
         [Name("CicloID")]

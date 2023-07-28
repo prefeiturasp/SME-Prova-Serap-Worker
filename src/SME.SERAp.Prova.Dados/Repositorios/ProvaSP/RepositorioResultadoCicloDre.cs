@@ -33,8 +33,8 @@ namespace SME.SERAp.Prova.Dados.Repositorios.ProvaSP
         public async Task<long> IncluirAsync(ResultadoCicloDre resultado)
         {
             const string query = @"insert into [dbo].[ResultadoCicloDre]
-                                    values(@edicao, @areaConhecimentoId, @dreSigla, @cicloId, @valor, @totalAlunos, 
-                                        @nivelProficienciaId, @percentualAbaixoDoBasico, @percentualBasico,
+                                    values(@edicao, @areaConhecimentoId, @dreSigla, @cicloId, @valor, @nivelProficienciaId, @totalAlunos, 
+                                        @percentualAbaixoDoBasico, @percentualBasico,
                                         @percentualAdequado, @percentualAvancado, @percentualAlfabetizado)";
 
             using var conn = ObterConexaoProvaSp();

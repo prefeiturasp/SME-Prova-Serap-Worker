@@ -16,17 +16,17 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            
             var proficienciaAlunoProvaTai = mensagemRabbit.ObterObjetoMensagem<ProficienciaAlunoProvaTaiDto>();
             if (proficienciaAlunoProvaTai == null)
                 throw new NegocioException($"É preciso informar os dados de proficiencia.");
 
             await Validacoes(proficienciaAlunoProvaTai);
 
-            var proficiencia = await mediator.Send(new ObterProficienciaAlunoQuery(proficienciaAlunoProvaTai.ProvaId, 
-                                                                                   proficienciaAlunoProvaTai.AlunoId, 
-                                                                                   (AlunoProvaProficienciaTipo)proficienciaAlunoProvaTai.Tipo, 
-                                                                                   (AlunoProvaProficienciaOrigem)proficienciaAlunoProvaTai.Origem));
+            var proficiencia = await mediator.Send(new ObterProficienciaAlunoQuery(proficienciaAlunoProvaTai.ProvaId,
+                proficienciaAlunoProvaTai.AlunoId,
+                (AlunoProvaProficienciaTipo)proficienciaAlunoProvaTai.Tipo,
+                (AlunoProvaProficienciaOrigem)proficienciaAlunoProvaTai.Origem));
+
             if (proficiencia == null)
             {
                 await mediator.Send(new IncluirAlunoProvaProficienciaCommand(new AlunoProvaProficiencia()
@@ -34,7 +34,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     AlunoId = proficienciaAlunoProvaTai.AlunoId,
                     Ra = proficienciaAlunoProvaTai.AlunoRa,
                     ProvaId = proficienciaAlunoProvaTai.ProvaId,
-                    DisciplinaId = proficienciaAlunoProvaTai.DisciplinaId.GetValueOrDefault() > 0 ? (long)proficienciaAlunoProvaTai.DisciplinaId.Value : (long?)null,
+                    DisciplinaId = proficienciaAlunoProvaTai.DisciplinaId,
                     Origem = (AlunoProvaProficienciaOrigem)proficienciaAlunoProvaTai.Origem,
                     Tipo = (AlunoProvaProficienciaTipo)proficienciaAlunoProvaTai.Tipo,
                     Proficiencia = proficienciaAlunoProvaTai.Proficiencia,

@@ -31,7 +31,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new ErroException($"Erro ao tratar cadernos da prova TAI: {ex.Message}");
             }
         }
 

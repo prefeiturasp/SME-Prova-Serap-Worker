@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SME.SERAp.Prova.Infra.Dtos
+namespace SME.SERAp.Prova.Infra
 {
     public class ObterItensProvaTaiDto
     {
@@ -28,5 +28,7 @@ namespace SME.SERAp.Prova.Infra.Dtos
         public string SubAssunto { get; set; }
         [JsonPropertyName("n.Ij")]
         public string NIj { get; set; }
+        [JsonPropertyName("componente")]
+        public string Componente { get; set; }
     }
 }

@@ -5,6 +5,5 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public interface IAjustarUeTurmasUseCase : IUseCase<MensagemRabbit, bool>
     {
-
     }
 }

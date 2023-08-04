@@ -26,7 +26,7 @@ namespace SME.SERAp.Prova.Dados
                                      tah.data_situacao as dataSituacao,
                                      tah.matricula               
                             from aluno a
-                            left join turma_aluno_historico tah ON tah.aluno_id = a.id 
+                            inner join turma_aluno_historico tah ON tah.aluno_id = a.id 
                             where a.ra = ANY(@alunosRa)";
                 return await conn.QueryAsync<TurmaAlunoHistoricoDto>(query, new { alunosRa });
             }

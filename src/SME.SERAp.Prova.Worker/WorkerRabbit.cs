@@ -197,7 +197,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.QuestaoCompletaTratar, new ComandoRabbit("Realiza a atualização dos dados completos da questão", typeof(ITratarQuestaoCompletaUseCase)));
 
             // proficiencia
-            comandos.Add(RotasRabbit.AlunoProvaProficienciaAsync, new ComandoRabbit("Sincronização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaAsyncUseCase)));
+            comandos.Add(RotasRabbit.AlunoProvaProficienciaSync, new ComandoRabbit("Sincronização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaSyncUseCase)));
+            comandos.Add(RotasRabbit.AlunoProvaProficienciaPorProvaSync, new ComandoRabbit("Sincronização das proficiencia do aluno por prova", typeof(ITratarAlunoProvaProficienciaPorProvaIdSyncUseCase)));            
             comandos.Add(RotasRabbit.AlunoProvaProficienciaTratar, new ComandoRabbit("Realiza a atuaização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaUseCase)));
 
             comandos.Add(RotasRabbit.ExtrairResultadosProva, new ComandoRabbit("Realizar a extração de uma prova", typeof(ITratarProvaResultadoExtracaoUseCase)));
@@ -214,15 +215,17 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.ProvaWebPushTeste, new ComandoRabbit("Teste de webpush", typeof(IProvaWebPushTesteUseCase)));
 
             // Sincronização das UES e turmas
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalDreSync, new ComandoRabbit("Estrutura Institucional - Sync de Dre", typeof(IExecutarSincronizacaoInstitucionalDreSyncUseCase)));
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, new ComandoRabbit("Estrutura Institucional - Sync de Ue", typeof(IExecutarSincronizacaoInstitucionalUeSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalDreSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Dres", typeof(IExecutarSincronizacaoInstitucionalDreSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalDreTratar, new ComandoRabbit("Estrutura Institucional - Tratar uma Dre", typeof(IExecutarSincronizacaoInstitucionalDreTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Ues", typeof(IExecutarSincronizacaoInstitucionalUeSyncUseCase)));
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalUeTratar, new ComandoRabbit("Estrutura Institucional - Tratar uma Ue", typeof(IExecutarSincronizacaoInstitucionalUeTratarUseCase)));
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Turmas/Alunos", typeof(IExecutarSincronizacaoInstitucionalTurmaSyncUseCase)));
-
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Turmas", typeof(IExecutarSincronizacaoInstitucionalTurmaSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar, new ComandoRabbit("Estrutura Institucional - Tratar turmas", typeof(IExecutarSincronizacaoInstitucionalTurmaTratarUseCase)));
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new ComandoRabbit("Estrutura Institucional - Sincronizar alunos", typeof(IExecutarSincronizacaoInstitucionalAlunoSyncUseCase)));
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, new ComandoRabbit("Estrutura Institucional - tratar alunos", typeof(IExecutarSincronizacaoInstitucionalAlunoTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, new ComandoRabbit("Estrutura Institucional - Tratar alunos", typeof(IExecutarSincronizacaoInstitucionalAlunoTratarUseCase)));
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync, new ComandoRabbit("Estrutura Institucional - Sincronizar turmas histórico alunos", typeof(IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase)));
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, new ComandoRabbit("Estrutura Institucional - Tratar turmas histórico alunos", typeof(IExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));            
 
             //Finalizar provas automaticamente
             comandos.Add(RotasRabbit.IniciarProcessoFinalizarProvasAutomaticamente, new ComandoRabbit("Finalizar provas automaticamente - Iniciar novo processo", typeof(IIniciarProcessoFinalizarProvasAutomaticamenteUseCase)));
@@ -237,10 +240,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.GrupoAbrangenciaExcluir, new ComandoRabbit("Busca abrangências por grupo para fila excluir", typeof(ITratarAbrangenciaGrupoExcluirUseCase)));
             comandos.Add(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, new ComandoRabbit("", typeof(ITratarAbrangenciaUsuarioGrupoExcluirUseCase)));
 
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));
-
+            //Prova TAI
             comandos.Add(RotasRabbit.TratarCadernosProvaTai, new ComandoRabbit("Tratamento cadernos amostra TAI", typeof(ITratarCadernosProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarCadernoAlunoProvaTai, new ComandoRabbit("Tratamento cadernos alunos prova TAI", typeof(ITratarCadernoAlunoProvaTaiUseCase)));
+            comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
+            comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));            
 
             // Persistencia Serap Estudantes
             comandos.Add(RotasRabbit.IncluirUsuario, new ComandoRabbit("Incluir Usuario Persistencia Serap", typeof(IIncluirUsuarioSerapUseCase)));
@@ -251,8 +255,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));
             comandos.Add(RotasRabbit.TratarUsuarioDispositivoLogin, new ComandoRabbit("Salvar dispositivo no login do usuário", typeof(ITratarUsuarioDispositivoLoginUseCase)));
             comandos.Add(RotasRabbit.TratarReaberturaProvaAluno, new ComandoRabbit("Tramento de reabertura de prova de aluno serap estudantes", typeof(ITratarReaberturaProvaAlunoUseCase)));
-            comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
-            comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));
 
             comandos.Add(RotasRabbit.TratarStatusProcessoResultado, new ComandoRabbit("Tratar status do processo", typeof(ITratarStatusProcessoResultadoPspUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoAlunoPsp, new ComandoRabbit("Importa arquivo csv proeficiencia aluno", typeof(IImportarProficienciaAlunoUseCase)));

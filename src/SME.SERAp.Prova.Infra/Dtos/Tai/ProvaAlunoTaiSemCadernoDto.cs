@@ -11,6 +11,7 @@ namespace SME.SERAp.Prova.Infra
         public long AlunoId { get; set; }
         public int Situacao { get; set; }
         public long ProvaLegadoId { get; set; }
+        public long AlunoRa { get; set; }
 
         public bool Ativo()
         {

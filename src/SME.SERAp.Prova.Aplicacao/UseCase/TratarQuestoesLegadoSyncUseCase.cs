@@ -2,7 +2,6 @@
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,26 +17,25 @@ namespace SME.SERAp.Prova.Aplicacao
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
+            var provaLegadoId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
 
-            var questoesSerap = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaId));
+            var questoesSerap = await mediator.Send(new ObterQuestoesPorProvaIdQuery(provaLegadoId));
 
             foreach (var questaoSerap in questoesSerap)
             {
-                var prova = await mediator.Send(new ObterProvaDetalhesPorIdQuery(questaoSerap.ProvaLegadoId));
-
-                if (prova == null)
-                    throw new Exception($"Prova {provaId} não localizada!");
+                var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(questaoSerap.ProvaLegadoId));
+                
+                if (provaAtual == null)
+                    throw new Exception($"Prova {provaLegadoId} não localizada!");
 
                 var questaoParaPersistir = new Questao(
                     questaoSerap.TextoBase,
                     questaoSerap.QuestaoId,
                     questaoSerap.Enunciado,
                     questaoSerap.Ordem,
-                    prova.Id,
+                    provaAtual.Id,
                     (QuestaoTipo)questaoSerap.TipoItem,
                     questaoSerap.Caderno,
                     questaoSerap.QuantidadeAlternativas
@@ -61,9 +59,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 await TratarVideosQuestao(questaoSerap.QuestaoId, questaoId);
 
                 if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
-                {
                     await TratarAlternativasQuestao(questaoSerap, questaoId);
-                }
             }
 
             return true;
@@ -78,7 +74,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var alternativa = await mediator.Send(new ObterAlternativaDetalheLegadoPorIdQuery(questaoSerap.QuestaoId, alternativaLegadoId));
 
                 if (alternativa == null)
-                    throw new Exception($"A Alternativa {alternativa.AlternativaLegadoId} não localizada!");
+                    throw new Exception($"A Alternativa {alternativaLegadoId} não localizada!");
 
                 var alternativaParaPersistir = new Alternativa(
                     alternativa.AlternativaLegadoId,
@@ -122,32 +118,35 @@ namespace SME.SERAp.Prova.Aplicacao
             var videosQuestao = await mediator.Send(new ObterVideosPorQuestaoLegadoIdQuery(questaoLegadoId));
             if (videosQuestao != null && videosQuestao.Any())
             {
-                IEnumerable<Arquivo> videos = videosQuestao.Select(v => new Arquivo
+                var videos = videosQuestao.Select(v => new Arquivo
                 {
                     LegadoId = v.VideoId,
                     Caminho = v.CaminhoVideo
                 });
+                
                 videos = await mediator.Send(new ObterTamanhoArquivosQuery(videos));
 
-                IEnumerable<Arquivo> thumbnails = videosQuestao.Where(t => t.ThumbnailVideoId > 0)
+                var thumbnails = videosQuestao.Where(t => t.ThumbnailVideoId > 0)
                     .Select(t => new Arquivo
                     {
                         LegadoId = t.ThumbnailVideoId,
                         Caminho = t.CaminhoThumbnailVideo
                     });
+                
                 thumbnails = await mediator.Send(new ObterTamanhoArquivosQuery(thumbnails));
 
-                IEnumerable<Arquivo> videosConvertido = videosQuestao.Where(vc => vc.VideoConvertidoId > 0)
+                var videosConvertido = videosQuestao.Where(vc => vc.VideoConvertidoId > 0)
                     .Select(vc => new Arquivo
                     {
                         LegadoId = vc.VideoConvertidoId,
                         Caminho = vc.CaminhoVideoConvertido
                     });
+                
                 videosConvertido = await mediator.Send(new ObterTamanhoArquivosQuery(videosConvertido));
 
                 foreach (var video in videosQuestao)
                 {
-                    long arquivoVideoId = await mediator.Send(new ArquivoPersistirCommand(videos.FirstOrDefault(v => v.LegadoId == video.VideoId)));
+                    var arquivoVideoId = await mediator.Send(new ArquivoPersistirCommand(videos.FirstOrDefault(v => v.LegadoId == video.VideoId)));
 
                     long? arquivoThumbnailId = null;
                     if (video.ThumbnailVideoId > 0)

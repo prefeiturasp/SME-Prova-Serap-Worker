@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
+using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Participacao.CicloDre;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Dados.Interfaces;
@@ -103,6 +104,10 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioParticipacaoDreAreaConhecimento, RepositorioParticipacaoDreAreaConhecimento>();
             services.AddScoped<IRepositorioParticipacaoSme, RepositorioParticipacaoSme>();
             services.AddScoped<IRepositorioParticipacaoSmeAreaConhecimento, RepositorioParticipacaoSmeAreaConhecimento>();
+            services.AddScoped<IRepositorioResultadoCicloSme, RepositorioResultadoCicloSme>();
+            services.AddScoped<IRepositorioResultadoCicloEscola, RepositorioResultadoCicloEscola>();
+            services.AddScoped<IRepositorioResultadoCicloTurma, RepositorioResultadoCicloTurma>();
+            services.AddScoped<IRepositorioResultadoCicloDre, RepositorioResultadoCicloDre>();
 
         }
 
@@ -144,10 +149,11 @@ namespace SME.SERAp.Prova.IoC
 
             // sincronização institucional 
             services.AddScoped<IExecutarSincronizacaoInstitucionalDreSyncUseCase, ExecutarSincronizacaoInstitucionalDreSyncUseCase>();
-            //services.AddScoped<IExecutarSincronizacaoInstitucionalDreTratarUseCase, ExecutarSincronizacaoInstitucionalDreTratarUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalDreTratarUseCase, ExecutarSincronizacaoInstitucionalDreTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeSyncUseCase, ExecutarSincronizacaoInstitucionalUeSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalUeTratarUseCase, ExecutarSincronizacaoInstitucionalUeTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaSyncUseCase, ExecutarSincronizacaoInstitucionalTurmaSyncUseCase>();
+            services.AddScoped<IExecutarSincronizacaoInstitucionalTurmaTratarUseCase, ExecutarSincronizacaoInstitucionalTurmaTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalAlunoSyncUseCase, ExecutarSincronizacaoInstitucionalAlunoSyncUseCase>();
             services.AddScoped<IExecutarSincronizacaoInstitucionalAlunoTratarUseCase, ExecutarSincronizacaoInstitucionalAlunoTratarUseCase>();
             services.AddScoped<IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase, ExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase>();
@@ -170,8 +176,9 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<ITratarQuestaoCompletaSyncUseCase, TratarQuestaoCompletaSyncUseCase>();
             services.AddScoped<ITratarQuestaoCompletaUseCase, TratarQuestaoCompletaUseCase>();         
-            services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasUseCase>();
-            services.AddScoped<ITratarAlunoProvaProficienciaAsyncUseCase, TratarAlunoProvaProficienciaAsyncUseCase>();
+            services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasesUseCase>();
+            services.AddScoped<ITratarAlunoProvaProficienciaSyncUseCase, TratarAlunoProvaProficienciaSyncUseCase>();
+            services.AddScoped<ITratarAlunoProvaProficienciaPorProvaIdSyncUseCase, TratarAlunoProvaProficienciaPorProvaIdSyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaUseCase, TratarAlunoProvaProficienciaUseCase>();
             services.AddScoped<ITratarCadernosProvaTaiUseCase, TratarCadernosProvaTaiUseCase>();
             services.AddScoped<ITratarCadernoAlunoProvaTaiUseCase, TratarCadernoAlunoProvaTaiUseCase>();
@@ -222,6 +229,15 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarResultadoParticipacaoSmeUseCase, TratarResultadoParticipacaoSmeUseCase>();
             services.AddScoped<IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase, ImportarResultadoParticipacaoSmeAreaConhecimentoUseCase>();
             services.AddScoped<ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase, TratarResultadoParticipacaoSmeAreaConhecimentoUseCase>();
+            services.AddScoped<IImportarProficienciaCicloSmeUseCase, ImportarProficienciaCicloSmeUseCase>();
+            services.AddScoped<ITratarProficienciaCicloSmeUseCase, TratarProficienciaCicloSmeUseCase>();
+            services.AddScoped<IImportarProficienciaCicloEscolaUseCase, ImportarProficienciaCicloEscolaUseCase>();
+            services.AddScoped<ITratarProficienciaCicloEscolaUseCase, TratarProficienciaCicloEscolaUseCase>();
+            services.AddScoped<IImportarProficienciaCicloTurmaUseCase, ImportarProficienciaCicloTurmaUseCase>();
+            services.AddScoped<ITratarProficienciaCicloTurmaUseCase, TratarProficienciaCicloTurmaUseCase>();
+            services.AddScoped<IImportarResultadoCicloDreUseCase, ImportarResultadoCicloDreUseCase>();
+            services.AddScoped<ITratarResultadoCicloDreUseCase, TratarResultadoCicloDreUseCase>();
+
         }
     }
 }

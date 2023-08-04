@@ -6,7 +6,6 @@ using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao.UseCase
@@ -48,7 +47,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             return true;
 
         }
-        private async Task IncluiListaPermissoes(ProvaIdsDto idsProvaDto, IEnumerable<Infra.Dtos.ProvaGrupoPermissaoDto> permissoesGrupoProvaLegado, IEnumerable<GrupoSerapCoreSso> gruposSerapEstudantesCoreSso, List<ProvaGrupoPermissao> listaPermissoes)
+        private async Task IncluiListaPermissoes(ProvaIdsDto idsProvaDto, IEnumerable<ProvaGrupoPermissaoDto> permissoesGrupoProvaLegado, IEnumerable<GrupoSerapCoreSso> gruposSerapEstudantesCoreSso, List<ProvaGrupoPermissao> listaPermissoes)
         {
             foreach (var permissaoGrupo in permissoesGrupoProvaLegado)
             {
@@ -66,7 +65,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
                 await mediator.Send(new IncluirProvaGrupoPermissaoCommand(listaPermissoes));
         }
 
-        private async Task AlteraListaPermissoes(IEnumerable<Infra.Dtos.ProvaGrupoPermissaoDto> permissoesGrupoProvaLegado, IEnumerable<GrupoSerapCoreSso> gruposSerapEstudantesCoreSso, List<ProvaGrupoPermissao> listaPermissoes, IEnumerable<ProvaGrupoPermissao> listaProvasGrupoPermissao)
+        private async Task AlteraListaPermissoes(IEnumerable<ProvaGrupoPermissaoDto> permissoesGrupoProvaLegado, IEnumerable<GrupoSerapCoreSso> gruposSerapEstudantesCoreSso, List<ProvaGrupoPermissao> listaPermissoes, IEnumerable<ProvaGrupoPermissao> listaProvasGrupoPermissao)
         {
             foreach (var provaGrupoPermissao in listaProvasGrupoPermissao)
             {

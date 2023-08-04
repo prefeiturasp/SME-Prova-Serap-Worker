@@ -9,7 +9,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class MontarQuestaoCompletaPorIdQueryHandler : IRequestHandler<MontarQuestaoCompletaPorIdQuery, QuestaoCompletaDto>
     {
-
         private readonly IRepositorioQuestao repositorioQuestao;
 
         public MontarQuestaoCompletaPorIdQueryHandler(IRepositorioQuestao repositorioQuestao)

@@ -4,6 +4,11 @@ namespace SME.SERAp.Prova.Infra
 {
     public class AmostraProvaTaiDto
     {
+        public AmostraProvaTaiDto()
+        {
+            ListaConfigItens = new List<ConfigAnoItensProvaTaiDto>();
+        }
+
         public long ProvaLegadoId { get; set; }
         public int DisciplinaId { get; set; }
         public int MatrizId { get; set; }

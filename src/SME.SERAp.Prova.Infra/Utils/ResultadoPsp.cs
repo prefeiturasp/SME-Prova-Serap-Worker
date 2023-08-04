@@ -33,7 +33,7 @@ namespace SME.SERAp.Prova.Infra
 
         public static CsvReader ObterReaderArquivoResultadosPsp(PathOptions pathOptions, string nomeArquivo)
         {
-            string path = $"{pathOptions.PathArquivos}/{"ResultadoPsp"}/{nomeArquivo}";
+            var path = $"{pathOptions.PathArquivos}/ResultadoPsp/{nomeArquivo}";
             var reader = new StreamReader(path, encoding: Encoding.UTF8);
             return new CsvReader(reader, config);
         }
@@ -48,10 +48,9 @@ namespace SME.SERAp.Prova.Infra
 
                 if (valor.ToUpper() == "NA") return null;
 
-                if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec_valor))
-                {
-                    return dec_valor;
-                }
+                if (decimal.TryParse(valor, NumberStyles.Number, CultureInfo.InvariantCulture, out var decValor))
+                    return decValor;
+                
                 throw new Exception();
             }
             catch (Exception)
@@ -81,8 +80,11 @@ namespace SME.SERAp.Prova.Infra
         {
             try
             {
-                if (valor == null) return true;
-                decimal dec_valor = (decimal)valor;
+                if (valor == null) 
+                    return true;
+                
+                var dec_valor = (decimal)valor;
+                
                 return true;
             }
             catch (Exception)
@@ -96,7 +98,7 @@ namespace SME.SERAp.Prova.Infra
             try
             {
                 var listaAreaConhecimentoId = Enum.GetValues(typeof(AreaConhecimentoProvaSp)).Cast<AreaConhecimentoProvaSp>().ToList();
-                if (!listaAreaConhecimentoId.Any(x => x == (AreaConhecimentoProvaSp)areaConhecimentoId))
+                if (listaAreaConhecimentoId.All(x => x != (AreaConhecimentoProvaSp)areaConhecimentoId))
                     throw new Exception();
             }
             catch (Exception ex)
@@ -107,38 +109,27 @@ namespace SME.SERAp.Prova.Infra
 
         public static string ObterFilaTratarPorTipoResultadoPsp(TipoResultadoPsp tipoResultado)
         {
-            switch (tipoResultado)
+            return tipoResultado switch
             {
-                case TipoResultadoPsp.ResultadoAluno:
-                    return RotasRabbit.TratarResultadoAlunoPsp;
-                case TipoResultadoPsp.ResultadoSme:
-                    return RotasRabbit.TratarResultadoSmePsp;
-                case TipoResultadoPsp.ResultadoDre:
-                    return RotasRabbit.TratarResultadoDrePsp;
-                case TipoResultadoPsp.ResultadoEscola:
-                    return RotasRabbit.TratarResultadoEscolaPsp;
-                case TipoResultadoPsp.ResultadoTurma:
-                    return RotasRabbit.TratarResultadoTurmaPsp;
-                case TipoResultadoPsp.ResultadoParticipacaoTurma:
-                    return RotasRabbit.TratarResultadoParticipacaoTurma;
-                case TipoResultadoPsp.ParticipacaoTurmaAreaConhecimento:
-                    return RotasRabbit.TratarParticipacaoTurmaAreaConhecimento;
-                case TipoResultadoPsp.ResultadoParticipacaoUe:
-                    return RotasRabbit.TratarResultadoParticipacaoUe;
-                case TipoResultadoPsp.ParticipacaoUeAreaConhecimento:
-                    return RotasRabbit.TratarParticipacaoUeAreaConhecimento;
-                case TipoResultadoPsp.ParticipacaoDre:
-                    return RotasRabbit.TratarResultadoParticipacaoDre;
-                case TipoResultadoPsp.ParticipacaoDreAreaConhecimento:
-                    return RotasRabbit.TratarResultadoParticipacaoDreAreaConhecimento;
-                case TipoResultadoPsp.ParticipacaoSme:
-                    return RotasRabbit.TratarResultadoParticipacaoSme;
-                case TipoResultadoPsp.ParticipacaoSmeAreaConhecimento:
-                    return RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento;
-
-                default:
-                    return string.Empty;
-            }
+                TipoResultadoPsp.ResultadoAluno => RotasRabbit.TratarResultadoAlunoPsp,
+                TipoResultadoPsp.ResultadoSme => RotasRabbit.TratarResultadoSmePsp,
+                TipoResultadoPsp.ResultadoDre => RotasRabbit.TratarResultadoDrePsp,
+                TipoResultadoPsp.ResultadoEscola => RotasRabbit.TratarResultadoEscolaPsp,
+                TipoResultadoPsp.ResultadoTurma => RotasRabbit.TratarResultadoTurmaPsp,
+                TipoResultadoPsp.ResultadoParticipacaoTurma => RotasRabbit.TratarResultadoParticipacaoTurma,
+                TipoResultadoPsp.ParticipacaoTurmaAreaConhecimento => RotasRabbit.TratarParticipacaoTurmaAreaConhecimento,
+                TipoResultadoPsp.ResultadoParticipacaoUe => RotasRabbit.TratarResultadoParticipacaoUe,
+                TipoResultadoPsp.ParticipacaoUeAreaConhecimento => RotasRabbit.TratarParticipacaoUeAreaConhecimento,
+                TipoResultadoPsp.ParticipacaoDre => RotasRabbit.TratarResultadoParticipacaoDre,
+                TipoResultadoPsp.ParticipacaoDreAreaConhecimento => RotasRabbit.TratarResultadoParticipacaoDreAreaConhecimento,
+                TipoResultadoPsp.ParticipacaoSme => RotasRabbit.TratarResultadoParticipacaoSme,
+                TipoResultadoPsp.ParticipacaoSmeAreaConhecimento => RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento,
+                TipoResultadoPsp.ResultadoCicloSme => RotasRabbit.TratarResultadoCicloSme,
+                TipoResultadoPsp.ResultadoCicloEscola => RotasRabbit.TratarResultadoCicloEscola,
+                TipoResultadoPsp.ResultadoCicloTurma => RotasRabbit.TratarResultadoCicloTurma,
+                TipoResultadoPsp.ResultadoCicloDre => RotasRabbit.TratarResultadoCicloDre,
+                _ => string.Empty
+            };
         }
 
         public static string ObterJsonObjetoResultado(object resultado)
@@ -149,5 +140,47 @@ namespace SME.SERAp.Prova.Infra
             };
             return JsonSerializer.Serialize(resultado, jsonSerializerOptions);
         }
+        
+        public static int? ConvertStringPraIntNullPsp(this string valor)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(valor)) 
+                    return null;
+
+                if (valor.ToUpper() == "NA") 
+                    return null;
+
+                if (int.TryParse(valor, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intValor))
+                    return intValor;
+                
+                throw new Exception();
+            }
+            catch (Exception)
+            {
+                throw new Exception($"não foi possível converter o valor para inteiro: {valor}");
+            }
+        }
+        
+        public static long? ConvertStringPraLongNullPsp(this string valor)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(valor)) 
+                    return null;
+
+                if (valor.ToUpper() == "NA") 
+                    return null;
+
+                if (long.TryParse(valor, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intValor))
+                    return intValor;
+                
+                throw new Exception();
+            }
+            catch (Exception)
+            {
+                throw new Exception($"não foi possível converter o valor para long: {valor}");
+            }
+        }        
     }
 }

@@ -221,10 +221,6 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryFirstOrDefaultAsync<Dominio.Prova>(query, new { id });
             }
-            catch (System.Exception)
-            {
-                throw;
-            }
             finally
             {
                 conn.Close();

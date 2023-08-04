@@ -28,7 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
         private readonly IServicoTelemetria servicoTelemetria;
         private readonly IServicoMensageria servicoMensageria;
         private readonly Dictionary<string, ComandoRabbit> comandos;
-        
+
         public WorkerRabbit(
             ILogger<WorkerRabbit> logger,
             RabbitOptions rabbitOptions,
@@ -92,27 +92,27 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 await Task.Delay(10000, stoppingToken);
             }
         }
-        
+
         private static void RegistrarConsumer(EventingBasicConsumer consumer, IModel channel)
         {
             foreach (var fila in typeof(RotasRabbit).ObterConstantesPublicas<string>())
                 channel.BasicConsume(fila, false, consumer);
         }
-        
+
         private void DeclararFilas(IModel channel)
         {
             foreach (var fila in typeof(RotasRabbit).ObterConstantesPublicas<string>())
             {
                 var filaDeadLetter = $"{fila}.deadletter";
                 var filaDeadLetterFinal = $"{fila}.deadletter.final";
-                
+
                 if (rabbitOptions.ForcarRecriarFilas)
                 {
                     channel.QueueDelete(fila, ifEmpty: true);
                     channel.QueueDelete(filaDeadLetter, ifEmpty: true);
                     channel.QueueDelete(filaDeadLetterFinal, ifEmpty: true);
-                }                
-                
+                }
+
                 var args = ObterArgumentoDaFila(fila);
                 channel.QueueDeclare(fila, true, false, false, args);
                 channel.QueueBind(fila, ExchangeRabbit.SerapEstudante, fila, null);
@@ -122,18 +122,18 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 channel.QueueBind(filaDeadLetter, ExchangeRabbit.SerapEstudanteDeadLetter, fila, null);
 
                 var argsFinal = new Dictionary<string, object> { { "x-queue-mode", "lazy" } };
-                
+
                 channel.QueueDeclare(
-                    queue: filaDeadLetterFinal, 
-                    durable: true, 
-                    exclusive: false, 
-                    autoDelete: false, 
+                    queue: filaDeadLetterFinal,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
                     arguments: argsFinal);
-                
+
                 channel.QueueBind(filaDeadLetterFinal, ExchangeRabbit.SerapEstudanteDeadLetter, filaDeadLetterFinal, null);
             }
         }
-        
+
         private Dictionary<string, object> ObterArgumentoDaFila(string fila)
         {
             var args = new Dictionary<string, object>
@@ -141,10 +141,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             if (comandos.ContainsKey(fila) && comandos[fila].ModeLazy)
                 args.Add("x-queue-mode", "lazy");
-            
+
             return args;
         }
-        
+
         private Dictionary<string, object> ObterArgumentoDaFilaDeadLetter(string fila)
         {
             var argsDlq = new Dictionary<string, object>();
@@ -156,18 +156,18 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             return argsDlq;
         }
-        
+
         private ulong GetRetryCount(IBasicProperties properties)
         {
             if (properties.Headers == null || !properties.Headers.ContainsKey("x-death"))
                 return 0;
-            
+
             var deathProperties = (List<object>)properties.Headers["x-death"];
             var lastRetry = (Dictionary<string, object>)deathProperties[0];
             var count = lastRetry["count"];
-            
-            return (ulong) Convert.ToInt64(count);
-        }        
+
+            return (ulong)Convert.ToInt64(count);
+        }
 
         private void RegistrarUseCases()
         {
@@ -197,7 +197,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.QuestaoCompletaTratar, new ComandoRabbit("Realiza a atualização dos dados completos da questão", typeof(ITratarQuestaoCompletaUseCase)));
 
             // proficiencia
-            comandos.Add(RotasRabbit.AlunoProvaProficienciaAsync, new ComandoRabbit("Sincronização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaAsyncUseCase)));
+            comandos.Add(RotasRabbit.AlunoProvaProficienciaSync, new ComandoRabbit("Sincronização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaSyncUseCase)));
+            comandos.Add(RotasRabbit.AlunoProvaProficienciaPorProvaSync, new ComandoRabbit("Sincronização das proficiencia do aluno por prova", typeof(ITratarAlunoProvaProficienciaPorProvaIdSyncUseCase)));            
             comandos.Add(RotasRabbit.AlunoProvaProficienciaTratar, new ComandoRabbit("Realiza a atuaização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaUseCase)));
 
             comandos.Add(RotasRabbit.ExtrairResultadosProva, new ComandoRabbit("Realizar a extração de uma prova", typeof(ITratarProvaResultadoExtracaoUseCase)));
@@ -214,15 +215,17 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.ProvaWebPushTeste, new ComandoRabbit("Teste de webpush", typeof(IProvaWebPushTesteUseCase)));
 
             // Sincronização das UES e turmas
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalDreSync, new ComandoRabbit("Estrutura Institucional - Sync de Dre", typeof(IExecutarSincronizacaoInstitucionalDreSyncUseCase)));
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, new ComandoRabbit("Estrutura Institucional - Sync de Ue", typeof(IExecutarSincronizacaoInstitucionalUeSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalDreSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Dres", typeof(IExecutarSincronizacaoInstitucionalDreSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalDreTratar, new ComandoRabbit("Estrutura Institucional - Tratar uma Dre", typeof(IExecutarSincronizacaoInstitucionalDreTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Ues", typeof(IExecutarSincronizacaoInstitucionalUeSyncUseCase)));
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalUeTratar, new ComandoRabbit("Estrutura Institucional - Tratar uma Ue", typeof(IExecutarSincronizacaoInstitucionalUeTratarUseCase)));
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Turmas/Alunos", typeof(IExecutarSincronizacaoInstitucionalTurmaSyncUseCase)));
-
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, new ComandoRabbit("Estrutura Institucional - Sincronizar Turmas", typeof(IExecutarSincronizacaoInstitucionalTurmaSyncUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar, new ComandoRabbit("Estrutura Institucional - Tratar turmas", typeof(IExecutarSincronizacaoInstitucionalTurmaTratarUseCase)));
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoSync, new ComandoRabbit("Estrutura Institucional - Sincronizar alunos", typeof(IExecutarSincronizacaoInstitucionalAlunoSyncUseCase)));
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, new ComandoRabbit("Estrutura Institucional - tratar alunos", typeof(IExecutarSincronizacaoInstitucionalAlunoTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAlunoTratar, new ComandoRabbit("Estrutura Institucional - Tratar alunos", typeof(IExecutarSincronizacaoInstitucionalAlunoTratarUseCase)));
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync, new ComandoRabbit("Estrutura Institucional - Sincronizar turmas histórico alunos", typeof(IExecutarSincronizacaoTurmaAlunoHistoricoSyncUseCase)));
             comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar, new ComandoRabbit("Estrutura Institucional - Tratar turmas histórico alunos", typeof(IExecutarSincronizacaoTurmaAlunoHistoricoTratarUseCase)));
+            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));            
 
             //Finalizar provas automaticamente
             comandos.Add(RotasRabbit.IniciarProcessoFinalizarProvasAutomaticamente, new ComandoRabbit("Finalizar provas automaticamente - Iniciar novo processo", typeof(IIniciarProcessoFinalizarProvasAutomaticamenteUseCase)));
@@ -237,10 +240,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.GrupoAbrangenciaExcluir, new ComandoRabbit("Busca abrangências por grupo para fila excluir", typeof(ITratarAbrangenciaGrupoExcluirUseCase)));
             comandos.Add(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, new ComandoRabbit("", typeof(ITratarAbrangenciaUsuarioGrupoExcluirUseCase)));
 
-            comandos.Add(RotasRabbit.SincronizaEstruturaInstitucionalAtualizarUeTurma, new ComandoRabbit("Atualizar escolas das turmas.", typeof(IAjustarUeTurmasUseCase)));
-
+            //Prova TAI
             comandos.Add(RotasRabbit.TratarCadernosProvaTai, new ComandoRabbit("Tratamento cadernos amostra TAI", typeof(ITratarCadernosProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarCadernoAlunoProvaTai, new ComandoRabbit("Tratamento cadernos alunos prova TAI", typeof(ITratarCadernoAlunoProvaTaiUseCase)));
+            comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
+            comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));            
 
             // Persistencia Serap Estudantes
             comandos.Add(RotasRabbit.IncluirUsuario, new ComandoRabbit("Incluir Usuario Persistencia Serap", typeof(IIncluirUsuarioSerapUseCase)));
@@ -251,8 +255,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.ReabrirProvaAluno, new ComandoRabbit("Reabrir Prova Aluno Serap estudantes", typeof(IReabrirProvaAlunoUseCase)));
             comandos.Add(RotasRabbit.TratarUsuarioDispositivoLogin, new ComandoRabbit("Salvar dispositivo no login do usuário", typeof(ITratarUsuarioDispositivoLoginUseCase)));
             comandos.Add(RotasRabbit.TratarReaberturaProvaAluno, new ComandoRabbit("Tramento de reabertura de prova de aluno serap estudantes", typeof(ITratarReaberturaProvaAlunoUseCase)));
-            comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
-            comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));
 
             comandos.Add(RotasRabbit.TratarStatusProcessoResultado, new ComandoRabbit("Tratar status do processo", typeof(ITratarStatusProcessoResultadoPspUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoAlunoPsp, new ComandoRabbit("Importa arquivo csv proeficiencia aluno", typeof(IImportarProficienciaAlunoUseCase)));
@@ -281,16 +283,23 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSme, new ComandoRabbit("Tratar registros arquivo csv participação Sme", typeof(ITratarResultadoParticipacaoSmeUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Sme AreaConhecimento", typeof(IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Sme AreaConhecimento", typeof(ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
-
+            comandos.Add(RotasRabbit.ImportarResultadoCicloSme, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Sme ", typeof(IImportarProficienciaCicloSmeUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoCicloSme, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Sme", typeof(ITratarProficienciaCicloSmeUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoCicloEscola, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Escola ", typeof(IImportarProficienciaCicloEscolaUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoCicloEscola, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Escola", typeof(ITratarProficienciaCicloEscolaUseCase)));
+            comandos.Add(RotasRabbit.ImportarResultadoCicloTurma, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Turma ", typeof(IImportarProficienciaCicloTurmaUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoCicloTurma, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Turma", typeof(ITratarProficienciaCicloTurmaUseCase)));            
+            comandos.Add(RotasRabbit.ImportarResultadoCicloDrePsp, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Dre ", typeof(IImportarResultadoCicloDreUseCase)));
+            comandos.Add(RotasRabbit.TratarResultadoCicloDre, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Dre", typeof(ITratarResultadoCicloDreUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)
         {
             var executar = objType.GetMethod(method);
 
-            if (executar != null) 
+            if (executar != null)
                 return executar;
-            
+
             foreach (var itf in objType.GetInterfaces())
             {
                 executar = ObterMetodo(itf, method);
@@ -339,23 +348,24 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 catch (Exception ex)
                 {
                     servicoTelemetria.RegistrarExcecao(transacao, ex);
-                    
+
                     var rejeicoes = GetRetryCount(ea.BasicProperties);
 
                     if (++rejeicoes >= comandoRabbit.QuantidadeReprocessamentoDeadLetter)
                     {
                         channel.BasicAck(ea.DeliveryTag, false);
-                        
+
                         var filaFinal = $"{ea.RoutingKey}.deadletter.final";
 
                         await servicoMensageria.Publicar(mensagemRabbit, filaFinal,
                             ExchangeRabbit.SerapEstudanteDeadLetter,
                             "PublicarDeadLetter");
-                    } else
+                    }
+                    else
                         channel.BasicReject(ea.DeliveryTag, false);
-                    
+
                     servicolog.Registrar(LogNivel.Critico, $"Rota-- {ea.RoutingKey} -- Erros: {ex.Message}", $"Mensagem Rabbit: {mensagemRabbit.Mensagem} --", ex.StackTrace);
-                    
+
                 }
                 finally
                 {

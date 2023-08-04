@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra;
 using System.Collections.Generic;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -12,6 +11,6 @@ namespace SME.SERAp.Prova.Aplicacao
             TurmaId = turmaId;
         }
 
-        public long TurmaId { get; set; }
+        public long TurmaId { get; }
     }
 }

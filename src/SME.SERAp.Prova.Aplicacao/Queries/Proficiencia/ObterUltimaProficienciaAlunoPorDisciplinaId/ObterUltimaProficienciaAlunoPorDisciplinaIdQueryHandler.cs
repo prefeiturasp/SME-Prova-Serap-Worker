@@ -34,7 +34,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<(decimal proficiencia, AlunoProvaProficienciaOrigem origem)> Handle(ObterUltimaProficienciaAlunoPorDisciplinaIdQuery request, CancellationToken cancellationToken)
         {
-
             var areaConhecimentoSerap = await repositorioGeralSerapLegado.ObterAreaConhecimentoSerapPorDisciplinaId((long)request.DisciplinaId);
             var areaConhecimentoProvaSp = ObterAreaConhecimentoProvaSp(areaConhecimentoSerap);
 
@@ -54,33 +53,25 @@ namespace SME.SERAp.Prova.Aplicacao
                 return (mediaProficienciaEscolaAluno, AlunoProvaProficienciaOrigem.PSP_ano_escolar);
 
             var dre = await repositorioDre.ObterPorIdAsync(escola.DreId);
-            string dreSigla = dre.Abreviacao.Replace("DRE - ", "");
+            var dreSigla = dre.Abreviacao.Replace("DRE - ", "");
+            
+            // TODO: VERIFICAR A DRE
             var mediaProficienciaDreAluno = await repositorioProficienciaProvaSP.ObterMediaProficienciaDre(dreSigla, turma.Ano, (long)areaConhecimentoProvaSp);
-            if (mediaProficienciaDreAluno > 0)
-                return (mediaProficienciaDreAluno, AlunoProvaProficienciaOrigem.PSP_Dre);
-
-            return (0, AlunoProvaProficienciaOrigem.TAI_estudante);
+            return mediaProficienciaDreAluno > 0 ? (mediaProficienciaDreAluno, AlunoProvaProficienciaOrigem.PSP_Dre) : (0, AlunoProvaProficienciaOrigem.TAI_estudante);
         }
 
         private AreaConhecimentoProvaSp ObterAreaConhecimentoProvaSp(AreaConhecimentoSerap areaConhecimentoSerap)
         {
-            switch (areaConhecimentoSerap)
+            return areaConhecimentoSerap switch
             {
-                case AreaConhecimentoSerap.CienciasHumanas:
-                    return AreaConhecimentoProvaSp.CienciasDaNatureza;
-                case AreaConhecimentoSerap.CienciasNatureza:
-                    return AreaConhecimentoProvaSp.CienciasDaNatureza;
-                case AreaConhecimentoSerap.CienciasNaturezaEM:
-                    return AreaConhecimentoProvaSp.CienciasDaNatureza;
-                case AreaConhecimentoSerap.NaturezaSociedade:
-                    return AreaConhecimentoProvaSp.CienciasDaNatureza;
-                case AreaConhecimentoSerap.LinguagensCodigos:
-                    return AreaConhecimentoProvaSp.LinguaPortuguesa;
-                case AreaConhecimentoSerap.Matematica:
-                    return AreaConhecimentoProvaSp.Matematica;
-                default:
-                    return AreaConhecimentoProvaSp.NaoCadastrado;
-            }
+                AreaConhecimentoSerap.CienciasHumanas => AreaConhecimentoProvaSp.CienciasDaNatureza,
+                AreaConhecimentoSerap.CienciasNatureza => AreaConhecimentoProvaSp.CienciasDaNatureza,
+                AreaConhecimentoSerap.CienciasNaturezaEM => AreaConhecimentoProvaSp.CienciasDaNatureza,
+                AreaConhecimentoSerap.NaturezaSociedade => AreaConhecimentoProvaSp.CienciasDaNatureza,
+                AreaConhecimentoSerap.LinguagensCodigos => AreaConhecimentoProvaSp.LinguaPortuguesa,
+                AreaConhecimentoSerap.Matematica => AreaConhecimentoProvaSp.Matematica,
+                _ => AreaConhecimentoProvaSp.NaoCadastrado
+            };
         }
     }
 }

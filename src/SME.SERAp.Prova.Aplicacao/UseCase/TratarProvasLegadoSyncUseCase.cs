@@ -32,6 +32,7 @@ namespace SME.SERAp.Prova.Aplicacao
                
                 serviceLog.Registrar(LogNivel.Informacao, $"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
                 serviceLog.Registrar(LogNivel.Informacao, $"Total de provas para sincronizar {provaIds.ToList().Count}");
+                
                 foreach (var provaId in provaIds)
                 {
                     serviceLog.Registrar(LogNivel.Informacao, $"Enviando prova {provaId} para tratar");

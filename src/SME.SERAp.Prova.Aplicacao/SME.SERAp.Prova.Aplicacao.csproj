@@ -23,6 +23,12 @@
 
   <ItemGroup>
     <Compile Remove="UseCase\ProvaSaoPaulo\Proficiencia\Aluno\TratarProeficienciaAlunoTratarUseCase.cs" />
+    <Compile Remove="Commands\Ue\TrataSincronizacaoInstitucionalUe\TrataSincronizacaoInstitucionalUeCommand.cs" />
+    <Compile Remove="UseCase\WorkerRabbit.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\Ue\TrataSincronizacaoInstitucionalUe\" />
   </ItemGroup>
 
 </Project>

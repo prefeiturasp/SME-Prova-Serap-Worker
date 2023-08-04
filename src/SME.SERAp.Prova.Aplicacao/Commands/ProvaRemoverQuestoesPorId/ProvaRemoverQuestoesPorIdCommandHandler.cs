@@ -25,9 +25,9 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioQuestaoAudio = repositorioQuestaoAudio ?? throw new ArgumentNullException(nameof(repositorioQuestaoAudio));
             this.repositorioQuestaoVideo = repositorioQuestaoVideo ?? throw new ArgumentNullException(nameof(repositorioQuestaoVideo));
         }
+        
         public async Task<bool> Handle(ProvaRemoverQuestoesPorIdCommand request, CancellationToken cancellationToken)
         {
-
             //TODO: IMPLEMENTAR TRANSAÇÃO
             var questoesArquivos = await repositorioQuestaoArquivo.ObterArquivosPorProvaIdAsync(request.Id);
             if (questoesArquivos.Any())

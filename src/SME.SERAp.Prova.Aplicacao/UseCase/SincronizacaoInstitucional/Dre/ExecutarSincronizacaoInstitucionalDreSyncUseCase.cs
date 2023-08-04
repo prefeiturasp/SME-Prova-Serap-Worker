@@ -13,53 +13,50 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExecutarSincronizacaoInstitucionalDreSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalDreSyncUseCase
     {
-        private readonly IServicoLog serviceLog;
-        public ExecutarSincronizacaoInstitucionalDreSyncUseCase(IMediator mediator, IServicoLog serviceLog) : base(mediator)
+        private readonly IServicoLog servicoLog;
+
+        public ExecutarSincronizacaoInstitucionalDreSyncUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
         {
-            this.serviceLog = serviceLog ?? throw new ArgumentNullException(nameof(serviceLog));
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             try
             {
+                var todasDresSgp = (await mediator.Send(new ObterDresSgpQuery())).ToList();
+                
+                if (todasDresSgp == null || !todasDresSgp.Any())
+                    throw new NegocioException("Não foi possível localizar as Dres no Sgp para a sincronização institucional.");
 
-          
-            var todasDresSgp = await mediator.Send(new ObterDresSgpQuery());
-            var todasDresSgpCodigo = todasDresSgp.Select(a => a.CodigoDre).ToList();
+                var todasDresSerap = (await mediator.Send(new ObterDresSerapQuery())).ToList();
 
-            if (todasDresSgp == null || !todasDresSgp.Any())
-            {
-                throw new NegocioException("Não foi possível localizar as Dres no Sgp para a sincronização instituicional");
+                await TratarInclusao(todasDresSgp, todasDresSerap);
+                await TratarAlteracao(todasDresSgp, todasDresSerap);
+
+                await Tratar();
+
+                return true;
             }
-
-            var todasDresSerap = await mediator.Send(new ObterDresSerapQuery());
-            var todasDresSerapCodigo = todasDresSerap.Select(a => a.CodigoDre).ToList();
-
-            await TratarInclusao(todasDresSgp, todasDresSgpCodigo, todasDresSerapCodigo);
-
-            await TratarAlteracao(todasDresSgp, todasDresSgpCodigo, todasDresSerap, todasDresSerapCodigo);
-
-            await PublicarFilaParaTratarUes();
-
-            return true;
-
-            }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                serviceLog.Registrar($"Erro ao sincronizar as Dres: {mensagemRabbit.Mensagem}", ex);
+                servicoLog.Registrar($"Erro ao sincronizar as Dres: {mensagemRabbit.Mensagem}", e);
                 throw;
             }
         }
 
-        private async Task TratarInclusao(IEnumerable<Dre> todasDresSgp, List<string> todasDresSgpCodigo, List<string> todasDresSerapCodigo)
+        private async Task TratarInclusao(IList<Dre> todasDresSgp, IEnumerable<Dre> todasDresSerap)
         {
+            var todasDresSgpCodigo = todasDresSgp.Select(c => c.CodigoDre).Distinct();
+            var todasDresSerapCodigo = todasDresSerap.Select(c => c.CodigoDre).Distinct();
+            
             var dresNovasCodigos = todasDresSgpCodigo.Where(a => !todasDresSerapCodigo.Contains(a)).ToList();
 
-            if (dresNovasCodigos != null && dresNovasCodigos.Any())
+            if (dresNovasCodigos.Any())
             {
                 var dresNovasParaIncluir = todasDresSgp.Where(a => dresNovasCodigos.Contains(a.CodigoDre)).ToList();
-                dresNovasParaIncluir = dresNovasParaIncluir.Select(a => new Dre()
+                
+                dresNovasParaIncluir = dresNovasParaIncluir.Select(a => new Dre
                 {
                     Abreviacao = a.Abreviacao,
                     CodigoDre = a.CodigoDre,
@@ -70,23 +67,28 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task TratarAlteracao(IEnumerable<Dre> todasDresSgp, List<string> todasDresSgpCodigo, IEnumerable<Dre> todasDresSerap, List<string> todasDresSerapCodigo)
+        private async Task TratarAlteracao(IList<Dre> todasDresSgp, IList<Dre> todasDresSerap)        
         {
+            var todasDresSgpCodigo = todasDresSgp.Select(c => c.CodigoDre).Distinct();
+            var todasDresSerapCodigo = todasDresSerap.Select(c => c.CodigoDre).Distinct();
+            
             var dresParaAlterarCodigos = todasDresSgpCodigo.Where(a => todasDresSerapCodigo.Contains(a)).ToList();
 
-            if (dresParaAlterarCodigos != null && dresParaAlterarCodigos.Any())
+            if (dresParaAlterarCodigos.Any())
             {
                 var dresParaQuePodemAlterar = todasDresSgp.Where(a => dresParaAlterarCodigos.Contains(a.CodigoDre)).ToList();
+                
                 var listaParaAlterar = new List<Dre>();
 
                 foreach (var dreQuePodeAlterar in dresParaQuePodemAlterar)
                 {
                     var dreAntiga = todasDresSerap.FirstOrDefault(a => a.CodigoDre == dreQuePodeAlterar.CodigoDre);
-                    if (dreAntiga != null && dreAntiga.DeveAtualizar(dreQuePodeAlterar))
-                    {
-                        dreAntiga.AtualizarCampos(dreQuePodeAlterar);
-                        listaParaAlterar.Add(dreAntiga);
-                    }
+
+                    if (dreAntiga == null || !dreAntiga.DeveAtualizar(dreQuePodeAlterar)) 
+                        continue;
+                    
+                    dreAntiga.AtualizarCampos(dreQuePodeAlterar);
+                    listaParaAlterar.Add(dreAntiga);
                 }
 
                 if (listaParaAlterar.Any())
@@ -94,13 +96,14 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task PublicarFilaParaTratarUes()
+        private async Task Tratar()
         {
-            var todasDresSerap = await mediator.Send(new ObterDresSerapQuery());
+            var todasDresSerap = (await mediator.Send(new ObterDresSerapQuery())).ToList();
 
-            foreach (var dreParaTratarUes in todasDresSerap)
+            foreach (var dre in todasDresSerap)
             {
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalUesSync, new DreParaSincronizacaoInstitucionalDto(dreParaTratarUes.Id, dreParaTratarUes.CodigoDre)));
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalDreTratar,
+                    new DreParaSincronizacaoInstitucionalDto(dre.Id, dre.CodigoDre)));
             }
         }
     }

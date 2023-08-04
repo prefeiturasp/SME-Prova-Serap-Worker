@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
@@ -6,73 +7,90 @@ using SME.SERAp.Prova.Infra.Exceptions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra.Interfaces;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExecutarSincronizacaoInstitucionalUeSyncUseCase : AbstractUseCase, IExecutarSincronizacaoInstitucionalUeSyncUseCase
     {
-        public ExecutarSincronizacaoInstitucionalUeSyncUseCase(IMediator mediator) : base(mediator)
+        private readonly IServicoLog servicoLog;
+        
+        public ExecutarSincronizacaoInstitucionalUeSyncUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
         {
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var dre = mensagemRabbit.ObterObjetoMensagem<DreParaSincronizacaoInstitucionalDto>();
+            try
+            {
+                var dre = mensagemRabbit.ObterObjetoMensagem<DreParaSincronizacaoInstitucionalDto>();
 
-            if (dre == null)
-                throw new NegocioException("Não foi possível localizar o código da Dre para tratar o Sync de Ues.");
+                if (dre == null)
+                    throw new NegocioException("Não foi possível localizar a Dre para sincronizar as Ues.");
 
-            var uesSgp = await mediator.Send(new ObterUesSgpPorDreCodigoQuery(dre.DreCodigo));
+                var uesSgp = (await mediator.Send(new ObterUesSgpPorDreCodigoQuery(dre.DreCodigo))).ToList();
 
-            if (uesSgp == null || !uesSgp.Any())
-                throw new NegocioException("Não foi possível localizar as Ues no Sgp para a sincronização instituicional");
+                if (uesSgp == null || !uesSgp.Any())
+                    throw new NegocioException("Não foi possível localizar as Ues no Sgp para a sincronização instituicional");                
+                
+                var uesSerap = (await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.DreCodigo))).ToList();
 
-            var uesSgpCodigo = uesSgp.Select(a => a.CodigoUe).Distinct().ToList();
-
-            var uesSerap = await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.DreCodigo));
-            var uesSerapCodigo = uesSerap.Select(a => a.CodigoUe).Distinct().ToList();
-
-            await TratarInclusao(uesSgp, uesSgpCodigo, uesSerapCodigo, dre.Id);
-
-            await TratarAlteracao(uesSgp, uesSgpCodigo, uesSerap, uesSerapCodigo);
-
-            await PublicarFilaParaTratarTurmas(dre);
-
-            return true;
+                await TratarInclusao(uesSgp, uesSerap, dre.Id);
+                await TratarAlteracao(uesSgp, uesSerap);
+            
+                await Tratar(dre);
+            
+                return true;
+            }
+            catch (Exception e)
+            {
+                servicoLog.Registrar($"Erro ao sincronizar as UEs: {mensagemRabbit.Mensagem}", e);
+                throw;
+            }
         }
 
-        private async Task TratarAlteracao(IEnumerable<Ue> todasUesSgp, List<string> todasUesSgpCodigo, IEnumerable<Ue> todasUesSerap, List<string> todasUesSerapCodigo)
+        private async Task TratarAlteracao(IList<Ue> todasUesSgp, IList<Ue> todasUesSerap)
         {
+            var todasUesSgpCodigo = todasUesSgp.Select(c => c.CodigoUe).Distinct();
+            var todasUesSerapCodigo = todasUesSerap.Select(c => c.CodigoUe).Distinct();
+            
             var uesParaAlterarCodigos = todasUesSgpCodigo.Where(a => todasUesSerapCodigo.Contains(a)).ToList();
 
-            if (uesParaAlterarCodigos != null && uesParaAlterarCodigos.Any())
+            if (uesParaAlterarCodigos.Any())
             {
                 var uesQuePodemAlterar = todasUesSgp.Where(a => uesParaAlterarCodigos.Contains(a.CodigoUe)).ToList();
+                
                 var listaParaAlterar = new List<Ue>();
 
                 foreach (var ueQuePodeAlterar in uesQuePodemAlterar)
                 {
                     var ueAntiga = todasUesSerap.FirstOrDefault(a => a.CodigoUe == ueQuePodeAlterar.CodigoUe);
-                    if (ueAntiga != null && ueAntiga.DeveAtualizar(ueQuePodeAlterar))
-                    {
-                        ueAntiga.AtualizarCampos(ueQuePodeAlterar);
-                        listaParaAlterar.Add(ueAntiga);
-                    }
+                    
+                    if (ueAntiga == null || !ueAntiga.DeveAtualizar(ueQuePodeAlterar)) 
+                        continue;
+                    
+                    ueAntiga.AtualizarCampos(ueQuePodeAlterar);
+                    listaParaAlterar.Add(ueAntiga);
                 }
 
                 if (listaParaAlterar.Any())
                     await mediator.Send(new AlterarUesCommand(listaParaAlterar));
             }
         }
-        private async Task TratarInclusao(IEnumerable<Ue> todasUesSgp, List<string> todasUesSgpCodigo, List<string> todasUesSerapCodigo, long dreIdSerap)
+
+        private async Task TratarInclusao(IList<Ue> todasUesSgp, IEnumerable<Ue> todasUesSerap, long dreIdSerap)
         {
+            var todasUesSgpCodigo = todasUesSgp.Select(c => c.CodigoUe).Distinct();
+            var todasUesSerapCodigo = todasUesSerap.Select(c => c.CodigoUe).Distinct();            
+            
             var uesNovasCodigos = todasUesSgpCodigo.Where(a => !todasUesSerapCodigo.Contains(a)).ToList();
 
-            if (uesNovasCodigos != null && uesNovasCodigos.Any())
+            if (uesNovasCodigos.Any())
             {
                 var uesNovasParaIncluir = todasUesSgp.Where(a => uesNovasCodigos.Contains(a.CodigoUe)).ToList();
 
-                uesNovasParaIncluir = uesNovasParaIncluir.Select(a => new Ue()
+                uesNovasParaIncluir = uesNovasParaIncluir.Select(a => new Ue
                 {
                     CodigoUe = a.CodigoUe,
                     DreId = dreIdSerap,
@@ -83,10 +101,16 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new InserirUesCommand(uesNovasParaIncluir));
             }
         }
-
-        private async Task PublicarFilaParaTratarTurmas(DreParaSincronizacaoInstitucionalDto dreParaSincronizacaoInstitucionalDto)
+        
+        private async Task Tratar(DreParaSincronizacaoInstitucionalDto dre)
         {
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalTurmasSync, dreParaSincronizacaoInstitucionalDto));
+            var todasUesSerap = (await mediator.Send(new ObterUesSerapPorDreCodigoQuery(dre.DreCodigo))).ToList();
+
+            foreach (var ue in todasUesSerap)
+            {
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.SincronizaEstruturaInstitucionalUeTratar,
+                    new UeParaSincronizacaoInstitucionalDto(ue.Id, ue.CodigoUe, dre.Id, dre.DreCodigo)));
+            }
         }
     }
 }

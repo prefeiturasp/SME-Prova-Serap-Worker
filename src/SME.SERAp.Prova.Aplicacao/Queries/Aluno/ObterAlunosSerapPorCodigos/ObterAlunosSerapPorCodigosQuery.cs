@@ -11,6 +11,6 @@ namespace SME.SERAp.Prova.Aplicacao
             CodigoAlunos = codigoAlunos;
         }
 
-        public long[] CodigoAlunos { get; set; }
+        public long[] CodigoAlunos { get; }
     }
 }

@@ -8,6 +8,7 @@ namespace SME.SERAp.Prova.Dominio
         {
             DataAtualizacao = DateTime.Now;
         }
+        
         public string CodigoDre { get; set; }
         public string Nome { get; set; }
         public string Abreviacao { get; set; }

@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Infra.Dtos;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Globalization;
@@ -28,7 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var client = new HttpClient();
                 client.DefaultRequestHeaders.Accept.Clear();
 
-                var obterItensProvaTaiDto = new ObterItensProvaTaiDto()
+                var obterItensProvaTaiDto = new ObterItensProvaTaiDto
                 {
                     Estudante = request.AlunoId.ToString(),
                     Proficiencia = request.ProeficienciaAluno.ToString(CultureInfo.InvariantCulture),
@@ -36,21 +36,21 @@ namespace SME.SERAp.Prova.Aplicacao
                     ParA = string.Join(",", request.Itens.Select(t => t.Discriminacao.ToString(CultureInfo.InvariantCulture))),
                     ParB = string.Join(",", request.Itens.Select(t => t.ProporcaoAcertos.ToString(CultureInfo.InvariantCulture))),
                     ParC = string.Join(",", request.Itens.Select(t => t.AcertoCasual.ToString(CultureInfo.InvariantCulture))),
-                    NIj = request.QuantidadeItensDaAmostra.ToString()
+                    NIj = request.QuantidadeItensDaAmostra.ToString(),
+                    Componente = request.Componente
                 };
 
                 var json = JsonSerializer.Serialize(obterItensProvaTaiDto);
                 var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(apiROptions.UrlAmostra, stringContent);
+                var response = await client.PostAsync(apiROptions.UrlAmostra, stringContent, cancellationToken);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsStringAsync();
-                    result = result.Replace("\"NA\"", "0").Replace(request.AlunoId.ToString(), "").Replace("_", "");
+                if (!response.IsSuccessStatusCode) 
+                    throw new Exception("Não foi possível obter os dados");
+                
+                var result = await response.Content.ReadAsStringAsync();
+                result = result.Replace("\"NA\"", "0").Replace(request.AlunoId.ToString(), "").Replace("_", "");
 
-                    return JsonSerializer.Deserialize<ItensProvaTAISorteioDto[]>(result, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true}).FirstOrDefault();
-                }
-                throw new Exception("Não foi possível obter os dados");
+                return JsonSerializer.Deserialize<ItensProvaTAISorteioDto[]>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true}).FirstOrDefault();
             }
             catch (Exception e)
             {

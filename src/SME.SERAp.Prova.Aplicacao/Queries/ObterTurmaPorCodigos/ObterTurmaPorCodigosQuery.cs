@@ -11,6 +11,6 @@ namespace SME.SERAp.Prova.Aplicacao
             Codigos = codigos;
         }
 
-        public string[] Codigos { get; set; }
+        public string[] Codigos { get; }
     }
 }

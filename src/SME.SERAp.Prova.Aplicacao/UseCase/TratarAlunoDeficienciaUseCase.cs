@@ -7,15 +7,12 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TratarAlunoDeficienciaUseCase : ITratarAlunoDeficienciaUseCase
-    {
-        
-        private readonly IMediator mediator;
+    public class TratarAlunoDeficienciaUseCase : AbstractUseCase, ITratarAlunoDeficienciaUseCase
+    {   
         private readonly IServicoLog servicoLog;
-
-        public TratarAlunoDeficienciaUseCase(IMediator mediator, IServicoLog servicoLog)
+        
+        public TratarAlunoDeficienciaUseCase(IMediator mediator, IServicoLog servicoLog) : base(mediator)
         {
-            this.mediator = mediator;
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
@@ -23,14 +20,16 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-                var alunoRa = long.Parse(mensagemRabbit.Mensagem.ToString());
+                var alunoRa = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
 
                 await mediator.Send(new RemoverAlunoDeficienciaPorAlunoRaCommand(alunoRa));
 
                 var alunoDeficienciaEol = await mediator.Send(new ObterAlunoDeficienciaEolPorAlunoRaQuery(alunoRa));
-                foreach (int deficiencia in alunoDeficienciaEol)
+                
+                foreach (var deficiencia in alunoDeficienciaEol)
                 {
                     var tipoDeficiencia = await mediator.Send(new ObterTipoDeficienciaPorCodigoEolQuery(deficiencia));
+                    
                     if (tipoDeficiencia != null)
                     {
                         var alunoDeficiencia = new AlunoDeficiencia(tipoDeficiencia.Id, alunoRa);
@@ -41,13 +40,13 @@ namespace SME.SERAp.Prova.Aplicacao
                         servicoLog.Registrar(Dominio.Enums.LogNivel.Negocio, $"Tipo de deficiência do aluno não cadastrada no serap estudantes: AlunoRa:{alunoRa}, codigoDeficienciaEol:{deficiencia}");
                     }
                 }
-
             }
             catch (Exception ex)
             {
                 servicoLog.Registrar(ex);
                 return false;
             }
+            
             return true;
         }
     }

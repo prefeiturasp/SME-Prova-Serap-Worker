@@ -11,6 +11,6 @@ namespace SME.SERAp.Prova.Aplicacao
             UltimaExecucao = ultimaExecucao;
         }
 
-        public DateTime UltimaExecucao { get; set; }
+        public DateTime UltimaExecucao { get; }
     }
 }

@@ -16,11 +16,6 @@ namespace SME.SERAp.Prova.Dominio
         public string Caderno { get; set; }
         public IEnumerable<Arquivo> Arquivos { get; set; }
 
-
-        public Questao()
-        {
-        }
-
         public Questao(string textoBase, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas)
         {
             Ordem = ordem;
@@ -34,35 +29,34 @@ namespace SME.SERAp.Prova.Dominio
             TrataArquivos();
         }
 
-        public void TrataArquivos()
+        private void TrataArquivos()
         {
-            List<Arquivo> arquivos = new List<Arquivo>();
+            var arquivos = new List<Arquivo>();
             var htmlDoc = new HtmlDocument();
+            
             if (!string.IsNullOrEmpty(Enunciado))
             {
-                
                 htmlDoc.LoadHtml(Enunciado);
+                
                 arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
-                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)))
-                                  .Where(a => a.Caminho.Substring(0,4).ToLower() == "http"));
+                    .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)))
+                    .Where(a => a.Caminho.Substring(0, 4).ToLower() == "http"));
             }
 
-            if(!string.IsNullOrEmpty(TextoBase))
+            if (!string.IsNullOrEmpty(TextoBase))
             {
-
                 htmlDoc.LoadHtml(TextoBase);
+
                 arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
-                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)))
-                                  .Where(a => a.Caminho.Substring(0, 4).ToLower() == "http"));
+                    .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)))
+                    .Where(a => a.Caminho.Substring(0, 4).ToLower() == "http"));
             }
 
-            foreach (var arquivo in arquivos)
+            foreach (var arquivo in arquivos.Where(arquivo => !arquivo.Caminho.Contains("#")))
             {
-                if (arquivo.Caminho.Contains("#"))
-                    continue;
-
                 if(!string.IsNullOrEmpty(Enunciado))
                     Enunciado = Enunciado.Replace(arquivo.Caminho, arquivo.NovoCaminho());
+                
                 if(!string.IsNullOrEmpty(TextoBase))
                     TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.NovoCaminho());
             }
@@ -72,23 +66,21 @@ namespace SME.SERAp.Prova.Dominio
 
         public void TrataArquivosTextoBase()
         {
-            List<Arquivo> arquivos = new List<Arquivo>();
+            var arquivos = new List<Arquivo>();
             var htmlDoc = new HtmlDocument();
            
             if (!string.IsNullOrEmpty(TextoBase))
             {
-
                 htmlDoc.LoadHtml(TextoBase);
                 arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
-                                  .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0))));
+                    .Select(e =>
+                        new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0))));
             }
 
-            foreach (var arquivo in arquivos)
+            foreach (var arquivo in arquivos.Where(arquivo => !arquivo.Caminho.Contains("#"))
+                         .Where(arquivo => !string.IsNullOrEmpty(TextoBase)))
             {
-                if (arquivo.Caminho.Contains("#"))
-                    continue;
-                if (!string.IsNullOrEmpty(TextoBase))
-                    TextoBase = TextoBase.Replace(arquivo.Caminho, arquivo.NovoCaminho());
+                TextoBase = TextoBase?.Replace(arquivo.Caminho, arquivo.NovoCaminho());
             }
 
             Arquivos = arquivos;

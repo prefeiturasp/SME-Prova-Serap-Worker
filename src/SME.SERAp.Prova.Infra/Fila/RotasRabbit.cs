@@ -28,8 +28,11 @@
         public const string TratarTipoProvaDeficiencia = "serap.estudante.prova.tipo.prova.deficiencia.tratar";
         public const string TratarAlunoDeficiencia = "serap.estudante.aluno.deficiencia.tratar";
         public const string DownloadProvaAlunoTratar = "serap.estudante.download.prova.aluno.tratar";
-        public const string AlunoProvaProficienciaAsync = "serap.estudante.aluno.prova.proficiencia.sync";
+        
+        public const string AlunoProvaProficienciaSync = "serap.estudante.aluno.prova.proficiencia.sync";
+        public const string AlunoProvaProficienciaPorProvaSync = "serap.estudante.aluno.prova.proficiencia.prova.sync";        
         public const string AlunoProvaProficienciaTratar = "serap.estudante.aluno.prova.proficiencia.tratar";
+        
         public const string ProvaGrupoPermissaoTratar = "serap.estudante.prova.grupo.permissao.tratar";
 
         public const string IniciarProcessoFinalizarProvasAutomaticamente = "serap.estudante.prova.finalizar.automaticamente.iniciar";
@@ -61,14 +64,14 @@
 
         public const string TratarCadernosProvaTai = "serap.estudante.prova.legado.tratar.cadernos.amostra.tai";
         public const string TratarCadernoAlunoProvaTai = "serap.estudante.prova.legado.tratar.caderno.aluno.tai";
-
+        public const string TratarOrdemQuestaoAlunoProvaTai = "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
+        public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";        
 
         public const string IncluirUsuario = "serap.estudantes.usuario.incluir";
         public const string AlterarUsuario = "serap.estudantes.usuario.alterar";
         public const string IncluirVersaoDispositivoApp = "serap.estudantes.versaoAppDispositivo.incluir";
         public const string IncluirProvaAluno = "serap.estudantes.provaAluno.incluir";
         public const string AlterarProvaAluno = "serap.estudantes.provaAluno.alterar";
-
 
         public const string ReabrirProvaAluno = "serap.estudantes.provaAluno.reabrir";
         public const string TratarUsuarioDispositivoLogin = "serap.estudantes.usuario.dispositivo.login.tratar";
@@ -78,9 +81,6 @@
         public static string ProvaAlunoReaberturaTratarAcompanhamento => "serap.estudante.acomp.prova.aluno.reabertura.tratar";
 
         public static string RotaLogs => "ApplicationLog";
-        public const string TratarOrdemQuestaoAlunoProvaTai = "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
-        public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";
-
 
         public const string ImportarProeficienciaCsvProvaSp = "serap.provaSp.importarCsv.proeficiencia";
         public const string TratarProeficienciaCsvProvaSp = "serap.provaSp.importarCsv.proeficiencia.tratar";

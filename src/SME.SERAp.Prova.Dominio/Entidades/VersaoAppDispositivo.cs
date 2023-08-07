@@ -4,6 +4,10 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class VersaoAppDispositivo : EntidadeBase
     {
+        public VersaoAppDispositivo()
+        {
+        }
+
         public VersaoAppDispositivo(int versaoCodigo, string versaoDescricao, string dispositivoImei, DateTime atualizadoEm, string dispositivoId)
         {
             VersaoCodigo = versaoCodigo;

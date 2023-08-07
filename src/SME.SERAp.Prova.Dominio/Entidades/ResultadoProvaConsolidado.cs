@@ -4,6 +4,10 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class ResultadoProvaConsolidado : EntidadeBase
 	{
+		public ResultadoProvaConsolidado()
+		{
+		}
+
 		public long ProvaSerapId { get; set; }
 		public long ProvaSerapEstudantesId { get; set; }
 		public string DreCodigoEol { get; set; }

@@ -4,6 +4,10 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class DownloadProvaAluno : EntidadeBase
     {
+        public DownloadProvaAluno()
+        {
+        }
+
         public DownloadProvaAluno(long provaId, long alunoRa, string dispositivoId, TipoDispositivo tipoDispositivo, string modeloDispositivo, string versao, int situacao, DateTime criadoEm, Guid codigo)
         {
             AlunoRA = alunoRa;

@@ -1,8 +1,5 @@
 ﻿using Dapper.FluentMap.Dommel.Mapping;
 using SME.SERAp.Prova.Dominio;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.SERAp.Prova.Dados.Mapeamentos
 {
@@ -24,6 +21,11 @@ namespace SME.SERAp.Prova.Dados.Mapeamentos
        //     Map(c => c.ResultadoLegadoId).ToColumn("ResultadoLegadoID");
             Map(c => c.NivelProficienciaID).ToColumn("NivelProficienciaID");
             Map(c => c.Valor).ToColumn("Valor");
+            Map(c => c.REDQ1).ToColumn("REDQ1");
+            Map(c => c.REDQ2).ToColumn("REDQ2");
+            Map(c => c.REDQ3).ToColumn("REDQ3");
+            Map(c => c.REDQ4).ToColumn("REDQ4");
+            Map(c => c.REDQ5).ToColumn("REDQ5");
         }
     }
 }

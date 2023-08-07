@@ -2,7 +2,6 @@
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dominio;
 using System;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 

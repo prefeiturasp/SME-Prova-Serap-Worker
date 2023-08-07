@@ -3,6 +3,10 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class ProvaAno : EntidadeBase
     {
+        public ProvaAno()
+        {
+        }
+
         public ProvaAno(string ano, long provaId, Modalidade modalidade, int etapaEja = 0)
         {
             Ano = ano;

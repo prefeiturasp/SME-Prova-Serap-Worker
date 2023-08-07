@@ -6,6 +6,10 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class Questao : EntidadeBase
     {
+        public Questao()
+        {
+        }
+
         public int Ordem { get; set; }
         public int QuantidadeAlternativas { get; set; }
         public string TextoBase { get; set; }

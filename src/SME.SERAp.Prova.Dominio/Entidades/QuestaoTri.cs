@@ -2,6 +2,10 @@
 {
     public class QuestaoTri : EntidadeBase
     {
+        public QuestaoTri()
+        {
+        }
+
         public long QuestaoId { get; set; }
         public decimal Discriminacao { get; set; }
         public decimal Dificuldade { get; set; }

@@ -4,6 +4,10 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class QuestaoCompleta : EntidadeBase
     {
+        public QuestaoCompleta()
+        {
+        }
+
         public QuestaoCompleta(long id, long questaoLegadoId, string json, DateTime ultimaAtualizacao)
         {
             Id = id;

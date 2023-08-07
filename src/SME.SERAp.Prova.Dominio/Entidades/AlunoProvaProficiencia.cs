@@ -4,6 +4,10 @@ namespace SME.SERAp.Prova.Dominio
 {
     public class AlunoProvaProficiencia : EntidadeBase
     {
+        public AlunoProvaProficiencia()
+        {
+        }
+
         public long AlunoId { get; set; }
         public long Ra { get; set; }
         public long ProvaId { get; set; }

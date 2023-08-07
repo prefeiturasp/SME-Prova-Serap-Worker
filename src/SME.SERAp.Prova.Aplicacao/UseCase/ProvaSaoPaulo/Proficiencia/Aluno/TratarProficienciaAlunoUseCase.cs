@@ -19,6 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var registroProficienciaPsp = mensagemRabbit.ObterObjetoMensagem<RegistroProficienciaPspCsvDto>();
             PopularRegistroProficienciaPsp(registroProficienciaPsp);
+            
             var objResultadoCsv = registroProficienciaPsp.ObterObjetoRegistro<ResultadoAlunoDto>();
             PopularTipoResultadoProcesso(TipoResultadoPsp.ResultadoAluno);
 
@@ -35,7 +36,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 await VerificaSeFinalizaProcesso();
 
                 return true;
-
             }
             catch (Exception ex)
             {
@@ -44,9 +44,9 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private ResultadoAluno MapearParaEntidade(ResultadoAlunoDto objResultadoCsv)
+        private static ResultadoAluno MapearParaEntidade(ResultadoAlunoDto objResultadoCsv)
         {
-            return new ResultadoAluno()
+            return new ResultadoAluno
             {
                 Edicao = objResultadoCsv.Edicao,
                 uad_sigla = objResultadoCsv.uad_sigla,
@@ -58,7 +58,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 alu_nome = objResultadoCsv.alu_nome,
                 NivelProficienciaID = objResultadoCsv.NivelProficienciaID,
                 AreaConhecimentoID = objResultadoCsv.AreaConhecimentoID,
-                Valor = objResultadoCsv.Valor
+                Valor = objResultadoCsv.Valor,
+                REDQ1 = objResultadoCsv.REDQ1,
+                REDQ2 = objResultadoCsv.REDQ2,
+                REDQ3 = objResultadoCsv.REDQ3,
+                REDQ4 = objResultadoCsv.REDQ4,
+                REDQ5 = objResultadoCsv.REDQ5
             };
         }
 

@@ -23,7 +23,7 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var idArquivoResultadoPsp = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
-                var arquivoResultadoPsp = await Mediator.Send(new ObterTipoResultadoPspQuery(idArquivoResultadoPsp));
+                var arquivoResultadoPsp = await mediator.Send(new ObterTipoResultadoPspQuery(idArquivoResultadoPsp));
 
                 if (arquivoResultadoPsp == null) 
                     return false;
@@ -32,18 +32,18 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 await AtualizaStatusDoProcesso(idArquivoResultadoPsp, StatusImportacao.EmAndamento);
 
-                using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(PathOptions, arquivoResultadoPsp.NomeArquivo))
+                using (var csv = ResultadoPsp.ObterReaderArquivoResultadosPsp(pathOptions, arquivoResultadoPsp.NomeArquivo))
                 {
                     var listaCsvResultados = csv.GetRecords<ResultadoAlunoDto>().ToList();
 
                     foreach (var dto in listaCsvResultados.Select(objCsvResultado =>
                                  new RegistroProficienciaPspCsvDto(arquivoResultadoPsp.Id, objCsvResultado)))
                     {
-                        await PublicarFilaTratar(dto, TipoResultadoProcesso);
+                        await publicarFilaTratar(dto, TipoResultadoProcesso);
                     }
                 }
                 
-                await PublicarFilaTratarStatusProcesso(idArquivoResultadoPsp);
+                await publicarFilaTratarStatusProcesso(idArquivoResultadoPsp);
                 return true;
             }
             catch (Exception ex)

@@ -27,6 +27,9 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 var client = new HttpClient();
                 client.DefaultRequestHeaders.Accept.Clear();
+                
+                var textInfo = new CultureInfo("pt-BR").TextInfo;
+                var componente = textInfo.ToTitleCase(request.Componente.ToLower());
 
                 var obterItensProvaTaiDto = new ObterItensProvaTaiDto
                 {
@@ -37,7 +40,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     ParB = string.Join(",", request.Itens.Select(t => t.ProporcaoAcertos.ToString(CultureInfo.InvariantCulture))),
                     ParC = string.Join(",", request.Itens.Select(t => t.AcertoCasual.ToString(CultureInfo.InvariantCulture))),
                     NIj = request.QuantidadeItensDaAmostra.ToString(),
-                    Componente = request.Componente
+                    Componente = componente
                 };
 
                 var json = JsonSerializer.Serialize(obterItensProvaTaiDto);

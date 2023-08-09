@@ -33,7 +33,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 var obterItensProvaTaiDto = new ObterItensProvaTaiDto
                 {
-                    Estudante = request.AlunoId.ToString(),
+                    Estudante = request.AlunoRa.ToString(),
                     Proficiencia = request.ProeficienciaAluno.ToString(CultureInfo.InvariantCulture),
                     IdItem = string.Join(",", request.Itens.Select(t => t.ItemId)),
                     ParA = string.Join(",", request.Itens.Select(t => t.Discriminacao.ToString(CultureInfo.InvariantCulture))),

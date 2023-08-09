@@ -68,6 +68,7 @@ namespace SME.SERAp.Prova.Aplicacao
             else
             {
                 provaParaTratar.Id = provaAtual.Id;
+
                 provaAtual.AderirTodos = provaParaTratar.AderirTodos;
                 provaAtual.Multidisciplinar = provaParaTratar.Multidisciplinar;
                 provaAtual.TipoProvaId = provaParaTratar.TipoProvaId;
@@ -128,11 +129,6 @@ namespace SME.SERAp.Prova.Aplicacao
                     ordem += 1;
                 }
             }
-
-            if (!provaLegado.FormatoTai)
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-            else
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai, provaAtual.Id));
 
             await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
 

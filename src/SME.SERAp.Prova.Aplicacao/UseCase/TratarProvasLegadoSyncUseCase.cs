@@ -38,25 +38,6 @@ namespace SME.SERAp.Prova.Aplicacao
                     serviceLog.Registrar(LogNivel.Informacao, $"Enviando prova {provaId} para tratar");
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
                 }
-
-                //-> atualizar questões/cadernos
-                foreach (var provaId in provaIds)
-                {
-                    var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
-                    
-                    if (provaLegado == null)
-                        continue;
-                    
-                    var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(provaLegado.Id));
-                    
-                    if (provaAtual == null)
-                        continue;
-
-                    if (!provaLegado.FormatoTai)
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-                    else
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai, provaAtual.Id));                    
-                }
             }  
             finally
             {

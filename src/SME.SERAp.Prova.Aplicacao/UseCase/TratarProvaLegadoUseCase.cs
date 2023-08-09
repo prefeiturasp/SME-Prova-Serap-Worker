@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra.Dtos.Tai;
 using SME.SERAp.Prova.Infra.Exceptions;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -80,7 +81,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.ApresentarResultadosPorItem = provaParaTratar.ApresentarResultadosPorItem;
                 provaAtual.ExibirAudio = provaParaTratar.ExibirAudio;
                 provaAtual.ExibirVideo = provaParaTratar.ExibirVideo;
-
+                
                 var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
 
                 if (verificaSePossuiRespostas)
@@ -129,6 +130,11 @@ namespace SME.SERAp.Prova.Aplicacao
                     ordem += 1;
                 }
             }
+            
+            if (!provaLegado.FormatoTai)
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
+            else
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai, new CadernoProvaTaiTratarDto(provaAtual.Id, provaAtual.Disciplina)));            
 
             await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
 

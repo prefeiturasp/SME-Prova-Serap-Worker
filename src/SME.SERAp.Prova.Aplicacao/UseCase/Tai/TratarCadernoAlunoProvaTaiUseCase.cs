@@ -32,7 +32,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             //Chamar Api TAI
             var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
-                proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra,
+                alunoProva.AlunoRa, proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra,
                 alunoProva.Disciplina));
             
             var cadernoAluno = new CadernoAluno(

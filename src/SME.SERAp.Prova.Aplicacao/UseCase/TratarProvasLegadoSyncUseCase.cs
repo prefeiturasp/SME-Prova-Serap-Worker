@@ -28,7 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 serviceLog.Registrar(LogNivel.Informacao, $"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
-                var provaIds = await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao));
+                var provaIds = (await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao))).ToList();
                
                 serviceLog.Registrar(LogNivel.Informacao, $"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
                 serviceLog.Registrar(LogNivel.Informacao, $"Total de provas para sincronizar {provaIds.ToList().Count}");
@@ -37,7 +37,26 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     serviceLog.Registrar(LogNivel.Informacao, $"Enviando prova {provaId} para tratar");
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
-                }              
+                }
+
+                //-> atualizar questões/cadernos
+                foreach (var provaId in provaIds)
+                {
+                    var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
+                    
+                    if (provaLegado == null)
+                        continue;
+                    
+                    var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(provaLegado.Id));
+                    
+                    if (provaAtual == null)
+                        continue;
+
+                    if (!provaLegado.FormatoTai)
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
+                    else
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai, provaAtual.Id));                    
+                }
             }  
             finally
             {

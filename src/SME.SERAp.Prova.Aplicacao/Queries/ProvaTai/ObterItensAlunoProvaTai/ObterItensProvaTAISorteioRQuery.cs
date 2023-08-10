@@ -6,7 +6,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterItensProvaTAISorteioRQuery : IRequest<ItensProvaTAISorteioDto>
     {
-        public ObterItensProvaTAISorteioRQuery(long alunoId, long alunoRa, decimal proeficienciaAluno,
+        public ObterItensProvaTAISorteioRQuery(long alunoId, decimal proeficienciaAluno,
             IEnumerable<ItemAmostraTaiDto> itens, int quantidadeItensDaAmostra, string componente)
         {
             AlunoId = alunoId;
@@ -14,11 +14,9 @@ namespace SME.SERAp.Prova.Aplicacao
             Itens = itens;
             QuantidadeItensDaAmostra = quantidadeItensDaAmostra;
             Componente = componente;
-            AlunoRa = alunoRa;
         }
 
         public long AlunoId { get; set; }
-        public long AlunoRa { get; set; }
         public decimal ProeficienciaAluno { get; set; }
         public IEnumerable<ItemAmostraTaiDto> Itens { get; set; }
         public int QuantidadeItensDaAmostra { get; set; }

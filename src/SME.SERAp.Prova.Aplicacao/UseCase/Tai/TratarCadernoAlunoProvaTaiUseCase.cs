@@ -24,11 +24,11 @@ namespace SME.SERAp.Prova.Aplicacao
             var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
                 proficienciaAluno, alunoProva.ItensAmostra, alunoProva.NumeroItensAmostra,
                 alunoProva.Disciplina));
-            
+
             var cadernoAluno = new CadernoAluno(
-                    alunoProva.AlunoId,
-                    alunoProva.ProvaId,
-                    alunoProva.AlunoId.ToString());
+                alunoProva.AlunoId,
+                alunoProva.ProvaId,
+                alunoProva.AlunoId.ToString());
 
             await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
 

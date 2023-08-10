@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra.Exceptions;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -48,7 +49,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var response = await client.PostAsync(apiROptions.UrlAmostra, stringContent, cancellationToken);
 
                 if (!response.IsSuccessStatusCode) 
-                    throw new Exception("Não foi possível obter os dados");
+                    throw new NegocioException("Não foi possível obter os dados do sorteio da amostra da prova TAI.");
                 
                 var result = await response.Content.ReadAsStringAsync();
                 result = result.Replace("\"NA\"", "0").Replace(request.AlunoId.ToString(), "").Replace("_", "");
@@ -57,7 +58,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             catch (Exception e)
             {
-                throw new ArgumentException(e.Message);
+                throw new ErroException($"Falha ao obter os dados do sorteio da amostra da prova TAI: {e.Message}");
             }
         }
     }

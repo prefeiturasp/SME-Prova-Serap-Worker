@@ -17,22 +17,12 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
-            var dadosDaAmostraTai = await mediator.Send(new ObterDadosAmostraProvaTaiQuery(alunoProva.ProvaLegadoId));
-
-            if (dadosDaAmostraTai == null)
-                throw new NegocioException($"Os dados da amostra tai não foram cadastrados para a prova {alunoProva.ProvaId}");
-
-            var itens = (await mediator.Send(new ObterItensAmostraTaiQuery(dadosDaAmostraTai.MatrizId,
-                dadosDaAmostraTai.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()))).ToList();
-            
-            if (itens == null || itens.Count < dadosDaAmostraTai.NumeroItensAmostra)
-                throw new NegocioException($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {alunoProva.ProvaLegadoId}");
 
             var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(alunoProva.ProvaId, alunoProva.AlunoId));
 
             //Chamar Api TAI
             var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
-                proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra,
+                proficienciaAluno, alunoProva.ItensAmostra, alunoProva.NumeroItensAmostra,
                 alunoProva.Disciplina));
             
             var cadernoAluno = new CadernoAluno(
@@ -44,7 +34,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var primeiraQuestao = true;
             
-            foreach (var questao in itens.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
+            foreach (var questao in alunoProva.ItensAmostra.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
             {
                 var questaoParaPersistir = new Questao(
                     questao.TextoBase,

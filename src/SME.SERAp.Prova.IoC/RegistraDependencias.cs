@@ -224,6 +224,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarResultadoParticipacaoSmeUseCase, TratarResultadoParticipacaoSmeUseCase>();
             services.AddScoped<IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase, ImportarResultadoParticipacaoSmeAreaConhecimentoUseCase>();
             services.AddScoped<ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase, TratarResultadoParticipacaoSmeAreaConhecimentoUseCase>();
+            
+            services.AddScoped<ITratarProvaTaiSyncUseCase, TratarProvaTaiSyncUseCase>();
+            services.AddScoped<ITratarProvaTaiUseCase, TratarProvaTaiUseCase>();            
         }
     }
 }

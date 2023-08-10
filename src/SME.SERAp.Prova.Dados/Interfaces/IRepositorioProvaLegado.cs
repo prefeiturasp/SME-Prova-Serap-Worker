@@ -23,6 +23,5 @@ namespace SME.SERAp.Prova.Dados
         Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId);
         Task<AmostraProvaTaiDto> ObterDadosAmostraProvaTai(long provaId);
         Task<IEnumerable<ProvaGrupoPermissaoDto>> ObterDadosProvaGrupoPermissaoPorId(long provaId);
-
     }
 }

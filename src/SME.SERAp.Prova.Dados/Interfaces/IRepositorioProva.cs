@@ -21,5 +21,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<ResultadoProvaConsolidado>> ObterDadosPorUeId(long provaId, string dreId, string ueId);
         Task<bool> FinalizarProvaAsync(ProvaParaAtualizarDto provaParaAtualizar);
         Task<IEnumerable<ProvaAlunoDto>> ObterProvasIniciadasPorModalidadeAsync(int modalidade);
+        Task<IEnumerable<ProvaTaiSyncDto>> ObterProvasTaiAsync();
     }
 }

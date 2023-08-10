@@ -6,7 +6,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using SME.SERAp.Prova.Infra.Dtos.Tai;
 using SME.SERAp.Prova.Infra.Exceptions;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -130,11 +129,9 @@ namespace SME.SERAp.Prova.Aplicacao
                     ordem += 1;
                 }
             }
-            
+
             if (!provaLegado.FormatoTai)
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-            else
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai, new CadernoProvaTaiTratarDto(provaAtual.Id, provaAtual.Disciplina)));            
 
             await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
 

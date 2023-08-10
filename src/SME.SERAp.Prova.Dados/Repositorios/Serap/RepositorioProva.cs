@@ -1,5 +1,4 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Dominio;
+﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System.Collections.Generic;
@@ -282,10 +281,6 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryFirstOrDefaultAsync<bool>(query, new { id });
             }
-            catch (System.Exception)
-            {
-                throw;
-            }
             finally
             {
                 conn.Close();
@@ -318,9 +313,26 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryAsync<ProvaAlunoDto>(query, new { modalidade, status });
             }
-            catch (System.Exception)
+            finally
             {
-                throw;
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<ProvaTaiSyncDto>> ObterProvasTaiAsync()
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = @"select p.id as ProvaId,
+                                        p.prova_legado_id as ProvaLegadoId,
+                                        p.disciplina
+                                        from prova p
+                                        where p.formato_tai = true
+                                        and p.disciplina is not null";
+
+                return await conn.QueryAsync<ProvaTaiSyncDto>(query);
             }
             finally
             {
@@ -351,10 +363,6 @@ namespace SME.SERAp.Prova.Dados
                     });
 
                 return true;
-            }
-            catch (System.Exception)
-            {
-                throw;
             }
             finally
             {

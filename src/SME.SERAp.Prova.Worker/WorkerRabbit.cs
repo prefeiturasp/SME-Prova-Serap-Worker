@@ -241,6 +241,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, new ComandoRabbit("", typeof(ITratarAbrangenciaUsuarioGrupoExcluirUseCase)));
 
             //Prova TAI
+            comandos.Add(RotasRabbit.ProvaTaiSync, new ComandoRabbit("Sincronização das provas com TAI", typeof(ITratarProvaTaiSyncUseCase)));
+            comandos.Add(RotasRabbit.ProvaTaiTratar, new ComandoRabbit("Tratar as provas com TAI", typeof(ITratarProvaTaiUseCase)));            
             comandos.Add(RotasRabbit.TratarCadernosProvaTai, new ComandoRabbit("Tratamento cadernos amostra TAI", typeof(ITratarCadernosProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarCadernoAlunoProvaTai, new ComandoRabbit("Tratamento cadernos alunos prova TAI", typeof(ITratarCadernoAlunoProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
@@ -283,7 +285,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSme, new ComandoRabbit("Tratar registros arquivo csv participação Sme", typeof(ITratarResultadoParticipacaoSmeUseCase)));
             comandos.Add(RotasRabbit.ImportarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Importa dados arquivo csv participação Sme AreaConhecimento", typeof(IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoParticipacaoSmeAreaConhecimento, new ComandoRabbit("Tratar registros arquivo csv participação Sme AreaConhecimento", typeof(ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase)));
-
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

@@ -116,5 +116,8 @@
 
         public const string ImportarResultadoParticipacaoSmeAreaConhecimento = "serap.resultados.psp.participacao.sme.area.conhecimento";
         public const string TratarResultadoParticipacaoSmeAreaConhecimento = "serap.resultados.psp.participacao.sme.area.conhecimento.tratar";
+        
+        public const string ProvaTaiSync = "serap.estudante.provatai.sync";
+        public const string ProvaTaiTratar = "serap.estudante.provatai.tratar";        
     }
 }

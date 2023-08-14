@@ -28,7 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 serviceLog.Registrar(LogNivel.Informacao, $"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
-                var provaIds = await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao));
+                var provaIds = (await mediator.Send(new ObterProvaLegadoParaSeremSincronizadasQuery(ultimaAtualizacao.UltimaExecucao))).ToList();
                
                 serviceLog.Registrar(LogNivel.Informacao, $"Última Atualização {ultimaAtualizacao.UltimaExecucao}");
                 serviceLog.Registrar(LogNivel.Informacao, $"Total de provas para sincronizar {provaIds.ToList().Count}");
@@ -37,7 +37,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     serviceLog.Registrar(LogNivel.Informacao, $"Enviando prova {provaId} para tratar");
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaTratar, provaId));
-                }              
+                }
             }  
             finally
             {

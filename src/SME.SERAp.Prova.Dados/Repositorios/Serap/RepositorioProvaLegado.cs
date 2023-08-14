@@ -29,8 +29,7 @@ namespace SME.SERAp.Prova.Dados
 	                test t
 					left join TestPermission tp
 					on tp.Test_Id = t.Id
-                     AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
-				
+                     AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'				
                 where
 	                t.ShowOnSerapEstudantes = 1
                     and (t.UpdateDate >  @ultimaAtualizacao or 

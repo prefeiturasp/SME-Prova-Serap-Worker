@@ -17,39 +17,24 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
-            var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(alunoProva.ProvaLegadoId));
-            
-            if (provaAtual == null)
-                throw new Exception($"Prova {alunoProva.ProvaId} não localizada.");
 
-            var dadosDaAmostraTai = await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaAtual.LegadoId));
-
-            if (dadosDaAmostraTai == null)
-                throw new NegocioException($"Os dados da amostra tai não foram cadastrados para a prova {alunoProva.ProvaId}");
-
-            var itens = await mediator.Send(new ObterItensAmostraTaiQuery(dadosDaAmostraTai.MatrizId,
-                dadosDaAmostraTai.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()));
-            
-            if (itens == null || itens.Count() < dadosDaAmostraTai.NumeroItensAmostra)
-                throw new NegocioException($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaAtual.LegadoId}");
-
-            var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(provaAtual.Id, alunoProva.AlunoId));
+            var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(alunoProva.ProvaId, alunoProva.AlunoId));
 
             //Chamar Api TAI
             var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
-                proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra,
-                provaAtual.Disciplina));
-            
+                proficienciaAluno, alunoProva.ItensAmostra, alunoProva.NumeroItensAmostra,
+                alunoProva.Disciplina));
+
             var cadernoAluno = new CadernoAluno(
-                    alunoProva.AlunoId,
-                    provaAtual.Id,
-                    alunoProva.AlunoId.ToString());
+                alunoProva.AlunoId,
+                alunoProva.ProvaId,
+                alunoProva.AlunoId.ToString());
 
             await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
 
             var primeiraQuestao = true;
             
-            foreach (var questao in itens.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
+            foreach (var questao in alunoProva.ItensAmostra.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
             {
                 var questaoParaPersistir = new Questao(
                     questao.TextoBase,

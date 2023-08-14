@@ -238,6 +238,9 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IImportarResultadoCicloDreUseCase, ImportarResultadoCicloDreUseCase>();
             services.AddScoped<ITratarResultadoCicloDreUseCase, TratarResultadoCicloDreUseCase>();
 
+            
+            services.AddScoped<ITratarProvaTaiSyncUseCase, TratarProvaTaiSyncUseCase>();
+            services.AddScoped<ITratarProvaTaiUseCase, TratarProvaTaiUseCase>();            
         }
     }
 }

@@ -10,7 +10,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterAlunosProvaTaiSemCadernoQueryHandler : IRequestHandler<ObterAlunosProvaTaiSemCadernoQuery, IEnumerable<ProvaAlunoTaiSemCadernoDto>>
     {
-
         private readonly IRepositorioAluno repositorioAluno;
 
         public ObterAlunosProvaTaiSemCadernoQueryHandler(IRepositorioAluno repositorioAluno)

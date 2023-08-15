@@ -28,9 +28,12 @@ namespace SME.SERAp.Prova.Aplicacao
                     throw new NegocioException("O Id da prova do legado deve ser informado.");                
                 
                 if (string.IsNullOrEmpty(cadernoProvaTaiTratar.Disciplina))
-                    throw new NegocioException("A disciplina da prova deve ser informado."); 
+                    throw new NegocioException("A disciplina da prova deve ser informada.");
+
+                var alunosAtivosProvaTaiSemCaderno = cadernoProvaTaiTratar.AlunosProvaTaiSemCaderno
+                    .Where(a => a.Ativo());
                 
-                foreach (var item in cadernoProvaTaiTratar.AlunosProvaTaiSemCaderno.Where(a => a.Ativo()))
+                foreach (var item in alunosAtivosProvaTaiSemCaderno)
                 {
                     await PublicarFilaTratarCadernoAluno(item.ProvaId, item.AlunoId, item.ProvaLegadoId, item.AlunoRa,
                         cadernoProvaTaiTratar.Disciplina, cadernoProvaTaiTratar.ItensAmostra,

@@ -21,20 +21,25 @@ namespace SME.SERAp.Prova.Aplicacao
             var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(alunoProva.ProvaId, alunoProva.AlunoId));
 
             //Chamar Api TAI
-            var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
+            var itensTaiSorteio = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
                 proficienciaAluno, alunoProva.ItensAmostra, alunoProva.NumeroItensAmostra,
                 alunoProva.Disciplina));
+
+            var caderno = alunoProva.AlunoId.ToString(); 
 
             var cadernoAluno = new CadernoAluno(
                 alunoProva.AlunoId,
                 alunoProva.ProvaId,
-                alunoProva.AlunoId.ToString());
+                caderno);
 
             await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
 
             var primeiraQuestao = true;
+
+            var questoes = alunoProva.ItensAmostra
+                .Where(c => itensTaiSorteio.ItemAluno.Contains(c.ItemId));
             
-            foreach (var questao in alunoProva.ItensAmostra.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
+            foreach (var questao in questoes)
             {
                 var questaoParaPersistir = new Questao(
                     questao.TextoBase,
@@ -43,7 +48,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     primeiraQuestao ? 0 : 999,
                     alunoProva.ProvaId,
                     (QuestaoTipo)questao.TipoItem,
-                    alunoProva.AlunoId.ToString(),
+                    caderno,
                     questao.QuantidadeAlternativas);
 
                 var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));

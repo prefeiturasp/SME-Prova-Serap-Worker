@@ -327,8 +327,10 @@ namespace SME.SERAp.Prova.Dados
             {
                 const string query = @"select p.id as ProvaId,
                                         p.prova_legado_id as ProvaLegadoId,
-                                        p.disciplina
+                                        p.disciplina,
+                                        pa.ano
                                         from prova p
+                                        inner join prova_ano pa on pa.prova_id = p.id
                                         where p.formato_tai = true
                                         and p.disciplina is not null";
 

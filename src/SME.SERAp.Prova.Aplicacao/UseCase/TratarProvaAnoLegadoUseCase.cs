@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra.Exceptions;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -24,17 +25,17 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-                var provaId = long.Parse(mensagemRabbit.Mensagem.ToString());
+                var provaId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
 
                 var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
                 var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(provaId));
 
                 if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
                 {
-                    var provaAnoDetalhes = await mediator.Send(new ObterProvaAnoLegadoDetalhesPorIdQuery(provaId));
+                    var provaAnoDetalhes = (await mediator.Send(new ObterProvaAnoLegadoDetalhesPorIdQuery(provaId))).ToList();
 
                     var ids = provaAnoDetalhes.Select(t => t.TcpId).ToArray();
-                    var provaAnosDepara = await mediator.Send(new ObterProvaAnoDeparaPorTcpIdQuery(ids));
+                    var provaAnosDepara = (await mediator.Send(new ObterProvaAnoDeparaPorTcpIdQuery(ids))).ToList();
 
                     var provaAnos = new List<ProvaAno>();
                     foreach (var provaAnoDetalhe in provaAnoDetalhes)
@@ -48,19 +49,15 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
 
                     foreach (var provaAno in provaAnos)
-                    {
                         await mediator.Send(new ProvaAnoIncluirCommand(provaAno));
-                    }
                 }
                 else
                 {
                     if (provaLegado == null)
-                        throw new Exception($"Prova {provaLegado} não localizada!");
+                        throw new Exception($"Prova {provaId} não localizada!");
 
                     foreach (var ano in provaLegado.Anos)
-                    {
                         await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id, provaAtual.Modalidade)));
-                    }
                 }
 
                 if (provaAtual.AderirTodos && provaAtual.FormatoTai)
@@ -71,7 +68,7 @@ namespace SME.SERAp.Prova.Aplicacao
             catch (Exception ex)
             {
                 servicoLog.Registrar(ex);
-                throw ex;
+                throw new ErroException($"Erro ao tratar prova ano: {ex.Message}");
             }
         }
     }

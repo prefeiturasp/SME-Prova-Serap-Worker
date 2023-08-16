@@ -21,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var provaTai = mensagemRabbit.ObterObjetoMensagem<ProvaTaiSyncDto>();
             
-            var alunosProvaTaiSemCaderno = (await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaTai.ProvaId))).ToList();
+            var alunosProvaTaiSemCaderno = (await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaTai.ProvaId, provaTai.Ano))).ToList();
             
             if (alunosProvaTaiSemCaderno == null || !alunosProvaTaiSemCaderno.Any())
                 throw new NegocioException("Todos os alunos já possuem cadernos para a prova.");
@@ -35,10 +35,11 @@ namespace SME.SERAp.Prova.Aplicacao
                 dadosDaAmostraTai.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()))).ToList();
                 
             if (itensAmostra == null || itensAmostra.Count < dadosDaAmostraTai.NumeroItensAmostra)
-                throw new NegocioException($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaTai.ProvaLegadoId}");            
-            
+                throw new NegocioException($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaTai.ProvaLegadoId}");
+
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai,
-                new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina, alunosProvaTaiSemCaderno, dadosDaAmostraTai, itensAmostra)));
+                new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina,
+                    alunosProvaTaiSemCaderno, dadosDaAmostraTai, itensAmostra)));
 
             return true;
         }

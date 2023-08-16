@@ -14,7 +14,6 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IMediator mediator;
         private readonly IServicoLog serviceLog;
 
-
         public TratarProvasLegadoSyncUseCase(IMediator mediator, IServicoLog serviceLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));

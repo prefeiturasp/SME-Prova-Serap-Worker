@@ -5,5 +5,6 @@
         public long ProvaId { get; set; }
         public long ProvaLegadoId { get; set; }
         public string Disciplina { get; set; }
+        public string Ano { get; set; }
     }
 }

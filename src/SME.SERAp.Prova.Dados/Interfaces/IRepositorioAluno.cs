@@ -14,8 +14,8 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<Aluno>> ObterTodosAsync();
         Task<IEnumerable<Aluno>> ObterAlunoPorCodigosAsync(long[] codigos);
         Task<IEnumerable<Aluno>> ObterAlunosAdesaoPorProvaId(long provaId);
-        Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCadernoProvaId(long provaId);
-        Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCaderno();
+        Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCadernoProvaId(long provaId, string ano);
+        Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCaderno(string ano);
         Task<Aluno> ObterAlunoPorIdAsync(long alunoId);
         Task<bool> InativarAlunoPorIdETurmaIdAsync(long turmaId, long[] alunosId);
     }

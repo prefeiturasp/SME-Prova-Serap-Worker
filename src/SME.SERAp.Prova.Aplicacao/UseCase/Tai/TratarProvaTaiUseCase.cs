@@ -21,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var provaTai = mensagemRabbit.ObterObjetoMensagem<ProvaTaiSyncDto>();
             
-            var alunosProvaTaiSemCaderno = (await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaTai.ProvaId))).ToList();
+            var alunosProvaTaiSemCaderno = (await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaTai.ProvaId, provaTai.Ano))).ToList();
             
             if (alunosProvaTaiSemCaderno == null || !alunosProvaTaiSemCaderno.Any())
                 throw new NegocioException("Todos os alunos já possuem cadernos para a prova.");

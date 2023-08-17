@@ -37,7 +37,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     await PublicarFilaTratarCadernoAluno(item.ProvaId, item.AlunoId, item.ProvaLegadoId, item.AlunoRa,
                         cadernoProvaTaiTratar.Disciplina, cadernoProvaTaiTratar.ItensAmostra,
-                        cadernoProvaTaiTratar.DadosDaAmostraTai.NumeroItensAmostra);
+                        cadernoProvaTaiTratar.DadosDaAmostraTai.NumeroItensAmostra, cadernoProvaTaiTratar.Ano);
                 }
 
                 return true;
@@ -49,10 +49,10 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         private async Task PublicarFilaTratarCadernoAluno(long provaId, long alunoId, long provaLegadoId, long alunoRa,
-            string disciplina, List<ItemAmostraTaiDto> itensAmostra, int numeroItensAmostra)
+            string disciplina, List<ItemAmostraTaiDto> itensAmostra, int numeroItensAmostra, string ano)
         {
             var msg = new AlunoCadernoProvaTaiTratarDto(provaId, alunoId, provaLegadoId, alunoRa, disciplina,
-                itensAmostra, numeroItensAmostra);
+                itensAmostra, numeroItensAmostra, ano);
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernoAlunoProvaTai, msg));
         }
     }

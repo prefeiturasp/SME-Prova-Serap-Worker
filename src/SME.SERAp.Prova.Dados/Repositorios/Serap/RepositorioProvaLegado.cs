@@ -227,12 +227,12 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT 
-                                    A.Id 
-                                FROM  Alternative A (NOLOCK)                             
-                                WHERE A.Item_Id = @questaoId;";
+	            const string query = @" SELECT A.Id 
+                                		FROM  Alternative A (NOLOCK)
+                                		WHERE A.Item_Id = @questaoId
+                                		and A.State = 1";
 
-                return await conn.QueryAsync<long>(query, new { questaoId });
+	            return await conn.QueryAsync<long>(query, new { questaoId });
             }
             finally
             {
@@ -246,17 +246,17 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"SELECT 
-                                    A.Id as AlternativaLegadoId,                                    
-                                    A.Numeration as Numeracao,
-                                    A.Description as Descricao,
-                                    A.[Order] as Ordem,
-                                    A.Correct as Correta
-                                FROM  Alternative A (NOLOCK)                             
-                                WHERE A.Item_Id = @questaoId and A.id = @alternativaId;";
+	            const string query = @"SELECT A.Id as AlternativaLegadoId,
+                                    		A.Numeration as Numeracao,
+                                    		A.Description as Descricao,
+                                    		A.[Order] as Ordem,
+                                    		A.Correct as Correta
+                                		FROM Alternative A (NOLOCK)
+                                		WHERE A.Item_Id = @questaoId 
+                                		and A.id = @alternativaId
+                                		and A.State = 1";
 
-
-                return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
+	            return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
             }
             finally
             {

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.Exceptions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,39 +16,29 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
-            var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(alunoProva.ProvaLegadoId));
-            
-            if (provaAtual == null)
-                throw new Exception($"Prova {alunoProva.ProvaId} não localizada.");
 
-            var dadosDaAmostraTai = await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaAtual.LegadoId));
-
-            if (dadosDaAmostraTai == null)
-                throw new NegocioException($"Os dados da amostra tai não foram cadastrados para a prova {alunoProva.ProvaId}");
-
-            var itens = await mediator.Send(new ObterItensAmostraTaiQuery(dadosDaAmostraTai.MatrizId,
-                dadosDaAmostraTai.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()));
-            
-            if (itens == null || itens.Count() < dadosDaAmostraTai.NumeroItensAmostra)
-                throw new NegocioException($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaAtual.LegadoId}");
-
-            var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(provaAtual.Id, alunoProva.AlunoId));
+            var proficienciaAluno = await mediator.Send(new ObterProficienciaAlunoPorProvaIdQuery(alunoProva.ProvaId, alunoProva.AlunoId));
 
             //Chamar Api TAI
-            var itensTai = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
-                proficienciaAluno, itens, dadosDaAmostraTai.NumeroItensAmostra,
-                provaAtual.Disciplina));
-            
+            var itensTaiSorteio = await mediator.Send(new ObterItensProvaTAISorteioRQuery(alunoProva.AlunoId,
+                proficienciaAluno, alunoProva.ItensAmostra, alunoProva.NumeroItensAmostra,
+                alunoProva.Disciplina));
+
+            var caderno = alunoProva.AlunoId.ToString(); 
+
             var cadernoAluno = new CadernoAluno(
-                    alunoProva.AlunoId,
-                    provaAtual.Id,
-                    alunoProva.AlunoId.ToString());
+                alunoProva.AlunoId,
+                alunoProva.ProvaId,
+                caderno);
 
             await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
 
             var primeiraQuestao = true;
+
+            var questoes = alunoProva.ItensAmostra
+                .Where(c => itensTaiSorteio.ItemAluno.Contains(c.ItemId));
             
-            foreach (var questao in itens.Where(t => itensTai.ItemAluno.Contains(t.ItemId)))
+            foreach (var questao in questoes)
             {
                 var questaoParaPersistir = new Questao(
                     questao.TextoBase,
@@ -58,7 +47,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     primeiraQuestao ? 0 : 999,
                     alunoProva.ProvaId,
                     (QuestaoTipo)questao.TipoItem,
-                    alunoProva.AlunoId.ToString(),
+                    caderno,
                     questao.QuantidadeAlternativas);
 
                 var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));

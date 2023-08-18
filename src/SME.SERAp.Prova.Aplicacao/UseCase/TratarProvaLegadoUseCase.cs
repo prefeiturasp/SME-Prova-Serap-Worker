@@ -68,6 +68,7 @@ namespace SME.SERAp.Prova.Aplicacao
             else
             {
                 provaParaTratar.Id = provaAtual.Id;
+
                 provaAtual.AderirTodos = provaParaTratar.AderirTodos;
                 provaAtual.Multidisciplinar = provaParaTratar.Multidisciplinar;
                 provaAtual.TipoProvaId = provaParaTratar.TipoProvaId;
@@ -79,7 +80,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.ApresentarResultadosPorItem = provaParaTratar.ApresentarResultadosPorItem;
                 provaAtual.ExibirAudio = provaParaTratar.ExibirAudio;
                 provaAtual.ExibirVideo = provaParaTratar.ExibirVideo;
-
+                
                 var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
 
                 if (verificaSePossuiRespostas)
@@ -131,8 +132,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (!provaLegado.FormatoTai)
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-            else
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai, provaAtual.Id));
 
             await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
 

@@ -34,11 +34,12 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<(decimal proficiencia, AlunoProvaProficienciaOrigem origem)> Handle(ObterUltimaProficienciaAlunoPorDisciplinaIdQuery request, CancellationToken cancellationToken)
         {
-            var areaConhecimentoSerap = await repositorioGeralSerapLegado.ObterAreaConhecimentoSerapPorDisciplinaId((long)request.DisciplinaId);
+            var disciplinaId = request.DisciplinaId ?? 0;
+            var areaConhecimentoSerap = await repositorioGeralSerapLegado.ObterAreaConhecimentoSerapPorDisciplinaId(disciplinaId);
             var areaConhecimentoProvaSp = ObterAreaConhecimentoProvaSp(areaConhecimentoSerap);
 
             if (areaConhecimentoProvaSp == AreaConhecimentoProvaSp.NaoCadastrado)
-                throw new Exception($"Área de conhecimento não encontrada no ProvaSP, DisciplinaId: {request.DisciplinaId}");
+                throw new Exception($"Área de conhecimento não encontrada no ProvaSP, DisciplinaId: {disciplinaId}");
 
             var aluno = await repositorioAluno.ObterAlunoPorCodigo(request.AlunoRa);
             var turma = await repositorioTurma.ObterPorIdAsync(aluno.TurmaId);

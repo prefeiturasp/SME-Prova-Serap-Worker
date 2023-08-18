@@ -15,7 +15,7 @@ namespace SME.SERAp.Prova.Aplicacao
             _repositorioProvaLegado = repositorioProvaLegado;
         }
 
-        public Task<IEnumerable<long>> Handle(ObterProvaLegadoParaSeremSincronizadasQuery request, CancellationToken cancellationToken)
-            => _repositorioProvaLegado.ObterProvasIdsParaSeremSincronizadasIds(request.UltimaExecucao);
+        public async Task<IEnumerable<long>> Handle(ObterProvaLegadoParaSeremSincronizadasQuery request, CancellationToken cancellationToken)
+            => await _repositorioProvaLegado.ObterProvasIdsParaSeremSincronizadasIds(request.UltimaExecucao);
     }
 }

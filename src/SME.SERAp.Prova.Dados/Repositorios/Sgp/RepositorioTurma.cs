@@ -396,7 +396,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select t.id, t.codigo
+                var query = @"select t.id, t.codigo, t.ano
                                 from turma t
                                 where t.codigo = ANY(@codigos)";
 

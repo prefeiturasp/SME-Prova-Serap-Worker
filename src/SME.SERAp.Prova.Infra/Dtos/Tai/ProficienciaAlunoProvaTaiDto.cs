@@ -9,5 +9,6 @@
         public decimal Proficiencia { get; set; }
         public int Origem { get; set; }
         public int Tipo { get; set; }
+        public decimal ErroMedida { get; set; }
     }
 }

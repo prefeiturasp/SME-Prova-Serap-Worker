@@ -39,7 +39,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 Origem = ultimaProficiencia.origem,
                 Tipo = AlunoProvaProficienciaTipo.Inicial,
                 Proficiencia = ultimaProficiencia.proficiencia,
-                UltimaAtualizacao = alunoProvaDto.UltimaAtualizacao
+                UltimaAtualizacao = alunoProvaDto.UltimaAtualizacao,
+                ErroMedida = decimal.Zero
             }));
 
             return true;

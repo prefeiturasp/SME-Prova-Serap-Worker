@@ -29,7 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (proficiencia == null)
             {
-                await mediator.Send(new IncluirAlunoProvaProficienciaCommand(new AlunoProvaProficiencia()
+                await mediator.Send(new IncluirAlunoProvaProficienciaCommand(new AlunoProvaProficiencia
                 {
                     AlunoId = proficienciaAlunoProvaTai.AlunoId,
                     Ra = proficienciaAlunoProvaTai.AlunoRa,
@@ -38,13 +38,15 @@ namespace SME.SERAp.Prova.Aplicacao
                     Origem = (AlunoProvaProficienciaOrigem)proficienciaAlunoProvaTai.Origem,
                     Tipo = (AlunoProvaProficienciaTipo)proficienciaAlunoProvaTai.Tipo,
                     Proficiencia = proficienciaAlunoProvaTai.Proficiencia,
-                    UltimaAtualizacao = DateTime.Now
+                    UltimaAtualizacao = DateTime.Now,
+                    ErroMedida = proficienciaAlunoProvaTai.ErroMedida
                 }));
             }
             else
             {
                 proficiencia.Proficiencia = proficienciaAlunoProvaTai.Proficiencia;
                 proficiencia.UltimaAtualizacao = DateTime.Now;
+                proficiencia.ErroMedida = proficienciaAlunoProvaTai.ErroMedida;
                 await mediator.Send(new AtualizarValorProficienciaAlunoCommand(proficiencia));
             }
 

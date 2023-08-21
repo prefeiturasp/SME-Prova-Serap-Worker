@@ -128,5 +128,8 @@
 
         public const string ImportarResultadoCicloDrePsp = "serap.resultados.psp.resultado.ciclo.dre";
         public const string TratarResultadoCicloDre = "serap.resultados.psp.resultado.ciclo.dre.tratar";
+        
+        public const string ProvaTaiSync = "serap.estudante.provatai.sync";
+        public const string ProvaTaiTratar = "serap.estudante.provatai.tratar";        
     }
 }

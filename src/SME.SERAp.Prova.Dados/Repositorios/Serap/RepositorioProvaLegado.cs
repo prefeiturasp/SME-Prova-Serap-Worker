@@ -29,8 +29,7 @@ namespace SME.SERAp.Prova.Dados
 	                test t
 					left join TestPermission tp
 					on tp.Test_Id = t.Id
-                     AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
-				
+                     AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'				
                 where
 	                t.ShowOnSerapEstudantes = 1
                     and (t.UpdateDate >  @ultimaAtualizacao or 
@@ -228,12 +227,12 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT 
-                                    A.Id 
-                                FROM  Alternative A (NOLOCK)                             
-                                WHERE A.Item_Id = @questaoId;";
+	            const string query = @" SELECT A.Id 
+                                		FROM  Alternative A (NOLOCK)
+                                		WHERE A.Item_Id = @questaoId
+                                		and A.State = 1";
 
-                return await conn.QueryAsync<long>(query, new { questaoId });
+	            return await conn.QueryAsync<long>(query, new { questaoId });
             }
             finally
             {
@@ -247,17 +246,17 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"SELECT 
-                                    A.Id as AlternativaLegadoId,                                    
-                                    A.Numeration as Numeracao,
-                                    A.Description as Descricao,
-                                    A.[Order] as Ordem,
-                                    A.Correct as Correta
-                                FROM  Alternative A (NOLOCK)                             
-                                WHERE A.Item_Id = @questaoId and A.id = @alternativaId;";
+	            const string query = @"SELECT A.Id as AlternativaLegadoId,
+                                    		A.Numeration as Numeracao,
+                                    		A.Description as Descricao,
+                                    		A.[Order] as Ordem,
+                                    		A.Correct as Correta
+                                		FROM Alternative A (NOLOCK)
+                                		WHERE A.Item_Id = @questaoId 
+                                		and A.id = @alternativaId
+                                		and A.State = 1";
 
-
-                return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
+	            return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
             }
             finally
             {

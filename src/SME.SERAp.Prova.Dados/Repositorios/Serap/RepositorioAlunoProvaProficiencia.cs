@@ -86,12 +86,18 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                const string query = @"select a.id as alunoId,
-                                            a.ra as alunoRa,
-                                            p.id as provaId,
+                const string query = @"select p.id as provaId,
                                             p.prova_legado_id as provaLegadoId,
                                             p.disciplina_id as disciplinaId,
-                                            p.ultima_atualizacao as ultimaAtualizacao
+                                            p.ultima_atualizacao as ultimaAtualizacao,
+                                            a.id as alunoId,
+                                            a.ra as alunoRa,
+                                            t.ano,
+                                            t.ano_letivo as anoletivo,
+                                            t.id as turmaid,
+                                            t.ue_id as ueid,
+                                            u.dre_id as dreid,
+                                            u.ue_id as uecodigo
                                         from prova p
                                         left join prova_ano_original pa on pa.prova_id = p.id
                                         left join turma t on (((pa.modalidade = 3 or pa.modalidade = 4) and pa.etapa_eja = t.etapa_eja) or (pa.modalidade <> 3 and pa.modalidade <> 4))
@@ -99,32 +105,43 @@ namespace SME.SERAp.Prova.Dados
   	                                        and t.modalidade_codigo = pa.modalidade 
   	                                        and t.ano_letivo::double precision = date_part('year'::text, p.inicio)
                                         join aluno a on a.turma_id = t.id
-                                        where (p.aderir_todos is null or p.aderir_todos)
-	                                    and p.formato_tai = true
+                                        join ue u on u.id = t.ue_id
+                                        where p.formato_tai = true
+	                                    and (p.aderir_todos or p.aderir_todos is null)
 	                                    and not exists(select 1 
-                                                        from aluno_prova_proficiencia ca
-                                                        where ca.prova_id = p.id
-                                                        and ca.aluno_id = a.id
-                                                        and ca.ultima_atualizacao = p.ultima_atualizacao)
+                                                        from aluno_prova_proficiencia app
+                                                        where app.prova_id = p.id
+                                                        and app.aluno_id = a.id
+                                                        and app.ultima_atualizacao = p.ultima_atualizacao)
 		
                                         union all 
  
-                                        select a.id as alunoId,
-                                            a.ra as alunoRa,
-                                            p.id as provaId,
-                                            p.prova_legado_id as provaLegadoId,
-                                            p.disciplina_id as disciplinaId,
-                                            p.ultima_atualizacao as ultimaAtualizacao
+                                        select p.id as provaid,
+                                            p.prova_legado_id as provalegadoid,
+                                            p.disciplina_id as disciplinaid,
+                                            p.ultima_atualizacao as ultimaatualizacao,
+                                            a.id as alunoid,
+                                            a.ra as alunora,
+                                            t.ano,
+                                            t.ano_letivo as anoletivo,
+                                            t.id as turmaid,
+                                            t.ue_id as ueid,
+                                            u.dre_id as dreid,
+                                            u.ue_id as uecodigo
                                         from prova p
-                                        left join prova_adesao pa on pa.prova_id = p.id
+                                        join prova_adesao pa on pa.prova_id = p.id
                                         join aluno a on a.ra = pa.aluno_ra
-                                        where p.aderir_todos = false
-	                                    and p.formato_tai = true
-	                                    and not exists(select 1
-	                                                    from aluno_prova_proficiencia ca
-	                                                    where ca.prova_id = p.id
-	                                                    and ca.aluno_id = a.id
-	                                                    and ca.ultima_atualizacao = p.ultima_atualizacao)";
+                                        join prova_ano_original pao on pao.prova_id = p.id
+                                        join turma t on t.id = a.turma_id
+	                                        and t.ano = pao.ano
+                                        join ue u on u.id = t.ue_id
+                                        where p.formato_tai = true
+	                                    and p.aderir_todos = false
+                                        and not exists (select 1
+				                                        from aluno_prova_proficiencia app
+				                                        where app.prova_id = p.id
+				                                        and app.aluno_id = a.id
+				                                        and app.ultima_atualizacao = p.ultima_atualizacao)";
 
                 return await conn.QueryAsync<AlunoProvaDto>(query);
             }

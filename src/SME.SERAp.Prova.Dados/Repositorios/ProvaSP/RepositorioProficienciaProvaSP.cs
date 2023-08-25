@@ -1,6 +1,4 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.EnvironmentVariables;
+﻿using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -18,16 +16,17 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<decimal> ObterProficienciaAluno(string alunoRa, string codigoAnoTurma, string anoTurma, string codigoEscola, long areaConhecimentoId)
         {
-            var query = $@"select top 1 Valor 
+            var query = @"select top 1 Valor 
 							from ResultadoAluno 
 							where alu_matricula = @alunoRa
 								and AreaConhecimentoID = @areaConhecimentoId
 								and (tur_codigo = @codigoAnoTurma or AnoEscolar = @anoTurma)
 								and esc_codigo = @codigoEscola
 								and Valor is not null
+								and Valor > 0
 						order by Edicao desc";
 
-            using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
+            await using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
             return await conn.QueryFirstOrDefaultAsync<decimal>(query, new { alunoRa, codigoAnoTurma, anoTurma, codigoEscola, areaConhecimentoId });
         }
 
@@ -41,13 +40,13 @@ namespace SME.SERAp.Prova.Dados
 										and Valor is not null
 										order by Edicao desc
 									), total_aluno as (
-										select (SUM(ISNULL(ra.Valor,0)) / count(ra.alu_matricula)) as media
-										from ResultadoAluno ra
-										inner join edicao_aluno ea on ea.Edicao = ra.Edicao
-	  										and ea.AreaConhecimentoID = ra.AreaConhecimentoID
-	  										and ea.AnoEscolar = ra.AnoEscolar
-	  										and ea.esc_codigo = ra.esc_codigo
-										where Valor is not null
+										select re.Valor as media
+										from ResultadoEscola re
+										inner join edicao_aluno ea on ea.Edicao = re.Edicao
+	  										and ea.AreaConhecimentoID = re.AreaConhecimentoID
+	  										and ea.AnoEscolar = re.AnoEscolar
+	  										and ea.esc_codigo = re.esc_codigo
+										where re.Valor is not null
 									)
 									select COALESCE(media, 0) as media
 									from total_aluno";
@@ -60,26 +59,22 @@ namespace SME.SERAp.Prova.Dados
 		{
 			var query = $@";with edicao_dre as (
 							select top 1 rd.uad_sigla, rd.Edicao, rd.AnoEscolar, rd.AreaConhecimentoID
-									from ResultadoDre rd
-									where rd.uad_sigla = @dreSigla
-									and rd.AnoEscolar = @anoEscolar
-									and rd.AreaConhecimentoID = @areaConhecimentoId
-								order by rd.Edicao desc)
+							from ResultadoDre rd
+							where rd.uad_sigla = @dreSigla
+							and rd.AnoEscolar = @anoEscolar
+							and rd.AreaConhecimentoID = @areaConhecimentoId
+							order by rd.Edicao desc)
 							,total_dre as (
-								select re.uad_sigla dre,
-										SUM(re.TotalAlunos) qtde_alunos,
-										SUM(re.Valor) total_profici
-									from ResultadoEscola re
-							inner join edicao_dre ed
-									on re.uad_sigla = ed.uad_sigla
-									and re.Edicao = ed.Edicao
-									and re.AnoEscolar = ed.AnoEscolar
-									and re.AreaConhecimentoID = ed.AreaConhecimentoID
-								group by re.uad_sigla)
-								select (total_profici / qtde_alunos) media_dre
-									from total_dre";
+								select rd.Valor as media
+									from ResultadoDre rd
+									inner join edicao_dre ed on rd.uad_sigla = ed.uad_sigla
+									and rd.Edicao = ed.Edicao
+									and rd.AnoEscolar = ed.AnoEscolar
+									and rd.AreaConhecimentoID = ed.AreaConhecimentoID)
+							select COALESCE(media, 0) as media_dre
+							from total_dre";
 
-			using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
+			await using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
 			return await conn.QueryFirstOrDefaultAsync<decimal>(query, new { dreSigla, anoEscolar, areaConhecimentoId });
 		}
 	}

@@ -11,54 +11,71 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         private readonly IRepositorioGeralSerapLegado repositorioGeralSerapLegado;
         private readonly IRepositorioProficienciaProvaSP repositorioProficienciaProvaSP;
-        private readonly IRepositorioAluno repositorioAluno;
         private readonly IRepositorioTurma repositorioTurma;
-        private readonly IRepositorioUe repositorioUe;
         private readonly IRepositorioDre repositorioDre;
 
         public ObterUltimaProficienciaAlunoPorDisciplinaIdQueryHandler(
             IRepositorioGeralSerapLegado repositorioGeralSerapLegado,
             IRepositorioProficienciaProvaSP repositorioProficienciaProvaSP,
-            IRepositorioAluno repositorioAluno,
             IRepositorioTurma repositorioTurma,
-            IRepositorioUe repositorioUe,
             IRepositorioDre repositorioDre)
         {
             this.repositorioGeralSerapLegado = repositorioGeralSerapLegado ?? throw new ArgumentException(nameof(repositorioGeralSerapLegado));
             this.repositorioProficienciaProvaSP = repositorioProficienciaProvaSP ?? throw new ArgumentException(nameof(repositorioProficienciaProvaSP));
-            this.repositorioAluno = repositorioAluno ?? throw new ArgumentException(nameof(repositorioAluno));
             this.repositorioTurma = repositorioTurma ?? throw new ArgumentException(nameof(repositorioTurma));
-            this.repositorioUe = repositorioUe ?? throw new ArgumentException(nameof(repositorioUe));
             this.repositorioDre = repositorioDre ?? throw new ArgumentException(nameof(repositorioDre));
         }
 
-        public async Task<(decimal proficiencia, AlunoProvaProficienciaOrigem origem)> Handle(ObterUltimaProficienciaAlunoPorDisciplinaIdQuery request, CancellationToken cancellationToken)
+        public async Task<(decimal proficiencia, AlunoProvaProficienciaOrigem origem)> Handle(
+            ObterUltimaProficienciaAlunoPorDisciplinaIdQuery request, CancellationToken cancellationToken)
         {
             var disciplinaId = request.DisciplinaId ?? 0;
+
+            if (disciplinaId == 0)
+                throw new Exception($"Disciplina deve ser informada.");
+
             var areaConhecimentoSerap = await repositorioGeralSerapLegado.ObterAreaConhecimentoSerapPorDisciplinaId(disciplinaId);
             var areaConhecimentoProvaSp = ObterAreaConhecimentoProvaSp(areaConhecimentoSerap);
 
             if (areaConhecimentoProvaSp == AreaConhecimentoProvaSp.NaoCadastrado)
-                throw new Exception($"Área de conhecimento não encontrada no ProvaSP, DisciplinaId: {disciplinaId}");
+                throw new Exception($"Área de conhecimento não encontrada no ProvaSP. DisciplinaId: {disciplinaId}");
 
-            var aluno = await repositorioAluno.ObterAlunoPorCodigo(request.AlunoRa);
-            var turma = await repositorioTurma.ObterPorIdAsync(aluno.TurmaId);
-            var escola = await repositorioUe.ObterPorIdAsync(turma.UeId);
+            //-> proficiência do aluno
+            var proficienciaAluno = await ObterProficienciaAluno(request.TurmaId, request.AlunoRa.ToString(),
+                request.Ano, request.UeCodigo, (long)areaConhecimentoProvaSp);
 
-            var proficienciaAluno = await repositorioProficienciaProvaSP.ObterProficienciaAluno(request.AlunoRa.ToString(), turma.NomeTurma, turma.Ano, escola.CodigoUe, (long)areaConhecimentoProvaSp);
             if (proficienciaAluno > 0)
                 return (proficienciaAluno, AlunoProvaProficienciaOrigem.PSP_estudante);
 
+            //-> média proficiência da escola
             var mediaProficienciaEscolaAluno = await repositorioProficienciaProvaSP.ObterMediaProficienciaEscolaAluno(request.AlunoRa.ToString(), (long)areaConhecimentoProvaSp);
+
             if (mediaProficienciaEscolaAluno > 0)
                 return (mediaProficienciaEscolaAluno, AlunoProvaProficienciaOrigem.PSP_ano_escolar);
 
-            var dre = await repositorioDre.ObterPorIdAsync(escola.DreId);
+            //-> média proficiência da DRE
+            var mediaProficienciaDreAluno = await ObterMediaProficienciaDre(request.DreId, request.Ano, (long)areaConhecimentoProvaSp);
+
+            return mediaProficienciaDreAluno > 0
+                ? (mediaProficienciaDreAluno, AlunoProvaProficienciaOrigem.PSP_Dre)
+                : (0, AlunoProvaProficienciaOrigem.TAI_estudante);
+        }
+
+        private async Task<decimal> ObterProficienciaAluno(long turmaId, string alunoRa, string anoTurma, string ueCodigo,
+            long areaConhecimentoProvaSp)
+        {
+            var turma = await repositorioTurma.ObterPorIdAsync(turmaId);
+            return await repositorioProficienciaProvaSP.ObterProficienciaAluno(
+                alunoRa, turma.NomeTurma, anoTurma, ueCodigo, areaConhecimentoProvaSp);
+        }
+
+        private async Task<decimal> ObterMediaProficienciaDre(long dreId, string anoTurma, long areaConhecimentoProvaSp)
+        {
+            var dre = await repositorioDre.ObterPorIdAsync(dreId);
             var dreSigla = dre.Abreviacao.Replace("DRE - ", "");
-            
-            // TODO: VERIFICAR A DRE
-            var mediaProficienciaDreAluno = await repositorioProficienciaProvaSP.ObterMediaProficienciaDre(dreSigla, turma.Ano, (long)areaConhecimentoProvaSp);
-            return mediaProficienciaDreAluno > 0 ? (mediaProficienciaDreAluno, AlunoProvaProficienciaOrigem.PSP_Dre) : (0, AlunoProvaProficienciaOrigem.TAI_estudante);
+
+            return await repositorioProficienciaProvaSP.ObterMediaProficienciaDre(dreSigla, anoTurma,
+                areaConhecimentoProvaSp);
         }
 
         private AreaConhecimentoProvaSp ObterAreaConhecimentoProvaSp(AreaConhecimentoSerap areaConhecimentoSerap)

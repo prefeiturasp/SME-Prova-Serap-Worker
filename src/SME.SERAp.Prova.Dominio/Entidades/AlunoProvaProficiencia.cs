@@ -16,5 +16,6 @@ namespace SME.SERAp.Prova.Dominio
         public AlunoProvaProficienciaOrigem Origem { get; set; }
         public AlunoProvaProficienciaTipo Tipo { get; set; }
         public DateTime UltimaAtualizacao { get; set; }
+        public decimal ErroMedida { get; set; }
     }
 }

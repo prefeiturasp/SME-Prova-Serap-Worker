@@ -262,14 +262,16 @@ namespace SME.SERAp.Prova.Dados
             {
                 const string query = @"update aluno_prova_proficiencia
                                         set proficiencia = @proficiencia,
-	                                        ultima_atualizacao = @ultimaAtualizacao
+	                                        ultima_atualizacao = @ultimaAtualizacao,
+	                                        erro_medida = @erroMedida
                                         where id = @id";
 
                 await conn.ExecuteAsync(query, new
                 {
                     id = alunoProvaProficiencia.Id,
                     proficiencia = alunoProvaProficiencia.Proficiencia,
-                    ultimaAtualizacao = alunoProvaProficiencia.UltimaAtualizacao
+                    ultimaAtualizacao = alunoProvaProficiencia.UltimaAtualizacao,
+                    erroMedida = alunoProvaProficiencia.ErroMedida
                 });
                 return true;
             }

@@ -18,6 +18,7 @@ namespace SME.SERAp.Prova.Dados
 								i.Id ItemId,
 								i.ItemCode ItemCodigo,
                                 i.Statement as Enunciado, 
+                                i.EvaluationMatrix_Id as MatrizId,
 								icg.TypeCurriculumGradeId TipoCurriculoGradeId,
 								s.Id HabilidadeId,
 								s.[Description] HabilidadeNome,

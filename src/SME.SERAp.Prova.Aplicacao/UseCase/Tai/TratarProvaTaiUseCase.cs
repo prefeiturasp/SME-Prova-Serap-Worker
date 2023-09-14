@@ -35,35 +35,32 @@ namespace SME.SERAp.Prova.Aplicacao
             
             if (dadosDaAmostraTai == null || !dadosDaAmostraTai.Any())
                 throw new NegocioException($"Os dados da amostra tai não foram cadastrados para a prova {provaTai.ProvaLegadoId}");
-
+            
             var listaLog = new List<string>();
+            var amostrasUtilizar = new List<ItemAmostraTaiDto>();
 
             foreach (var dadosAmostra in dadosDaAmostraTai)
             {
-                var itensAmostra = (await mediator
-                    .Send(new ObterItensAmostraTaiQuery(dadosAmostra.MatrizId,
-                        dadosAmostra.ListaConfigItens
-                            .Select(x => x.TipoCurriculoGradeId).ToArray())))
-                    .ToList();
-
-                if (!itensAmostra.Any() || itensAmostra.Count < dadosAmostra.NumeroItensAmostra)
+                foreach (var configItem in dadosAmostra.ListaConfigItens)
+                {
+                    var itensAmostra = (await mediator
+                            .Send(new ObterItensAmostraTaiQuery(configItem.MatrizId, new [] { configItem.TipoCurriculoGradeId })))
+                        .ToList();
+                    
+                    var numeroItens = itensAmostra.Count * configItem.Porcentagem / 100;
+                    var itensAmostraUtilizar = itensAmostra.Take(numeroItens).ToList();
+                    amostrasUtilizar.AddRange(itensAmostraUtilizar);
+                }
+                
+                if (!amostrasUtilizar.Any() || amostrasUtilizar.Count < dadosAmostra.NumeroItensAmostra)
                 {
                     listaLog.Add($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaTai.ProvaLegadoId}.");
                     continue;                    
                 }
-
-                foreach (var configItem in dadosAmostra.ListaConfigItens)
-                {
-                    var totalNumeroItens = itensAmostra.Count(c =>
-                        c.MatrizId == configItem.MatrizId && c.TipoCurriculoGradeId == configItem.TipoCurriculoGradeId);
-
-                    var numeroItens = totalNumeroItens * configItem.Porcentagem / 100;
-                    var itensAmostraUtilizar = itensAmostra.Take(numeroItens).ToList();
-                    
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai,
-                        new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina,
-                            alunosProvaTaiSemCaderno, dadosAmostra, itensAmostraUtilizar, provaTai.Ano)));
-                }
+                
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai,
+                    new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina,
+                        alunosProvaTaiSemCaderno, dadosAmostra.NumeroItensAmostra, amostrasUtilizar, provaTai.Ano)));                
             }
 
             if (!listaLog.Any()) 

@@ -37,7 +37,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     await PublicarFilaTratarCadernoAluno(item.ProvaId, item.AlunoId, item.ProvaLegadoId, item.AlunoRa,
                         cadernoProvaTaiTratar.Disciplina, cadernoProvaTaiTratar.ItensAmostra,
-                        cadernoProvaTaiTratar.DadosDaAmostraTai.NumeroItensAmostra, cadernoProvaTaiTratar.Ano);
+                        cadernoProvaTaiTratar.NumeroItensAmostra, cadernoProvaTaiTratar.Ano);
                 }
 
                 return true;

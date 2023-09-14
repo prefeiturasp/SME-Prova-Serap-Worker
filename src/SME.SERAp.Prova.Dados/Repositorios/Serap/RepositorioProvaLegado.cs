@@ -430,9 +430,8 @@ namespace SME.SERAp.Prova.Dados
 											where tcg.[State] = 1
 											and tcg.Test_Id = @provaId
 										)
-										select nit.TestId ProvaLegadoId,
+										select top 1 nit.TestId ProvaLegadoId,
 											dm.DisciplinaId,
-											dm.MatrizId,
 											niat.[Value] NumeroItensAmostra,
 											nit.AdvanceWithoutAnswering AvancarSemResponder,
 											nit.BackToPreviousItem VoltarAoItemAnterior
@@ -457,7 +456,7 @@ namespace SME.SERAp.Prova.Dados
                 var configItens = await dados.ReadAsync<ConfigAnoItensProvaTaiDto>();
 
                 foreach (var amostra in amostrasProvaTai)
-	                amostra.ListaConfigItens.AddRange(configItens.Where(c => c.MatrizId == amostra.MatrizId));
+	                amostra.ListaConfigItens.AddRange(configItens);
 
                 return amostrasProvaTai;
             }

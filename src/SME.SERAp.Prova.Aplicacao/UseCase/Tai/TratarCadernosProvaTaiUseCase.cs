@@ -208,7 +208,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 var msg = new AlunoCadernoProvaTaiTratarDto(item.ProvaId, item.AlunoId, item.ProvaLegadoId,
                     item.AlunoRa, cadernoProvaTaiTratar.Disciplina, cadernoProvaTaiTratar.ItensAmostra,
-                    cadernoProvaTaiTratar.DadosDaAmostraTai.NumeroItensAmostra, cadernoProvaTaiTratar.Ano,
+                    cadernoProvaTaiTratar.NumeroItensAmostra, cadernoProvaTaiTratar.Ano,
                     cadernoProvaTaiTratar.Caderno);
                 
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernoAlunoProvaTai, msg));

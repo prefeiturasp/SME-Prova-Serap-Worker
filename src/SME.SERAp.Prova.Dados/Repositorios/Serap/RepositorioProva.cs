@@ -331,8 +331,7 @@ namespace SME.SERAp.Prova.Dados
                                         pa.ano
                                         from prova p
                                         inner join prova_ano pa on pa.prova_id = p.id
-                                        where p.formato_tai = true
-                                        and p.disciplina is not null";
+                                        where p.formato_tai = true";
 
                 return await conn.QueryAsync<ProvaTaiSyncDto>(query);
             }

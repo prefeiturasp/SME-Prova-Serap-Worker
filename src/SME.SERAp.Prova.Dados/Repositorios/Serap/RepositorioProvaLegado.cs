@@ -417,52 +417,49 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<AmostraProvaTaiDto> ObterDadosAmostraProvaTai(long provaId)
+        public async Task<IEnumerable<AmostraProvaTaiDto>> ObterDadosAmostraProvaTai(long provaId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = @"with DisciplinaMatriz as(
-								select top 1
-									tcg.Discipline_Id DisciplinaId,
-									tcg.EvaluationMatrix_Id MatrizId,
-									tcg.Test_Id
-								from TestTaiCurriculumGrade tcg 
-								where tcg.[State] = 1
-									and tcg.Test_Id = @provaId
-								)
-								select
-									nit.TestId ProvaLegadoId,
-									dm.DisciplinaId,
-									dm.MatrizId,
-									niat.[Value] NumeroItensAmostra,
-									nit.AdvanceWithoutAnswering AvancarSemResponder,
-									nit.BackToPreviousItem VoltarAoItemAnterior
-								from NumberItemTestTai nit
-								inner join NumberItemsAplicationTai niat
-									on nit.ItemAplicationTaiId = niat.Id
-								inner join DisciplinaMatriz dm on dm.Test_Id = nit.TestId
-								where nit.[State] = 1
-									and niat.[State] = 1
-									and nit.TestId = @provaId
-								order by nit.Id desc
+                const string query = @"with DisciplinaMatriz as(
+											select tcg.Discipline_Id DisciplinaId,
+												tcg.EvaluationMatrix_Id MatrizId,
+												tcg.Test_Id
+											from TestTaiCurriculumGrade tcg 
+											where tcg.[State] = 1
+											and tcg.Test_Id = @provaId
+										)
+										select nit.TestId ProvaLegadoId,
+											dm.DisciplinaId,
+											dm.MatrizId,
+											niat.[Value] NumeroItensAmostra,
+											nit.AdvanceWithoutAnswering AvancarSemResponder,
+											nit.BackToPreviousItem VoltarAoItemAnterior
+										from NumberItemTestTai nit
+										inner join NumberItemsAplicationTai niat on nit.ItemAplicationTaiId = niat.Id
+										inner join DisciplinaMatriz dm on dm.Test_Id = nit.TestId
+										where nit.[State] = 1
+										and niat.[State] = 1
+										and nit.TestId = @provaId
+										order by nit.Id desc
 
-								select
-									tcg.TypeCurriculumGradeId TipoCurriculoGradeId,
-									tcg.[Percentage] Porcentagem
-								from TestTaiCurriculumGrade tcg 
-								where tcg.[State] = 1
-									and tcg.Test_Id = @provaId";
+										select tcg.EvaluationMatrix_Id as MatrizId, 
+											tcg.TypeCurriculumGradeId TipoCurriculoGradeId,
+											tcg.[Percentage] Porcentagem
+										from TestTaiCurriculumGrade tcg 
+										where tcg.[State] = 1
+										and tcg.Test_Id = @provaId";
 
                 var dados = await conn.QueryMultipleAsync(query, new { provaId });
 
-                var amostraProvaTai = await dados.ReadSingleOrDefaultAsync<AmostraProvaTaiDto>();
-                var configItens = (await dados.ReadAsync<ConfigAnoItensProvaTaiDto>()).ToList();
+                var amostrasProvaTai = await dados.ReadAsync<AmostraProvaTaiDto>();
+                var configItens = await dados.ReadAsync<ConfigAnoItensProvaTaiDto>();
 
-                if (configItens.Any())
-                    amostraProvaTai.ListaConfigItens = configItens.ToList();
+                foreach (var amostra in amostrasProvaTai)
+	                amostra.ListaConfigItens.AddRange(configItens.Where(c => c.MatrizId == amostra.MatrizId));
 
-                return amostraProvaTai;
+                return amostrasProvaTai;
             }
             finally
             {

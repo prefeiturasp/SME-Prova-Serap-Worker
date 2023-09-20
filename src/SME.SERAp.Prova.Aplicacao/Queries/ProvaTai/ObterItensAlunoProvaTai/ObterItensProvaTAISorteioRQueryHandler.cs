@@ -30,7 +30,10 @@ namespace SME.SERAp.Prova.Aplicacao
                 client.DefaultRequestHeaders.Accept.Clear();
                 
                 var textInfo = new CultureInfo("pt-BR").TextInfo;
-                var componente = textInfo.ToTitleCase(request.Componente.ToLower());
+                var componente = string.Empty;
+                
+                if (!string.IsNullOrEmpty(request.Componente))
+                    componente = textInfo.ToTitleCase(request.Componente.ToLower());
 
                 var obterItensProvaTaiDto = new ObterItensProvaTaiDto
                 {

@@ -25,10 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     throw new NegocioException("O Id da prova deve ser informado.");
                 
                 if (cadernoProvaTaiTratar.ProvaLegadoId == 0)
-                    throw new NegocioException("O Id da prova do legado deve ser informado.");                
-                
-                if (string.IsNullOrEmpty(cadernoProvaTaiTratar.Disciplina))
-                    throw new NegocioException("A disciplina da prova deve ser informada.");
+                    throw new NegocioException("O Id da prova do legado deve ser informado.");
 
                 var alunosAtivosProvaTaiSemCaderno = cadernoProvaTaiTratar.AlunosProvaTaiSemCaderno
                     .Where(a => a.Ativo());

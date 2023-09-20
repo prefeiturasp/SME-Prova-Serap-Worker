@@ -28,19 +28,22 @@ namespace SME.SERAp.Prova.Aplicacao
             
             var dadosDaAmostraTai = await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaTai.ProvaLegadoId));
             
-            if (dadosDaAmostraTai == null)
+            if (dadosDaAmostraTai == null || !dadosDaAmostraTai.Any())
                 throw new NegocioException($"Os dados da amostra tai não foram cadastrados para a prova {provaTai.ProvaLegadoId}");
-            
-            var itensAmostra = (await mediator.Send(new ObterItensAmostraTaiQuery(dadosDaAmostraTai.MatrizId,
-                dadosDaAmostraTai.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()))).ToList();
+
+            foreach (var dadosAmostra in dadosDaAmostraTai)
+            {
+                var itensAmostra = (await mediator.Send(new ObterItensAmostraTaiQuery(dadosAmostra.MatrizId,
+                    dadosAmostra.ListaConfigItens.Select(x => x.TipoCurriculoGradeId).ToArray()))).ToList();
                 
-            if (itensAmostra == null || itensAmostra.Count < dadosDaAmostraTai.NumeroItensAmostra)
-                throw new NegocioException($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaTai.ProvaLegadoId}");
+                if (itensAmostra == null || itensAmostra.Count < dadosAmostra.NumeroItensAmostra)
+                    throw new NegocioException($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaTai.ProvaLegadoId}");
 
-            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai,
-                new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina,
-                    alunosProvaTaiSemCaderno, dadosDaAmostraTai, itensAmostra, provaTai.Ano)));
-
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai,
+                    new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina,
+                        alunosProvaTaiSemCaderno, dadosAmostra, itensAmostra, provaTai.Ano)));                
+            }
+            
             return true;
         }
     }

@@ -24,8 +24,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            const string caderno = "999";
-            
             var provaTai = mensagemRabbit.ObterObjetoMensagem<ProvaTaiSyncDto>();
 
             var alunosProvaTaiSemCaderno = (await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaTai.ProvaId, provaTai.Ano))).ToList();
@@ -62,7 +60,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai,
                     new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina,
-                        alunosProvaTaiSemCaderno, dadosAmostra.NumeroItensAmostra, amostrasUtilizar, provaTai.Ano, caderno)));                
+                        alunosProvaTaiSemCaderno, dadosAmostra.NumeroItensAmostra, amostrasUtilizar, provaTai.Ano)));                
             }
 
             if (!listaLog.Any()) 

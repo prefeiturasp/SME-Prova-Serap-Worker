@@ -6,7 +6,7 @@ namespace SME.SERAp.Prova.Infra.Dtos.Tai
     {
         public CadernoProvaTaiTratarDto(long provaId, long provaLegadoId, string disciplina,
             List<ProvaAlunoTaiSemCadernoDto> alunosProvaTaiSemCaderno, int numeroItensAmostra,
-            List<ItemAmostraTaiDto> itensAmostra, string ano, string caderno)
+            List<ItemAmostraTaiDto> itensAmostra, string ano)
         {
             ProvaId = provaId;
             ProvaLegadoId = provaLegadoId;
@@ -15,7 +15,6 @@ namespace SME.SERAp.Prova.Infra.Dtos.Tai
             NumeroItensAmostra = numeroItensAmostra;
             ItensAmostra = itensAmostra;
             Ano = ano;
-            Caderno = caderno;
         }
 
         public long ProvaId { get; }
@@ -25,6 +24,5 @@ namespace SME.SERAp.Prova.Infra.Dtos.Tai
         public List<ItemAmostraTaiDto> ItensAmostra { get; }
         public int NumeroItensAmostra { get; }
         public string Ano { get; }
-        public string Caderno { get; }
     }
 }

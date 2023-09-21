@@ -16,11 +16,12 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var ordemQuestaoTai = mensagemRabbit.ObterObjetoMensagem<OrdemQuestaoTaiDto>();
+            
             if (ordemQuestaoTai == null)
                 throw new NegocioException($"É preciso informar os dados de ordem da questão.");
 
             var questao = await mediator.Send(new ObterQuestaoPorIdQuery(ordemQuestaoTai.QuestaoId));
-            await Validacoes(ordemQuestaoTai, questao);
+            await Validacoes(questao);
 
             questao.Ordem = ordemQuestaoTai.Ordem;
             await mediator.Send(new QuestaoParaAtualizarCommand(questao));
@@ -28,7 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
             return true;
         }
 
-        private async Task Validacoes(OrdemQuestaoTaiDto ordemQuestaoTai, Questao questao)
+        private async Task Validacoes(Questao questao)
         {
             if (questao == null)
                 throw new NegocioException($"Questão não encontrada.");

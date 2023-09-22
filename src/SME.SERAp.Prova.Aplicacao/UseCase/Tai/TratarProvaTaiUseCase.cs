@@ -41,17 +41,36 @@ namespace SME.SERAp.Prova.Aplicacao
 
             foreach (var dadosAmostra in dadosDaAmostraTai)
             {
-                foreach (var configItem in dadosAmostra.ListaConfigItens)
+                var resto = dadosAmostra.NumeroItensAmostra;
+
+                while (resto > 0)
                 {
-                    var itensAmostra = (await mediator
-                            .Send(new ObterItensAmostraTaiQuery(configItem.MatrizId, new [] { configItem.TipoCurriculoGradeId })))
-                        .ToList();
-                    
-                    var numeroItens = itensAmostra.Count * configItem.Porcentagem / 100;
-                    var itensAmostraUtilizar = itensAmostra.Take(numeroItens).ToList();
-                    amostrasUtilizar.AddRange(itensAmostraUtilizar);
+                    foreach (var configItem in dadosAmostra.ListaConfigItens)
+                    {
+                        var itensAmostra = (await mediator
+                                .Send(new ObterItensAmostraTaiQuery(configItem.MatrizId,
+                                    new[] { configItem.TipoCurriculoGradeId })))
+                            .ToList();
+
+                        var numeroItens = dadosAmostra.NumeroItensAmostra * configItem.Porcentagem / 100;
+
+                        if (numeroItens > resto)
+                            numeroItens = resto;
+                        
+                        var itensAmostraUtilizar = itensAmostra
+                            .Where(c => !amostrasUtilizar.Select(x => x.ItemId).Contains(c.ItemId))
+                            .Take(numeroItens)
+                            .ToList();
+                        
+                        amostrasUtilizar.AddRange(itensAmostraUtilizar);
+
+                        resto -= numeroItens;
+                        
+                        if (resto <= 0)
+                            break;
+                    }
                 }
-                
+
                 if (!amostrasUtilizar.Any() || amostrasUtilizar.Count < dadosAmostra.NumeroItensAmostra)
                 {
                     listaLog.Add($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaTai.ProvaLegadoId}.");

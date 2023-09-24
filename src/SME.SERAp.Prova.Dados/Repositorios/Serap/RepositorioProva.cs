@@ -328,13 +328,10 @@ namespace SME.SERAp.Prova.Dados
                 const string query = @"select p.id as ProvaId,
                                         p.prova_legado_id as ProvaLegadoId,
                                         p.disciplina,
-                                        pa.ano
+                                        pao.ano
                                         from prova p
-                                        left join prova_ano pa on pa.prova_id = p.id
-                                        where p.formato_tai = true
-                                        and not exists (select ca.caderno 
-                                                        from caderno_aluno ca
-                                        			    where ca.prova_id = p.id)";
+                                        inner join prova_ano_original pao on pao.prova_id = p.id
+                                        where p.formato_tai = true";
 
                 return await conn.QueryAsync<ProvaTaiSyncDto>(query);
             }

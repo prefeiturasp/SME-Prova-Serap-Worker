@@ -27,8 +27,9 @@ namespace SME.SERAp.Prova.Aplicacao
             var provaTai = mensagemRabbit.ObterObjetoMensagem<ProvaTaiSyncDto>();
 
             var alunosProvaTaiSemCaderno = (await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaTai.ProvaId, provaTai.Ano))).ToList();
+            var alunosAtivosProvaTaiSemCaderno = alunosProvaTaiSemCaderno.Where(c => c.Ativo()).ToList();
             
-            if (alunosProvaTaiSemCaderno == null || !alunosProvaTaiSemCaderno.Any())
+            if (alunosAtivosProvaTaiSemCaderno == null || !alunosAtivosProvaTaiSemCaderno.Any())
                 throw new NegocioException("Todos os alunos já possuem cadernos para a prova.");
 
             var dadosDaAmostraTai = (await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaTai.ProvaLegadoId))).ToList();
@@ -79,7 +80,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai,
                     new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina,
-                        alunosProvaTaiSemCaderno, dadosAmostra.NumeroItensAmostra, amostrasUtilizar, provaTai.Ano)));                
+                        alunosAtivosProvaTaiSemCaderno, dadosAmostra.NumeroItensAmostra, amostrasUtilizar, provaTai.Ano)));                
             }
 
             if (!listaLog.Any()) 

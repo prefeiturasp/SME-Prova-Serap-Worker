@@ -330,8 +330,11 @@ namespace SME.SERAp.Prova.Dados
                                         p.disciplina,
                                         pa.ano
                                         from prova p
-                                        inner join prova_ano pa on pa.prova_id = p.id
-                                        where p.formato_tai = true";
+                                        left join prova_ano pa on pa.prova_id = p.id
+                                        where p.formato_tai = true
+                                        and not exists (select ca.caderno 
+                                                        from caderno_aluno ca
+                                        			    where ca.prova_id = p.id)";
 
                 return await conn.QueryAsync<ProvaTaiSyncDto>(query);
             }

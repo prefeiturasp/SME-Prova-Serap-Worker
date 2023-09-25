@@ -28,7 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao
             
             var primeiraQuestao = true;
 
-            var questoes = alunoProva.ItensAmostra;
+            var questoes = alunoProva.ItensAmostra.Distinct();
             
             foreach (var questao in questoes)
             {
@@ -70,6 +70,7 @@ namespace SME.SERAp.Prova.Aplicacao
             //-> Limpar o cache
             await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
             await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
+            await RemoverQuestaoProvaResumoCache(alunoProva.ProvaId, alunoProva.AlunoId);
 
             return true;
         }
@@ -200,6 +201,12 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.RespostaAmostraTaiAluno,
                 alunoRa, provaId)));            
-        }        
+        }
+
+        private async Task RemoverQuestaoProvaResumoCache(long provaId, long alunoId)
+        {
+            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaResumo,
+                provaId, alunoId)));            
+        }
     }
 }

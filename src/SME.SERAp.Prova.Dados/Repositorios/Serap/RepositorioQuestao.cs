@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -135,18 +136,21 @@ namespace SME.SERAp.Prova.Dados
         public async Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas(int pagina, int quantidade)
         {
             var ignorarRegistros = ((pagina - 1) * quantidade);
+            var dataBase = DateTime.Now.AddDays(-3);
 
             using var conn = ObterConexao();
             try
             {
-                var query = @"select q.id, p.ultima_atualizacao as UltimaAtualizacao 
+                var query = @"select q.id,
+                                p.ultima_atualizacao as UltimaAtualizacao,
+                                qc.ultima_atualizacao as UltimaAtualizacaoQuestao 
                               from prova p
                               left join questao q on q.prova_id = p.id 
-                              left join questao_completa qc on qc.id = q.id 
-                              where p.ultima_atualizacao <> qc.ultima_atualizacao or qc.ultima_atualizacao is null
+                              left join questao_completa qc on qc.id = q.id
+                              where p.ultima_atualizacao >= @dataBase
                               limit @quantidade offset @ignorarRegistros";
-
-                return await conn.QueryAsync<QuestaoAtualizada>(query, new { quantidade, ignorarRegistros });
+                
+                return await conn.QueryAsync<QuestaoAtualizada>(query, new { quantidade, ignorarRegistros, dataBase });
             }
             finally
             {

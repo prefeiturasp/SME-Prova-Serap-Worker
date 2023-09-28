@@ -31,7 +31,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     foreach (var questaoAtualizada in questoesAtualizadas)
                     {
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaTratar, questaoAtualizada));
+                        if (questaoAtualizada.UltimaAtualizacao != questaoAtualizada.UltimaAtualizacaoQuestao.GetValueOrDefault())
+                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaTratar, questaoAtualizada));
                     }
                 }
 

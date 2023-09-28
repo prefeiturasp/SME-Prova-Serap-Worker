@@ -8,5 +8,6 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<bool> RemoverPorProvaId(long provaId);
         Task<IEnumerable<Alternativa>> ObterAlternativasComImagemNaoSincronizadas();
+        Task<long> ObterIdAlternativaPorQuestaoIdLegadoId(long questaoId, long alternativaLegadoId);
     }
 }

@@ -12,11 +12,11 @@ namespace SME.SERAp.Prova.Aplicacao
         public TratarCadernoAlunoProvaTaiUseCase(IMediator mediator) : base(mediator)
         {
         }
-        
+
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
-            
+
             var caderno = alunoProva.AlunoId.ToString();
 
             var cadernoAluno = new CadernoAluno(
@@ -24,12 +24,14 @@ namespace SME.SERAp.Prova.Aplicacao
                 alunoProva.ProvaId,
                 caderno);
 
-            await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
-            
+            var existe = await mediator.Send(new ExisteCadernoAlunoPorProvaIdAlunoIdQuery(cadernoAluno.ProvaId, cadernoAluno.AlunoId));
+            if (!existe)
+                await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
+
             var primeiraQuestao = true;
 
             var questoes = alunoProva.ItensAmostra.Distinct();
-            
+
             foreach (var questao in questoes)
             {
                 var questaoParaPersistir = new Questao(
@@ -42,7 +44,9 @@ namespace SME.SERAp.Prova.Aplicacao
                     caderno,
                     questao.QuantidadeAlternativas);
 
-                var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
+                var questaoId = await mediator.Send(new ObterIdQuestaoPorProvaIdCadernoLegadoIdQuery(alunoProva.ProvaId, caderno, questao.ItemId));
+                if (questaoId == 0)
+                    questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
 
                 if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
                 {
@@ -66,7 +70,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 primeiraQuestao = false;
             }
-            
+
             //-> Limpar o cache
             await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
             await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
@@ -74,7 +78,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             return true;
         }
-        
+
         private async Task TratarAlternativasQuestao(ItemAmostraTaiDto questaoSerap, long questaoId)
         {
             var alternativasLegadoId = await mediator.Send(new ObterAlternativasLegadoPorIdQuery(questaoSerap.ItemId));
@@ -94,11 +98,14 @@ namespace SME.SERAp.Prova.Aplicacao
                     questaoId,
                     alternativa.Correta);
 
-                var alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
+                var alternativaId = await mediator.Send(new ObterIdAlternativaPorQuestaoIdLegadoIdQuery(questaoId, alternativa.AlternativaLegadoId));
 
-                if (alternativaParaPersistir.Arquivos == null || !alternativaParaPersistir.Arquivos.Any()) 
+                if(alternativaId == 0)
+                    alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
+
+                if (alternativaParaPersistir.Arquivos == null || !alternativaParaPersistir.Arquivos.Any())
                     continue;
-                
+
                 alternativaParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(alternativaParaPersistir.Arquivos));
 
                 foreach (var arquivoParaPersistir in alternativaParaPersistir.Arquivos)
@@ -145,7 +152,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         LegadoId = t.ThumbnailVideoId,
                         Caminho = t.CaminhoThumbnailVideo
                     });
-                
+
                 thumbnails = await mediator.Send(new ObterTamanhoArquivosQuery(thumbnails));
 
                 var videosConvertido = videosQuestao.Where(vc => vc.VideoConvertidoId > 0)
@@ -154,7 +161,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         LegadoId = vc.VideoConvertidoId,
                         Caminho = vc.CaminhoVideoConvertido
                     });
-                
+
                 videosConvertido = await mediator.Send(new ObterTamanhoArquivosQuery(videosConvertido));
 
                 foreach (var video in videosQuestao)
@@ -162,7 +169,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     var arquivoVideoId = await mediator.Send(new ArquivoPersistirCommand(videos.FirstOrDefault(v => v.LegadoId == video.VideoId)));
 
                     long? arquivoThumbnailId = null;
-                    
+
                     if (video.ThumbnailVideoId > 0)
                         arquivoThumbnailId = await mediator.Send(new ArquivoPersistirCommand(thumbnails.FirstOrDefault(t => t.LegadoId == video.ThumbnailVideoId)));
 
@@ -189,24 +196,24 @@ namespace SME.SERAp.Prova.Aplicacao
             };
 
             await mediator.Send(new IncluirAtualizarQuestaoTriCommand(questaoTriInserir));
-        }        
+        }
 
         private async Task RemoverQuestaoAmostraTaiAlunoCache(long alunoRa, long provaId)
         {
             await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoAmostraTaiAluno,
-                alunoRa, provaId)));            
+                alunoRa, provaId)));
         }
-        
+
         private async Task RemoverRespostaAmostraTaiAlunoCache(long alunoRa, long provaId)
         {
             await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.RespostaAmostraTaiAluno,
-                alunoRa, provaId)));            
+                alunoRa, provaId)));
         }
 
         private async Task RemoverQuestaoProvaResumoCache(long provaId, long alunoId)
         {
             await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaResumo,
-                provaId, alunoId)));            
+                provaId, alunoId)));
         }
     }
 }

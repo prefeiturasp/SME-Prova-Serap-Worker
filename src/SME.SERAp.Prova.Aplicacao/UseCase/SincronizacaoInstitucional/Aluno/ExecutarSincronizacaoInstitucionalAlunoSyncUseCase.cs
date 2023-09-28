@@ -41,11 +41,10 @@ namespace SME.SERAp.Prova.Aplicacao
                 foreach (var turma in turmas)
                 {
                     var alunosTurmaEol = todosAlunosTurmaEol.Where(c => c.TurmaCodigo.ToString() == turma.Codigo).ToList();
-                    var alunosTurmaSerap = todosAlunosSerap.Where(c => c.TurmaId == turma.Id).ToList();
-                    
-                    await TratarInclusao(alunosTurmaEol, alunosTurmaSerap, turma.Id);
-                    await TratarAlteracao(alunosTurmaEol, alunosTurmaSerap, turma);
-                    await TratarInativo(alunosTurmaEol, alunosTurmaSerap, turma.Id);
+
+                    await TratarInclusao(alunosTurmaEol, todosAlunosSerap, turma.Id);
+                    await TratarAlteracao(alunosTurmaEol, todosAlunosSerap, turma);
+                    await TratarInativo(alunosTurmaEol, todosAlunosSerap, turma.Id);
                 }
 
                 var turmasIds = turmas.Select(c => c.Id).Distinct().ToArray();

@@ -132,8 +132,10 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas()
+        public async Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas(int pagina, int quantidade)
         {
+            var ignorarRegistros = ((pagina - 1) * quantidade);
+
             using var conn = ObterConexao();
             try
             {
@@ -141,9 +143,10 @@ namespace SME.SERAp.Prova.Dados
                               from prova p
                               left join questao q on q.prova_id = p.id 
                               left join questao_completa qc on qc.id = q.id 
-                              where p.ultima_atualizacao <> qc.ultima_atualizacao or qc.ultima_atualizacao is null";
+                              where p.ultima_atualizacao <> qc.ultima_atualizacao or qc.ultima_atualizacao is null
+                              limit @quantidade offset @ignorarRegistros";
 
-                return await conn.QueryAsync<QuestaoAtualizada>(query);
+                return await conn.QueryAsync<QuestaoAtualizada>(query, new { quantidade, ignorarRegistros });
             }
             finally
             {

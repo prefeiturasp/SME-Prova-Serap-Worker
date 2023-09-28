@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Infra;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarQuestaoCompletaSyncUseCase : ITratarQuestaoCompletaSyncUseCase
     {
+        private const int QUANTIDADE_PAGINACAO = 1000;
 
         private readonly IRepositorioQuestao repositorioQuestao;
         private readonly IMediator mediator;
@@ -20,14 +22,22 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var questoesAtualizadas = await repositorioQuestao.ObterQuestoesAtualizadas();
-            if (questoesAtualizadas != null && questoesAtualizadas.Any())
+            var pagina = 1;
+            IEnumerable<QuestaoAtualizada> questoesAtualizadas;
+            do
             {
-                foreach(var questaoAtualizada in questoesAtualizadas)
+                questoesAtualizadas = await repositorioQuestao.ObterQuestoesAtualizadas(pagina, QUANTIDADE_PAGINACAO);
+                if (questoesAtualizadas != null && questoesAtualizadas.Any())
                 {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaTratar, questaoAtualizada));
+                    foreach (var questaoAtualizada in questoesAtualizadas)
+                    {
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaTratar, questaoAtualizada));
+                    }
                 }
+
+                pagina++;
             }
+            while (questoesAtualizadas.Any());
 
             return true;
         }

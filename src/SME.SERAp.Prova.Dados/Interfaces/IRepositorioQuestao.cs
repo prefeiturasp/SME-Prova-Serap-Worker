@@ -13,5 +13,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<Questao>> ObterQuestoesComImagemNaoSincronizadas();
         Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas(int pagina, int quantidade);
         Task<QuestaoCompletaDto> MontarQuestaoCompletaPorIdAsync(long id);
+        Task<long> ObterIdQuestaoPorProvaIdCadernoLegadoId(long provaId, string caderno, long questaoLegadoId);
     }
 }

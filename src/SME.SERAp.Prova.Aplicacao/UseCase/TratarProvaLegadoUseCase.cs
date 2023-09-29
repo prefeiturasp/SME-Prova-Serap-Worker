@@ -99,6 +99,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
                     
                     await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
                     return true;
                 }
 

@@ -162,9 +162,8 @@ namespace SME.SERAp.Prova.Dados
                                      f.aluno_id as AlunoId,
                                      f.aluno_situacao as Situacao,
                                      f.prova_legado_id as ProvaLegadoId,
-                                     a.ra as AlunoRa
+                                     f.aluno_ra as AlunoRa
                                 from v_prova_turma_aluno f
-                                    inner join aluno a on a.id = f.aluno_id
                                where f.formato_tai = true
                                  and f.prova_id = @provaId
                                  and f.turma_ano = @ano

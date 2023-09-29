@@ -73,5 +73,20 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<long> ObterQuestaoAudioIdPorArquivoId(long arquivoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = "select id from questao_audio where arquivo_id = @arquivoId limit 1";
+                return await conn.QueryFirstOrDefaultAsync<long>(query, new { arquivoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

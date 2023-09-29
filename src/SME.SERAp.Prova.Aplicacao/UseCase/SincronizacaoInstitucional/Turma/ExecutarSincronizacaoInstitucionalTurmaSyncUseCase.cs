@@ -57,9 +57,10 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 await TratarInclusao(todasTurmasSgp, todasTurmasSerap, ue.Id);
                 await TratarAlteracao(todasTurmasSgp, todasTurmasSerap);
-
-                await Tratar(ue, anoLetivo);
             }
+
+            // -> Sincroniza somente alunos das turmas do ano letivo atual
+            await Tratar(ue, anoAtual);
 
             return true;
         }

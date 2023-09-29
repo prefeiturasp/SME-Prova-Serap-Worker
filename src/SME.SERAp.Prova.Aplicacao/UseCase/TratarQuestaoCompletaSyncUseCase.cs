@@ -9,7 +9,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarQuestaoCompletaSyncUseCase : ITratarQuestaoCompletaSyncUseCase
     {
-        private const int QUANTIDADE_PAGINACAO = 1000;
+        private const int QUANTIDADE_PAGINACAO = 5000;
 
         private readonly IRepositorioQuestao repositorioQuestao;
         private readonly IMediator mediator;

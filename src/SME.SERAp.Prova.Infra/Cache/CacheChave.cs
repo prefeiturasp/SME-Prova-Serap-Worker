@@ -111,6 +111,12 @@
         /// 0 - Código ra do aluno
         /// 1 - Código da Prova
         /// </summary>
-        public const string RespostaAmostraTaiAluno = "al-q-tai-prova-resposta-{0}-{1}";        
+        public const string RespostaAmostraTaiAluno = "al-q-tai-prova-resposta-{0}-{1}";
+
+        /// <summary>
+        /// 0 - prova tai id
+        /// 1 - aluno id
+        /// </summary>
+        public const string SincronizandoProvaTaiAluno = "sinc-prova-tai-aluno-{0}-{1}";
     }
 }

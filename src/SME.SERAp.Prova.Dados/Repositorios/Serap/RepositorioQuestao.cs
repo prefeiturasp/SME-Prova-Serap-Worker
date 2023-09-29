@@ -148,7 +148,6 @@ namespace SME.SERAp.Prova.Dados
                               left join questao q on q.prova_id = p.id 
                               left join questao_completa qc on qc.id = q.id
                               where p.ultima_atualizacao >= @dataBase
-                              and p.id = 39
                               limit @quantidade offset @ignorarRegistros";
                 
                 return await conn.QueryAsync<QuestaoAtualizada>(query, new { quantidade, ignorarRegistros, dataBase });

@@ -104,7 +104,7 @@ namespace SME.SERAp.Prova.Dados
                 query.AppendLine(" join arquivo ar on ar.id = aa.arquivo_id ");
                 query.AppendLine(" where q.id = @id; ");
 
-                using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id });
+                using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id }, commandTimeout: 300);
                 var questaoCompleta = await sqlMapper.ReadFirstOrDefaultAsync<QuestaoCompletaDto>();
 
                 if (questaoCompleta == null || questaoCompleta.Id <= 0)
@@ -148,6 +148,7 @@ namespace SME.SERAp.Prova.Dados
                               left join questao q on q.prova_id = p.id 
                               left join questao_completa qc on qc.id = q.id
                               where p.ultima_atualizacao >= @dataBase
+                              and p.id = 39
                               limit @quantidade offset @ignorarRegistros";
                 
                 return await conn.QueryAsync<QuestaoAtualizada>(query, new { quantidade, ignorarRegistros, dataBase });

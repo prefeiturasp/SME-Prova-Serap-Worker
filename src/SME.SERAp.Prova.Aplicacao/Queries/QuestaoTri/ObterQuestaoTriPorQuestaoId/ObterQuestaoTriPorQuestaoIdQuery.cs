@@ -11,6 +11,5 @@ namespace SME.SERAp.Prova.Aplicacao
         }
 
         public long QuestaoId { get; set; }
-
     }
 }

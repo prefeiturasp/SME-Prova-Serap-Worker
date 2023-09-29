@@ -6,5 +6,6 @@ namespace SME.SERAp.Prova.Dados
     public interface IRepositorioArquivo : IRepositorioBase<Arquivo>
     {
         Task<bool> RemoverPorIdsAsync(long[] idsArquivos);
+        Task<long> ObterIdArquivoPorCaminho(string caminho);
     }
 }

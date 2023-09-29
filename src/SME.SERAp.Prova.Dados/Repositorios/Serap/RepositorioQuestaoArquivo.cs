@@ -33,6 +33,26 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task<long> ObterQuestaoArquivoIdPorQuestaoIdArquivoId(long questaoId, long arquivoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = @"select id 
+                                        from questao_arquivo 
+                                        where questao_id = @questaoId 
+                                          and arquivo_id = @arquivoId
+                                          limit 1";
+                
+                return await conn.QueryFirstOrDefaultAsync<long>(query, new { questaoId, arquivoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<bool> RemoverPorIdsAsync(long[] ids)
         {
             using var conn = ObterConexao();

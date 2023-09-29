@@ -4,6 +4,7 @@ using MediatR;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Aplicacao.Queries;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -54,8 +55,13 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
                     {
-                        var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
-                        await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
+                        var arquivoId = await mediator.Send(new ObterIdArquivoPorCaminhoQuery(arquivoParaPersistir.Caminho));
+                        if (arquivoId == 0)
+                            arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+
+                        var questaoArquivoId = await mediator.Send(new ObterQuestaoArquivoIdPorQuestaoIdArquivoIdQuery(questaoId, arquivoId));
+                        if (questaoArquivoId == 0)
+                            await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
                     }
                 }
 
@@ -99,7 +105,6 @@ namespace SME.SERAp.Prova.Aplicacao
                     alternativa.Correta);
 
                 var alternativaId = await mediator.Send(new ObterIdAlternativaPorQuestaoIdLegadoIdQuery(questaoId, alternativa.AlternativaLegadoId));
-
                 if(alternativaId == 0)
                     alternativaId = await mediator.Send(new AlternativaIncluirCommand(alternativaParaPersistir));
 
@@ -110,8 +115,13 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 foreach (var arquivoParaPersistir in alternativaParaPersistir.Arquivos)
                 {
-                    var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
-                    await mediator.Send(new AlternativaArquivoPersistirCommand(alternativaId, arquivoId));
+                    var arquivoId = await mediator.Send(new ObterIdArquivoPorCaminhoQuery(arquivoParaPersistir.Caminho));
+                    if (arquivoId == 0)
+                        arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+
+                    var alternativaArquivoId = await mediator.Send(new ObterAlternativaArquivoIdPorAlternativaIdArquivoIdQuery(alternativaId, arquivoId));
+                    if (alternativaArquivoId == 0)
+                        await mediator.Send(new AlternativaArquivoPersistirCommand(alternativaId, arquivoId));
                 }
             }
         }
@@ -126,8 +136,13 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 foreach (var audioParaPersistir in audiosQuestao)
                 {
-                    var arquivoId = await mediator.Send(new ArquivoPersistirCommand(audioParaPersistir));
-                    await mediator.Send(new QuestaoAudioPersistirCommand(questaoId, arquivoId));
+                    var arquivoId = await mediator.Send(new ObterIdArquivoPorCaminhoQuery(audioParaPersistir.Caminho));
+                    if (arquivoId == 0)
+                        arquivoId = await mediator.Send(new ArquivoPersistirCommand(audioParaPersistir));
+
+                    var questaoAudioId = await mediator.Send(new ObterQuestaoAudioIdPorArquivoIdQuery(arquivoId));
+                    if (questaoAudioId == 0)
+                        await mediator.Send(new QuestaoAudioPersistirCommand(questaoId, arquivoId));
                 }
             }
         }
@@ -166,20 +181,33 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 foreach (var video in videosQuestao)
                 {
-                    var arquivoVideoId = await mediator.Send(new ArquivoPersistirCommand(videos.FirstOrDefault(v => v.LegadoId == video.VideoId)));
+                    var arquivoVideoId = await mediator.Send(new ObterIdArquivoPorCaminhoQuery(video.CaminhoVideo));
+                    if (arquivoVideoId == 0)
+                        arquivoVideoId = await mediator.Send(new ArquivoPersistirCommand(videos.FirstOrDefault(v => v.LegadoId == video.VideoId)));
 
                     long? arquivoThumbnailId = null;
 
                     if (video.ThumbnailVideoId > 0)
-                        arquivoThumbnailId = await mediator.Send(new ArquivoPersistirCommand(thumbnails.FirstOrDefault(t => t.LegadoId == video.ThumbnailVideoId)));
+                    {
+                        arquivoThumbnailId = await mediator.Send(new ObterIdArquivoPorCaminhoQuery(video.CaminhoVideo));
+                        if (arquivoThumbnailId == 0)
+                            arquivoThumbnailId = await mediator.Send(new ArquivoPersistirCommand(thumbnails.FirstOrDefault(t => t.LegadoId == video.ThumbnailVideoId)));
+                    }
 
                     long? arquivoVideoConvertidoId = null;
 
                     if (video.VideoConvertidoId > 0)
-                        arquivoVideoConvertidoId = await mediator.Send(new ArquivoPersistirCommand(videosConvertido.FirstOrDefault(vc => vc.LegadoId == video.VideoConvertidoId)));
+                    {
+                        arquivoVideoConvertidoId = await mediator.Send(new ObterIdArquivoPorCaminhoQuery(video.CaminhoVideo));
+                        if (arquivoVideoConvertidoId == 0)
+                            arquivoVideoConvertidoId = await mediator.Send(new ArquivoPersistirCommand(videosConvertido.FirstOrDefault(vc => vc.LegadoId == video.VideoConvertidoId)));
+                    }
 
+                    var questaoVideoId = await mediator.Send(new ObterQuestaoVideoIdPorQuestaoIdArquivoVideoIdQuery(questaoId, arquivoVideoId));
+                    if (questaoVideoId > 0) 
+                        continue;
+                    
                     var questaoVideoInserir = new QuestaoVideo(questaoId, arquivoVideoId, arquivoThumbnailId, arquivoVideoConvertidoId);
-
                     await mediator.Send(new QuestaoVideoPersistirCommand(questaoVideoInserir));
                 }
             }
@@ -187,6 +215,10 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task TratarQuestaoTri(ItemAmostraTaiDto questaoSerap, long questaoId)
         {
+            var questaoTri = await mediator.Send(new ObterQuestaoTriPorQuestaoIdQuery(questaoId));
+            if (questaoTri != null)
+                return;
+            
             var questaoTriInserir = new QuestaoTri
             {
                 QuestaoId = questaoId,

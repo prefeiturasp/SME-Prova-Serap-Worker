@@ -48,10 +48,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     foreach (var configItem in dadosAmostra.ListaConfigItens)
                     {
-                        var itensAmostra = (await mediator
-                                .Send(new ObterItensAmostraTaiQuery(configItem.MatrizId,
-                                    new[] { configItem.TipoCurriculoGradeId })))
-                            .ToList();
+                        var itensAmostra = await mediator
+                            .Send(new ObterItensAmostraTaiQuery(configItem.MatrizId,
+                                new[] { configItem.TipoCurriculoGradeId }));
 
                         var numeroItens = dadosAmostra.NumeroItensAmostra * configItem.Porcentagem / 100;
 
@@ -60,8 +59,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         
                         var itensAmostraUtilizar = itensAmostra
                             .Where(c => !amostrasUtilizar.Select(x => x.ItemId).Contains(c.ItemId))
-                            .Take(numeroItens)
-                            .ToList();
+                            .Take(numeroItens);
                         
                         amostrasUtilizar.AddRange(itensAmostraUtilizar);
 

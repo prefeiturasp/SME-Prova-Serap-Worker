@@ -1,44 +1,30 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Infra;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TratarQuestaoCompletaSyncUseCase : ITratarQuestaoCompletaSyncUseCase
+    public class TratarQuestaoCompletaSyncUseCase : AbstractUseCase, ITratarQuestaoCompletaSyncUseCase
     {
-        private const int QUANTIDADE_PAGINACAO = 5000;
-
-        private readonly IRepositorioQuestao repositorioQuestao;
-        private readonly IMediator mediator;
-
-        public TratarQuestaoCompletaSyncUseCase(IRepositorioQuestao repositorioQuestao, IMediator mediator)
+        const int DIAS_ANTERIORES = -3;
+        public TratarQuestaoCompletaSyncUseCase(IMediator mediator) : base(mediator)
         {
-            this.repositorioQuestao = repositorioQuestao;
-            this.mediator = mediator;
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var pagina = 1;
-            IEnumerable<QuestaoAtualizada> questoesAtualizadas;
-            do
-            {
-                questoesAtualizadas = await repositorioQuestao.ObterQuestoesAtualizadas(pagina, QUANTIDADE_PAGINACAO);
-                if (questoesAtualizadas != null && questoesAtualizadas.Any())
-                {
-                    foreach (var questaoAtualizada in questoesAtualizadas)
-                    {
-                        if (questaoAtualizada.UltimaAtualizacao != questaoAtualizada.UltimaAtualizacaoQuestao.GetValueOrDefault())
-                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaTratar, questaoAtualizada));
-                    }
-                }
+            var dataBase = DateTime.Now.AddDays(DIAS_ANTERIORES);
+            var provasAtualizadas = await mediator.Send(new ObterProvasPorUltimaAtualizacaoQuery(dataBase));
 
-                pagina++;
+            if (provasAtualizadas != null && provasAtualizadas.Any())
+            {
+                foreach (var provaAtualizada in provasAtualizadas)
+                {
+                    await mediator.Send(await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaProva, provaAtualizada)));
+                }
             }
-            while (questoesAtualizadas.Any());
 
             return true;
         }

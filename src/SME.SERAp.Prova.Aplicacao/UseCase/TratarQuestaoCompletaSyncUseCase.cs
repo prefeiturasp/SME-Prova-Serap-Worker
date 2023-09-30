@@ -22,7 +22,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 foreach (var provaAtualizada in provasAtualizadas)
                 {
-                    await mediator.Send(await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaProva, provaAtualizada)));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaProva, provaAtualizada));
                 }
             }
 

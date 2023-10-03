@@ -22,7 +22,7 @@ namespace SME.SERAp.Prova.Infra
 
         public static string ConverterObjectParaJson(this object obj)
         {
-            return JsonSerializer.Serialize(obj, ObterConfigSerializer());
+            return obj == null ? string.Empty : JsonSerializer.Serialize(obj, ObterConfigSerializer());
         }
     }
 }

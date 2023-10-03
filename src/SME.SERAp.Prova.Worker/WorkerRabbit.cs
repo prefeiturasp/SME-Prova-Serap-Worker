@@ -80,6 +80,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception ex)
                 {
+                    logger.LogCritical(null, ex, ex.Message);
                     servicolog.Registrar($"Erro ao tratar mensagem {ea.DeliveryTag}", ex);
                 }
             };
@@ -322,27 +323,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             if (comandos.ContainsKey(rota))
             {
                 logger.LogInformation("Worker rota: {Rota}", rota);
-                logger.LogInformation(mensagem);
-                
+
                 var transacao = servicoTelemetria.IniciarTransacao(rota);
-
-                logger.LogInformation("Iniciou a transacao APM");
-
-                MensagemRabbit mensagemRabbit = null;
-                
-                try
-                {
-                    mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
-                }
-                catch (Exception e)
-                {
-                    logger.LogCritical(null, e, e.Message);
-                    throw;
-                }
-                
-                logger.LogInformation("Serializou a mensagem rabbit:", mensagemRabbit);
+                var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
                 var comandoRabbit = comandos[rota];
-                logger.LogInformation("Obter o comando rabbit.");
 
                 try
                 {

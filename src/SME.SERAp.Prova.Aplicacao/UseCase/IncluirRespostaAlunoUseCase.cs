@@ -2,6 +2,7 @@
 using SME.SERAp.Prova.Infra;
 using System;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra.Exceptions;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -17,6 +18,10 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var dto = mensagemRabbit.ObterObjetoMensagem<QuestaoAlunoRespostaSincronizarDto>();
+
+            if (dto == null)
+                throw new ErroException("Resposta não processada.");
+            
             var horaDataResposta = new DateTime(dto.DataHoraRespostaTicks);
             
             horaDataResposta = horaDataResposta.AddHours(-3);

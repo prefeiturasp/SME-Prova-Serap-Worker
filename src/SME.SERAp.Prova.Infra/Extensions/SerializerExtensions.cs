@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace SME.SERAp.Prova.Infra
 {
@@ -10,7 +11,15 @@ namespace SME.SERAp.Prova.Infra
             {
                 PropertyNameCaseInsensitive = true
             };
-            return JsonSerializer.Deserialize<T>(objectString, jsonSerializerOptions);
+            return System.Text.Json.JsonSerializer.Deserialize<T>(objectString, jsonSerializerOptions);
         }
+        
+        public static T ConverterObjectStringPraObjetoNewtonsoft<T>(this string objectString)
+        {
+            return JsonConvert.DeserializeObject<T>(objectString, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+        }      
     }
 }

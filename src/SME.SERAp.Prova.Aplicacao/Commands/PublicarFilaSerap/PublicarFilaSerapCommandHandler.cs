@@ -28,11 +28,9 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var mensagem = new MensagemRabbit(request.Mensagem, Guid.NewGuid());
+                var body = Encoding.UTF8.GetBytes(mensagem.ConverterObjectParaJson());
 
-                var mensagemJson = JsonSerializer.Serialize(mensagem);
-                var body = Encoding.UTF8.GetBytes(mensagemJson);
-
-                using (IModel canal = connectionRabbit.CreateModel())
+                using (var canal = connectionRabbit.CreateModel())
                 {
                     var props = canal.CreateBasicProperties();
                     props.Persistent = true;

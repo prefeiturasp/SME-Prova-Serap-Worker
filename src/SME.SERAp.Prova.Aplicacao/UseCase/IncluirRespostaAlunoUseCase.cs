@@ -22,6 +22,11 @@ namespace SME.SERAp.Prova.Aplicacao
             if (dto == null)
                 throw new ErroException("Resposta não processada.");
             
+            var questao = await mediator.Send(new ObterQuestaoPorIdQuery(dto.QuestaoId));
+
+            if (questao == null)
+                throw new ErroException($"A questão {dto.QuestaoId} não existe.");            
+            
             var horaDataResposta = new DateTime(dto.DataHoraRespostaTicks);
             
             horaDataResposta = horaDataResposta.AddHours(-3);
@@ -30,11 +35,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (questaoRespondida == null)
             {
-                var questao = await mediator.Send(new ObterQuestaoPorIdQuery(dto.QuestaoId));
-
-                if (questao == null)
-                    throw new ErroException($"A questão {dto.QuestaoId} não existe.");
-                
                 return await mediator.Send(new IncluirQuestaoAlunoRespostaCommand(dto.QuestaoId,
                     dto.AlunoRa,
                     dto.AlternativaId,

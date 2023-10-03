@@ -324,7 +324,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 logger.LogInformation("Worker rota: {Rota}", rota);
                 var transacao = servicoTelemetria.IniciarTransacao(rota);
 
-                var mensagemRabbit = mensagem.ConverterObjectStringPraObjetoNewtonsoft<MensagemRabbit>();
+                var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
                 var comandoRabbit = comandos[rota];
 
                 try

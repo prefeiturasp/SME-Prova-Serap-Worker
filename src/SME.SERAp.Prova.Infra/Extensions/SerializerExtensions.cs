@@ -13,13 +13,5 @@ namespace SME.SERAp.Prova.Infra
             };
             return System.Text.Json.JsonSerializer.Deserialize<T>(objectString, jsonSerializerOptions);
         }
-        
-        public static T ConverterObjectStringPraObjetoNewtonsoft<T>(this string objectString)
-        {
-            return JsonConvert.DeserializeObject<T>(objectString, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
-        }      
     }
 }

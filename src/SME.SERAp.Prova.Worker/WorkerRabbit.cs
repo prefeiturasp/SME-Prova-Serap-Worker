@@ -326,14 +326,18 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 
                 var transacao = servicoTelemetria.IniciarTransacao(rota);
 
+                logger.LogInformation("Iniciou a transacao APM");
                 var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
+                
+                logger.LogInformation("Serializou a mensagem rabbit:", mensagemRabbit);
                 var comandoRabbit = comandos[rota];
+                logger.LogInformation("Obter o comando rabbit.");
 
                 try
                 {
                     using var scope = serviceScopeFactory.CreateScope();
                     var casoDeUso = scope.ServiceProvider.GetService(comandoRabbit.TipoCasoUso);
-
+                    
                     await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, mensagemRabbit);
 
                     channel.BasicAck(ea.DeliveryTag, false);

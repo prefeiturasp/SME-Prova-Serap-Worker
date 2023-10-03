@@ -30,6 +30,11 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (questaoRespondida == null)
             {
+                var questao = await mediator.Send(new ObterQuestaoPorIdQuery(dto.QuestaoId));
+
+                if (questao == null)
+                    throw new ErroException($"A questão {dto.QuestaoId} não existe.");
+                
                 return await mediator.Send(new IncluirQuestaoAlunoRespostaCommand(dto.QuestaoId,
                     dto.AlunoRa,
                     dto.AlternativaId,

@@ -336,7 +336,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception e)
                 {
-                    logger.LogCritical(null, e);
+                    logger.LogCritical(null, e, e.Message);
+                    throw;
                 }
                 
                 logger.LogInformation("Serializou a mensagem rabbit:", mensagemRabbit);

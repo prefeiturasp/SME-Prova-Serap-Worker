@@ -322,6 +322,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             if (comandos.ContainsKey(rota))
             {
                 logger.LogInformation("Worker rota: {Rota}", rota);
+                logger.LogInformation(mensagem);
+                
                 var transacao = servicoTelemetria.IniciarTransacao(rota);
 
                 var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();

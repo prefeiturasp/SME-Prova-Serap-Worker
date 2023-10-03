@@ -80,6 +80,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception ex)
                 {
+                    logger.LogCritical(null, ex, ex.Message);
                     servicolog.Registrar($"Erro ao tratar mensagem {ea.DeliveryTag}", ex);
                 }
             };

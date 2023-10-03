@@ -327,7 +327,17 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 var transacao = servicoTelemetria.IniciarTransacao(rota);
 
                 logger.LogInformation("Iniciou a transacao APM");
-                var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
+
+                MensagemRabbit mensagemRabbit = null;
+                
+                try
+                {
+                    mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
+                }
+                catch (Exception e)
+                {
+                    logger.LogCritical(null, e);
+                }
                 
                 logger.LogInformation("Serializou a mensagem rabbit:", mensagemRabbit);
                 var comandoRabbit = comandos[rota];

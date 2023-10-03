@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Polly;
 using Polly.Registry;
 using RabbitMQ.Client;
@@ -27,10 +27,19 @@ namespace SME.SERAp.Prova.Infra.Services
 
         public async Task<bool> Publicar(MensagemRabbit mensagemRabbit, string rota, string exchange, string nomeAcao)
         {
+            /* TODO: removido
             var mensagem = JsonConvert.SerializeObject(mensagemRabbit, new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
             });
+            */
+            
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };            
+
+            var mensagem = JsonSerializer.Serialize(mensagemRabbit, jsonSerializerOptions);
             var body = Encoding.UTF8.GetBytes(mensagem);
 
             await servicoTelemetria.RegistrarAsync(

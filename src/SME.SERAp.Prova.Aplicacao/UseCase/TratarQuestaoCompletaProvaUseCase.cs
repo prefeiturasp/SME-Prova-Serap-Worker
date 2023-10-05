@@ -10,7 +10,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
 {
     public class TratarQuestaoCompletaProvaUseCase : AbstractUseCase, ITratarQuestaoCompletaProvaUseCase
     {
-        private const int QUANTIDADE_PAGINACAO = 5000;
+        private const int QUANTIDADE_PAGINACAO = 100000;
         public TratarQuestaoCompletaProvaUseCase(IMediator mediator) : base(mediator)
         {
         }

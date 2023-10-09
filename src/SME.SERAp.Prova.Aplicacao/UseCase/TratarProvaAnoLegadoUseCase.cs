@@ -25,14 +25,16 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             try
             {
-                var provaId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
+                var provaLegadoId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
 
-                var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaId));
-                var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(provaId));
+                var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaLegadoId));
+                var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(provaLegadoId));
+                
+                await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
 
                 if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
                 {
-                    var provaAnoDetalhes = (await mediator.Send(new ObterProvaAnoLegadoDetalhesPorIdQuery(provaId))).ToList();
+                    var provaAnoDetalhes = (await mediator.Send(new ObterProvaAnoLegadoDetalhesPorIdQuery(provaLegadoId))).ToList();
 
                     var ids = provaAnoDetalhes.Select(t => t.TcpId).ToArray();
                     var provaAnosDepara = (await mediator.Send(new ObterProvaAnoDeparaPorTcpIdQuery(ids))).ToList();
@@ -54,7 +56,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 else
                 {
                     if (provaLegado == null)
-                        throw new Exception($"Prova {provaId} não localizada!");
+                        throw new Exception($"Prova {provaLegadoId} não localizada!");
 
                     foreach (var ano in provaLegado.Anos)
                         await mediator.Send(new ProvaAnoIncluirCommand(new ProvaAno(ano, provaAtual.Id, provaAtual.Modalidade)));

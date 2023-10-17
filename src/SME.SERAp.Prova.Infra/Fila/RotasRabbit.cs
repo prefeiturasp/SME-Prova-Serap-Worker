@@ -60,6 +60,7 @@
         public const string UsuarioGrupoAbrangenciaExcluirTratar = "serap.estudante.usuario.grupo.abrangencia.excluir.tratar";
 
         public const string QuestaoCompletaSync = "serap.estudante.questao.completa.legado.sync";
+        public const string QuestaoCompletaProva = "serap.estudante.questao.completa.legado.prova";
         public const string QuestaoCompletaTratar = "serap.estudante.questao.completa.legado.tratar";
 
         public const string TratarCadernosProvaTai = "serap.estudante.prova.legado.tratar.cadernos.amostra.tai";

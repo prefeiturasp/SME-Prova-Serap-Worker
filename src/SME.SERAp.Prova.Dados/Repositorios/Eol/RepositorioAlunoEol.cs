@@ -51,7 +51,7 @@ namespace SME.SERAp.Prova.Dados
         public async Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo)
         {            
             var query = $@";with mtr_norm as (
-								select ROW_NUMBER() OVER(PARTITION BY amn.CodigoMatricula ORDER BY amn.DataSituacao DESC) AS Linha,
+								select ROW_NUMBER() OVER(PARTITION BY amn.CodigoMatricula ORDER BY amn.DataSituacao DESC, amn.CodigoSituacaoMatricula) AS Linha,
 									amn.CodigoAluno,
 									amn.CodigoTurma,
 									amn.AnoLetivo,

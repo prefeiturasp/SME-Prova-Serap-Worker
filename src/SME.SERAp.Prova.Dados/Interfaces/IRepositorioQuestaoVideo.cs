@@ -9,5 +9,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<QuestaoVideo>> ObterPorQuestaoId(long questaoId);
         Task<IEnumerable<QuestaoVideo>> ObterPorProvaId(long provaId);
         Task<bool> RemoverPorIdsAsync(long[] ids);
+        Task<long> ObterQuestaoVideoIdPorQuestaoIdArquivoVideoId(long questaoId, long arquivoVideoId);
     }
 }

@@ -47,7 +47,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     Componente = componente
                 };
 
-                var json = JsonSerializer.Serialize(obterItensProvaTaiDto);
+                var json = obterItensProvaTaiDto.ConverterObjectParaJson();
                 var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = await client.PostAsync(apiROptions.UrlAmostra, stringContent, cancellationToken);
 

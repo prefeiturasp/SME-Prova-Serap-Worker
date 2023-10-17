@@ -1,6 +1,8 @@
 ﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -328,9 +330,9 @@ namespace SME.SERAp.Prova.Dados
                 const string query = @"select p.id as ProvaId,
                                         p.prova_legado_id as ProvaLegadoId,
                                         p.disciplina,
-                                        pa.ano
+                                        pao.ano
                                         from prova p
-                                        inner join prova_ano pa on pa.prova_id = p.id
+                                        inner join prova_ano_original pao on pao.prova_id = p.id
                                         where p.formato_tai = true";
 
                 return await conn.QueryAsync<ProvaTaiSyncDto>(query);
@@ -398,6 +400,24 @@ namespace SME.SERAp.Prova.Dados
                 var query = @"select prova_id_origem_caderno from prova p where p.id = @provaId";
 
                 return await conn.QueryFirstOrDefaultAsync<long?>(query, new { provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<ProvaAtualizadaDto>> ObterProvaPorUltimaAtualizacao(DateTime dataBase)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select p.id as provaId, p.ultima_atualizacao as UltimaAtualizacao
+                              from prova p
+                              where p.ultima_atualizacao > @dataBase";
+
+                return await conn.QueryAsync<ProvaAtualizadaDto>(query, new { dataBase });
             }
             finally
             {

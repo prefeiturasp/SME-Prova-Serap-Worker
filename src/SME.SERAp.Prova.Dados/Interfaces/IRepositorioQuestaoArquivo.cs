@@ -8,5 +8,6 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<bool> RemoverPorIdsAsync(long[] ids);
         Task<IEnumerable<QuestaoArquivo>> ObterArquivosPorProvaIdAsync(long id);
+        Task<long> ObterQuestaoArquivoIdPorQuestaoIdArquivoId(long questaoId, long arquivoId);
     }
 }

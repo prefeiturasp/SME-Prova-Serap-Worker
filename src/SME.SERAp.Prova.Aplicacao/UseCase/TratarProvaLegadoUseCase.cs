@@ -91,14 +91,11 @@ namespace SME.SERAp.Prova.Aplicacao
                     provaAtual.QtdItensSincronizacaoRespostas = provaLegado.QtdItensSincronizacaoRespostas;
 
                     await mediator.Send(new ProvaAtualizarCommand(provaAtual));
-                    
-                    if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
-                    {
-                        await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
-                    }
-                    
                     await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
+
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
+
                     return true;
                 }
 
@@ -108,9 +105,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
 
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
-
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
-
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaGrupoPermissaoTratar, new ProvaIdsDto(provaParaTratar.Id, provaLegado.Id)));
 
             var contextosProva = (await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaLegadoId))).ToList();

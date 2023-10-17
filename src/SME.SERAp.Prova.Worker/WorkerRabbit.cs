@@ -80,6 +80,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception ex)
                 {
+                    logger.LogCritical(null, ex, ex.Message);
                     servicolog.Registrar($"Erro ao tratar mensagem {ea.DeliveryTag}", ex);
                 }
             };
@@ -194,6 +195,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             // Questao completa
             comandos.Add(RotasRabbit.QuestaoCompletaSync, new ComandoRabbit("Sincronização das questoes completas", typeof(ITratarQuestaoCompletaSyncUseCase)));
+            comandos.Add(RotasRabbit.QuestaoCompletaProva, new ComandoRabbit("Sincronização das questoes completas por prova", typeof(ITratarQuestaoCompletaProvaUseCase)));
             comandos.Add(RotasRabbit.QuestaoCompletaTratar, new ComandoRabbit("Realiza a atualização dos dados completos da questão", typeof(ITratarQuestaoCompletaUseCase)));
 
             // proficiencia
@@ -321,8 +323,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             if (comandos.ContainsKey(rota))
             {
                 logger.LogInformation("Worker rota: {Rota}", rota);
-                var transacao = servicoTelemetria.IniciarTransacao(rota);
 
+                var transacao = servicoTelemetria.IniciarTransacao(rota);
                 var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
                 var comandoRabbit = comandos[rota];
 
@@ -330,7 +332,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 {
                     using var scope = serviceScopeFactory.CreateScope();
                     var casoDeUso = scope.ServiceProvider.GetService(comandoRabbit.TipoCasoUso);
-
+                    
                     await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, mensagemRabbit);
 
                     channel.BasicAck(ea.DeliveryTag, false);

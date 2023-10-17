@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -103,7 +104,7 @@ namespace SME.SERAp.Prova.Dados
                 query.AppendLine(" join arquivo ar on ar.id = aa.arquivo_id ");
                 query.AppendLine(" where q.id = @id; ");
 
-                using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id });
+                using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id }, commandTimeout: 300);
                 var questaoCompleta = await sqlMapper.ReadFirstOrDefaultAsync<QuestaoCompletaDto>();
 
                 if (questaoCompleta == null || questaoCompleta.Id <= 0)
@@ -132,18 +133,22 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas()
+        public async Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas(long provaId, int pagina, int quantidade)
         {
+            var ignorarRegistros = ((pagina - 1) * quantidade);
             using var conn = ObterConexao();
             try
             {
-                var query = @"select q.id, p.ultima_atualizacao as UltimaAtualizacao 
-                              from prova p
-                              left join questao q on q.prova_id = p.id 
-                              left join questao_completa qc on qc.id = q.id 
-                              where p.ultima_atualizacao <> qc.ultima_atualizacao or qc.ultima_atualizacao is null";
-
-                return await conn.QueryAsync<QuestaoAtualizada>(query);
+                var query = @"select 
+                                q.id,
+                                qc.ultima_atualizacao as UltimaAtualizacaoQuestao 
+                              from questao q
+                              left join questao_completa qc on qc.id = q.id
+                              where q.prova_id = @provaId
+                              order by q.prova_id, q.id
+                              limit @quantidade offset @ignorarRegistros";
+                
+                return await conn.QueryAsync<QuestaoAtualizada>(query, new { provaId, quantidade, ignorarRegistros });
             }
             finally
             {
@@ -182,6 +187,21 @@ namespace SME.SERAp.Prova.Dados
                 await conn.ExecuteAsync(query, new { provaId });
 
                 return true;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<long> ObterIdQuestaoPorProvaIdCadernoLegadoId(long provaId, string caderno, long questaoLegadoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select id from questao where prova_id = @provaId and caderno = @caderno and questao_legado_id = @questaoLegadoId";
+                return await conn.ExecuteScalarAsync<long>(query, new { provaId, caderno, questaoLegadoId });
             }
             finally
             {

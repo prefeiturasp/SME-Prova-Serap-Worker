@@ -1,5 +1,7 @@
 ﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -22,5 +24,6 @@ namespace SME.SERAp.Prova.Dados
         Task<bool> FinalizarProvaAsync(ProvaParaAtualizarDto provaParaAtualizar);
         Task<IEnumerable<ProvaAlunoDto>> ObterProvasIniciadasPorModalidadeAsync(int modalidade);
         Task<IEnumerable<ProvaTaiSyncDto>> ObterProvasTaiAsync();
+        Task<IEnumerable<ProvaAtualizadaDto>> ObterProvaPorUltimaAtualizacao(DateTime dataBase);
     }
 }

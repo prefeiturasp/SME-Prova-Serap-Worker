@@ -25,5 +25,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<ProvaAlunoDto>> ObterProvasIniciadasPorModalidadeAsync(int modalidade);
         Task<IEnumerable<ProvaTaiSyncDto>> ObterProvasTaiAsync();
         Task<IEnumerable<ProvaAtualizadaDto>> ObterProvaPorUltimaAtualizacao(DateTime dataBase);
+        Task<bool> VerificaSePossuiDownload(long provaId);
     }
 }

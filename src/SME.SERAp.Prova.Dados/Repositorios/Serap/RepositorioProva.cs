@@ -5,6 +5,7 @@ using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static Slapper.AutoMapper;
 
 namespace SME.SERAp.Prova.Dados
 {
@@ -418,6 +419,26 @@ namespace SME.SERAp.Prova.Dados
                               where p.ultima_atualizacao > @dataBase";
 
                 return await conn.QueryAsync<ProvaAtualizadaDto>(query, new { dataBase });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<bool> VerificaSePossuiDownload(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select 1
+                              from prova p
+                              left join downloads_prova_aluno dpa on dpa.prova_id = p.id
+                              where p.id = @provaId limit 1"
+                ;
+
+                return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaId });
             }
             finally
             {

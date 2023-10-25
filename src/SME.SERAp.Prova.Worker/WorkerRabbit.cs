@@ -214,6 +214,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarTipoProvaDeficiencia, new ComandoRabbit("Faz a sincronização dos tipos de deficiência do tipo de prova", typeof(ITratarTipoProvaDeficienciaUseCase)));
             comandos.Add(RotasRabbit.TratarAlunoDeficiencia, new ComandoRabbit("Faz a sincronização dos tipos de deficiência do aluno", typeof(ITratarAlunoDeficienciaUseCase)));
 
+            comandos.Add(RotasRabbit.ProvaWebPushTesteSync, new ComandoRabbit("Faz a sincronização do teste de webpush", typeof(IProvaWebPushTesteSyncUseCase)));
             comandos.Add(RotasRabbit.ProvaWebPushTeste, new ComandoRabbit("Teste de webpush", typeof(IProvaWebPushTesteUseCase)));
 
             // Sincronização das UES e turmas

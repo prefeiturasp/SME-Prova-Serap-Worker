@@ -58,7 +58,11 @@ namespace SME.SERAp.Prova.Dados
 									amn.CodigoSituacaoMatricula,
 									amn.DataSituacao
 								from alunos_matriculas_norm amn
+								inner join turma_escola te on te.cd_turma_escola = amn.CodigoTurma
+								inner join serie_turma_grade stg on te.cd_turma_escola = stg.cd_turma_escola
+								inner join serie_ensino se on se.cd_serie_ensino = stg.cd_serie_ensino
 								where amn.CodigoTurma in ({string.Join(',', turmasCodigo)})
+								  and se.cd_etapa_ensino not in (14, 18)
 							)
 
 							SELECT distinct
@@ -88,7 +92,6 @@ namespace SME.SERAp.Prova.Dados
 							WHERE matricula.Linha = 1
 							  and turesc.cd_tipo_turma = 1
 							  and CodigoSituacaoMatricula in (1, 6, 10, 13, 5) -- Alunos que podem acessar o serap
-							  and se.cd_etapa_ensino not in (14, 18)
 							order by aluno.nm_aluno";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);

@@ -13,6 +13,7 @@
         public const string AlternativaTratar = "serap.estudante.alternativa.legado.tratar";
         public const string ProvaBIBSync = "serap.estudante.provabib.sync";
         public const string ProvaBIBTratar = "serap.estudante.provabib.tratar";
+        public const string ProvaWebPushTesteSync = "serap.estudante.prova.webpush.teste.sync";
         public const string ProvaWebPushTeste = "serap.estudante.prova.webpush.teste";
         public const string IncluirRespostaAluno = "serap.estudante.resposta.aluno.incluir";
         public const string IncluirPreferenciasAluno = "serap.estudante.preferencias.aluno.incluir";

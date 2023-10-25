@@ -35,8 +35,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (todosAlunosTurmaEol == null || !todosAlunosTurmaEol.Any())
                     throw new NegocioException("Não foi possível localizar os alunos no Eol para a sincronização instituicional.");
 
-                var alunosEolParaTratarCodigos = todosAlunosTurmaEol.Select(a => a.CodigoAluno).Distinct();
-                var todosAlunosSerap = await mediator.Send(new ObterAlunosSerapPorCodigosQuery(alunosEolParaTratarCodigos.ToArray()));
+                var todosAlunosSerap = await mediator.Send(new ObterAlunosSerapPorTurmasIdsQuery(turmas.Select(c => c.Id).ToArray()));
 
                 foreach (var turma in turmas)
                 {
@@ -188,7 +187,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             if (alunosTurmaSerap.Any())
             {
-                var alunosInativos = alunosTurmaSerap.Where(t => alunosTurmaEol.All(x => x.CodigoAluno != t.RA)).ToList();
+                var alunosInativos = alunosTurmaSerap.Where(t => alunosTurmaEol.All(x => x.CodigoAluno != t.RA));
 
                 if (alunosInativos.Any())
                 {

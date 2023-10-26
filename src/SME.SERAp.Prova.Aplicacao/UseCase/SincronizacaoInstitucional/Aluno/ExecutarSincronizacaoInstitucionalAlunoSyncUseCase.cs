@@ -35,7 +35,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (todosAlunosTurmaEol == null || !todosAlunosTurmaEol.Any())
                     throw new NegocioException("Não foi possível localizar os alunos no Eol para a sincronização instituicional.");
 
-                var todosAlunosSerap = await mediator.Send(new ObterAlunosSerapPorTurmasIdsQuery(turmas.Select(c => c.Id).ToArray()));
+                var alunosEolParaTratarCodigos = todosAlunosTurmaEol.Select(a => a.CodigoAluno).Distinct().ToArray();
+                var todosAlunosSerap = await mediator.Send(new ObterAlunosSerapPorCodigosQuery(alunosEolParaTratarCodigos));
 
                 foreach (var turma in turmas)
                 {
@@ -45,7 +46,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     {
                         TratarInclusao(alunosTurmaEol, todosAlunosSerap, turma.Id),
                         TratarAlteracao(alunosTurmaEol, todosAlunosSerap, turma),
-                        TratarInativo(alunosTurmaEol, todosAlunosSerap, turma.Id)
+                        TratarInativo(alunosTurmaEol, turma.Id)
                     };
 
                     // -> processamento concorrente
@@ -183,12 +184,12 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
-        private async Task TratarInativo(IEnumerable<AlunoEolDto> alunosTurmaEol, IEnumerable<Aluno> alunosTurmaSerap, long turmaId)
+        private async Task TratarInativo(IEnumerable<AlunoEolDto> alunosTurmaEol, long turmaId)
         {
+            var alunosTurmaSerap = await mediator.Send(new ObterAlunosSerapPorTurmasIdsQuery(turmaId));
             if (alunosTurmaSerap.Any())
             {
                 var alunosInativos = alunosTurmaSerap.Where(t => alunosTurmaEol.All(x => x.CodigoAluno != t.RA));
-
                 if (alunosInativos.Any())
                 {
                     await mediator.Send(new InativarAlunosCommand(turmaId, alunosInativos));

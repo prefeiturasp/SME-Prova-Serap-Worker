@@ -46,11 +46,12 @@ namespace SME.SERAp.Prova.Aplicacao
                     {
                         TratarInclusao(alunosTurmaEol, todosAlunosSerap, turma.Id),
                         TratarAlteracao(alunosTurmaEol, todosAlunosSerap, turma),
-                        TratarInativo(alunosTurmaEol, turma.Id)
                     };
 
                     // -> processamento concorrente
                     Task.WaitAll(tasks);
+
+                    await TratarInativo(alunosTurmaEol, turma.Id);
                 }
 
                 var turmasIds = turmas.Select(c => c.Id).Distinct().ToArray();
@@ -143,8 +144,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     //-> Valida se existe alguma informação a ser alterada.
                     if (alunoAntigo.Nome == alunoQuePodeAlterar.Nome &&
                         alunoAntigo.Situacao == alunoQuePodeAlterar.SituacaoAluno &&
-                        alunoAntigo.DataNascimento.Date == alunoQuePodeAlterar.DataNascimento.Date &&
-                        alunoAntigo.NomeSocial == alunoQuePodeAlterar.NomeSocial &&
+                        alunoAntigo.DataNascimento.ToUniversalTime().Date == alunoQuePodeAlterar.DataNascimento.Date &&
+                        alunoAntigo.NomeSocial?.ToString() == alunoQuePodeAlterar.NomeSocial?.ToString() &&
                         alunoAntigo.Sexo == alunoQuePodeAlterar.Sexo &&
                         turmaAntigaDoAluno.Codigo == alunoQuePodeAlterar.TurmaCodigo.ToString())
                     {

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Dominio.Enums;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -40,9 +41,15 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 foreach (var turma in turmas)
                 {
+                    if ((turma.Id == 27680 || turma.Id == 27673) && todosAlunosTurmaEol.Any(c => c.CodigoAluno == 6563771))
+                    {
+                        var certoErrado = turma.Id == 27680 ? "errada" : "certa";
+                        servicoLog.Registrar(LogNivel.Informacao, $"Turma {certoErrado}: {turma.Id}.");
+                    }
+
                     var alunosTurmaEol = todosAlunosTurmaEol.Where(c => c.TurmaCodigo.ToString() == turma.Codigo);
 
-                    var tasks = new Task[]
+                    var tasks = new[]
                     {
                         TratarInclusao(alunosTurmaEol, todosAlunosSerap, turma.Id),
                         TratarAlteracao(alunosTurmaEol, todosAlunosSerap, turma),
@@ -81,17 +88,17 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (alunosNovosParaIncluir.Any())
                 {
                     var alunosNovosParaIncluirNormalizada = alunosNovosParaIncluir.Select(a => new Aluno
-                    {
-                        Nome = a.Nome,
-                        RA = a.CodigoAluno,
-                        Situacao = a.SituacaoAluno,
-                        NomeSocial = a.NomeSocial,
-                        Sexo = a.Sexo,
-                        DataNascimento = a.DataNascimento,
-                        TurmaId = turmaId,
-                        DataAtualizacao = a.DataSituacao
+                        {
+                            Nome = a.Nome,
+                            RA = a.CodigoAluno,
+                            Situacao = a.SituacaoAluno,
+                            NomeSocial = a.NomeSocial,
+                            Sexo = a.Sexo,
+                            DataNascimento = a.DataNascimento,
+                            TurmaId = turmaId,
+                            DataAtualizacao = a.DataSituacao
                     }).ToList();
-
+                    
                     await mediator.Send(new InserirAlunosCommand(alunosNovosParaIncluirNormalizada));
                 }
             }
@@ -113,17 +120,31 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 foreach (var alunoQuePodeAlterar in alunosQuePodemAlterar)
                 {
+                    var ehAlunoQueNaoSicroniza = alunoQuePodeAlterar.CodigoAluno == 6563771;
+                    
+                    if (ehAlunoQueNaoSicroniza)
+                        servicoLog.Registrar(LogNivel.Informacao, $"Aluno que não sincroniza: {alunoQuePodeAlterar.CodigoAluno}.");
+                    
                     var alunoAntigo = alunosTurmaSerap.FirstOrDefault(a => a.RA == alunoQuePodeAlterar.CodigoAluno);
 
                     if (alunoAntigo == null)
                         continue;
 
+                    if (ehAlunoQueNaoSicroniza)
+                        servicoLog.Registrar(LogNivel.Informacao, $"Obteve o aluno antigo {alunoAntigo.RA}.");
+                    
                     var turmaFix = await mediator.Send(new ObterTurmaSerapPorIdQuery(alunoAntigo.TurmaId));
 
                     if (turmaFix == null)
                         continue;
+                    
+                    if (ehAlunoQueNaoSicroniza)
+                        servicoLog.Registrar(LogNivel.Informacao, $"Obteve a turma Fix {turmaFix.Id}");
 
                     var turmaAntigaDoAluno = new TurmaSgpDto { Id = turmaFix.Id, Codigo = turmaFix.Codigo };
+                    
+                    if (ehAlunoQueNaoSicroniza)
+                        servicoLog.Registrar(LogNivel.Informacao, $"Obteve a turma antiga do aluno {turmaAntigaDoAluno.Id}.");
 
                     if (turmaFix.ModalidadeCodigo == (int)Modalidade.EJA && turma.ModalidadeCodigo == (int)Modalidade.EJA
                                                                          && turmaFix.Semestre > turma.Semestre
@@ -131,6 +152,9 @@ namespace SME.SERAp.Prova.Aplicacao
                                                                          && turmaFix.Codigo != turma.Codigo)
                     {
                         alunoQuePodeAlterar.TurmaCodigo = long.Parse(turmaAntigaDoAluno.Codigo);
+                        
+                        if (ehAlunoQueNaoSicroniza)
+                            servicoLog.Registrar(LogNivel.Informacao, "Retornou a turma antiga para o aluno a ser alterado.");
                     }
 
                     //-> Atualiza somente se for a ultima situação do aluno do ano letivo mais atual.
@@ -138,6 +162,9 @@ namespace SME.SERAp.Prova.Aplicacao
                         (turmaFix.AnoLetivo != turma.AnoLetivo ||
                          alunoAntigo.DataAtualizacao > alunoQuePodeAlterar.DataSituacao))
                     {
+                        if (ehAlunoQueNaoSicroniza)
+                            servicoLog.Registrar(LogNivel.Informacao, "Aluno não atualizado: Atualiza somente se for a ultima situação do aluno do ano letivo mais atual.");                        
+                        
                         continue;
                     }
 
@@ -149,19 +176,34 @@ namespace SME.SERAp.Prova.Aplicacao
                         alunoAntigo.Sexo == alunoQuePodeAlterar.Sexo &&
                         turmaAntigaDoAluno.Codigo == alunoQuePodeAlterar.TurmaCodigo.ToString())
                     {
+                        if (ehAlunoQueNaoSicroniza)
+                            servicoLog.Registrar(LogNivel.Informacao, "Aluno não atualizado: Valida se existe alguma informação a ser alterada.");
+                        
                         continue;
                     }
 
                     var turmaId = alunoAntigo.TurmaId;
+                    
+                    if (ehAlunoQueNaoSicroniza)
+                        servicoLog.Registrar(LogNivel.Informacao, $"Turma ID: {turmaId}.");
 
                     if (turmaAntigaDoAluno.Codigo != alunoQuePodeAlterar.TurmaCodigo.ToString())
                     {
                         turmaId = turma.Id;
+                        
+                        if (ehAlunoQueNaoSicroniza)
+                            servicoLog.Registrar(LogNivel.Informacao, $"Atualizou para o novo ID da Turma: {turmaId}.");                        
 
                         await mediator.Send(new PublicaFilaRabbitCommand(
                             RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar,
                             new[] { alunoQuePodeAlterar.CodigoAluno }));
+                        
+                        if (ehAlunoQueNaoSicroniza)
+                            servicoLog.Registrar(LogNivel.Informacao, "Publicou na fila: SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar.");                        
                     }
+                    
+                    if (ehAlunoQueNaoSicroniza)
+                        servicoLog.Registrar(LogNivel.Informacao, $"Aluno adicionado na lista de alteração: Aluno ID: {alunoAntigo.Id}, RA: {alunoQuePodeAlterar.CodigoAluno}, Turma ID: {turmaId}.");
 
                     listaParaAlterar.Add(new Aluno
                     {
@@ -179,6 +221,11 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (listaParaAlterar.Any())
                 {
+                    var alunoQueNaoAltera = listaParaAlterar.FirstOrDefault(c => c.RA == 6563771);
+                    
+                    if (alunoQueNaoAltera != null)
+                        servicoLog.Registrar(LogNivel.Informacao, $"O aluno {alunoQueNaoAltera.RA} será atualizado com a turma: {alunoQueNaoAltera.TurmaId}.");
+                    
                     await mediator.Send(new AlterarAlunosCommand(listaParaAlterar));
                     await mediator.Send(new RemoverAlunosCacheCommand(listaParaAlterar.Select(x => x.RA).Distinct().ToArray()));
                 }

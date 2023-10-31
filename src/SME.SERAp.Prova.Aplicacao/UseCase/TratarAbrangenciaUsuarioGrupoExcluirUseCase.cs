@@ -1,10 +1,8 @@
-﻿
-using MediatR;
+﻿using MediatR;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,7 +19,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new NegocioException("Abrangencia deve ser informada");
 
             var grupo = await mediator.Send(new ObterGrupoSerapPorIdQuery(abrangencia.GrupoId));
+            if (grupo == null)
+                throw new NegocioException("Grupo não localizado.");
+            
             var usuario = await mediator.Send(new ObterUsuarioSerapPorIdQuery(abrangencia.UsuarioId));
+            if (usuario == null)
+                throw new NegocioException("Usuário não localizado.");
 
             var dre = new Dre();
             if (abrangencia.DreId != null)

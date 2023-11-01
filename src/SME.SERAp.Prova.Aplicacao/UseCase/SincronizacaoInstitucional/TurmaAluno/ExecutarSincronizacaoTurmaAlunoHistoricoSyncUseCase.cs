@@ -32,10 +32,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 var todosAlunosTurmaSerap = await mediator.Send(new ObterAlunosSerapPorTurmasIdsQuery(turmasIds));
 
                 var alunosParaSincronizacaoInstitucional = todosAlunosTurmaSerap.Select(alunoTurma =>
-                        new AlunoParaSincronizacaoInstitucionalDto(alunoTurma.Id, alunoTurma.RA, alunoTurma.TurmaId))
-                    .ToList();
+                    new AlunoParaSincronizacaoInstitucionalDto(alunoTurma.Id, alunoTurma.RA, alunoTurma.TurmaId));
 
-                for (var i = 0; i < alunosParaSincronizacaoInstitucional.Count; i+= 10)
+                for (var i = 0; i < alunosParaSincronizacaoInstitucional.Count(); i+= 10)
                 {
                     var alunosParaTratar = alunosParaSincronizacaoInstitucional.Skip(i).Take(10);
                     

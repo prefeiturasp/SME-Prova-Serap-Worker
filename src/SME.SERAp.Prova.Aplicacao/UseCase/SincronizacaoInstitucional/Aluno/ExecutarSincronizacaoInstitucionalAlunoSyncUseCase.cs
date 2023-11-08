@@ -159,9 +159,15 @@ namespace SME.SERAp.Prova.Aplicacao
                     {
                         turmaId = turma.Id;
 
+                        var alunosParaTratar = new List<AlunoParaSincronizacaoInstitucionalDto>
+                        {
+                            new AlunoParaSincronizacaoInstitucionalDto(alunoAntigo.Id, alunoQuePodeAlterar.CodigoAluno,
+                                turmaId)
+                        };
+
                         await mediator.Send(new PublicaFilaRabbitCommand(
                             RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar,
-                            new[] { alunoQuePodeAlterar.CodigoAluno }));
+                            alunosParaTratar));
                     }
 
                     listaParaAlterar.Add(new Aluno

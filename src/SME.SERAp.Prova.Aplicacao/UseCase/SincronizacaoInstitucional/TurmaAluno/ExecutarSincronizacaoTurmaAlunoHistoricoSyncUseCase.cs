@@ -40,7 +40,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     
                     await mediator.Send(new PublicaFilaRabbitCommand(
                         RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoTratar,
-                        alunosParaTratar));
+                        alunosParaTratar.ToList()));
                 }
 
                 return true;

@@ -63,7 +63,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             questaoRespondida.Resposta = dto.Resposta;
             questaoRespondida.AlternativaId = dto.AlternativaId;
-            questaoRespondida.TempoRespostaAluno += dto.TempoRespostaAluno ?? 0;
+            questaoRespondida.TempoRespostaAluno = dto.TempoRespostaAluno ?? 0;
             questaoRespondida.CriadoEm = horaDataResposta;
             questaoRespondida.Visualizacoes += 1;
             questaoRespondida.DispositivoId = dto.DispositivoId;

@@ -434,7 +434,7 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"select 1
                               from prova p
-                              left join downloads_prova_aluno dpa on dpa.prova_id = p.id
+                              inner join downloads_prova_aluno dpa on dpa.prova_id = p.id
                               where p.id = @provaId limit 1"
                 ;
 

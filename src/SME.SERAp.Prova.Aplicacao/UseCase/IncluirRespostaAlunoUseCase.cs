@@ -2,16 +2,20 @@
 using SME.SERAp.Prova.Infra;
 using System;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Dominio.Enums;
+using SME.SERAp.Prova.Infra.Interfaces;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class IncluirRespostaAlunoUseCase : IIncluirRespostaAlunoUseCase
     {
         private readonly IMediator mediator;
+        private readonly IServicoLog servicoLog;
 
-        public IncluirRespostaAlunoUseCase(IMediator mediator)
+        public IncluirRespostaAlunoUseCase(IMediator mediator, IServicoLog servicoLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -25,13 +29,21 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (questaoRespondida == null)
             {
-                return await mediator.Send(new IncluirQuestaoAlunoRespostaCommand(dto.QuestaoId,
-                    dto.AlunoRa,
-                    dto.AlternativaId,
-                    dto.Resposta,
-                    horaDataResposta,
-                    dto.TempoRespostaAluno ?? 0,
-                    dto.DispositivoId));
+                var questao = await mediator.Send(new ObterQuestaoPorIdQuery(dto.QuestaoId));
+
+                if (questao != null)
+                {
+                    return await mediator.Send(new IncluirQuestaoAlunoRespostaCommand(dto.QuestaoId,
+                        dto.AlunoRa,
+                        dto.AlternativaId,
+                        dto.Resposta,
+                        horaDataResposta,
+                        dto.TempoRespostaAluno ?? 0,
+                        dto.DispositivoId));
+                }
+
+                servicoLog.Registrar(LogNivel.Informacao,$"Questão não existe na base de dados: {mensagemRabbit.Mensagem.ToString()}");
+                return false;
             }
 
             if (questaoRespondida.CriadoEm.Date > DateTime.Now.Date)

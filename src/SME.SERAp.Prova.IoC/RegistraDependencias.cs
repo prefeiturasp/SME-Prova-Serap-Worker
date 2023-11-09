@@ -127,6 +127,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarQuestoesLegadoSyncUseCase, TratarQuestoesLegadoSyncUseCase>();
             services.AddScoped<ITratarProvaBIBSyncUseCase, TratarProvaBIBSyncUseCase>();
             services.AddScoped<ITratarProvaBIBUseCase, TratarProvaBIBUseCase>();
+            services.AddScoped<IProvaWebPushTesteSyncUseCase, ProvaWebPushTesteSyncUseCase>();
             services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();
             services.AddScoped<IAtualizaImagensQuestoesUseCase, AtualizaImagensQuestoesUseCase>();
             services.AddScoped<IAtualizaImagensAlternativasUseCase, AtualizaImagensAlternativasUseCase>();

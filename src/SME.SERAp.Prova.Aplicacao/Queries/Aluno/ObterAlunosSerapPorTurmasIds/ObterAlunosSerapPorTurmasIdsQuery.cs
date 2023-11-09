@@ -6,7 +6,7 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterAlunosSerapPorTurmasIdsQuery : IRequest<IEnumerable<Aluno>>
     {
-        public ObterAlunosSerapPorTurmasIdsQuery(long[] turmasIds)
+        public ObterAlunosSerapPorTurmasIdsQuery(params long[] turmasIds)
         {
             TurmasIds = turmasIds;
         }

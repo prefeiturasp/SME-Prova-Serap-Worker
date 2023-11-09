@@ -28,21 +28,39 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var dre = new Dre();
             if (abrangencia.DreId != null)
-                dre = await mediator.Send(new ObterDrePorIdQuery(abrangencia.DreId.GetValueOrDefault()));
+            {
+                var dreId = abrangencia.DreId.GetValueOrDefault();
+                dre = await mediator.Send(new ObterDrePorIdQuery(dreId));
+                
+                if (dre == null)
+                    throw new NegocioException($"Dre {dreId} não localizada.");
+            }
 
             var ue = new Ue();
             if (abrangencia.UeId != null)
-                ue = await mediator.Send(new ObterUePorIdQuery(abrangencia.UeId.GetValueOrDefault()));
+            {
+                var ueId = abrangencia.UeId.GetValueOrDefault();
+                ue = await mediator.Send(new ObterUePorIdQuery(ueId));
+                
+                if (ue == null)
+                    throw new NegocioException($"Ue {ueId} não localizada.");                
+            }
 
             var turma = new Turma();
             if (abrangencia.TurmaId != null)
-                turma = await mediator.Send(new ObterTurmaSerapPorIdQuery(abrangencia.TurmaId.GetValueOrDefault()));
+            {
+                var turmaId = abrangencia.TurmaId.GetValueOrDefault();
+                turma = await mediator.Send(new ObterTurmaSerapPorIdQuery(turmaId));
+                
+                if (turma == null)
+                    throw new NegocioException($"Turma {turmaId} não localizada.");                
+            }
 
             if (grupo.IdCoreSso == GruposCoreSso.Professor || grupo.IdCoreSso == GruposCoreSso.Professor_old)
             {
                 var atribuicoes = await mediator.Send(new ObterTurmaAtribuidasEolPorUsuarioQuery(usuario.Login, long.Parse(turma.Codigo), turma.AnoLetivo));
 
-                if (!atribuicoes.Any(t => t.AnoLetivo == turma.AnoLetivo && t.TurmaCodigo.ToString() == turma.Codigo))
+                if (atribuicoes != null && !atribuicoes.Any(t => t.AnoLetivo == turma.AnoLetivo && t.TurmaCodigo.ToString() == turma.Codigo))
                     await mediator.Send(new ExcluirAbrangenciaPorIdCommand(abrangencia.Id));
             }
             else
@@ -51,11 +69,14 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (codigosAbrangencia == null || !codigosAbrangencia.Any())
                     codigosAbrangencia = await mediator.Send(new ObterUeDreAtribuidasEolPorUsuarioQuery(usuario.Login));
 
-                if (abrangencia.DreId != null && abrangencia.UeId == null && abrangencia.TurmaId is null)
-                    await VerificarExcluirAbrangencia(codigosAbrangencia.ToArray(), dre.CodigoDre, abrangencia.Id);
+                if (codigosAbrangencia != null)
+                {
+                    if (abrangencia.DreId != null && abrangencia.UeId == null && abrangencia.TurmaId is null)
+                        await VerificarExcluirAbrangencia(codigosAbrangencia.ToArray(), dre.CodigoDre, abrangencia.Id);
 
-                if (abrangencia.DreId != null && abrangencia.UeId != null && abrangencia.TurmaId is null)
-                    await VerificarExcluirAbrangencia(codigosAbrangencia.ToArray(), ue.CodigoUe, abrangencia.Id);
+                    if (abrangencia.DreId != null && abrangencia.UeId != null && abrangencia.TurmaId is null)
+                        await VerificarExcluirAbrangencia(codigosAbrangencia.ToArray(), ue.CodigoUe, abrangencia.Id);
+                }
             }
 
             return true;

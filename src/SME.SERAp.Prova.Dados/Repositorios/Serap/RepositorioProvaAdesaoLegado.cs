@@ -49,6 +49,9 @@ namespace SME.SERAp.Prova.Dados
 									ON ttcp.tur_id = tc.tur_id AND
 										ttcp.crp_ordem = tc.crp_id AND
 										tc.tcr_situacao = 1
+  	                                INNER JOIN TestCurriculumGrade tcg2 ON tcg2.Test_Id = t.Id 
+	                                	and tcg2.TypeCurriculumGradeId = tc.tcp_id 
+  	                                	and tcg2.State = 1
 									INNER JOIN sgp_aca_tipocurriculoperiodo tcg (nolock)
 									ON tcg.tcp_id = tc.tcp_id AND tc.tcr_situacao = 1
 									INNER JOIN sgp_aca_curso cur (nolock)

@@ -296,6 +296,18 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoCicloTurma, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Turma", typeof(ITratarProficienciaCicloTurmaUseCase)));            
             comandos.Add(RotasRabbit.ImportarResultadoCicloDrePsp, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Dre ", typeof(IImportarResultadoCicloDreUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoCicloDre, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Dre", typeof(ITratarResultadoCicloDreUseCase)));
+            
+            // Propagar Cache
+            comandos.Add(RotasRabbit.PropagarCache, new ComandoRabbit("Propagar o cache", typeof(IPropagarCacheUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheParametros, new ComandoRabbit("Propagar o cache dos parâmetros", typeof(IPropagarCacheParametrosUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheProvasAnos, new ComandoRabbit("Propagar o cache das provas e anos", typeof(IPropagarCacheProvasAnosUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheProvasLiberadas, new ComandoRabbit("Propagar o cache das provas liberadas", typeof(IPropagarCacheProvasLiberadasUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheProvasLiberadasTratar, new ComandoRabbit("Propagar o cache por prova", typeof(IPropagarCacheProvasLiberadasTratarUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheResumoQuestoesProva, new ComandoRabbit("Propagar o cache do resumo das questões da prova", typeof(IPropagarCacheResumoQuestoesProvaUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasProva, new ComandoRabbit("Propagar o cache das questões completas da prova", typeof(IPropagarCacheQuestoesCompletasProvaUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasProvaTratar, new ComandoRabbit("Propagar o cache da questão completa", typeof(IPropagarCacheQuestoesCompletasProvaTratarUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasLegadoProva, new ComandoRabbit("Propagar o cache das questões completas do legado", typeof(IPropagarCacheQuestoesCompletasLegadoProvaUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasLegadoProvaTratar, new ComandoRabbit("Propagar o cache da questão completa do legado", typeof(IPropagarCacheQuestoesCompletasLegadoProvaTratarUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

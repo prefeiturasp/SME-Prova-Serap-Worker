@@ -132,6 +132,17 @@
         public const string TratarResultadoCicloDre = "serap.resultados.psp.resultado.ciclo.dre.tratar";
         
         public const string ProvaTaiSync = "serap.estudante.provatai.sync";
-        public const string ProvaTaiTratar = "serap.estudante.provatai.tratar";        
+        public const string ProvaTaiTratar = "serap.estudante.provatai.tratar";
+
+        public const string PropagarCache = "serap.estudante.propagar.cache";
+        public const string PropagarCacheParametros = "serap.estudante.propagar.cache.parametros";
+        public const string PropagarCacheProvasAnos = "serap.estudante.propagar.cache.provas.anos";
+        public const string PropagarCacheProvasLiberadas = "serap.estudante.propagar.cache.provas.liberadas";
+        public const string PropagarCacheProvasLiberadasTratar = "serap.estudante.propagar.cache.provas.liberadas.tratar";
+        public const string PropagarCacheResumoQuestoesProva = "serap.estudante.propagar.cache.resumo.questoes.prova";
+        public const string PropagarCacheQuestoesCompletasProva = "serap.estudante.propagar.cache.questoes.completas.prova";
+        public const string PropagarCacheQuestoesCompletasProvaTratar = "serap.estudante.propagar.cache.questoes.completas.prova.tratar";
+        public const string PropagarCacheQuestoesCompletasLegadoProva = "serap.estudante.propagar.cache.questoes.completas.legado.prova";
+        public const string PropagarCacheQuestoesCompletasLegadoProvaTratar = "serap.estudante.propagar.cache.questoes.completas.legado.prova.tratar";        
     }
 }

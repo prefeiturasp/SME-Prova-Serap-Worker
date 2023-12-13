@@ -66,7 +66,6 @@ namespace SME.SERAp.Prova.Dominio
         public bool FormatoTai { get; set; }
         public ProvaFormatoTaiItem? ProvaFormatoTaiItem { get; set; }
         public int? QtdItensSincronizacaoRespostas { get; set; }
-
         public bool PermiteAvancarSemResponderTai { get; set; }
         public bool PermiteVoltarItemAnteriorTai { get; set; }
         public DateTime UltimaAtualizacao { get; set; }

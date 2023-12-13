@@ -5,14 +5,16 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class SalvarCacheCommandCommand : IRequest<bool>
     {
-        public SalvarCacheCommandCommand(string nomeCache, object valor)
+        public SalvarCacheCommandCommand(string nomeCache, object valor, int? minutosParaExpirar = null)
         {
             NomeCache = nomeCache;
             Valor = valor;
+            MinutosParaExpirar = minutosParaExpirar;
         }
 
         public string NomeCache { get; }
         public object Valor { get; }
+        public int? MinutosParaExpirar { get; }
     }
 
     public class SalvarCacheCommandCommandValidator : AbstractValidator<SalvarCacheCommandCommand>
@@ -26,6 +28,10 @@ namespace SME.SERAp.Prova.Aplicacao
             RuleFor(x => x.Valor)
                 .NotEmpty()
                 .WithMessage("Informe o valor da chave para salvar o cache");
+
+            RuleFor(x => x.MinutosParaExpirar)
+                .GreaterThan(0).When(x => x.MinutosParaExpirar != null)
+                .WithMessage("Minutos para expirar deve ser maior que 0.");
         }
     }
 }

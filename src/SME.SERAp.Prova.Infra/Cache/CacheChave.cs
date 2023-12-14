@@ -2,7 +2,6 @@
 {
     public static class CacheChave
     {
-        public const string CachePropagado = "cache-propagado";
         /// <summary>
         /// Questões resumidas da prova do aluno
         /// 0 - Prova Id

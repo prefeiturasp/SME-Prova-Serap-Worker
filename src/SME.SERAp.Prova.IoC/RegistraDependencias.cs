@@ -130,6 +130,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarFrequenciaAlunoProvaUseCase, TratarFrequenciaAlunoProvaUseCase>();
             services.AddScoped<ITratarFrequenciaAlunoProvaSyncUseCase, TratarFrequenciaAlunoProvaSyncUseCase>();
 
+            //Exportação resultados
+            services.AddScoped<IExcluirDadosConsolidadoUseCase, ExcluirDadosConsolidadoUseCase>();
             services.AddScoped<IExtracaoProvaResultadoUseCase, TratarProvaResultadoExtracaoUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
 
@@ -218,7 +220,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IImportarResultadoParticipacaoSmeUseCase, ImportarResultadoParticipacaoSmeUseCase>();
             services.AddScoped<ITratarResultadoParticipacaoSmeUseCase, TratarResultadoParticipacaoSmeUseCase>();
             services.AddScoped<IImportarResultadoParticipacaoSmeAreaConhecimentoUseCase, ImportarResultadoParticipacaoSmeAreaConhecimentoUseCase>();
-            services.AddScoped<ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase, TratarResultadoParticipacaoSmeAreaConhecimentoUseCase>();
+            services.AddScoped<ITratarResultadoParticipacaoSmeAreaConhecimentoUseCase, TratarResultadoParticipacaoSmeAreaConhecimentoUseCase>();            
         }
     }
 }

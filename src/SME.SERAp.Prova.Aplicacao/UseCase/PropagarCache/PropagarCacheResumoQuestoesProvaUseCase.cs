@@ -29,7 +29,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             
             var chaveCache = string.Format(CacheChave.QuestaoProvaResumo, provaId);
-            await mediator.Send(new SalvarCacheCommandCommand(chaveCache, resumoQuestoes));
+            await mediator.Send(new SalvarCacheCommand(chaveCache, resumoQuestoes));
 
             return true;
         }

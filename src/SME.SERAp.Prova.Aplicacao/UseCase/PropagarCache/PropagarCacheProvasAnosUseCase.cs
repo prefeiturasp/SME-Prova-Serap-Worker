@@ -20,7 +20,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             
             var minutosParaUmDia = (int)TimeSpan.FromDays(1).TotalMinutes;                
-            await mediator.Send(new SalvarCacheCommandCommand(CacheChave.ProvasAnosDatasEModalidades, provasAnos, minutosParaUmDia));
+            await mediator.Send(new SalvarCacheCommand(CacheChave.ProvasAnosDatasEModalidades, provasAnos, minutosParaUmDia));
 
             return true;
         }

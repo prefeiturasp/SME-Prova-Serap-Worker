@@ -3,9 +3,9 @@ using MediatR;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class SalvarCacheCommandCommand : IRequest<bool>
+    public class SalvarCacheCommand : IRequest<bool>
     {
-        public SalvarCacheCommandCommand(string nomeCache, object valor, int? minutosParaExpirar = null)
+        public SalvarCacheCommand(string nomeCache, object valor, int? minutosParaExpirar = null)
         {
             NomeCache = nomeCache;
             Valor = valor;
@@ -17,9 +17,9 @@ namespace SME.SERAp.Prova.Aplicacao
         public int? MinutosParaExpirar { get; }
     }
 
-    public class SalvarCacheCommandCommandValidator : AbstractValidator<SalvarCacheCommandCommand>
+    public class SalvarCacheCommandValidator : AbstractValidator<SalvarCacheCommand>
     {
-        public SalvarCacheCommandCommandValidator()
+        public SalvarCacheCommandValidator()
         {
             RuleFor(x => x.NomeCache)
                 .NotEmpty()

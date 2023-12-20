@@ -25,7 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (sincronizandoProvaAlunoTai)
                     return false;
 
-                await mediator.Send(new SalvarCacheCommandCommand(nomeChave, true));
+                await mediator.Send(new SalvarCacheCommand(nomeChave, true));
 
                 var caderno = alunoProva.AlunoId.ToString();
 

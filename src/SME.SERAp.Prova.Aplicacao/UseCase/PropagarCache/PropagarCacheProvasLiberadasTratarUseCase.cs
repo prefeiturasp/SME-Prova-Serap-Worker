@@ -30,7 +30,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var chaveCache = string.Format(CacheChave.Prova, provaId);
             var minutosParaUmDia = (int)TimeSpan.FromDays(1).TotalMinutes;
-            await mediator.Send(new SalvarCacheCommandCommand(chaveCache, prova, minutosParaUmDia));
+            await mediator.Send(new SalvarCacheCommand(chaveCache, prova, minutosParaUmDia));
             
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.PropagarCacheResumoQuestoesProva, provaId));
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.PropagarCacheQuestoesCompletasProva, provaId));

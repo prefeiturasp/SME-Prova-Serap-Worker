@@ -30,7 +30,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var chaveCache = string.Format(CacheChave.QuestaoCompletaLegado, questaoId);
             var minutosParaUmDia = (int)TimeSpan.FromDays(1).TotalMinutes;
-            await mediator.Send(new SalvarCacheCommandCommand(chaveCache, questaoCompleta.Json, minutosParaUmDia));
+            await mediator.Send(new SalvarCacheJsonCommand(chaveCache, questaoCompleta.Json, minutosParaUmDia));
 
             return true;
         }

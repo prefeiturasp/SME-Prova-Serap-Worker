@@ -25,7 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (sincronizandoProvaAlunoTai)
                     return false;
 
-                await mediator.Send(new SalvarCacheCommandCommand(nomeChave, true));
+                await mediator.Send(new SalvarCacheCommand(nomeChave, true));
 
                 var caderno = alunoProva.AlunoId.ToString();
 
@@ -89,7 +89,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 //-> Limpar o cache
                 await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
                 await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
-                await RemoverQuestaoProvaResumoCache(alunoProva.ProvaId, alunoProva.AlunoId);
+                await RemoverQuestaoProvaAlunoResumoCache(alunoProva.ProvaId, alunoProva.AlunoId);
+                await RemoverQuestaoProvaResumoCache(alunoProva.ProvaId);
 
                 await mediator.Send(new RemoverCacheCommand(nomeChave));
                 return true;
@@ -258,10 +259,15 @@ namespace SME.SERAp.Prova.Aplicacao
                 alunoRa, provaId)));
         }
 
-        private async Task RemoverQuestaoProvaResumoCache(long provaId, long alunoId)
+        private async Task RemoverQuestaoProvaAlunoResumoCache(long provaId, long alunoId)
         {
-            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaResumo,
+            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaAlunoResumo,
                 provaId, alunoId)));
         }
+        
+        private async Task RemoverQuestaoProvaResumoCache(long provaId)
+        {
+            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaResumo, provaId)));
+        }        
     }
 }

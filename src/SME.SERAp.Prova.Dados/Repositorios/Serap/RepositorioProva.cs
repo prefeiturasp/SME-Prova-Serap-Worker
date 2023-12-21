@@ -5,7 +5,6 @@ using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static Slapper.AutoMapper;
 
 namespace SME.SERAp.Prova.Dados
 {
@@ -439,6 +438,21 @@ namespace SME.SERAp.Prova.Dados
                 ;
 
                 return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<Dominio.Prova>> ObterProvasLiberadasNoPeriodoParaCacheAsync()
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                const string query = "select * from prova where inicio_download::date <= current_date and fim::date >= current_date";
+                return await conn.QueryAsync<Dominio.Prova>(query);
             }
             finally
             {

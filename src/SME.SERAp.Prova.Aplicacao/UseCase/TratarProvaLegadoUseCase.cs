@@ -45,18 +45,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var modalidadeSerap = ObterModalidade(provaLegado.Modalidade, provaLegado.ModeloProva);
             var tipoProvaSerap = await ObterTipoProva(provaLegado.TipoProva);
-
-            ProvaFormatoTaiItem? provaFormatoTaiItem = null;
-            
-            if (provaLegado.FormatoTai)
-            {
-                provaFormatoTaiItem = await mediator.Send(new ObterProvaLegadoItemFormatoTaiQuery(provaLegadoId));
-
-                if (provaFormatoTaiItem == null)
-                    throw new Exception($"Formato Tai Item da prova {provaLegadoId} não localizado no legado.");
-            }
-
-            var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap, provaFormatoTaiItem);
+            var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap);
 
             if (provaAtual == null)
             {
@@ -133,12 +122,12 @@ namespace SME.SERAp.Prova.Aplicacao
             return true;
         }
 
-        private static Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap, ProvaFormatoTaiItem? provaFormatoTaiItem)
+        private static Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap)
         {
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
-                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, provaFormatoTaiItem,
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, 
                 provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem,
                 provaLegado.ExibirAudio, provaLegado.ExibirVideo);
         }

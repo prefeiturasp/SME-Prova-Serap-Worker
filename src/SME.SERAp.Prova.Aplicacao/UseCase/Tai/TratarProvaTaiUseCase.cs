@@ -26,14 +26,13 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var provaTai = mensagemRabbit.ObterObjetoMensagem<ProvaTaiSyncDto>();
 
-            var alunosProvaTaiSemCaderno = (await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaTai.ProvaId, provaTai.Ano))).ToList();
-            var alunosAtivosProvaTaiSemCaderno = alunosProvaTaiSemCaderno.Where(c => c.Ativo()).ToList();
+            var alunosProvaTaiSemCaderno = await mediator.Send(new ObterAlunosProvaTaiSemCadernoQuery(provaTai.ProvaId, provaTai.Ano));
+            var alunosAtivosProvaTaiSemCaderno = alunosProvaTaiSemCaderno.Where(c => c.Ativo());
             
             if (alunosAtivosProvaTaiSemCaderno == null || !alunosAtivosProvaTaiSemCaderno.Any())
                 throw new NegocioException("Todos os alunos já possuem cadernos para a prova.");
 
-            var dadosDaAmostraTai = (await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaTai.ProvaLegadoId))).ToList();
-            
+            var dadosDaAmostraTai = await mediator.Send(new ObterDadosAmostraProvaTaiQuery(provaTai.ProvaLegadoId));
             if (dadosDaAmostraTai == null || !dadosDaAmostraTai.Any())
                 throw new NegocioException($"Os dados da amostra tai não foram cadastrados para a prova {provaTai.ProvaLegadoId}");
             
@@ -42,35 +41,19 @@ namespace SME.SERAp.Prova.Aplicacao
 
             foreach (var dadosAmostra in dadosDaAmostraTai)
             {
-                var resto = dadosAmostra.NumeroItensAmostra;
-
-                while (resto > 0)
+                foreach (var configItem in dadosAmostra.ListaConfigItens)
                 {
-                    foreach (var configItem in dadosAmostra.ListaConfigItens)
-                    {
-                        var itensAmostra = await mediator
-                            .Send(new ObterItensAmostraTaiQuery(configItem.MatrizId,
-                                new[] { configItem.TipoCurriculoGradeId }));
-
-                        var numeroItens = dadosAmostra.NumeroItensAmostra * configItem.Porcentagem / 100;
-
-                        if (numeroItens > resto)
-                            numeroItens = resto;
-                        
-                        var itensAmostraUtilizar = itensAmostra
-                            .Where(c => !amostrasUtilizar.Select(x => x.ItemId).Contains(c.ItemId))
-                            .Take(numeroItens);
-                        
-                        amostrasUtilizar.AddRange(itensAmostraUtilizar);
-
-                        resto -= numeroItens;
-                        
-                        if (resto <= 0)
-                            break;
-                    }
+                    var itensAmostra = await mediator
+                        .Send(new ObterItensAmostraTaiQuery(configItem.MatrizId,
+                            new[] { configItem.TipoCurriculoGradeId }));
+                    
+                    var itensAmostraUtilizar = itensAmostra
+                        .Where(c => !amostrasUtilizar.Select(x => x.ItemId).Contains(c.ItemId));
+                    
+                    amostrasUtilizar.AddRange(itensAmostraUtilizar);
                 }
 
-                if (!amostrasUtilizar.Any() || amostrasUtilizar.Count < dadosAmostra.NumeroItensAmostra)
+                if (!amostrasUtilizar.Any())
                 {
                     listaLog.Add($"A quantidade de itens configurados com TRI é menor do que o número de itens para a prova {provaTai.ProvaLegadoId}.");
                     continue;                    
@@ -78,7 +61,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai,
                     new CadernoProvaTaiTratarDto(provaTai.ProvaId, provaTai.ProvaLegadoId, provaTai.Disciplina,
-                        alunosAtivosProvaTaiSemCaderno, dadosAmostra.NumeroItensAmostra, amostrasUtilizar, provaTai.Ano)));                
+                        alunosAtivosProvaTaiSemCaderno, amostrasUtilizar, provaTai.Ano)));                
             }
 
             if (!listaLog.Any()) 

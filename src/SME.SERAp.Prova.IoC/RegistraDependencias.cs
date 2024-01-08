@@ -108,7 +108,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoCicloEscola, RepositorioResultadoCicloEscola>();
             services.AddScoped<IRepositorioResultadoCicloTurma, RepositorioResultadoCicloTurma>();
             services.AddScoped<IRepositorioResultadoCicloDre, RepositorioResultadoCicloDre>();
-
+            services.AddScoped<IRepositorioQuestaoAlunoAdministrado, RepositorioQuestaoAlunoAdministrado>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)

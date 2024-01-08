@@ -5,14 +5,13 @@ namespace SME.SERAp.Prova.Infra.Dtos.Tai
     public class CadernoProvaTaiTratarDto : DtoBase
     {
         public CadernoProvaTaiTratarDto(long provaId, long provaLegadoId, string disciplina,
-            List<ProvaAlunoTaiSemCadernoDto> alunosProvaTaiSemCaderno, int numeroItensAmostra,
-            List<ItemAmostraTaiDto> itensAmostra, string ano)
+            IEnumerable<ProvaAlunoTaiSemCadernoDto> alunosProvaTaiSemCaderno,
+            IEnumerable<ItemAmostraTaiDto> itensAmostra, string ano)
         {
             ProvaId = provaId;
             ProvaLegadoId = provaLegadoId;
             Disciplina = disciplina;
             AlunosProvaTaiSemCaderno = alunosProvaTaiSemCaderno;
-            NumeroItensAmostra = numeroItensAmostra;
             ItensAmostra = itensAmostra;
             Ano = ano;
         }
@@ -20,9 +19,8 @@ namespace SME.SERAp.Prova.Infra.Dtos.Tai
         public long ProvaId { get; }
         public long ProvaLegadoId { get; }
         public string Disciplina { get; }
-        public List<ProvaAlunoTaiSemCadernoDto> AlunosProvaTaiSemCaderno { get; }
-        public List<ItemAmostraTaiDto> ItensAmostra { get; }
-        public int NumeroItensAmostra { get; }
+        public IEnumerable<ProvaAlunoTaiSemCadernoDto> AlunosProvaTaiSemCaderno { get; }
+        public IEnumerable<ItemAmostraTaiDto> ItensAmostra { get; }
         public string Ano { get; }
     }
 }

@@ -27,19 +27,16 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 await mediator.Send(new SalvarCacheCommand(nomeChave, true));
 
-                var caderno = alunoProva.AlunoId.ToString();
-
                 var cadernoAluno = new CadernoAluno(
                     alunoProva.AlunoId,
                     alunoProva.ProvaId,
-                    caderno);
+                    alunoProva.Caderno);
 
                 var existe = await mediator.Send(new ExisteCadernoAlunoPorProvaIdAlunoIdQuery(cadernoAluno.ProvaId, cadernoAluno.AlunoId));
                 if (!existe)
                     await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
 
                 var primeiraQuestao = true;
-
                 var questoes = alunoProva.ItensAmostra.Distinct();
 
                 foreach (var questao in questoes)
@@ -48,13 +45,13 @@ namespace SME.SERAp.Prova.Aplicacao
                         questao.TextoBase,
                         questao.ItemId,
                         questao.Enunciado,
-                        primeiraQuestao ? 0 : 999,
+                        999,
                         alunoProva.ProvaId,
                         (QuestaoTipo)questao.TipoItem,
-                        caderno,
+                        alunoProva.Caderno,
                         questao.QuantidadeAlternativas);
 
-                    var questaoId = await mediator.Send(new ObterIdQuestaoPorProvaIdCadernoLegadoIdQuery(alunoProva.ProvaId, caderno, questao.ItemId));
+                    var questaoId = await mediator.Send(new ObterIdQuestaoPorProvaIdCadernoLegadoIdQuery(alunoProva.ProvaId, alunoProva.Caderno, questao.ItemId));
                     if (questaoId == 0)
                         questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
 
@@ -75,14 +72,17 @@ namespace SME.SERAp.Prova.Aplicacao
                     }
 
                     await TratarAudiosQuestao(questao, questaoId);
-
                     await TratarVideosQuestao(questao.ItemId, questaoId);
-
                     await TratarQuestaoTri(questao, questaoId);
 
                     if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
                         await TratarAlternativasQuestao(questao, questaoId);
 
+                    if (!primeiraQuestao) 
+                        continue;
+
+                    await IncluirPrimeiraQuestaoAlunoAdministrado(questaoId, alunoProva.AlunoId);
+                    
                     primeiraQuestao = false;
                 }
 
@@ -91,8 +91,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
                 await RemoverQuestaoProvaAlunoResumoCache(alunoProva.ProvaId, alunoProva.AlunoId);
                 await RemoverQuestaoProvaResumoCache(alunoProva.ProvaId);
-
                 await mediator.Send(new RemoverCacheCommand(nomeChave));
+                
                 return true;
             }
             catch
@@ -102,6 +102,15 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
+        private async Task IncluirPrimeiraQuestaoAlunoAdministrado(long questaoId, long alunoId)
+        {
+            var questaoAlunoAdministrado = new QuestaoAlunoAdministrado(questaoId, alunoId, 0);
+            var questaoAlunoAdministradoId = await mediator.Send(new QuestaoAlunoAdministradoIncluirCommand(questaoAlunoAdministrado));
+                    
+            if (questaoAlunoAdministradoId <= 0)
+                throw new Exception("O administrado da questão do aluno não foi inserido.");            
+        }
+
         private async Task TratarAlternativasQuestao(ItemAmostraTaiDto questaoSerap, long questaoId)
         {
             var alternativasLegadoId = await mediator.Send(new ObterAlternativasLegadoPorIdQuery(questaoSerap.ItemId));
@@ -109,7 +118,6 @@ namespace SME.SERAp.Prova.Aplicacao
             foreach (var alternativaLegadoId in alternativasLegadoId)
             {
                 var alternativa = await mediator.Send(new ObterAlternativaDetalheLegadoPorIdQuery(questaoSerap.ItemId, alternativaLegadoId));
-
                 if (alternativa == null)
                     throw new Exception($"A alternativa {alternativaLegadoId} não localizada!");
 

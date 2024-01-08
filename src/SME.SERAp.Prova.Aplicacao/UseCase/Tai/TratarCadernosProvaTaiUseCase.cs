@@ -3,7 +3,6 @@ using SME.SERAp.Prova.Infra;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.Dtos.Tai;
 using SME.SERAp.Prova.Infra.Exceptions;
 
@@ -39,6 +38,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task PublicarFilaTratarCadernoAluno(CadernoProvaTaiTratarDto cadernoProvaTaiTratar)
         {
+            const string caderno = "1";
+            
             var alunosAtivosProvaTaiSemCaderno = cadernoProvaTaiTratar.AlunosProvaTaiSemCaderno
                 .Where(a => a.Ativo());
 
@@ -46,7 +47,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 var msg = new AlunoCadernoProvaTaiTratarDto(item.ProvaId, item.AlunoId, item.ProvaLegadoId,
                     item.AlunoRa, cadernoProvaTaiTratar.Disciplina, cadernoProvaTaiTratar.ItensAmostra,
-                    cadernoProvaTaiTratar.NumeroItensAmostra, cadernoProvaTaiTratar.Ano);
+                    cadernoProvaTaiTratar.Ano, caderno);
                 
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernoAlunoProvaTai, msg));
             }

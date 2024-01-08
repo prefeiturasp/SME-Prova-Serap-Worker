@@ -55,7 +55,6 @@ namespace SME.SERAp.Prova.Dados
                                             p.apresentar_resultados ApresentarResultados,
                                             p.apresentar_resultados_por_item ApresentarResultadosPorItem,
                                             p.formato_tai FormatoTai,
-                                            p.formato_tai_item FormatoTaiItem,
                                             p.formato_tai_avancar_sem_responder FormatoTaiAvancarSemResponder,
                                             p.formato_tai_voltar_item_anterior FormatoTaiVoltarItemAnterior,
                                             p.exibir_video as ExibirVideo,

@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -9,12 +8,10 @@ namespace SME.SERAp.Prova.Aplicacao
     public class TratarProvaBIBUseCase : ITratarProvaBIBUseCase
     {
         private readonly IMediator mediator;
-        private readonly IServicoLog servicoLog;
 
-        public TratarProvaBIBUseCase(IMediator mediator, IServicoLog servicoLog)
+        public TratarProvaBIBUseCase(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -30,7 +27,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (provaOrigem.HasValue)
                 {
                     caderno = await mediator.Send(new ObterCadernoAlunoPorProvaIdAlunoIdQuery(provaOrigem.Value, provaCadernoAluno.AlunoId));
-
                     if (caderno == null)
                         throw new Exception($"Prova {provaCadernoAluno.ProvaId} Caderno não encontrado para o aluno { provaCadernoAluno.AlunoId} na prova de origem {provaOrigem.Value}");
 

@@ -393,30 +393,6 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId)
-        {
-            using var conn = ObterConexao();
-            try
-            {
-                var query = @"select case when niat.Value = '' then 0 else niat.Value end as value
-                              from NumberItemTestTai nit
-                              left join NumberItemsAplicationTai niat on niat.Id = nit.ItemAplicationTaiId
-                              where nit.TestId = @provaId
-							   and nit.State = 1";
-                var formatos = await conn.QueryAsync<long>(query, new { provaId });
-
-                if (formatos.Any())
-                    return (ProvaFormatoTaiItem)formatos.FirstOrDefault();
-
-                return null;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
-
         public async Task<IEnumerable<AmostraProvaTaiDto>> ObterDadosAmostraProvaTai(long provaId)
         {
             using var conn = ObterConexao();
@@ -432,20 +408,16 @@ namespace SME.SERAp.Prova.Dados
 										)
 										select top 1 nit.TestId ProvaLegadoId,
 											dm.DisciplinaId,
-											niat.[Value] NumeroItensAmostra,
 											nit.AdvanceWithoutAnswering AvancarSemResponder,
 											nit.BackToPreviousItem VoltarAoItemAnterior
 										from NumberItemTestTai nit
-										inner join NumberItemsAplicationTai niat on nit.ItemAplicationTaiId = niat.Id
 										inner join DisciplinaMatriz dm on dm.Test_Id = nit.TestId
 										where nit.[State] = 1
-										and niat.[State] = 1
 										and nit.TestId = @provaId
 										order by nit.Id desc
 
 										select tcg.EvaluationMatrix_Id as MatrizId, 
-											tcg.TypeCurriculumGradeId TipoCurriculoGradeId,
-											tcg.[Percentage] Porcentagem
+											tcg.TypeCurriculumGradeId TipoCurriculoGradeId
 										from TestTaiCurriculumGrade tcg 
 										where tcg.[State] = 1
 										and tcg.Test_Id = @provaId";

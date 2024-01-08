@@ -12,13 +12,11 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         public TratarProficienciaAlunoProvaTaiUseCase(IMediator mediator) : base(mediator)
         {
-
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var proficienciaAlunoProvaTai = mensagemRabbit.ObterObjetoMensagem<ProficienciaAlunoProvaTaiDto>();
-
             if (proficienciaAlunoProvaTai == null)
                 throw new NegocioException("É preciso informar os dados de proficiencia.");
 

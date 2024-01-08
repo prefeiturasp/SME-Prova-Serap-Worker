@@ -52,6 +52,7 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new ProvaGrupoPermissaoMap());
                 config.AddMap(new QuestaoTriMap());
                 config.AddMap(new ResultadoAlunoMap());
+                config.AddMap(new QuestaoAlunoAdministradoMap());
 
                 config.ForDommel();
             });

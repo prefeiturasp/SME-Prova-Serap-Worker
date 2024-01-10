@@ -22,12 +22,10 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var provaLegadoId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
-
             if (provaLegadoId == 0)
                 throw new NegocioException("O Id da prova deve ser informado.");
 
             var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaLegadoId));
-
             if (provaLegado == null)
                 throw new Exception($"Prova {provaLegadoId} não localizada!");
 
@@ -114,9 +112,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
             }
 
-            if (!provaLegado.FormatoTai)
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
             await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
 
             return true;
@@ -151,6 +147,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private async Task RemoverEntidadesFilhas(Dominio.Prova provaAtual)
         {
             await mediator.Send(new ProvaRemoverContextoProvaPorProvaIdCommand(provaAtual.Id));
+            await mediator.Send(new RemoverQuestaoAlunoTaiPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverCadernoAlunosPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAlternativasPorIdCommand(provaAtual.Id));

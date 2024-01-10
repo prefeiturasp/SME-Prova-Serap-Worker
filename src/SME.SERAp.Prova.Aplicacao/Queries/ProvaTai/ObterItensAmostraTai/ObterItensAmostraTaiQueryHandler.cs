@@ -10,7 +10,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterItensAmostraTaiQueryHandler : IRequestHandler<ObterItensAmostraTaiQuery, IEnumerable<ItemAmostraTaiDto>>
     {
-
         private readonly IRepositorioQuestaoLegado repositorioQuestaoLegado;
 
         public ObterItensAmostraTaiQueryHandler(IRepositorioQuestaoLegado repositorioQuestaoLegado)
@@ -20,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<IEnumerable<ItemAmostraTaiDto>> Handle(ObterItensAmostraTaiQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioQuestaoLegado.ObterItensAmostraTai(request.MatrizId, request.TipoCurriculoGradeIds);
+            return await repositorioQuestaoLegado.ObterItensAmostraTai(request.MatrizId, request.TipoCurriculoGradeId);            
         }
     }
 }

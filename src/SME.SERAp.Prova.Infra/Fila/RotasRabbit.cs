@@ -64,7 +64,6 @@
         public const string QuestaoCompletaProva = "serap.estudante.questao.completa.legado.prova";
         public const string QuestaoCompletaTratar = "serap.estudante.questao.completa.legado.tratar";
 
-        public const string TratarCadernosProvaTai = "serap.estudante.prova.legado.tratar.cadernos.amostra.tai";
         public const string TratarCadernoAlunoProvaTai = "serap.estudante.prova.legado.tratar.caderno.aluno.tai";
         public const string TratarOrdemQuestaoAlunoProvaTai = "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
         public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";        

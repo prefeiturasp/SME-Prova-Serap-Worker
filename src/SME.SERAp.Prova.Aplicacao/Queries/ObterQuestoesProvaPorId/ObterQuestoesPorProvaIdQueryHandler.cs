@@ -8,12 +8,12 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterQuestoesProvaPorProvaIdQueryHandler :
+    public class ObterQuestoesPorProvaIdQueryHandler :
         IRequestHandler<ObterQuestoesPorProvaIdQuery, IEnumerable<QuestoesPorProvaIdDto>>
     {
         private readonly IRepositorioProvaLegado repositorioProvaLegado;
 
-        public ObterQuestoesProvaPorProvaIdQueryHandler(IRepositorioProvaLegado repositorioProvaLegado)
+        public ObterQuestoesPorProvaIdQueryHandler(IRepositorioProvaLegado repositorioProvaLegado)
         {
             this.repositorioProvaLegado = repositorioProvaLegado ??
                                           throw new ArgumentNullException(nameof(repositorioProvaLegado));

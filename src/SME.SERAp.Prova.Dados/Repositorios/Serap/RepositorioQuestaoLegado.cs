@@ -9,12 +9,12 @@ namespace SME.SERAp.Prova.Dados
     {
         public RepositorioQuestaoLegado(ConnectionStringOptions connectionStrings) : base(connectionStrings) { }
 
-        public async Task<IEnumerable<ItemAmostraTaiDto>> ObterItensAmostraTai(long matrizId, int[] tipoCurriculoGradeIds)
+        public async Task<IEnumerable<ItemAmostraTaiDto>> ObterItensAmostraTai(long matrizId, int tipoCurriculoGradeId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = @$"select
+                var query = @"select
 								i.Id ItemId,
 								i.ItemCode ItemCodigo,
                                 i.Statement as Enunciado, 
@@ -51,10 +51,10 @@ namespace SME.SERAp.Prova.Dados
 								and i.TRIDiscrimination is not null
 								and i.TRIDifficulty is not null
 								and i.TRICasualSetting is not null
-								and icg.TypeCurriculumGradeId in({string.Join(",", tipoCurriculoGradeIds)})
+								and icg.TypeCurriculumGradeId = @tipoCurriculoGradeId
 								and i.ItemVersion = (select max(i2.ItemVersion) from Item i2 where i2.Id = i.Id)";
 
-                return await conn.QueryAsync<ItemAmostraTaiDto>(query, new { matrizId });
+                return await conn.QueryAsync<ItemAmostraTaiDto>(query, new { matrizId, tipoCurriculoGradeId });
             }
             finally
             {

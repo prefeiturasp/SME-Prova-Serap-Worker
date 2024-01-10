@@ -21,10 +21,10 @@ namespace SME.SERAp.Prova.Aplicacao
             var questao = await mediator.Send(new ObterQuestaoPorIdQuery(ordemQuestaoTai.QuestaoId));
             await Validacoes(questao);
 
-            var questaoAlunoAdministrado = new QuestaoAlunoAdministrado(ordemQuestaoTai.QuestaoId,
+            var questaoAlunoTai = new QuestaoAlunoTai(ordemQuestaoTai.QuestaoId,
                 ordemQuestaoTai.AlunoId, ordemQuestaoTai.Ordem);
             
-            await mediator.Send(new QuestaoAlunoAdministradoIncluirCommand(questaoAlunoAdministrado));
+            await mediator.Send(new QuestaoAlunoTaiIncluirCommand(questaoAlunoTai));
 
             return true;
         }

@@ -11,15 +11,18 @@ namespace SME.SERAp.Prova.Aplicacao
     public class ObterDadosAmostraProvaTaiQueryHandler : IRequestHandler<ObterDadosAmostraProvaTaiQuery, IEnumerable<AmostraProvaTaiDto>>
     {   
         private readonly IRepositorioProvaLegado repositorioProvaLegado;
+        private readonly IRepositorioCache repositorioCache;
 
-        public ObterDadosAmostraProvaTaiQueryHandler(IRepositorioProvaLegado repositorioProvaLegado)
+        public ObterDadosAmostraProvaTaiQueryHandler(IRepositorioProvaLegado repositorioProvaLegado, IRepositorioCache repositorioCache)
         {
             this.repositorioProvaLegado = repositorioProvaLegado ?? throw new ArgumentNullException(nameof(repositorioProvaLegado));
+            this.repositorioCache = repositorioCache ?? throw new ArgumentNullException(nameof(repositorioCache));
         }
 
         public async Task<IEnumerable<AmostraProvaTaiDto>> Handle(ObterDadosAmostraProvaTaiQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioProvaLegado.ObterDadosAmostraProvaTai(request.ProvaLegadoId);
+            return await repositorioCache.ObterRedisAsync(CacheChave.DadosAmostraProvaTai,
+                () => repositorioProvaLegado.ObterDadosAmostraProvaTai(request.ProvaLegadoId));
         }
     }
 }

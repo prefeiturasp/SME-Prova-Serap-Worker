@@ -42,9 +42,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
                 await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
                 await RemoverQuestaoProvaAlunoResumoCache(alunoProva.ProvaId, alunoProva.AlunoId);
-                await RemoverQuestaoProvaResumoCache(alunoProva.ProvaId);
-                await RemoverDadosAmostraProvaTaiCache(alunoProva.ProvaLegadoId);
-                await RemoverAmostrasUtilizarProvaTaiCache(alunoProva.ProvaLegadoId);
                 await mediator.Send(new RemoverCacheCommand(nomeChave));
                 
                 return true;
@@ -88,21 +85,6 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaAlunoResumo,
                 provaId, alunoId)));
-        }
-        
-        private async Task RemoverQuestaoProvaResumoCache(long provaId)
-        {
-            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaResumo, provaId)));
-        }
-
-        private async Task RemoverDadosAmostraProvaTaiCache(long provaLegadoId)
-        {
-            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.DadosAmostraProvaTai, provaLegadoId)));            
-        }
-
-        private async Task RemoverAmostrasUtilizarProvaTaiCache(long provaLegadoId)
-        {
-            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.AmostrasUtilizarProvaTai, provaLegadoId)));
         }
     }
 }

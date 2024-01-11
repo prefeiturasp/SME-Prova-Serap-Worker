@@ -12,7 +12,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarQuestoesLegadoSyncUseCase : ITratarQuestoesLegadoSyncUseCase
     {
-        private const string Caderno = "1";
         private readonly IMediator mediator;
 
         public TratarQuestoesLegadoSyncUseCase(IMediator mediator)
@@ -79,7 +78,7 @@ namespace SME.SERAp.Prova.Aplicacao
             if (dadosDaAmostraTai == null || !dadosDaAmostraTai.Any())
                 throw new NegocioException($"Os dados da amostra tai não foram cadastrados para a prova {provaLegadoId}.");
             
-            var amostrasUtilizar = await ObterAmostrasUtilizar(provaLegadoId, dadosDaAmostraTai);
+            var amostrasUtilizar = await ObterAmostrasUtilizar(dadosDaAmostraTai);
             if (!amostrasUtilizar.Any())
                 throw new NegocioException($"Não há itens de amostra para serem utilizados na prova {provaLegadoId}.");
             
@@ -93,10 +92,10 @@ namespace SME.SERAp.Prova.Aplicacao
                     999,
                     provaId,
                     (QuestaoTipo)questao.TipoItem,
-                    Caderno,
+                    ProvaTai.Caderno,
                     questao.QuantidadeAlternativas);
 
-                var questaoId = await mediator.Send(new ObterIdQuestaoPorProvaIdCadernoLegadoIdQuery(provaId, Caderno, questao.ItemId));
+                var questaoId = await mediator.Send(new ObterIdQuestaoPorProvaIdCadernoLegadoIdQuery(provaId, ProvaTai.Caderno, questao.ItemId));
                 if (questaoId == 0)
                     questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
 
@@ -129,12 +128,8 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
         
-        private async Task<List<ItemAmostraTaiDto>> ObterAmostrasUtilizar(long provaLegadoId, IEnumerable<AmostraProvaTaiDto> dadosDaAmostraTai)
+        private async Task<List<ItemAmostraTaiDto>> ObterAmostrasUtilizar(IEnumerable<AmostraProvaTaiDto> dadosDaAmostraTai)
         {
-            var amostrasUtilizarCache = await mediator.Send(new ObterAmostrasUtilizarTaiCacheQuery(provaLegadoId));
-            if (amostrasUtilizarCache != null)
-                return amostrasUtilizarCache.ToList();
-            
             var amostrasUtilizar = new List<ItemAmostraTaiDto>();
 
             foreach (var dadosAmostra in dadosDaAmostraTai)
@@ -150,8 +145,6 @@ namespace SME.SERAp.Prova.Aplicacao
                     amostrasUtilizar.AddRange(itensAmostraUtilizar);
                 }
             }
-            
-            await mediator.Send(new SalvarCacheCommand(string.Format(CacheChave.AmostrasUtilizarProvaTai, provaLegadoId), amostrasUtilizar));
 
             return amostrasUtilizar;
         }          

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 
@@ -9,7 +10,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarProvaTaiUseCase : ITratarProvaTaiUseCase
     {
-        private const string Caderno = "1";
         private readonly IMediator mediator;
 
         public TratarProvaTaiUseCase(IMediator mediator)
@@ -31,12 +31,20 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 var msg = new AlunoCadernoProvaTaiTratarDto(provaTai.ProvaId, aluno.AlunoId,
                     provaTai.ProvaLegadoId, aluno.AlunoRa, provaTai.Disciplina,
-                    provaTai.Ano, Caderno);
+                    provaTai.Ano, ProvaTai.Caderno);
             
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernoAlunoProvaTai, msg));
             }
+            
+            //-> Limpar o cache
+            await RemoverQuestaoProvaResumoCache(provaTai.ProvaId);
 
             return true;
+        }
+        
+        private async Task RemoverQuestaoProvaResumoCache(long provaId)
+        {
+            await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaResumo, provaId)));
         }
     }
 }

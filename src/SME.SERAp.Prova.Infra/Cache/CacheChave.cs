@@ -122,15 +122,5 @@
         /// 1 - aluno id
         /// </summary>
         public const string SincronizandoProvaTaiAluno = "sinc-prova-tai-aluno-{0}-{1}";
-
-        /// <summary>
-        /// 0 - prova tai id
-        /// </summary>
-        public const string DadosAmostraProvaTai = "dados-amostra-prova-tai-{0}";
-
-        /// <summary>
-        /// 0 - prova tai id
-        /// </summary>
-        public const string AmostrasUtilizarProvaTai = "amostras-utilizar-prova-tai-{0}";
     }
 }

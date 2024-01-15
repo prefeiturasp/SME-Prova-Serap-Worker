@@ -6,13 +6,13 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterItensAmostraTaiQuery : IRequest<IEnumerable<ItemAmostraTaiDto>>
     {
-        public ObterItensAmostraTaiQuery(long matrizId, int[] tipoCurriculoGradeIds)
+        public ObterItensAmostraTaiQuery(long matrizId, int tipoCurriculoGradeId)
         {
             MatrizId = matrizId;
-            TipoCurriculoGradeIds = tipoCurriculoGradeIds;
+            TipoCurriculoGradeId = tipoCurriculoGradeId;
         }
 
-        public long MatrizId { get; set; }
-        public int[] TipoCurriculoGradeIds { get; set; }
+        public long MatrizId { get; }
+        public int TipoCurriculoGradeId { get; }
     }
 }

@@ -10,7 +10,7 @@ namespace SME.SERAp.Prova.Dominio
         }
         public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB,
             int totalCadernos, Modalidade modalidade, long? disciplinaId, string disciplina, bool ocultarProva, bool aderirTodos, bool multidisciplinar, int tipoProvaId, bool formatoTai,
-            int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = null, bool permiteAvancarSemResponderTai = false,
+            int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = Dominio.ProvaFormatoTaiItem.Todos, bool permiteAvancarSemResponderTai = false,
             bool permiteVoltarItemAnteriorTai = false, bool provaComProficiencia = false, bool apresentarResultados = false, bool apresentarResultadosPorItem = false, bool exibirAudio = false, bool exibirVideo = false)
         {
             Id = id;

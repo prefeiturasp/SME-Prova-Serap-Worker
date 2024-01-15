@@ -27,7 +27,6 @@ namespace SME.SERAp.Prova.Infra
         public bool ApresentarResultados { get; set; }
         public bool ApresentarResultadosPorItem { get; set; }
         public bool FormatoTai { get; set; }
-        public long? FormatoTaiItem { get; set; }
         public bool FormatoTaiAvancarSemResponder { get; set; }
         public bool FormatoTaiVoltarItemAnterior { get; set; }
         public bool ExibirAudio { get; set; }

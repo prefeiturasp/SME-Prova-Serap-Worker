@@ -22,12 +22,10 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var provaLegadoId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
-
             if (provaLegadoId == 0)
                 throw new NegocioException("O Id da prova deve ser informado.");
 
             var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaLegadoId));
-
             if (provaLegado == null)
                 throw new Exception($"Prova {provaLegadoId} não localizada!");
 
@@ -45,18 +43,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var modalidadeSerap = ObterModalidade(provaLegado.Modalidade, provaLegado.ModeloProva);
             var tipoProvaSerap = await ObterTipoProva(provaLegado.TipoProva);
-
-            ProvaFormatoTaiItem? provaFormatoTaiItem = null;
-            
-            if (provaLegado.FormatoTai)
-            {
-                provaFormatoTaiItem = await mediator.Send(new ObterProvaLegadoItemFormatoTaiQuery(provaLegadoId));
-
-                if (provaFormatoTaiItem == null)
-                    throw new Exception($"Formato Tai Item da prova {provaLegadoId} não localizado no legado.");
-            }
-
-            var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap, provaFormatoTaiItem);
+            var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap);
 
             if (provaAtual == null)
             {
@@ -125,22 +112,20 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
             }
 
-            if (!provaLegado.FormatoTai)
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
             await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
 
             return true;
         }
 
-        private static Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap, ProvaFormatoTaiItem? provaFormatoTaiItem)
+        private static Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap)
         {
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
-                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, provaFormatoTaiItem,
-                provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem,
-                provaLegado.ExibirAudio, provaLegado.ExibirVideo);
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, 
+                ProvaFormatoTaiItem.Todos, provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, 
+                provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem, provaLegado.ExibirAudio, provaLegado.ExibirVideo);
         }
 
         private static Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)
@@ -162,6 +147,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private async Task RemoverEntidadesFilhas(Dominio.Prova provaAtual)
         {
             await mediator.Send(new ProvaRemoverContextoProvaPorProvaIdCommand(provaAtual.Id));
+            await mediator.Send(new RemoverQuestaoAlunoTaiPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverCadernoAlunosPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAlternativasPorIdCommand(provaAtual.Id));

@@ -124,8 +124,8 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
                 provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, 
-                provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem,
-                provaLegado.ExibirAudio, provaLegado.ExibirVideo);
+                ProvaFormatoTaiItem.Todos, provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, 
+                provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem, provaLegado.ExibirAudio, provaLegado.ExibirVideo);
         }
 
         private static Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

@@ -122,5 +122,15 @@
         /// 1 - aluno id
         /// </summary>
         public const string SincronizandoProvaTaiAluno = "sinc-prova-tai-aluno-{0}-{1}";
+
+        /// <summary>
+        /// 0 - Login do usuário
+        /// </summary>
+        public const string AtribuicoesEolUsuario = "atribuicoes-eol-usuario-{0}";
+
+        /// <summary>
+        /// 0 - RF do usuário
+        /// </summary>
+        public const string UeDreAtribuidasEolUsuario = "ue-dre-atribuidas-eol-usuario-{0}";
     }
 }

@@ -26,56 +26,50 @@ namespace SME.SERAp.Prova.Aplicacao
             if (usuario == null)
                 throw new NegocioException("Usuário não localizado.");
 
-            var dre = new Dre();
-            if (abrangencia.DreId != null)
-            {
-                var dreId = abrangencia.DreId.GetValueOrDefault();
-                dre = await mediator.Send(new ObterDrePorIdQuery(dreId));
-                
-                if (dre == null)
-                    throw new NegocioException($"Dre {dreId} não localizada.");
-            }
-
-            var ue = new Ue();
-            if (abrangencia.UeId != null)
-            {
-                var ueId = abrangencia.UeId.GetValueOrDefault();
-                ue = await mediator.Send(new ObterUePorIdQuery(ueId));
-                
-                if (ue == null)
-                    throw new NegocioException($"Ue {ueId} não localizada.");                
-            }
-
-            var turma = new Turma();
-            if (abrangencia.TurmaId != null)
-            {
-                var turmaId = abrangencia.TurmaId.GetValueOrDefault();
-                turma = await mediator.Send(new ObterTurmaSerapPorIdQuery(turmaId));
-                
-                if (turma == null)
-                    throw new NegocioException($"Turma {turmaId} não localizada.");                
-            }
-
             if (grupo.IdCoreSso == GruposCoreSso.Professor || grupo.IdCoreSso == GruposCoreSso.Professor_old)
             {
-                var atribuicoes = await mediator.Send(new ObterTurmaAtribuidasEolPorUsuarioQuery(usuario.Login, long.Parse(turma.Codigo), turma.AnoLetivo));
+                if (abrangencia.TurmaId == null) 
+                    return false;
+                
+                var turmaId = abrangencia.TurmaId.GetValueOrDefault();
 
+                var turma = await mediator.Send(new ObterTurmaSerapPorIdQuery(turmaId));
+                if (turma == null)
+                    throw new NegocioException($"Turma {turmaId} não localizada.");
+
+                var atribuicoes = await mediator.Send(new ObterAtribuicoesEolQuery(usuario.Login, long.Parse(turma.Codigo), turma.AnoLetivo));
                 if (atribuicoes != null && !atribuicoes.Any(t => t.AnoLetivo == turma.AnoLetivo && t.TurmaCodigo.ToString() == turma.Codigo))
                     await mediator.Send(new ExcluirAbrangenciaPorIdCommand(abrangencia.Id));
             }
             else
             {
-                var codigosAbrangencia = await mediator.Send(new ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(usuario.IdCoreSso, grupo.IdCoreSso));
+                var codigosAbrangencia = await mediator.Send(new ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(usuario.IdCoreSso, grupo.IdCoreSso, usuario.Login));
                 if (codigosAbrangencia == null || !codigosAbrangencia.Any())
                     codigosAbrangencia = await mediator.Send(new ObterUeDreAtribuidasEolPorUsuarioQuery(usuario.Login));
 
-                if (codigosAbrangencia != null)
+                if (codigosAbrangencia == null)
+                    return false;
+                
+                if (abrangencia.DreId != null && abrangencia.UeId == null && abrangencia.TurmaId is null)
                 {
-                    if (abrangencia.DreId != null && abrangencia.UeId == null && abrangencia.TurmaId is null)
-                        await VerificarExcluirAbrangencia(codigosAbrangencia.ToArray(), dre.CodigoDre, abrangencia.Id);
+                    var dreId = abrangencia.DreId.GetValueOrDefault();
 
-                    if (abrangencia.DreId != null && abrangencia.UeId != null && abrangencia.TurmaId is null)
-                        await VerificarExcluirAbrangencia(codigosAbrangencia.ToArray(), ue.CodigoUe, abrangencia.Id);
+                    var dre = await mediator.Send(new ObterDrePorIdQuery(dreId));
+                    if (dre == null)
+                        throw new NegocioException($"Dre {dreId} não localizada.");
+
+                    await VerificarExcluirAbrangencia(codigosAbrangencia.ToArray(), dre.CodigoDre, abrangencia.Id);
+                }
+
+                if (abrangencia.DreId != null && abrangencia.UeId != null && abrangencia.TurmaId is null)
+                {
+                    var ueId = abrangencia.UeId.GetValueOrDefault();
+                        
+                    var ue = await mediator.Send(new ObterUePorIdQuery(ueId));
+                    if (ue == null)
+                        throw new NegocioException($"Ue {ueId} não localizada.");                        
+                        
+                    await VerificarExcluirAbrangencia(codigosAbrangencia.ToArray(), ue.CodigoUe, abrangencia.Id);
                 }
             }
 

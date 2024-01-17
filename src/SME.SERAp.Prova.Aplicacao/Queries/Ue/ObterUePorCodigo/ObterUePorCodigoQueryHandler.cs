@@ -10,13 +10,17 @@ namespace SME.SERAp.Prova.Aplicacao
     public class ObterUePorCodigoQueryHandler : IRequestHandler<ObterUePorCodigoQuery, Ue>
     {
         private readonly IRepositorioUe repositorioUe;
+        private readonly IRepositorioCache repositorioCache;
 
-        public ObterUePorCodigoQueryHandler(IRepositorioUe repositorioUe)
+        public ObterUePorCodigoQueryHandler(IRepositorioUe repositorioUe, IRepositorioCache repositorioCache)
         {
             this.repositorioUe = repositorioUe ?? throw new ArgumentNullException(nameof(repositorioUe));
+            this.repositorioCache = repositorioCache ?? throw new ArgumentNullException(nameof(repositorioCache));
         }
 
         public async Task<Ue> Handle(ObterUePorCodigoQuery request, CancellationToken cancellationToken)
-            => await repositorioUe.ObterUePorCodigo(request.UeCodigo);
+        {
+            return await repositorioCache.ObterRedisAsync($"ue-cod-{request.UeCodigo}", () => repositorioUe.ObterUePorCodigo(request.UeCodigo), 60);
+        }
     }
 }

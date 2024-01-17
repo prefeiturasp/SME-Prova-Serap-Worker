@@ -3,14 +3,12 @@ using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarUsuarioCoreSsoUseCase : AbstractUseCase, ITratarUsuarioCoreSsoUseCase
     {
-
         public TratarUsuarioCoreSsoUseCase(IMediator mediator) : base(mediator) { }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -41,8 +39,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             else
             {
-                if (usuarioSerap.Login != usuarioCoreSso.Login
-                    || usuarioSerap.Nome != usuarioCoreSso.Nome)
+                if (usuarioSerap.Login != usuarioCoreSso.Login || usuarioSerap.Nome != usuarioCoreSso.Nome)
                 {
                     usuarioSerap.Login = usuarioCoreSso.Login;
                     usuarioSerap.Nome = usuarioCoreSso.Nome;
@@ -57,6 +54,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     await mediator.Send(new InserirUsuarioGrupoSerapCoreSsoCommand(usuarioGrupoSerap));
                 }
             }
+
             return usuarioGrupoSerap;
         }
     }

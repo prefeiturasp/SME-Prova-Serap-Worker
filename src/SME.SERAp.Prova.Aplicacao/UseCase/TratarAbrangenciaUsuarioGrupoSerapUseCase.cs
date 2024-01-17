@@ -33,10 +33,11 @@ namespace SME.SERAp.Prova.Aplicacao
             if (grupoSerap == null)
                 throw new NegocioException($"Sync abrangência - Grupo não encontrado, IdGrupo:{usuarioGrupoSerap.IdGrupoSerap}.");
 
-            string parametrosMsgLog = ObterParametrosMsgLog(usuarioSerap, grupoSerap);
+            var parametrosMsgLog = ObterParametrosMsgLog(usuarioSerap, grupoSerap);
+
             if (grupoSerap.IdCoreSso == GruposCoreSso.Professor || grupoSerap.IdCoreSso == GruposCoreSso.Professor_old)
             {
-                var atribuicoes = await mediator.Send(new ObterTurmaAtribuidasEolPorUsuarioQuery(usuarioSerap.Login));
+                var atribuicoes = await mediator.Send(new ObterAtribuicoesEolQuery(usuarioSerap.Login));
 
                 TurmaAtribuicaoDto turma;
                 Abrangencia abrangencia;
@@ -49,7 +50,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     abrangencia = await mediator.Send(new ObterAbrangenciaPorUsuarioGrupoDreUeTurmaQuery(usuarioSerap.Id,
                         grupoSerap.Id,
                         turma.DreId,
-                         turma.UeId,
+                        turma.UeId,
                         turma.TurmaId));
 
                     if (abrangencia == null)
@@ -58,14 +59,14 @@ namespace SME.SERAp.Prova.Aplicacao
                             usuarioSerap.Id,
                             grupoSerap.Id,
                             turma.DreId,
-                             turma.UeId,
+                            turma.UeId,
                             turma.TurmaId,
                             atribuicao.DataAtribuicao,
                             atribuicao.DataDisponibilizacaoAula);
 
                         await mediator.Send(new InserirAbrangenciaCommand(abrangencia));
                     }
-                    else if(abrangencia.Inicio != atribuicao.DataAtribuicao || abrangencia.Fim != atribuicao.DataDisponibilizacaoAula)
+                    else if (abrangencia.Inicio != atribuicao.DataAtribuicao || abrangencia.Fim != atribuicao.DataDisponibilizacaoAula)
                     {
                         abrangencia.Inicio = atribuicao.DataAtribuicao;
                         abrangencia.Fim = atribuicao.DataDisponibilizacaoAula;
@@ -76,7 +77,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             else
             {
-                var abrangencias = await mediator.Send(new ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(usuarioSerap.IdCoreSso, grupoSerap.IdCoreSso));
+                var abrangencias = await mediator.Send(new ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(usuarioSerap.IdCoreSso, grupoSerap.IdCoreSso, usuarioSerap.Login));
                 if (abrangencias == null || !abrangencias.Any())
                     abrangencias = await mediator.Send(new ObterUeDreAtribuidasEolPorUsuarioQuery(usuarioSerap.Login));
 
@@ -88,13 +89,13 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
 
                 Abrangencia abrangencia;
-                var dresSerap = await mediator.Send(new ObterDresSerapQuery());
-                foreach (string codigo in abrangencias)
+                
+                foreach (var codigo in abrangencias)
                 {
-                    var dre = dresSerap.Where(d => d.CodigoDre == codigo).FirstOrDefault();
+                    var dre = await mediator.Send(new ObterDrePorCodigoQuery(codigo));
                     if (dre != null)
                     {
-                        abrangencia = abrangencia = new Abrangencia(
+                        abrangencia = new Abrangencia(
                             usuarioSerap.Id,
                             grupoSerap.Id,
                             dre.Id);
@@ -106,7 +107,7 @@ namespace SME.SERAp.Prova.Aplicacao
                         var ue = await mediator.Send(new ObterUePorCodigoQuery(codigo));
                         if (ue != null)
                         {
-                            abrangencia = abrangencia = new Abrangencia(
+                            abrangencia = new Abrangencia(
                                 usuarioSerap.Id,
                                 grupoSerap.Id,
                                 ue.DreId,

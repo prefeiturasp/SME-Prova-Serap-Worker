@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -20,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
         }
         public async Task<IEnumerable<ParametroSistema>> Handle(ObterParametroSistemaPorTiposEAnoQuery request, CancellationToken cancellationToken)
         {
-            var parametrosDoSistema = await repositorioCache.ObterRedisAsync("parametros", async () => await repositorioParametroSistema.ObterTudoAsync(), 1440);
+            var parametrosDoSistema = await repositorioCache.ObterRedisAsync(CacheChave.Parametros, async () => await repositorioParametroSistema.ObterTudoAsync(), 1440);
 
             if (parametrosDoSistema != null && parametrosDoSistema.Any())
                 return parametrosDoSistema.Where(a => a.Ano == request.Ano && request.Tipos.Contains((int)a.Tipo));

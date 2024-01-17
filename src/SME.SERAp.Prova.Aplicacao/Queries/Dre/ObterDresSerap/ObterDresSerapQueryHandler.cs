@@ -15,6 +15,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.repositorioDre = repositorioDre ?? throw new System.ArgumentNullException(nameof(repositorioDre));
         }
+
         public async Task<IEnumerable<Dre>> Handle(ObterDresSerapQuery request, CancellationToken cancellationToken)
         {
             return await repositorioDre.ObterTudoAsync();

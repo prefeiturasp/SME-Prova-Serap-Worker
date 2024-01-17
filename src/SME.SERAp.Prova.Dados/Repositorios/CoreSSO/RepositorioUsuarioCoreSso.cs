@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<UsuarioCoreSsoDto>> ObterUsuariosPorGrupoCoreSso(Guid grupo)
         {
-            var query = $@"select u.usu_id IdCoreSso, u.usu_login [Login], p.pes_nome Nome
+            var query = @"select distinct u.usu_id IdCoreSso, u.usu_login [Login], p.pes_nome Nome
                                 from SYS_Grupo g
                             inner join SYS_UsuarioGrupo ug
                                 on g.gru_id = ug.gru_id and ug.usg_situacao = 1 and g.gru_situacao = 1
@@ -30,7 +30,7 @@ namespace SME.SERAp.Prova.Dados
                             where g.gru_id = @grupo
                             and g.sis_id = 204";
 
-            using var conn = new SqlConnection(connectionStringOptions.CoreSSO);
+            await using var conn = new SqlConnection(connectionStringOptions.CoreSSO);
             return await conn.QueryAsync<UsuarioCoreSsoDto>(query, new { grupo });
         }
     }

@@ -41,7 +41,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                StringBuilder query = new StringBuilder();
+                var query = new StringBuilder();
                 query.Append(@"select a.id, a.usuario_id, a.grupo_id, a.dre_id, a.ue_id, a.turma_id
                                         from abrangencia a
                                         where a.grupo_id = @grupoId");
@@ -60,8 +60,8 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                StringBuilder query = new StringBuilder();
-                query.Append(@"delete from abrangencia where id = @id");
+                var query = new StringBuilder();
+                query.Append("delete from abrangencia where id = @id");
 
                 await conn.QueryAsync<long>(query.ToString(), new { id });
                 return true;
@@ -86,7 +86,7 @@ namespace SME.SERAp.Prova.Dados
                                           and a.ue_id = @ueId
                                           and a.turma_id = @turmaId";
 
-                return await conn.QueryFirstOrDefaultAsync<Abrangencia>(query.ToString(), new { usuarioId, grupoId, dreId, ueId, turmaId });
+                return await conn.QueryFirstOrDefaultAsync<Abrangencia>(query, new { usuarioId, grupoId, dreId, ueId, turmaId });
             }
             finally
             {

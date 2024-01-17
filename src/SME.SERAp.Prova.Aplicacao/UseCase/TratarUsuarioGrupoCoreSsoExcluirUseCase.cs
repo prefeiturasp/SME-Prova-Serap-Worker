@@ -20,10 +20,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var usuarioParaExcluir = usuariosGrupoSerap.Where(u => !usuariosGrupoCoreSso.Any(ugc => ugc.IdCoreSso == u.IdCoreSso));
 
-            foreach (UsuarioSerapCoreSso usuario in usuarioParaExcluir)
-            {
+            foreach (var usuario in usuarioParaExcluir)
                 await mediator.Send(new ExcluirUsuarioGrupoSerapPorUsuarioIdEGrupoIdCommand(usuario.Id, grupo.Id));
-            }
 
             return true;
         }

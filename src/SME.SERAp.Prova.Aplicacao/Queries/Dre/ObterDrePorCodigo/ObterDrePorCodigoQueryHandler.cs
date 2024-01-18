@@ -20,7 +20,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<Dre> Handle(ObterDrePorCodigoQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioCache.ObterRedisAsync($"dre-cod-{request.DreCodigo}", () => repositorioDre.ObterDREPorCodigo(request.DreCodigo), 60);
+            return await repositorioCache.ObterRedisAsync($"dre-cod-{request.DreCodigo}", async () => await repositorioDre.ObterDREPorCodigo(request.DreCodigo), 60);
         }
     }
 }

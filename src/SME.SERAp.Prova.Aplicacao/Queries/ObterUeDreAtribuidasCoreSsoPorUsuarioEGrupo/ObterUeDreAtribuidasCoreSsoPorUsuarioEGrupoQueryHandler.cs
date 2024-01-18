@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 string.Format(CacheChave.UeDreAtribuidasEolUsuario, request.CodigoRf),
                 async () => await repositorioGeralCoreSso.ObterUeDreAtribuidasCoreSsoPorUsuarioIdAsync(request.UsuarioIdCoreSso), 60);
 
-            if (retorno != null && EnumerableExtensions.Any(retorno))
+            if (retorno != null && retorno.Any())
                 return retorno.Where(c => c.GrupoIdCoreSso == request.GrupoIdCoreSso).Select(c => c.UeCodigo).Distinct();
             
             return await repositorioGeralCoreSso.ObterUeDreAtribuidasCoreSso(request.UsuarioIdCoreSso, request.GrupoIdCoreSso);

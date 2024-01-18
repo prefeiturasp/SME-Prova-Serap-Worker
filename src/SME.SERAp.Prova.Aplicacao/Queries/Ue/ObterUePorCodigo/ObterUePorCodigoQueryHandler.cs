@@ -20,7 +20,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<Ue> Handle(ObterUePorCodigoQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioCache.ObterRedisAsync($"ue-cod-{request.UeCodigo}", () => repositorioUe.ObterUePorCodigo(request.UeCodigo), 60);
+            return await repositorioCache.ObterRedisAsync($"ue-cod-{request.UeCodigo}", async () => await repositorioUe.ObterUePorCodigo(request.UeCodigo), 60);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<TurmaAtribuicaoDto> Handle(ObterTurmaPorCodigoQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioCache.ObterRedisAsync($"turma-cod-{request.Codigo}", () => repositorioTurma.ObterTurmaAtribuicaoPorCodigo(request.AnoLetivo, request.Codigo), 5);
+            return await repositorioCache.ObterRedisAsync($"turma-cod-{request.Codigo}", async () => await repositorioTurma.ObterTurmaAtribuicaoPorCodigo(request.AnoLetivo, request.Codigo), 5);
         }
     }
 }

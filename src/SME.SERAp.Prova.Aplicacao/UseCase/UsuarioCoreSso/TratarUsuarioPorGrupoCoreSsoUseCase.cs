@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
-using System;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -15,11 +14,13 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var grupo = mensagemRabbit.ObterObjetoMensagem<GrupoSerapCoreSso>();
             var usuariosGrupo = await mediator.Send(new ObterUsuariosPorGrupoCoreSsoQuery(grupo.IdCoreSso));
-            foreach (UsuarioCoreSsoDto usuario in usuariosGrupo)
+
+            foreach (var usuario in usuariosGrupo)
             {
                 var usuarioMsg = new UsuarioGrupoDto(grupo.Id, usuario);
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.UsuarioCoreSsoTratar, usuarioMsg));
             }
+
             return true;
         }
     }

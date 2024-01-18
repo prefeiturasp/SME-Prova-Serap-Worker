@@ -6,13 +6,15 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery : IRequest<IEnumerable<string>>
     {
-        public ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(Guid usuarioIdCoreSso, Guid grupoIdCoreSso)
+        public ObterUeDreAtribuidasCoreSsoPorUsuarioEGrupoQuery(Guid usuarioIdCoreSso, Guid grupoIdCoreSso, string codigoRf)
         {
             UsuarioIdCoreSso = usuarioIdCoreSso;
             GrupoIdCoreSso = grupoIdCoreSso;
+            CodigoRf = codigoRf;
         }
 
-        public Guid UsuarioIdCoreSso { get; set; }
-        public Guid GrupoIdCoreSso { get; set; }
+        public Guid UsuarioIdCoreSso { get; }
+        public Guid GrupoIdCoreSso { get; }
+        public string CodigoRf { get; }
     }
 }

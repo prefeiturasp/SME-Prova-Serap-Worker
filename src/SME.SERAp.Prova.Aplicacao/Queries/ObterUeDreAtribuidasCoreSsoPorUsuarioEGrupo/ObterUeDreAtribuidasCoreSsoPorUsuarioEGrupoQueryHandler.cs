@@ -5,7 +5,6 @@ using MediatR;
 using SME.SERAp.Prova.Dados;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
 using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao

@@ -147,8 +147,8 @@ namespace SME.SERAp.Prova.Aplicacao
         private async Task RemoverEntidadesFilhas(Dominio.Prova provaAtual)
         {
             await mediator.Send(new ProvaRemoverContextoProvaPorProvaIdCommand(provaAtual.Id));
-            await mediator.Send(new RemoverQuestaoAlunoTaiPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverCadernoAlunosPorProvaIdCommand(provaAtual.Id));
+            await mediator.Send(new RemoverQuestaoAlunoTaiPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAlternativasPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverQuestoesTriPorIdCommand(provaAtual.Id));

@@ -106,14 +106,11 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
                     {
-                        var arquivoId =
-                            await mediator.Send(new ObterIdArquivoPorCaminhoQuery(arquivoParaPersistir.Caminho));
+                        var arquivoId = await mediator.Send(new ObterIdArquivoPorCaminhoQuery(arquivoParaPersistir.Caminho));
                         if (arquivoId == 0)
                             arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
 
-                        var questaoArquivoId =
-                            await mediator.Send(
-                                new ObterQuestaoArquivoIdPorQuestaoIdArquivoIdQuery(questaoId, arquivoId));
+                        var questaoArquivoId =await mediator.Send(new ObterQuestaoArquivoIdPorQuestaoIdArquivoIdQuery(questaoId, arquivoId));
                         if (questaoArquivoId == 0)
                             await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
                     }

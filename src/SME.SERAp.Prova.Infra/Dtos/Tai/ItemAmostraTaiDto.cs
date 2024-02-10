@@ -8,6 +8,8 @@ namespace SME.SERAp.Prova.Infra
         public string ItemCodigo { get; set; }
         public long MatrizId { get; set; }
         public long TipoCurriculoGradeId { get; set; }
+        public long EixoId { get; set; }
+        public string EixoNome { get; set; }
         public long HabilidadeId { get; set; }
         public string HabilidadeNome { get; set; }
         public string HabilidadeCodigo { get; set; }

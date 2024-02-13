@@ -52,7 +52,7 @@ namespace SME.SERAp.Prova.Dados
 								and i.TRIDifficulty is not null
 								and i.TRICasualSetting is not null
 								and icg.TypeCurriculumGradeId = @tipoCurriculoGradeId
-								and i.ItemVersion = (select max(i2.ItemVersion) from Item i2 where i2.Id = i.Id)";
+								and i.ItemVersion = (select max(i2.ItemVersion) from Item i2 where i2.ItemCode = i.ItemCode)";
 
                 return await conn.QueryAsync<ItemAmostraTaiDto>(query, new { matrizId, tipoCurriculoGradeId });
             }

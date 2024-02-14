@@ -139,15 +139,19 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private async Task Tratar(UeParaSincronizacaoInstitucionalDto ue, int anoLetivo)
         {
-            var todasTurmasSerap = (await mediator.Send(new ObterTurmasSerapPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo))).ToList();
+            var todasTurmasSerap = await mediator.Send(new ObterTurmasSerapPorUeCodigoEAnoLetivoQuery(ue.UeCodigo, anoLetivo));
 
             var turmasParaSincronizacaoInstitucional = todasTurmasSerap.Select(turma =>
                 new TurmaParaSincronizacaoInstitucionalDto(turma.Id, turma.AnoLetivo, turma.Codigo,
                     turma.ModalidadeCodigo, turma.Semestre, ue.Id, ue.UeCodigo)).ToList();
-            
+
             await mediator.Send(new PublicaFilaRabbitCommand(
                 RotasRabbit.SincronizaEstruturaInstitucionalTurmaTratar,
-                turmasParaSincronizacaoInstitucional));            
+                turmasParaSincronizacaoInstitucional));
+
+            await mediator.Send(new PublicaFilaRabbitCommand(
+                RotasRabbit.SincronizaEstruturaInstitucionalTurmaAlunoHistoricoSync,
+                turmasParaSincronizacaoInstitucional));
         }
     }
 }

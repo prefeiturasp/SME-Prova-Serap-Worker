@@ -93,7 +93,9 @@ namespace SME.SERAp.Prova.Aplicacao
                     provaId,
                     (QuestaoTipo)questao.TipoItem,
                     ProvaTai.Caderno,
-                    questao.QuantidadeAlternativas);
+                    questao.QuantidadeAlternativas,
+                    questao.EixoId,
+                    questao.HabilidadeId);
 
                 var questaoId = await mediator.Send(new ObterIdQuestaoPorProvaIdCadernoLegadoIdQuery(provaId, ProvaTai.Caderno, questao.ItemId));
                 if (questaoId == 0)

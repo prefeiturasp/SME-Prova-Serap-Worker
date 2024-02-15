@@ -20,23 +20,21 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"
-	            select
-                    
-	                t.id,
-					t.UpdateDate,
-					tp.UpdateDate
-                from
-	                test t
-					left join TestPermission tp
-					on tp.Test_Id = t.Id
-                     AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'				
-                where
-	                t.ShowOnSerapEstudantes = 1
-                    and (t.UpdateDate >  @ultimaAtualizacao or 
-					      tp.UpdateDate >  @ultimaAtualizacao )
-                    and t.State = 1
-                order by
-	                t.ApplicationStartDate desc";
+		            select
+		                t.id,
+						t.UpdateDate,
+						tp.UpdateDate
+	                from
+		                test t
+						left join TestPermission tp
+						on tp.Test_Id = t.Id 
+						AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+	                where
+		                t.ShowOnSerapEstudantes = 1
+	                    and (t.UpdateDate > @ultimaAtualizacao or tp.UpdateDate > @ultimaAtualizacao)
+	                    and t.State = 1
+	                order by
+		                t.ApplicationStartDate desc";
 
                 return await conn.QueryAsync<long>(query, new { ultimaAtualizacao });
             }
@@ -393,30 +391,6 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId)
-        {
-            using var conn = ObterConexao();
-            try
-            {
-                var query = @"select case when niat.Value = '' then 0 else niat.Value end as value
-                              from NumberItemTestTai nit
-                              left join NumberItemsAplicationTai niat on niat.Id = nit.ItemAplicationTaiId
-                              where nit.TestId = @provaId
-							   and nit.State = 1";
-                var formatos = await conn.QueryAsync<long>(query, new { provaId });
-
-                if (formatos.Any())
-                    return (ProvaFormatoTaiItem)formatos.FirstOrDefault();
-
-                return null;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
-
         public async Task<IEnumerable<AmostraProvaTaiDto>> ObterDadosAmostraProvaTai(long provaId)
         {
             using var conn = ObterConexao();
@@ -432,20 +406,16 @@ namespace SME.SERAp.Prova.Dados
 										)
 										select top 1 nit.TestId ProvaLegadoId,
 											dm.DisciplinaId,
-											niat.[Value] NumeroItensAmostra,
 											nit.AdvanceWithoutAnswering AvancarSemResponder,
 											nit.BackToPreviousItem VoltarAoItemAnterior
 										from NumberItemTestTai nit
-										inner join NumberItemsAplicationTai niat on nit.ItemAplicationTaiId = niat.Id
 										inner join DisciplinaMatriz dm on dm.Test_Id = nit.TestId
 										where nit.[State] = 1
-										and niat.[State] = 1
 										and nit.TestId = @provaId
 										order by nit.Id desc
 
 										select tcg.EvaluationMatrix_Id as MatrizId, 
-											tcg.TypeCurriculumGradeId TipoCurriculoGradeId,
-											tcg.[Percentage] Porcentagem
+											tcg.TypeCurriculumGradeId TipoCurriculoGradeId
 										from TestTaiCurriculumGrade tcg 
 										where tcg.[State] = 1
 										and tcg.Test_Id = @provaId";

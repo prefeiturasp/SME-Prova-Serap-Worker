@@ -17,7 +17,8 @@ namespace SME.SERAp.Prova.Infra
         public bool PodeFinalizarProva(int tempoExtra)
         {
             ProvaStatus provaStatus = (ProvaStatus)Status;
-            if (provaStatus == ProvaStatus.Finalizado || provaStatus == ProvaStatus.FinalizadoAutomaticamente)
+            if (provaStatus == ProvaStatus.Finalizado || provaStatus == ProvaStatus.FINALIZADA_AUTOMATICAMENTE_JOB || 
+                provaStatus == ProvaStatus.FINALIZADA_AUTOMATICAMENTE_TEMPO || provaStatus == ProvaStatus.FINALIZADA_OFFLINE)
                 return false;
 
             if (TempoExecucao > 0)

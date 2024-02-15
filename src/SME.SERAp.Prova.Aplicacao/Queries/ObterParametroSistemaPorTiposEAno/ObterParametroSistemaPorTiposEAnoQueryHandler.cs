@@ -19,14 +19,15 @@ namespace SME.SERAp.Prova.Aplicacao
             this.repositorioParametroSistema = repositorioParametroSistema ?? throw new System.ArgumentNullException(nameof(repositorioParametroSistema));
             this.repositorioCache = repositorioCache ?? throw new System.ArgumentNullException(nameof(repositorioCache));
         }
+
         public async Task<IEnumerable<ParametroSistema>> Handle(ObterParametroSistemaPorTiposEAnoQuery request, CancellationToken cancellationToken)
         {
             var parametrosDoSistema = await repositorioCache.ObterRedisAsync(CacheChave.Parametros, async () => await repositorioParametroSistema.ObterTudoAsync(), 1440);
 
             if (parametrosDoSistema != null && parametrosDoSistema.Any())
                 return parametrosDoSistema.Where(a => a.Ano == request.Ano && request.Tipos.Contains((int)a.Tipo));
-            else
-                return default;
+            
+            return default;
         }
     }
 }

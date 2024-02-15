@@ -13,6 +13,6 @@ namespace SME.SERAp.Prova.Dominio
         [Display(Name = "40")]
         Item_40 = 40,
         [Display(Name = "50")]
-        Item_50 = 50
+        Item_50 = 50        
     }
 }

@@ -18,7 +18,6 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var provasTai = await mediator.Send(new ObterProvasTaiQuery());
-
             if (provasTai != null && !provasTai.Any())
                 return false;
 

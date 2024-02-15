@@ -9,5 +9,6 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<IEnumerable<TipoCurriculoPeriodoAnoDto>> ObterProvaAnoPorTipoCurriculoPeriodoId(int[] tcpIds);
         Task<bool> RemoverAnosPorProvaIdAsync(long provaId);
+        Task<IEnumerable<ProvaAnoDto>> ObterProvasAnosDatasEModalidadesParaCacheAsync();        
     }
 }

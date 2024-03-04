@@ -12,6 +12,14 @@ namespace SME.SERAp.Prova.Infra
             UeEolIds = ueEolIds;
         }
 
+        public ExportacaoResultadoFiltroDto(long processoId, long provaId, string caminhoArquivo)
+        {
+            ProcessoId = processoId;
+            ProvaId = provaId;
+            CaminhoArquivo = caminhoArquivo;
+        }
+
+
         public ExportacaoResultadoFiltroDto()
         {
 

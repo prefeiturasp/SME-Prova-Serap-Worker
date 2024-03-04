@@ -25,9 +25,15 @@ namespace SME.SERAp.Prova.Aplicacao
             var resultado = await repositorioResultadoProvaConsolidado.ObterExtracaoProvaRespostaQuery(request.ProvaSerapId, request.DreCodigoEol, request.UeCodigoEol, request.TurmasCodigosEol);
             var alunos = resultado.Select(a => a.AlunoCodigoEol).Distinct();
 
+            if (request.AderirATodos == false)
+            {
+                var res = resultado.OrderBy(x => x.DreCodigoEol).ThenBy(x => x.UeCodigoEol).ThenBy(x => x.TurmaAnoEscolar).ThenBy(x => x.TurmaDescricao).ThenBy(x => x.AlunoNome).ThenBy(x => x.QuestaoOrdem).ToList();
+                return res;
+            }
+
             var resultadoRetorno = new List<ConsolidadoProvaRespostaDto>();
             foreach (var aluno in alunos)
-            {                
+            {
                 var turmas = await repositorioResultadoProvaConsolidado.ObterTurmasResultadoProvaAluno(request.ProvaSerapId, aluno);
                 var turma = turmas.FirstOrDefault();
 

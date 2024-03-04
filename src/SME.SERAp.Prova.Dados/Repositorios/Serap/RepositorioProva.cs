@@ -126,6 +126,27 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+
+
+        public async Task ConsolidarProvaRespostasAdesaoManual(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = $@"call p_consolidar_dados_prova_adesao_manual(@provaId);";
+                await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 50000);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task ConsolidarProvaRespostasPorProvaSerapId(long provaId)
         {
             using var conn = ObterConexao();
@@ -453,6 +474,25 @@ namespace SME.SERAp.Prova.Dados
             {
                 const string query = "select * from prova where inicio_download::date <= current_date and fim::date >= current_date";
                 return await conn.QueryAsync<Dominio.Prova>(query);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task LimparDadosConsolidadosPorProvaSerapEstudantesId(long provaSerapEstudantesId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = $@"delete from resultado_prova_consolidado where prova_serap_estudantes_id = @provaSerapEstudantesId;";
+                await conn.ExecuteAsync(query, new { provaSerapEstudantesId  }, commandTimeout: 50000);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
             }
             finally
             {

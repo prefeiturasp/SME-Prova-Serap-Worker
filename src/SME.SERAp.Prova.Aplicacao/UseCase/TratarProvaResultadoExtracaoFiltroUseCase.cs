@@ -15,7 +15,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
-       
+
         public TratarProvaResultadoExtracaoFiltroUseCase(IMediator mediator, IServicoLog servicoLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -26,7 +26,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
-            
+
             try
             {
                 if (filtro is null)
@@ -36,25 +36,39 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (exportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
                 {
-                    if(!ExisteArquivo(filtro.CaminhoArquivo))
+                    if (!ExisteArquivo(filtro.CaminhoArquivo))
                         throw new NegocioException($"Arquivo não foi encontrado: {filtro.CaminhoArquivo}");
 
-                    var resultado = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaId, filtro.DreEolId, filtro.UeEolIds[0], filtro.TurmaEolIds));                    
+                    var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));
+
+
+                    var resultado = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaId, prova.AderirTodos));
 
                     if (resultado != null && resultado.Any())
                         await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultado, filtro.CaminhoArquivo));
-                    
-                    await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
 
-                    bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
-                    if (!existeItemProcesso)
-                    {
+                    if (prova.AderirTodos == false)
                         await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Finalizado));
-                        await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
+
+                    else
+                    {
+
+                        await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
+                        bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
+                        if (!existeItemProcesso)
+                        {
+
+                            await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
+                        }
+
                     }
+
+
+
+
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));

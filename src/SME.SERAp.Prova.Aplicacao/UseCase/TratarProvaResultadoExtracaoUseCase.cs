@@ -57,39 +57,49 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     await mediator.Send(new GerarCSVExtracaoProvaCommand(prova.TotalItens, caminhoCompletoArquivo));
 
-                    var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
-                    var dres = await mediator.Send(new ObterDresSerapQuery());
-                    foreach (Dre dre in dres)
+                    if (prova.AderirTodos == false)
                     {
-                        var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
-                        foreach (Ue ue in ues)
+                        var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, caminhoCompletoArquivo);
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
+                    }
+
+                    else
+                    {
+                        var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
+                        var dres = await mediator.Send(new ObterDresSerapQuery());
+                        foreach (Dre dre in dres)
                         {
-                            var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ue.CodigoUe, prova.LegadoId));
-                            if (turmasUe != null && turmasUe.Any())
+                            var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
+                            foreach (Ue ue in ues)
                             {
-                                var paginasTurmas = Paginar(turmasUe.ToList());
-                                foreach (List<Turma> turmas in paginasTurmas)
+                                var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ue.CodigoUe, prova.LegadoId));
+                                if (turmasUe != null && turmasUe.Any())
                                 {
-                                    var codigosTurmas = turmas.Select(t => t.Codigo).ToArray();
+                                    var paginasTurmas = Paginar(turmasUe.ToList());
+                                    foreach (List<Turma> turmas in paginasTurmas)
+                                    {
+                                        var codigosTurmas = turmas.Select(t => t.Codigo).ToArray();
 
-                                    var ueIds = new string[] { ue.CodigoUe };
-                                    var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
-                                    exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+                                        var ueIds = new string[] { ue.CodigoUe };
+                                        var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
+                                        exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
 
-                                    var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
-                                    filtro.TurmaEolIds = codigosTurmas;
-                                    filtro.CaminhoArquivo = caminhoCompletoArquivo;
-                                    filtrosParaPublicar.Add(filtro);
+                                        var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
+                                        filtro.TurmaEolIds = codigosTurmas;
+                                        filtro.CaminhoArquivo = caminhoCompletoArquivo;
+                                        filtrosParaPublicar.Add(filtro);
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
-                    {
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
+                        foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
+                        {
+                            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
+                        }
                     }
                 }
+
                 return true;
             }
             catch (Exception ex)
@@ -99,7 +109,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 servicoLog.Registrar($"Escrever dados no arquivo CSV. msg: {mensagemRabbit.Mensagem}", ex);
                 return false;
             }
-            
+
         }
 
         private List<List<Turma>> Paginar(List<Turma> turmas)

@@ -89,10 +89,14 @@ namespace SME.SERAp.Prova.Dados
                                  ";                
 
                 string where = " where 1=1 ";
-                where += @"     and rpc.prova_serap_id = @provaSerapId
-                                and rpc.dre_codigo_eol = @dreCodigoEol
-                                and rpc.ue_codigo_eol = @ueCodigoEol 
-                                 ";
+                where += @"     and rpc.prova_serap_id = @provaSerapId";
+
+
+                if (dreCodigoEol != null)
+                    where += " and rpc.dre_codigo_eol = @dreCodigoEol ";
+
+                if (ueCodigoEol != null)
+                    where += "and rpc.ue_codigo_eol = @ueCodigoEol ";
 
                 if (turmasCodigosEol != null)
                     where += " and rpc.turma_codigo = any(@turmasCodigosEol) ";

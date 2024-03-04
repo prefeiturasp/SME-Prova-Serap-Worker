@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (request.AderirATodos == false)
             {
-                var res = resultado.OrderBy(x => x.DreCodigoEol).OrderBy(x => x.UeCodigoEol).OrderBy(x => x.TurmaAnoEscolar).OrderBy(x => x.TurmaDescricao).OrderBy(x => x.AlunoNome).OrderBy(x => x.QuestaoOrdem).OrderBy(x => x.QuestaoId).ToList();
+                var res = resultado.OrderBy(x => x.DreCodigoEol).ThenBy(x => x.UeCodigoEol).ThenBy(x => x.TurmaAnoEscolar).ThenBy(x => x.TurmaDescricao).ThenBy(x => x.AlunoNome).ThenBy(x => x.QuestaoOrdem).ToList();
                 return res;
             }
 

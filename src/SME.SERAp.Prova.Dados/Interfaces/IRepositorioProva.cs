@@ -28,7 +28,8 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<Dominio.Prova>> ObterProvasLiberadasNoPeriodoParaCacheAsync();
         Task ConsolidarProvaRespostasAdesaoManual(long provaId);
         Task<bool> VerificaSePossuiTipoDeficiencia(long provaLegadoId);
-        Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterAlunosProvaAdesaoManualPorProvaLegadoId(long provaLegadoId);
-        Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterAlunosProvaDeficienciaPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);
+        Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaAdesaoTodosPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);        
+        Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaAdesaoManualPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);
+        Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaDeficienciaPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace SME.SERAp.Prova.Aplicacao.Queries.ObterAlunosResultadoProvaDeficiencia
+namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterAlunosResultadoProvaDeficienciaQueryValidator : AbstractValidator<ObterAlunosResultadoProvaDeficienciaQuery>
     {

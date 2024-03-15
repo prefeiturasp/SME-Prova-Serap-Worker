@@ -1,9 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dados;
-using SME.SERAp.Prova.Dominio;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using SME.SERAp.Prova.Infra.Dtos;
@@ -18,9 +15,10 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.ObterQuestaoAlunoRespostaPorProvaIdE
         {
             this.repositorioResultadoProvaConsolidado = repositorioResultadoProvaConsolidado ?? throw new System.ArgumentNullException(nameof(repositorioResultadoProvaConsolidado));
         }
+
         public async Task<IEnumerable<AlunoQuestaoRespostasDto>> Handle(ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQuery request, CancellationToken cancellationToken)
         {
-            return await   repositorioResultadoProvaConsolidado.ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRA(request.ProvaLegadoId, request.AlunoRa);
+            return await repositorioResultadoProvaConsolidado.ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRA(request.ProvaLegadoId, request.AlunoRa);
         }
     }
 }

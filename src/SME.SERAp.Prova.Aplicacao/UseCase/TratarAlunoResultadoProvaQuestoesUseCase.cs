@@ -1,26 +1,18 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using SME.SERAp.Prova.Infra;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Linq;
 using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Aplicacao.Commands.ResultadoProvaConsolidado.Incluir;
-using SME.SERAp.Prova.Aplicacao.Queries.ObterAlunosResultadoProvaAdesao;
-using SME.SERAp.Prova.Aplicacao.Queries.ObterAlunosResultadoProvaDeficiencia;
 using SME.SERAp.Prova.Aplicacao.Queries.ObterQuestaoAlunoRespostaPorProvaIdEAlunoRa;
-using StackExchange.Redis;
 
 namespace SME.SERAp.Prova.Aplicacao.UseCase
 {
     public class TratarAlunoResultadoProvaQuestoesUseCase : ITratarAlunoResultadoProvaQuestoesUseCase
     {
-
         private readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
 
@@ -36,22 +28,19 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             
             try
             {
-             
-
                 if (filtro.ExportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
-                {
                     await BuscaRespostasEIncluiConsolidado(filtro);
-                }
-
-
             }
             catch (Exception ex)
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(filtro.ExportacaoResultado, ExportacaoResultadoStatus.Erro));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, filtro.ExportacaoResultado.Id));
+                
                 servicoLog.Registrar($"Escrever dados no arquivo CSV. msg: {mensagemRabbit.Mensagem}", ex);
+
                 return false;
             }
+
             return true;
         }
 

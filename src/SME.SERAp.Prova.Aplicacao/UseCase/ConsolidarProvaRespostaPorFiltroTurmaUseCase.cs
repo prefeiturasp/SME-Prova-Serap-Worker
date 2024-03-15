@@ -6,7 +6,6 @@ using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using SME.SERAp.Prova.Aplicacao.Queries.ObterAlunosResultadoProvaDeficiencia;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -37,14 +36,15 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
                     return true;
                 
-                var consolidadoProvaResposta = Enumerable.Empty<ConsolidadoProvaRespostaDto>();
+                var consolidadoAlunoProva = Enumerable.Empty<ConsolidadoAlunoProvaDto>();
                 
                 if (filtro.AlunosComDeficiencia)
-                    consolidadoProvaResposta = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaId, filtro.TurmaEolIds));
+                    consolidadoAlunoProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaId, filtro.TurmaEolIds));
                 else if (filtro.AdesaoManual)
-                    ConsolidarProvaRespostaAdesaoManual();
+                    consolidadoAlunoProva = await mediator.Send( new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaId, filtro.TurmaEolIds));
                 else
-                    ConsolidarProvaRespostaAdesaoTodos();
+                    consolidadoAlunoProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaId, filtro.TurmaEolIds));
+
                 
                 /* todo:
                 await mediator.Send(new ConsolidarProvaRespostaPorFiltroCommand(filtro.ProvaId, filtro.DreEolId, filtro.UeEolIds, filtro.TurmaEolIds));

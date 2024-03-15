@@ -208,6 +208,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.ConsolidarProvaResultado, new ComandoRabbit("Inicia consolidação dos dados da prova para exportação", typeof(IConsolidarProvaResultadoUseCase)));
             comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltro, new ComandoRabbit("Faz a consolidação dos dados da prova por filtro", typeof(IConsolidarProvaRespostaPorFiltroUseCase)));
             comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, new ComandoRabbit("Faz a consolidação dos dados da prova por turma", typeof(IConsolidarProvaRespostaPorFiltroTurmaUseCase)));
+            comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltroTurmaTratar, new ComandoRabbit("Tratar alunos resultado prova", typeof(ITratarAlunoResultadoProvaQuestoesUseCase)));
             comandos.Add(RotasRabbit.TratarAdesaoProva, new ComandoRabbit("Faz a sincronização da adesão da prova do legado para o serap estudantes", typeof(ITratarAdesaoProvaUseCase)));
             comandos.Add(RotasRabbit.TratarAdesaoProvaAluno, new ComandoRabbit("Faz a sincronização da adesão do aluno na prova do legado para o serap estudantes", typeof(ITratarAdesaoProvaAlunoUseCase)));
 
@@ -295,8 +296,6 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoCicloTurma, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Turma", typeof(ITratarProficienciaCicloTurmaUseCase)));            
             comandos.Add(RotasRabbit.ImportarResultadoCicloDrePsp, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Dre ", typeof(IImportarResultadoCicloDreUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoCicloDre, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Dre", typeof(ITratarResultadoCicloDreUseCase)));
-
-            comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltroTurmaTratar, new ComandoRabbit("Tratar alunos resultado prova", typeof(ITratarAlunoResultadoProvaQuestoesUseCase)));
             
             // Propagar Cache
             comandos.Add(RotasRabbit.PropagarCache, new ComandoRabbit("Propagar o cache", typeof(IPropagarCacheUseCase)));

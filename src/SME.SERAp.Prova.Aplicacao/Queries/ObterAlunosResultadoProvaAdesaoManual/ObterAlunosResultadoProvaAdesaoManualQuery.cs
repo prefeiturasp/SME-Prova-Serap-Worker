@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterAlunosResultadoProvaDeficienciaQuery : IRequest<IEnumerable<ConsolidadoAlunoProvaDto>>
+    public class ObterAlunosResultadoProvaAdesaoManualQuery : IRequest<IEnumerable<ConsolidadoAlunoProvaDto>>
     {
-        public ObterAlunosResultadoProvaDeficienciaQuery(long provaId, string[] turmasCodigos)
+        public ObterAlunosResultadoProvaAdesaoManualQuery(long provaId, string[] turmasCodigos)
         {
             ProvaId = provaId;
             TurmasCodigos = turmasCodigos;
@@ -16,4 +16,3 @@ namespace SME.SERAp.Prova.Aplicacao
         public string[] TurmasCodigos { get; }
     }
 }
-

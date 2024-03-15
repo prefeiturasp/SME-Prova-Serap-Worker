@@ -14,9 +14,7 @@ namespace SME.SERAp.Prova.Dados
         Task ExcluirResultadoProvaAlunoTurma(long provaLegadoId, long alunoCodigoEol, string turmaCodigo);
         Task<IEnumerable<string>> ObterTurmasResultadoProvaAluno(long provaLegadoId, long alunoCodigoEol);
         Task IncluirResultadoProvaConsolidado(ResultadoProvaConsolidado resultado);
-
         Task<IEnumerable<AlunoQuestaoRespostasDto>> ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRA(long provaLegadoId, long alunoRa);
-
         Task ExcluirDadosConsolidadosPorProvaSerapEstudantesId(long provaSerapEstudantesId);
         Task ExcluirDadosConsolidadosPorProvaLegadoId(long provaSerapId);
     }

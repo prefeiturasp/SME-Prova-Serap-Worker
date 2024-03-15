@@ -56,7 +56,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = $@"select 1 from exportacao_resultado_item where exportacao_resultado_id = @id;";
+                const string query = "select 1 from exportacao_resultado_item where exportacao_resultado_id = @id;";
                 var result = await conn.QueryFirstOrDefaultAsync(query, new { Id = IdProcesso }, commandTimeout: 600);
                 return result != null;
             }

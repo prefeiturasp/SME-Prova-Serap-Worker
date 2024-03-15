@@ -14,11 +14,12 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.repositorioProva = repositorioProva ?? throw new ArgumentNullException(nameof(repositorioProva));
         }
+        
         public async Task<bool> Handle(ConsolidarProvaRespostaPorFiltroCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                foreach (string ueId in request.UeEolIds)
+                foreach (var ueId in request.UeEolIds)
                 {
                     await repositorioProva.LimparDadosConsolidadosPorFiltros(request.ProvaId, request.DreEolId, ueId, request.TurmaEolIds[0]);
                     await repositorioProva.ConsolidarProvaRespostasPorFiltros(request.ProvaId, request.DreEolId, ueId, request.TurmaEolIds[0]);

@@ -1,7 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.SERAp.Prova.Aplicacao.Queries.VerificaProvaPossuiTipoDeficiencia
 {
@@ -12,6 +9,6 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.VerificaProvaPossuiTipoDeficiencia
             ProvaLegadoId = provaLegadoId;
         }
 
-        public long ProvaLegadoId { get; set; }
+        public long ProvaLegadoId { get; }
     }
 }

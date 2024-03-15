@@ -14,21 +14,16 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public string[] TurmasCodigosEol { get; set; }
 
-        public bool AderirATodos { get; set; } = false;
-
-        public ObterExtracaoProvaRespostaQuery(long provaSerapId, string dreCodigoEol, string ueCodigoEol, string[] turmasCodigosEol = null)
-        {
-            ProvaSerapId = provaSerapId;
-            DreCodigoEol = dreCodigoEol;
-            UeCodigoEol = ueCodigoEol;
-            TurmasCodigosEol = turmasCodigosEol;
-        }
-
+        public bool AderirATodos { get; set; }
 
         public ObterExtracaoProvaRespostaQuery(long provaSerapId, bool aderirATodos)
         {
             ProvaSerapId = provaSerapId;
             AderirATodos = aderirATodos;
+        }
+
+        public ObterExtracaoProvaRespostaQuery()
+        {
         }
     }
 }

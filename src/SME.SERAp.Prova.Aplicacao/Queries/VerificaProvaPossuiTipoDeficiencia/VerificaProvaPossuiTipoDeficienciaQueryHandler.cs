@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dados;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -16,6 +14,7 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.VerificaProvaPossuiTipoDeficiencia
         {
             this.repositorioProva = repositorioProva ?? throw new ArgumentNullException(nameof(repositorioProva));
         }
+
         public async Task<bool> Handle(VerificaProvaPossuiTipoDeficienciaQuery request, CancellationToken cancellationToken)
         {
            return await repositorioProva.VerificaSePossuiTipoDeficiencia(request.ProvaLegadoId);

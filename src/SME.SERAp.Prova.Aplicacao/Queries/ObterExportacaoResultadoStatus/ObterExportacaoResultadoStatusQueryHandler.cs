@@ -21,7 +21,7 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var exportacao = new ExportacaoResultado { Id = request.Id, ProvaSerapId = request.ProvaSerapId };
-                string chaveRedis = $"exportacao-{exportacao.Id}-prova-{exportacao.ProvaSerapId}-status";
+                var chaveRedis = $"exportacao-{exportacao.Id}-prova-{exportacao.ProvaSerapId}-status";
                 exportacao.Status = (ExportacaoResultadoStatus)await repositorioCache.ObterRedisAsync(chaveRedis, async () => await repositorioExportacaoResultado.ObterStatusPorIdAsync(exportacao.Id));
                 return exportacao;
             }

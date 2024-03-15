@@ -12,7 +12,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarProvaResultadoExtracaoFiltroUseCase : ITratarProvaResultadoExtracaoFiltroUseCase
     {
-
         private readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
 
@@ -25,54 +24,43 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
+            
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
-            var aderirATodosOuDeficiencia = filtro.AdesaoManual ? true : filtro.AlunosComDeficiencia ? true : false;
+            if (exportacaoResultado is null)
+                throw new NegocioException("A exportação não foi encontrada");
+
             try 
             {
                 if (filtro is null)
                     throw new NegocioException("O filtro precisa ser informado");
-                if (exportacaoResultado is null)
-                    throw new NegocioException("A exportação não foi encontrada");
 
                 if (exportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
                 {
-                    if (!ExisteArquivo(filtro.CaminhoArquivo))
+                    if (!File.Exists(filtro.CaminhoArquivo))
                         throw new NegocioException($"Arquivo não foi encontrado: {filtro.CaminhoArquivo}");
 
+                    var resultados = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaId, !filtro.AdesaoManual));
+                    if (resultados != null && resultados.Any())
+                        await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultados, filtro.CaminhoArquivo));
 
-                    var resultado = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaId, aderirATodosOuDeficiencia));
+                    await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
 
-                    if (resultado != null && resultado.Any())
-                        await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultado, filtro.CaminhoArquivo));
-
-                    if (aderirATodosOuDeficiencia)
-                        await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Finalizado));
-
-                    else
-                    {
-
-                        await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
-                        bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
-                        if (!existeItemProcesso)
-                        {
-                            await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
-                        }
-                    }
+                    var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
+                    if (!existeItemProcesso)
+                        await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
                 }
             }
             catch (Exception ex)
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
+
                 servicoLog.Registrar($"Escrever dados no arquivo CSV. msg: {mensagemRabbit.Mensagem}", ex);
+
                 return false;
             }
-            return true;
-        }
 
-        private bool ExisteArquivo(string caminhoArquivo)
-        {
-            return File.Exists(caminhoArquivo);
+            return true;
         }
     }
 }

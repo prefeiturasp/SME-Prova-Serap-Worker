@@ -22,7 +22,7 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.ObterAlunosResultadoProvaDeficiencia
 
         public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> Handle(ObterAlunosResultadoProvaDeficienciaQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioProva.ObterAlunosProvaDeficienciaPorProvaLegadoId(request.ProvaId);
+            return await repositorioProva.ObterAlunosProvaDeficienciaPorProvaLegadoIdETurmasCodigos(request.ProvaId, request.TurmasCodigos);
         }
     }
 }

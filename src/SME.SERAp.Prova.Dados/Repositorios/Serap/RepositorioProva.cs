@@ -14,18 +14,16 @@ namespace SME.SERAp.Prova.Dados
         {
 
         }
-
-       
-
+        
         public async Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = $@"call p_excluir_dados_consolidados_prova(@provaId, @dreId, @ueId, @turmaCodigo);";
-                await conn.ExecuteAsync(query, new { provaId, dreId, ueId, turmaCodigo }, commandTimeout: 50000);
+	            const string query = @"call p_excluir_dados_consolidados_prova(@provaId, @dreId, @ueId, @turmaCodigo);";
+	            await conn.ExecuteAsync(query, new { provaId, dreId, ueId, turmaCodigo }, commandTimeout: 50000);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -95,10 +93,10 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = $@"call p_consolidar_dados_prova(@provaId, @dreId, @ueId, @turmaCodigo);";
-                await conn.ExecuteAsync(query, new { provaId, dreId, ueId, turmaCodigo }, commandTimeout: 50000);
+	            const string query = "call p_consolidar_dados_prova(@provaId, @dreId, @ueId, @turmaCodigo);";
+	            await conn.ExecuteAsync(query, new { provaId, dreId, ueId, turmaCodigo }, commandTimeout: 50000);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -466,24 +464,18 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-    
-
         public async Task<bool> VerificaSePossuiTipoDeficiencia(long provaLegadoId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = $@"select
-                                1
-                                from prova p
-                                inner
-                                join tipo_prova tp
-                                    on p.tipo_prova_id = tp.id
-                                    and tp.para_estudante_com_deficiencia
-                                   where p.prova_legado_id = @ProvaLegadoId";
+	            const string query = @"select 1
+										from prova p
+                                		inner join tipo_prova tp on p.tipo_prova_id = tp.id
+                                    		and tp.para_estudante_com_deficiencia
+                                   		where p.prova_legado_id = @ProvaLegadoId";
 
-                return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaLegadoId });
-
+	            return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaLegadoId });
             }
             catch (Exception ex)
             {
@@ -495,8 +487,6 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-
-
 
         public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterAlunosProvaAdesaoManualPorProvaLegadoId(long provaLegadoId)
         {
@@ -620,207 +610,184 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-
-        public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterAlunosProvaDeficienciaPorProvaLegadoId(long provaLegadoId)
+        public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterAlunosProvaDeficienciaPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos)
         {
             using var conn = ObterConexao();
+
             try
             {
-                var query = $@"
-                	 with tb_prova_turma as (
-                	select
-                		distinct vpta.prova_id as prova_serap_estudantes_id,
-                		vpta.prova_legado_id as prova_serap_id,
-                		vpta.turma_id,
-                		vpta.aluno_id,
-                		vpta.aluno_ra,
-                		p.inicio,
-                		p.fim,
-                		case
-                			when p.disciplina is null
-                			or p.multidisciplinar then 'Multidisciplinar'
-                			else p.disciplina
-                		end as prova_componente,
-                		p.total_itens as prova_quantidade_questoes,
-                		p.possui_bib
-                	from
-                		v_prova_turma_aluno vpta
-                	left join prova p on p.id = vpta.prova_id
-                	where vpta.aderir_todos = true
-                	and vpta.prova_legado_id =  @provaLegadoId
-                ),                     
-                tb_deficiencias as (
-                	select td.id as deficiencia_id, p.prova_legado_id 
-                	from prova p
-                	inner join tipo_prova tp on tp.id = p.tipo_prova_id
-                	inner join tipo_prova_deficiencia tpd on tpd.tipo_prova_id = tp.id  
-                	inner join tipo_deficiencia td on td.id = tpd.deficiencia_id 
-                	where p.prova_legado_id =  @provaLegadoId
-                ),
-                tb_prova_turma_aluno as (
-                	select
-                		distinct tb_prova_turma.prova_serap_estudantes_id,
-                		tb_prova_turma.prova_serap_id,
-                		tb_prova_turma.inicio,
-                		tb_prova_turma.fim,
-                		tb_prova_turma.prova_componente,
-                		tb_prova_turma.prova_quantidade_questoes,
-                		tb_prova_turma.possui_bib,
-                		coalesce(tah.aluno_id, tb_prova_turma.aluno_id) as aluno_id
-                	from
-                		tb_prova_turma
-                	left join aluno a on a.id = tb_prova_turma.aluno_id		
-                	left join turma_aluno_historico tah on tah.turma_id = tb_prova_turma.turma_id
-                		and tah.data_matricula <= tb_prova_turma.fim
-                		and (tah.data_situacao >= tb_prova_turma.inicio or tah.data_situacao is null or tah.data_situacao <= a.data_atualizacao)
-                		and tah.ano_letivo = extract(year from tb_prova_turma.inicio)	
-                	left join turma t on t.id = coalesce(tah.turma_id, tb_prova_turma.turma_id)
-                	where t.nome not similar to '(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|X|W|Y|Z)%'
-                	and (exists (select 1
-                				from aluno_deficiencia ad
-                				where ad.aluno_ra = tb_prova_turma.aluno_ra
-                				and ad.deficiencia_id in (select deficiencia_id from tb_deficiencias))
-                	or exists (select 1 
-                				from aluno_deficiencia ad 
-                				join aluno a on a.ra = ad.aluno_ra
-                				where a.id = coalesce(tah.aluno_id, tb_prova_turma.aluno_id) 
-                				and ad.deficiencia_id in (select deficiencia_id from tb_deficiencias)))
-                ),
-                tb_prova_turma_aluno_adesao_todos as (
-                	select
-                		tb_prova_turma_aluno.prova_serap_id,
-                		tb_prova_turma_aluno.prova_serap_estudantes_id,
-                		a.ra as aluno_codigo_eol,
-                		coalesce(a.nome_social,
-                		a.nome) as aluno_nome,
-                		a.sexo as aluno_sexo,
-                		a.data_nascimento as aluno_data_nascimento,
-                		tb_prova_turma_aluno.prova_componente,
-                		case
-                			when tb_prova_turma_aluno.possui_bib then ca.caderno
-                			else ''
-                		end as prova_caderno,
-                		tb_prova_turma_aluno.prova_quantidade_questoes,
-                		case
-                			when palu.frequencia = 0 then 'N'
-                			when palu.frequencia = 1 then 'P'
-                			when palu.frequencia = 2 then 'A'
-                			when palu.frequencia = 3 then 'R'
-                			else 'N'
-                		end as aluno_frequencia,
-                		palu.criado_em as prova_data_inicio,
-                		palu.finalizado_em as prova_data_entregue,
-                		tb_prova_turma_aluno.possui_bib,
-                		coalesce(case
-                			when palu.id is null then
-                				(select
-                					tah.turma_id
-                				from
-                					turma_aluno_historico tah
-                				inner join turma t on t.id = tah.turma_id 
-                				where
-                					tah.aluno_id = a.id
-                					and tah.data_matricula::date <= tb_prova_turma_aluno.fim::date
-                					and (tah.data_situacao::date >= tb_prova_turma_aluno.inicio::date or tah.data_situacao is null)
-                					and tah.ano_letivo = extract(year from tb_prova_turma_aluno.inicio)
-                					and t.nome not similar to '(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|X|W|Y|Z)%'
-                				order by tah.data_matricula desc
-                				limit 1)
-                			else
-                				(select
-                					tah.turma_id
-                				from
-                					turma_aluno_historico tah
-                				inner join turma t on t.id = tah.turma_id
-                				where
-                					tah.aluno_id = a.id
-                					and tah.data_matricula::date <= palu.finalizado_em::date
-                					and (tah.data_situacao::date >= tb_prova_turma_aluno.inicio::date or tah.data_situacao is null)
-                					and tah.ano_letivo = extract(year from tb_prova_turma_aluno.inicio)
-                					and t.nome not similar to '(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|X|W|Y|Z)%'
-                				order by tah.data_matricula desc
-                				limit 1)
-                		end, a.turma_id) as turma_id,
-                		a.situacao as aluno_situacao
-                	from
-                		tb_prova_turma_aluno
-                	left join aluno a on a.id = tb_prova_turma_aluno.aluno_id
-                	left join caderno_aluno ca on ca.prova_id = tb_prova_turma_aluno.prova_serap_estudantes_id and ca.aluno_id = a.id
-                	left join prova_aluno palu on palu.prova_id = tb_prova_turma_aluno.prova_serap_estudantes_id and palu.aluno_ra = a.ra
-                		and palu.status in (2, 5)
-                		and palu.finalizado_em is not null
-                	left join aluno_deficiencia ad on ad.aluno_ra = a.ra
-                	left join tipo_deficiencia td on td.id = ad.deficiencia_id
-                	where td.id is not null
-                )		
-                
-                            select
-                            prova_serap_id as ProvaSerapId,
-                            prova_serap_estudantes_id as ProvaSerapEstudantesId,
-                            	 dre.dre_id  as DreCodigoEol,
-                    dre.abreviacao  as DreSigla,
-                    dre.nome  as DreNome,
-                    ue.ue_id  as UeCodigoEol,
-                    (
-                        CASE
-                            WHEN ue.tipo_escola = 1 THEN 'EMEF'::text
-                            WHEN ue.tipo_escola = 2 THEN 'EMEI'::text
-                            WHEN ue.tipo_escola = 3 THEN 'EMEFM'::text
-                            WHEN ue.tipo_escola = 4 THEN 'EMEBS'::text
-                            WHEN ue.tipo_escola = 10 THEN 'CEI DIRET'::text
-                            WHEN ue.tipo_escola = 11 THEN 'CEI INDIR'::text
-                            WHEN ue.tipo_escola = 12 THEN 'CR.P.CONV'::text
-                            WHEN ue.tipo_escola = 13 THEN 'CIEJA'::text
-                            WHEN ue.tipo_escola = 14 THEN 'CCI/CIPS'::text
-                            WHEN ue.tipo_escola = 15 THEN 'ESC.PART.'::text
-                            WHEN ue.tipo_escola = 16 THEN 'CEU EMEF'::text
-                            WHEN ue.tipo_escola = 17 THEN 'CEU EMEI'::text
-                            WHEN ue.tipo_escola = 18 THEN 'CEU CEI'::text
-                            WHEN ue.tipo_escola = 19 THEN 'CEU'::text
-                            WHEN ue.tipo_escola = 22 THEN 'MOVA'::text
-                            WHEN ue.tipo_escola = 23 THEN 'CMCT'::text
-                            WHEN ue.tipo_escola = 25 THEN 'E TEC'::text
-                            WHEN ue.tipo_escola = 26 THEN 'ESP CONV'::text
-                            WHEN ue.tipo_escola = 27 THEN 'CEU AT COMPL'::text
-                            WHEN ue.tipo_escola = 29 THEN 'CCA'::text
-                            WHEN ue.tipo_escola = 28 THEN 'CEMEI'::text
-                            WHEN ue.tipo_escola = 30 THEN 'CECI'::text
-                            WHEN ue.tipo_escola = 31 THEN 'CEU CEMEI'::text
-                            WHEN ue.tipo_escola = 32 THEN 'EMEF'::text
-                            WHEN ue.tipo_escola = 33 THEN 'EMEI'::text
-                    ELSE NULL::text
-                             END || ' '::text) || ue.nome::text as UeNome,
-                              t.ano as TurmaAnoEscolar,
-							   CASE
-                            WHEN t.ano::text <> 'S'::text THEN (t.ano::text || 'ano'::text)::CHARACTER varying
-                            ELSE t.ano
-                            END AS TurmaAnoEscolarDescricaco,
-							t.codigo AS TurmaCodigo,
-                            t.nome AS TurmaDescricao,
-                            aluno_codigo_eol as AlunoCodigoEol,
-                            aluno_nome as AlunoNome,
-                            aluno_sexo as AlunoSexo,
-                            aluno_data_nascimento as AlunoDataNascimento,
-                            prova_componente as ProvaComponente,
-                            prova_caderno as ProvaCaderno,
-                            prova_quantidade_questoes as ProvaQuantidadeQuestoes,
-                            aluno_frequencia as AlunoFrequencia,
-                            prova_data_inicio as DataInicio,
-                            prova_data_entregue as DataFim,
-                            possui_bib,
-                            turma_id as TurmaCodigo,
-                            aluno_situacao
-                            
-                            from tb_prova_turma_aluno_adesao_todos p
-                            inner join turma t on t.id  = p.turma_id 
-                            inner join ue  on ue.id = t.ue_id  
-                            inner join dre on dre.id = ue.dre_id 
-                            "; ;
+                const string query = @"with tb_prova_turma as (
+                							select distinct vpta.prova_id as prova_serap_estudantes_id,
+                								vpta.prova_legado_id as prova_serap_id,
+                								vpta.turma_id,
+                								vpta.aluno_id,
+                								vpta.aluno_ra,
+                								p.inicio,
+                								p.fim,
+                								case
+                									when p.disciplina is null
+                									or p.multidisciplinar then 'Multidisciplinar'
+                									else p.disciplina
+                								end as prova_componente,
+                								p.total_itens as prova_quantidade_questoes,
+                								p.possui_bib
+                							from v_prova_turma_aluno vpta
+                							left join prova p on p.id = vpta.prova_id
+                							where vpta.aderir_todos = true
+                							and vpta.prova_legado_id = @provaLegadoId											
+										),                     
+						                tb_deficiencias as (
+                							select td.id as deficiencia_id, p.prova_legado_id 
+                							from prova p
+                							inner join tipo_prova tp on tp.id = p.tipo_prova_id
+                							inner join tipo_prova_deficiencia tpd on tpd.tipo_prova_id = tp.id  
+                							inner join tipo_deficiencia td on td.id = tpd.deficiencia_id 
+                							where p.prova_legado_id =  @provaLegadoId
+						                ),
+										tb_prova_turma_aluno as (
+                							select distinct tb_prova_turma.prova_serap_estudantes_id,
+                								tb_prova_turma.prova_serap_id,
+                								tb_prova_turma.inicio,
+                								tb_prova_turma.fim,
+                								tb_prova_turma.prova_componente,
+                								tb_prova_turma.prova_quantidade_questoes,
+                								tb_prova_turma.possui_bib,
+                								coalesce(tah.aluno_id, tb_prova_turma.aluno_id) as aluno_id
+                							from tb_prova_turma
+                							left join aluno a on a.id = tb_prova_turma.aluno_id		
+                							left join turma_aluno_historico tah on tah.turma_id = tb_prova_turma.turma_id
+                								and tah.data_matricula <= tb_prova_turma.fim
+                								and (tah.data_situacao >= tb_prova_turma.inicio or tah.data_situacao is null or tah.data_situacao <= a.data_atualizacao)
+                								and tah.ano_letivo = extract(year from tb_prova_turma.inicio)	
+                							left join turma t on t.id = coalesce(tah.turma_id, tb_prova_turma.turma_id)
+                							where (exists (select 1
+                										from aluno_deficiencia ad
+                										where ad.aluno_ra = tb_prova_turma.aluno_ra
+                										and ad.deficiencia_id in (select deficiencia_id from tb_deficiencias))
+                									or exists (select 1 
+                												from aluno_deficiencia ad 
+                												join aluno a on a.ra = ad.aluno_ra
+                												where a.id = coalesce(tah.aluno_id, tb_prova_turma.aluno_id) 
+                												and ad.deficiencia_id in (select deficiencia_id from tb_deficiencias)))
+										),
+										tb_prova_turma_aluno_adesao_todos as (
+                							select tb_prova_turma_aluno.prova_serap_id,
+                								tb_prova_turma_aluno.prova_serap_estudantes_id,
+                								a.ra as aluno_codigo_eol,
+                								coalesce(a.nome_social, a.nome) as aluno_nome,
+                								a.sexo as aluno_sexo,
+                								a.data_nascimento as aluno_data_nascimento,
+                								tb_prova_turma_aluno.prova_componente,
+                								case
+                									when tb_prova_turma_aluno.possui_bib then ca.caderno
+                									else ''
+                								end as prova_caderno,
+                								tb_prova_turma_aluno.prova_quantidade_questoes,
+                								case
+                									when palu.frequencia = 0 then 'N'
+                									when palu.frequencia = 1 then 'P'
+                									when palu.frequencia = 2 then 'A'
+                									when palu.frequencia = 3 then 'R'
+                									else 'N'
+                								end as aluno_frequencia,
+                								palu.criado_em as prova_data_inicio,
+                								palu.finalizado_em as prova_data_entregue,
+                								tb_prova_turma_aluno.possui_bib,
+                								coalesce(case
+                									when palu.id is null then
+                										(select tah.turma_id
+                											from turma_aluno_historico tah
+                											inner join turma t on t.id = tah.turma_id 
+                											where tah.aluno_id = a.id
+                											and tah.data_matricula::date <= tb_prova_turma_aluno.fim::date
+                											and (tah.data_situacao::date >= tb_prova_turma_aluno.inicio::date or tah.data_situacao is null)
+                											and tah.ano_letivo = extract(year from tb_prova_turma_aluno.inicio)
+                											order by tah.data_matricula desc
+															limit 1)
+                									else
+                										(select tah.turma_id
+                											from turma_aluno_historico tah
+                											inner join turma t on t.id = tah.turma_id
+                											where tah.aluno_id = a.id
+                											and tah.data_matricula::date <= palu.finalizado_em::date
+                											and (tah.data_situacao::date >= tb_prova_turma_aluno.inicio::date or tah.data_situacao is null)
+                											and tah.ano_letivo = extract(year from tb_prova_turma_aluno.inicio)
+                											order by tah.data_matricula desc
+															limit 1)
+                								end, a.turma_id) as turma_id,
+                								a.situacao as aluno_situacao
+                							from tb_prova_turma_aluno
+                							left join aluno a on a.id = tb_prova_turma_aluno.aluno_id
+                							left join caderno_aluno ca on ca.prova_id = tb_prova_turma_aluno.prova_serap_estudantes_id
+												and ca.aluno_id = a.id
+                							left join prova_aluno palu on palu.prova_id = tb_prova_turma_aluno.prova_serap_estudantes_id 
+												and palu.aluno_ra = a.ra
+                								and palu.status in (2, 5, 6, 7)
+                								and palu.finalizado_em is not null
+										)		
+			                            select distinct prova_serap_id as ProvaSerapId,
+											prova_serap_estudantes_id as ProvaSerapEstudantesId,
+                            				dre.dre_id as DreCodigoEol,
+											dre.abreviacao as DreSigla,
+											dre.nome as DreNome,
+											ue.ue_id as UeCodigoEol,
+											(CASE
+												WHEN ue.tipo_escola = 1 THEN 'EMEF'::text
+					                            WHEN ue.tipo_escola = 2 THEN 'EMEI'::text
+					                            WHEN ue.tipo_escola = 3 THEN 'EMEFM'::text
+					                            WHEN ue.tipo_escola = 4 THEN 'EMEBS'::text
+					                            WHEN ue.tipo_escola = 10 THEN 'CEI DIRET'::text
+					                            WHEN ue.tipo_escola = 11 THEN 'CEI INDIR'::text
+					                            WHEN ue.tipo_escola = 12 THEN 'CR.P.CONV'::text
+					                            WHEN ue.tipo_escola = 13 THEN 'CIEJA'::text
+					                            WHEN ue.tipo_escola = 14 THEN 'CCI/CIPS'::text
+					                            WHEN ue.tipo_escola = 15 THEN 'ESC.PART.'::text
+					                            WHEN ue.tipo_escola = 16 THEN 'CEU EMEF'::text
+					                            WHEN ue.tipo_escola = 17 THEN 'CEU EMEI'::text
+					                            WHEN ue.tipo_escola = 18 THEN 'CEU CEI'::text
+					                            WHEN ue.tipo_escola = 19 THEN 'CEU'::text
+					                            WHEN ue.tipo_escola = 22 THEN 'MOVA'::text
+					                            WHEN ue.tipo_escola = 23 THEN 'CMCT'::text
+					                            WHEN ue.tipo_escola = 25 THEN 'E TEC'::text
+					                            WHEN ue.tipo_escola = 26 THEN 'ESP CONV'::text
+					                            WHEN ue.tipo_escola = 27 THEN 'CEU AT COMPL'::text
+					                            WHEN ue.tipo_escola = 29 THEN 'CCA'::text
+					                            WHEN ue.tipo_escola = 28 THEN 'CEMEI'::text
+					                            WHEN ue.tipo_escola = 30 THEN 'CECI'::text
+					                            WHEN ue.tipo_escola = 31 THEN 'CEU CEMEI'::text
+					                            WHEN ue.tipo_escola = 32 THEN 'EMEF'::text
+					                            WHEN ue.tipo_escola = 33 THEN 'EMEI'::text
+												ELSE NULL::text
+											END || ' '::text) || ue.nome::text as UeNome,
+											t.ano as TurmaAnoEscolar,
+											CASE
+												WHEN t.ano::text <> 'S'::text THEN (t.ano::text || 'ano'::text)::CHARACTER varying
+												ELSE t.ano
+											END AS TurmaAnoEscolarDescricaco,
+											t.codigo AS TurmaCodigo,
+											t.nome AS TurmaDescricao,
+											aluno_codigo_eol as AlunoCodigoEol,
+											aluno_nome as AlunoNome,
+											aluno_sexo as AlunoSexo,
+											aluno_data_nascimento as AlunoDataNascimento,
+											prova_componente as ProvaComponente,
+											prova_caderno as ProvaCaderno,
+											prova_quantidade_questoes as ProvaQuantidadeQuestoes,
+											aluno_frequencia as AlunoFrequencia,
+											prova_data_inicio as DataInicio,
+											prova_data_entregue as DataFim,
+											possui_bib,
+											turma_id as TurmaCodigo,
+											aluno_situacao                            
+										from tb_prova_turma_aluno_adesao_todos p
+											inner join turma t on t.id  = p.turma_id 
+											inner join ue on ue.id = t.ue_id  
+											inner join dre on dre.id = ue.dre_id
+										where t.codigo = in @turmasCodigos";
 
-                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaLegadoId }, commandTimeout: 300000);
-
+                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaLegadoId, turmasCodigos });
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -830,8 +797,5 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-
-
-
     }
 }

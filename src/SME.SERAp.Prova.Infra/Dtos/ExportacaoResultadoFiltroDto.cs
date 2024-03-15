@@ -3,17 +3,17 @@ namespace SME.SERAp.Prova.Infra
 {
     public class ExportacaoResultadoFiltroDto : DtoBase
     {
-        public ExportacaoResultadoFiltroDto(long processoId, long provaId, long itemId, string dreEolId, string[] ueEolIds)
+        public ExportacaoResultadoFiltroDto(long processoId, long provaSerapId, long itemId, string dreEolId, string[] ueEolIds)
         {
             ProcessoId = processoId;
-            ProvaId = provaId;
+            ProvaSerapId = provaSerapId;
             ItemId = itemId;
             DreEolId = dreEolId;
             UeEolIds = ueEolIds;
         }
 
-        public ExportacaoResultadoFiltroDto(long processoId, long provaId, long itemId, string dreEolId,
-            string[] ueEolIds, bool adesaoManual, bool alunosComDeficiencia) : this(processoId, provaId, itemId,
+        public ExportacaoResultadoFiltroDto(long processoId, long provaSerapId, long itemId, string dreEolId,
+            string[] ueEolIds, bool adesaoManual, bool alunosComDeficiencia) : this(processoId, provaSerapId, itemId,
             dreEolId, ueEolIds)
         {
             AdesaoManual = adesaoManual;
@@ -25,7 +25,7 @@ namespace SME.SERAp.Prova.Infra
         }
 
         public long ProcessoId { get; set; }
-        public long ProvaId { get; set; }
+        public long ProvaSerapId { get; set; }
         public long ItemId { get; set; }
         public string DreEolId { get; set; }
         public string[] UeEolIds { get; set; }

@@ -25,7 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
             
-            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaSerapId));
             if (exportacaoResultado is null)
                 throw new NegocioException("A exportação não foi encontrada");
 
@@ -39,7 +39,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     if (!File.Exists(filtro.CaminhoArquivo))
                         throw new NegocioException($"Arquivo não foi encontrado: {filtro.CaminhoArquivo}");
 
-                    var resultados = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaId, !filtro.AdesaoManual));
+                    var resultados = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaSerapId, !filtro.AdesaoManual));
                     if (resultados != null && resultados.Any())
                         await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultados, filtro.CaminhoArquivo));
 

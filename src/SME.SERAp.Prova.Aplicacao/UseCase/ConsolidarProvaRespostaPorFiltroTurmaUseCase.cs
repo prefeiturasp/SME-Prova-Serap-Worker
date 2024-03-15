@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
             
-            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaSerapId));
             if (exportacaoResultado is null)
                 throw new NegocioException("A exportação não foi encontrada");            
 
@@ -36,24 +37,23 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
                     return true;
                 
-                var consolidadoAlunosProva = Enumerable.Empty<ConsolidadoAlunoProvaDto>();
-                
-                if (filtro.AlunosComDeficiencia)
-                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaId, filtro.TurmaEolIds));
-                else if (filtro.AdesaoManual)
-                    consolidadoAlunosProva = await mediator.Send( new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaId, filtro.TurmaEolIds));
-                else
-                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaId, filtro.TurmaEolIds));
+                await mediator.Send(new ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand(filtro.ProvaSerapId));
 
-                if (consolidadoAlunosProva.Any())
+                IEnumerable<ConsolidadoAlunoProvaDto> consolidadoAlunosProva;
+                if (filtro.AlunosComDeficiencia)
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaSerapId, filtro.TurmaEolIds));
+                else if (filtro.AdesaoManual)
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaSerapId, filtro.TurmaEolIds));
+                else
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaSerapId, filtro.TurmaEolIds));
+
+                if (consolidadoAlunosProva != null && consolidadoAlunosProva.Any())
                 {
                     foreach (var consolidadoAlunoProva in consolidadoAlunosProva)
                     {
                         var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQuery(consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));
                         if (respostas == null || !respostas.Any()) 
                             continue;
-                        
-                        await mediator.Send(new ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand(consolidadoAlunoProva.ProvaSerapId));
                         
                         foreach (var resposta in respostas)
                         {
@@ -96,7 +96,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (existeItemProcesso)
                     return true;
 
-                var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaId };
+                var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaSerapId };
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
 
                 return true;

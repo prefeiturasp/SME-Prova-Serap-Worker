@@ -28,7 +28,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova por filtro. msg: {mensagemRabbit.Mensagem}");
 
-            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaSerapId));
             try
             {
                 if (filtro is null)
@@ -43,7 +43,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 foreach (var ueCodigo in filtro.UeEolIds)
                 {
                     var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
-                    var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ueCodigo, filtro.ProvaId));
+                    var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ueCodigo, filtro.ProvaSerapId));
                     
                     if (turmasUe != null && turmasUe.Any())
                     {

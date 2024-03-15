@@ -111,7 +111,7 @@ namespace SME.SERAp.Prova.Dados
                 await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 50000);
 
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

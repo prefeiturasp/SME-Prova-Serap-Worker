@@ -11,16 +11,18 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.ConsolidarProvaRespostaAdesaoManual
     internal class ConsolidarProvaRespostaAdesaoManualCommandHandler : IRequestHandler<ConsolidarProvaRespostaAdesaoManualCommand, bool>
     {
         private readonly IRepositorioProva repositorioProva;
+        private readonly IRepositorioResultadoProvaConsolidado repositorioProvaConsolidado;
 
-        public ConsolidarProvaRespostaAdesaoManualCommandHandler(IRepositorioProva repositorioProva)
+        public ConsolidarProvaRespostaAdesaoManualCommandHandler(IRepositorioProva repositorioProva, IRepositorioResultadoProvaConsolidado repositorioProvaConsolidado)
         {
             this.repositorioProva = repositorioProva ?? throw new ArgumentNullException(nameof(repositorioProva));
+            this.repositorioProvaConsolidado = repositorioProvaConsolidado ?? throw new ArgumentNullException(nameof(repositorioProvaConsolidado)); ; 
         }
         public async Task<bool> Handle(ConsolidarProvaRespostaAdesaoManualCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                await repositorioProva.LimparDadosConsolidadosPorProvaSerapEstudantesId(request.ProvaId);
+                await repositorioProvaConsolidado.ExcluirDadosConsolidadosPorProvaSerapEstudantesId(request.ProvaId);
                 await repositorioProva.ConsolidarProvaRespostasAdesaoManual(request.ProvaId);
 
                 return true;

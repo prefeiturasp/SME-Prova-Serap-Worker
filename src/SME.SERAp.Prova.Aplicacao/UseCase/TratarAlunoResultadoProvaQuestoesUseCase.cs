@@ -43,19 +43,6 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
                     await BuscaRespostasEIncluiConsolidado(filtro);
                 }
 
-                await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ExportacaoResultado.Id));
-
-
-               // if(filtro.qtdRestante > 0)
-
-              //  bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
-                //if (!existeItemProcesso)
-                //{
-                //    var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaId };
-                //    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
-                //}
-
-                //if (qtdRestante > 0)
 
             }
             catch (Exception ex)
@@ -102,7 +89,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
                     Resposta = resposta.Resposta
                 };
 
-                await mediator.Send(new ResultadoProvaConsolidadoCommand(res));
+                await mediator.Send(new InserirResultadoProvaConsolidadoCommand(res));
             }
         }
     }

@@ -26,8 +26,8 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
-
-            try
+            var aderirATodosOuDeficiencia = filtro.AdesaoManual ? true : filtro.AlunosComDeficiencia ? true : false;
+            try 
             {
                 if (filtro is null)
                     throw new NegocioException("O filtro precisa ser informado");
@@ -39,15 +39,13 @@ namespace SME.SERAp.Prova.Aplicacao
                     if (!ExisteArquivo(filtro.CaminhoArquivo))
                         throw new NegocioException($"Arquivo não foi encontrado: {filtro.CaminhoArquivo}");
 
-                    var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));
 
-
-                    var resultado = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaId, prova.AderirTodos));
+                    var resultado = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaId, aderirATodosOuDeficiencia));
 
                     if (resultado != null && resultado.Any())
                         await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultado, filtro.CaminhoArquivo));
 
-                    if (prova.AderirTodos == false)
+                    if (aderirATodosOuDeficiencia)
                         await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Finalizado));
 
                     else
@@ -57,15 +55,9 @@ namespace SME.SERAp.Prova.Aplicacao
                         bool existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
                         if (!existeItemProcesso)
                         {
-
                             await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
                         }
-
                     }
-
-
-
-
                 }
             }
             catch (Exception ex)

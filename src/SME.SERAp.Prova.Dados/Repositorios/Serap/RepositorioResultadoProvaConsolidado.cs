@@ -160,6 +160,46 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task ExcluirDadosConsolidadosPorProvaSerapEstudantesId(long provaSerapEstudantesId)
+        {
+            using var conn = ObterConexaoLeitura(); 
+            try
+            {
+                var query = $@"delete from resultado_prova_consolidado where prova_serap_estudantes_id = @provaSerapEstudantesId;";
+                await conn.ExecuteAsync(query, new { provaSerapEstudantesId }, commandTimeout: 50000);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+
+        public async Task ExcluirDadosConsolidadosPorProvaLegadoId(long provaSerapId)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = $@"delete from resultado_prova_consolidado where prova_serap_id = @provaSerapId;";
+                await conn.ExecuteAsync(query, new { provaSerapId }, commandTimeout: 50000);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+
         public async Task<IEnumerable<string>> ObterTurmasResultadoProvaAluno(long provaLegadoId, long alunoCodigoEol)
         {
             using var conn = ObterConexaoLeitura();
@@ -183,7 +223,6 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        // Criar DTOS RETORNO     e incluoir na interface
 
         public async Task ObterRespostasAlunoPorProvaIdEAlunoCodigoEol(long provaId, long alunoCodigoEol)
         {

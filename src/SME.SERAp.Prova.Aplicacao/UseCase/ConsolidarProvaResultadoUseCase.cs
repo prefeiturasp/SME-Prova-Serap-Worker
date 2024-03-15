@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using RabbitMQ.Client;
 using SME.SERAp.Prova.Aplicacao.Commands.ConsolidarProvaRespostaAdesaoManual;
+using SME.SERAp.Prova.Aplicacao.Commands.ResultadoProvaConsolidado.Excluir;
 using SME.SERAp.Prova.Aplicacao.Commands.ResultadoProvaConsolidado.Incluir;
 using SME.SERAp.Prova.Aplicacao.Queries.ObterAlunosResultadoProvaAdesao;
 using SME.SERAp.Prova.Aplicacao.Queries.ObterAlunosResultadoProvaDeficiencia;
@@ -8,11 +10,14 @@ using SME.SERAp.Prova.Aplicacao.Queries.VerificaProvaPossuiTipoDeficiencia;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -21,17 +26,19 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         private readonly IMediator mediator;
         private readonly IServicoLog serviceLog;
-        public ConsolidarProvaResultadoUseCase(IMediator mediator, IServicoLog serviceLog)
+        private readonly IModel model;
+        public ConsolidarProvaResultadoUseCase(IMediator mediator, IServicoLog serviceLog, IModel model)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.serviceLog = serviceLog ?? throw new ArgumentNullException(nameof(serviceLog));
+            this.model = model ?? throw new ArgumentNullException(nameof(model));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             // var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
 
-            var extracao = new ProvaExtracaoDto { ProvaSerapId = 1494, ExtracaoResultadoId = 32 };
+            var extracao = new ProvaExtracaoDto { ProvaSerapId = 1439, ExtracaoResultadoId = 12 };
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
 
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));
@@ -51,63 +58,14 @@ namespace SME.SERAp.Prova.Aplicacao
                 var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));
                 var possuiTipoDeficiencia = await mediator.Send(new VerificaProvaPossuiTipoDeficienciaQuery(exportacaoResultado.ProvaSerapId));
 
-                // Podia excluir tudo da prova logo de uma vez 
-
-                //IEnumerable<ConsolidadoProvaRespostaDto> AlunosResultadoProva;
 
 
-                //if (possuiTipoDeficiencia)
-                //{
-                //    AlunosResultadoProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(exportacaoResultado.ProvaSerapId)); // queryAdesao
-
-                //    foreach(var alunoResult in AlunosResultadoProva)
-                //    {
-                //        var respostas =  await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQuery(exportacaoResultado.ProvaSerapId, alunoResult.AlunoCodigoEol)); // queryAdesao 
-
-                //        foreach(var resposta in respostas)
-                //        {
-                //            var res = new ResultadoProvaConsolidado()
-                //            {
-                //                AlunoCodigoEol = alunoResult.AlunoCodigoEol,
-                //                AlunoDataNascimento = alunoResult.AlunoDataNascimento,
-                //                AlunoFrequencia = alunoResult.AlunoFrequencia,
-                //                AlunoNome = alunoResult.AlunoNome,
-                //                AlunoSexo = alunoResult.AlunoSexo,
-                //                DataFim = alunoResult.DataFim,
-                //                DataInicio = alunoResult.DataInicio,
-                //                DreCodigoEol = alunoResult.DreCodigoEol,
-                //                DreNome = alunoResult.DreNome,
-                //                DreSigla = alunoResult.DreSigla,
-                //                ProvaCaderno = alunoResult.ProvaCaderno,
-                //                ProvaComponente = alunoResult.ProvaComponente,
-                //                ProvaQuantidadeQuestoes = alunoResult.ProvaQuantidadeQuestoes,
-                //                ProvaSerapEstudantesId = alunoResult.ProvaSerapEstudantesId,
-                //                ProvaSerapId = alunoResult.ProvaSerapId,
-                //                TurmaAnoEscolar = alunoResult.TurmaAnoEscolar,
-                //                TurmaAnoEscolarDescricao = alunoResult.TurmaAnoEscolarDescricao,
-                //                TurmaCodigo = alunoResult.TurmaCodigo,
-                //                TurmaDescricao = alunoResult.TurmaDescricao,
-                //                UeCodigoEol = alunoResult.UeCodigoEol,
-                //                UeNome = alunoResult.UeNome,
-                //                QuestaoId = resposta.QuestaoId,
-                //                QuestaoOrdem = resposta.QuestaoOrdem,
-                //                Resposta = resposta.Resposta
-                //            };
-
-                //            await mediator.Send(new ResultadoProvaConsolidadoCommand(res));
-                //        }
-
-                //    }
-                   
-                //}
-
-                //else if (prova.AderirTodos == false)
-                //{
-                //    AlunosResultadoProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoQuery(exportacaoResultado.ProvaSerapId)); // queryAdesao 
-                //}
-
-                //else
-                //{
+                if (prova.AderirTodos == false || possuiTipoDeficiencia)
+                {
+                    await TrataSeForAdesaoManualOuPossuirDeficiencia(exportacaoResultado, extracao, prova.AderirTodos, possuiTipoDeficiencia);
+                }
+                else
+                {
 
                     var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
                     var dres = await mediator.Send(new ObterDresSerapQuery());
@@ -139,7 +97,10 @@ namespace SME.SERAp.Prova.Aplicacao
                         await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
                     }
                 }
-            //}
+
+
+            }
+
             catch (Exception ex)
             {
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
@@ -148,6 +109,69 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
             return true;
+        }
+
+        private async Task TrataSeForAdesaoManualOuPossuirDeficiencia(ExportacaoResultado exportacaoResultado, ProvaExtracaoDto extracao, bool aderiraAtodos, bool possuiTipoDeficiencia)
+        {
+
+            await mediator.Send(new ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand(exportacaoResultado.ProvaSerapId));
+
+            IEnumerable<ConsolidadoProvaRespostaDto> AlunosResultadoProva;
+
+
+            if (possuiTipoDeficiencia)
+            {
+                AlunosResultadoProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(exportacaoResultado.ProvaSerapId)); // queryAdesao 
+
+                foreach (var alunoConsolidar in AlunosResultadoProva)
+                {
+
+                    var consolidado = new ExportacaoAlunoProvaResultadoQuestaoDto()
+                    {
+                        ExportacaoResultado = exportacaoResultado,
+                        ConsolidadoProvaRespostaDto = alunoConsolidar,
+                        EhAdesaoATodos = false,
+                        PossuiDeficiencia = true
+
+                    };
+
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurmaTratar, consolidado));
+                }
+            }
+
+            else if (aderiraAtodos == false)
+            {
+                AlunosResultadoProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoQuery(exportacaoResultado.ProvaSerapId)); // queryAdesao 
+                foreach (var alunoConsolidar in AlunosResultadoProva)
+                {
+
+                    var consolidado = new ExportacaoAlunoProvaResultadoQuestaoDto()
+                    {
+                        ExportacaoResultado = exportacaoResultado,
+                        ConsolidadoProvaRespostaDto = alunoConsolidar,
+                        EhAdesaoATodos = true,
+                        PossuiDeficiencia = false
+
+                    };
+
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurmaTratar, consolidado));
+                }
+            }
+
+            uint qtd = 1;
+            while (qtd > 0)
+            {
+                qtd = model.MessageCount(RotasRabbit.ConsolidarProvaResultadoFiltroTurmaTratar);
+
+
+                if (qtd == 0)
+                {
+
+                    await Task.Delay(30000);
+                    extracao.AderirTodosOuDeficiencia = true;
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                }
+            }
         }
 
     }

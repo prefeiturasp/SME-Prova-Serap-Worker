@@ -57,9 +57,9 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     await mediator.Send(new GerarCSVExtracaoProvaCommand(prova.TotalItens, caminhoCompletoArquivo));
 
-                    if (prova.AderirTodos == false)
+                    if (extracao.AderirTodosOuDeficiencia)
                     {
-                        var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, caminhoCompletoArquivo);
+                        var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, caminhoCompletoArquivo, extracao.AderirTodosOuDeficiencia);
                         await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
                     }
 

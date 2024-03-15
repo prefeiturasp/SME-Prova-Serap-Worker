@@ -8,9 +8,9 @@ using System.Threading;
 
 namespace SME.SERAp.Prova.Aplicacao.Commands.ResultadoProvaConsolidado.Incluir
 {
-    public class ResultadoProvaConsolidadoCommand : IRequest<bool>
+    public class InserirResultadoProvaConsolidadoCommand : IRequest<bool>
     {
-        public ResultadoProvaConsolidadoCommand(Dominio.ResultadoProvaConsolidado resultadoProvaConsolidado)
+        public InserirResultadoProvaConsolidadoCommand(Dominio.ResultadoProvaConsolidado resultadoProvaConsolidado)
         {
             ResultadoProvaConsolidado = resultadoProvaConsolidado;
         }

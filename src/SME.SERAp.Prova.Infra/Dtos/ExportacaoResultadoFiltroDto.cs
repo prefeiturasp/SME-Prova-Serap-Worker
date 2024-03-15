@@ -12,11 +12,12 @@ namespace SME.SERAp.Prova.Infra
             UeEolIds = ueEolIds;
         }
 
-        public ExportacaoResultadoFiltroDto(long processoId, long provaId, string caminhoArquivo)
+        public ExportacaoResultadoFiltroDto(long processoId, long provaId, string caminhoArquivo, bool adesaoManualOuDeficiencia)
         {
             ProcessoId = processoId;
             ProvaId = provaId;
             CaminhoArquivo = caminhoArquivo;
+            AdesaoManualOuDeficiencia = adesaoManualOuDeficiencia;
 
         }
 
@@ -47,6 +48,6 @@ namespace SME.SERAp.Prova.Infra
         public string CaminhoArquivo { get; set; }
         public bool AdesaoManual { get; set; }
         public bool AlunosComDeficiencia { get; set; }
-
+        public bool AdesaoManualOuDeficiencia { get; set; }
     }
 }

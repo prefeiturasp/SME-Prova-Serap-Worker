@@ -15,24 +15,7 @@ namespace SME.SERAp.Prova.Dados
 
         }
 
-        public async Task LimparDadosConsolidadosPorProvaSerapId(long provaId)
-        {
-            using var conn = ObterConexao();
-            try
-            {
-                var query = $@"delete from resultado_prova_consolidado where prova_serap_id = @provaId;";
-                await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 50000);
-            }
-            catch (System.Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
+       
 
         public async Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo)
         {
@@ -483,25 +466,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task LimparDadosConsolidadosPorProvaSerapEstudantesId(long provaSerapEstudantesId)
-        {
-            using var conn = ObterConexao();
-            try
-            {
-                var query = $@"delete from resultado_prova_consolidado where prova_serap_estudantes_id = @provaSerapEstudantesId;";
-                await conn.ExecuteAsync(query, new { provaSerapEstudantesId }, commandTimeout: 50000);
-            }
-            catch (System.Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
-
+    
 
         public async Task<bool> VerificaSePossuiTipoDeficiencia(long provaLegadoId)
         {
@@ -539,7 +504,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = $@"
-                		SELECT p.prova_legado_id AS ProvaSerapId,
+                		    SELECT p.prova_legado_id AS ProvaSerapId,
                 	p.id AS ProvaSerapEstudantesId,
                 	a.ra AS AlunoCodigoEol,
                 	 dre.dre_id AS DreCodigoEol,
@@ -576,6 +541,13 @@ namespace SME.SERAp.Prova.Dados
                             
                             ELSE NULL::text
                         END || ' '::text) || ue.nome::text AS UeNome,
+						  t.ano as TurmaAnoEscolar,
+							   CASE
+                            WHEN t.ano::text <> 'S'::text THEN (t.ano::text || 'ano'::text)::CHARACTER varying
+                            ELSE t.ano
+                            END AS TurmaAnoEscolarDescricaco,
+							t.codigo AS TurmaCodigo,
+                            t.nome AS TurmaDescricao,
                        	COALESCE(a.nome_social, a.nome) AS AlunoNome,
                        	a.sexo AS aluno_sexo,
                        	a.data_nascimento AS AlunoDataNascimento,
@@ -630,21 +602,11 @@ namespace SME.SERAp.Prova.Dados
                 	    AND palu.finalizado_em IS NOT null
                     JOIN turma t ON t.id = turma_id  
                     JOIN ue ON t.ue_id = ue.id
-                    JOIN dre ON ue.dre_id = dre.id
-                    
-                    JOIN prova_ano pra on pra.prova_id = p.id
-                       and (
-                       		   (p.modalidade not in (3,4) and p.modalidade = t.modalidade_codigo and t.ano = pra.ano)
-                       		or (t.ano = pra.ano and t.modalidade_codigo = pra.modalidade and t.etapa_eja = pra.etapa_eja)
-                       	 )
-                       and (case when t.modalidade_codigo::text in('3','4') then '3'::text else t.modalidade_codigo::text end) = p.modalidade::text
-                 	    
-                 	    
-                	    
+                    JOIN dre ON ue.dre_id = dre.id                    
                 	WHERE p.aderir_todos = false
-                	AND p.prova_legado_id = @provaLegadoId);";
+                	AND p.prova_legado_id = @provaLegadoId;";
 
-                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query);
+                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, commandTimeout: 300000);
 
             }
             catch (System.Exception ex)
@@ -826,10 +788,15 @@ namespace SME.SERAp.Prova.Dados
                             WHEN ue.tipo_escola = 31 THEN 'CEU CEMEI'::text
                             WHEN ue.tipo_escola = 32 THEN 'EMEF'::text
                             WHEN ue.tipo_escola = 33 THEN 'EMEI'::text
-                            
-                            ELSE NULL::text
-                        END || ' '::text) || ue.nome::text as UeNome,
-                            
+                    ELSE NULL::text
+                             END || ' '::text) || ue.nome::text as UeNome,
+                              t.ano as TurmaAnoEscolar,
+							   CASE
+                            WHEN t.ano::text <> 'S'::text THEN (t.ano::text || 'ano'::text)::CHARACTER varying
+                            ELSE t.ano
+                            END AS TurmaAnoEscolarDescricaco,
+							t.codigo AS TurmaCodigo,
+                            t.nome AS TurmaDescricao,
                             aluno_codigo_eol as AlunoCodigoEol,
                             aluno_nome as AlunoNome,
                             aluno_sexo as AlunoSexo,
@@ -848,9 +815,9 @@ namespace SME.SERAp.Prova.Dados
                             inner join turma t on t.id  = p.turma_id 
                             inner join ue  on ue.id = t.ue_id  
                             inner join dre on dre.id = ue.dre_id 
-                            ";
+                            "; ;
 
-                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaLegadoId });
+                return await conn.QueryAsync<ConsolidadoProvaRespostaDto>(query, new { provaLegadoId }, commandTimeout: 300000);
 
             }
             catch (System.Exception ex)

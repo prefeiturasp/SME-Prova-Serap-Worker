@@ -4,6 +4,7 @@
     {
         public long ProvaSerapId { get; set; }
         public long ExtracaoResultadoId { get; set; }
+        public bool  AderirTodosOuDeficiencia { get; set; }
         public ProvaExtracaoDto()
         {
 

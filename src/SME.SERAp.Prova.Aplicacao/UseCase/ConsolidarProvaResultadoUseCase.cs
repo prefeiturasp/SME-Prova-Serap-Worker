@@ -36,9 +36,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            // var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
+             var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
 
-            var extracao = new ProvaExtracaoDto { ProvaSerapId = 1439, ExtracaoResultadoId = 12 };
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
 
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));

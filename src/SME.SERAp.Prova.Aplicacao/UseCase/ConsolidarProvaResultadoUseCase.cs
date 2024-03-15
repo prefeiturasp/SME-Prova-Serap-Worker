@@ -17,13 +17,11 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         private readonly IMediator mediator;
         private readonly IServicoLog serviceLog;
-        private readonly IModel model;
 
-        public ConsolidarProvaResultadoUseCase(IMediator mediator, IServicoLog serviceLog, IModel model)
+        public ConsolidarProvaResultadoUseCase(IMediator mediator, IServicoLog serviceLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.serviceLog = serviceLog ?? throw new ArgumentNullException(nameof(serviceLog));
-            this.model = model ?? throw new ArgumentNullException(nameof(model));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)

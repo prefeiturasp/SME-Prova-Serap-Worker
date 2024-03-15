@@ -23,7 +23,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoAlunoProvaResultadoQuestaoDto>();
-            
+
             try
             {
                 if (filtro.ExportacaoResultado.Status == ExportacaoResultadoStatus.Processando)

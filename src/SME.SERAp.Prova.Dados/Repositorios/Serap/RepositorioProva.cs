@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -568,8 +569,8 @@ namespace SME.SERAp.Prova.Dados
 								inner join turma t on t.id = p.TurmaId
 								inner join ue on ue.id = t.ue_id  
 								inner join dre on dre.id = ue.dre_id
-							where t.codigo in ({string.Join(',', turmasCodigos)})";
-
+							where t.codigo in ({string.Join(',', turmasCodigos.Select(c => $"'{c}'"))})";
+	            
 	            return await conn.QueryAsync<ConsolidadoAlunoProvaDto>(query, new { provaLegadoId });
             }
             catch (Exception ex)
@@ -689,7 +690,7 @@ namespace SME.SERAp.Prova.Dados
 								JOIN turma t ON t.id = tb.TurmaId
 								JOIN ue ON t.ue_id = ue.id
 								JOIN dre ON ue.dre_id = dre.id
-								WHERE t.codigo in ({string.Join(',', turmasCodigos)})";
+								WHERE t.codigo in ({string.Join(',', turmasCodigos.Select(c => $"'{c}'"))})";
 
 	            return await conn.QueryAsync<ConsolidadoAlunoProvaDto>(query, new { provaLegadoId });
             }
@@ -863,7 +864,7 @@ namespace SME.SERAp.Prova.Dados
 								inner join turma t on t.id = p.TurmaId 
 								inner join ue on ue.id = t.ue_id  
 								inner join dre on dre.id = ue.dre_id
-							where t.codigo in ({string.Join(',', turmasCodigos)})";
+							where t.codigo in ({string.Join(',', turmasCodigos.Select(c => $"'{c}'"))})";
 
                 return await conn.QueryAsync<ConsolidadoAlunoProvaDto>(query, new { provaLegadoId });
             }

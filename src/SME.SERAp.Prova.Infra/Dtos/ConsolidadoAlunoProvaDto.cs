@@ -25,6 +25,7 @@ namespace SME.SERAp.Prova.Infra
         public string UeCodigoEol { get; set; }        
         public string UeNome { get; set; }
         public string TurmaAnoEscolar { get; set; }
+        public string TurmaAnoEscolarDescricao { get; set; }
         public string TurmaCodigo { get; set; }
         public string TurmaDescricao { get; set; }
     }

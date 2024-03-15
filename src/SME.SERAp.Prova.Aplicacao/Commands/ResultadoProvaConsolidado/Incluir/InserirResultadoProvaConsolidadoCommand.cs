@@ -1,12 +1,6 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Dados;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 
-namespace SME.SERAp.Prova.Aplicacao.Commands.ResultadoProvaConsolidado.Incluir
+namespace SME.SERAp.Prova.Aplicacao
 {
     public class InserirResultadoProvaConsolidadoCommand : IRequest<bool>
     {

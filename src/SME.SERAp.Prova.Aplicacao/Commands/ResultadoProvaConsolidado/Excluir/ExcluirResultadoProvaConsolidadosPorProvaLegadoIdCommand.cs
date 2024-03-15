@@ -1,9 +1,6 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SME.SERAp.Prova.Aplicacao.Commands.ResultadoProvaConsolidado.Excluir
+namespace SME.SERAp.Prova.Aplicacao
 {
     public class ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand : IRequest<bool>
     {

@@ -14,25 +14,6 @@ namespace SME.SERAp.Prova.Dados
         {
 
         }
-        
-        public async Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo)
-        {
-            using var conn = ObterConexao();
-            try
-            {
-	            const string query = @"call p_excluir_dados_consolidados_prova(@provaId, @dreId, @ueId, @turmaCodigo);";
-	            await conn.ExecuteAsync(query, new { provaId, dreId, ueId, turmaCodigo }, commandTimeout: 50000);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
 
         public async Task<IEnumerable<ResultadoProvaConsolidado>> ObterDadosPorUeId(long provaId, string dreId, string ueId)
         {
@@ -87,47 +68,7 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-
-        public async Task ConsolidarProvaRespostasPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo)
-        {
-            using var conn = ObterConexao();
-            try
-            {
-	            const string query = "call p_consolidar_dados_prova(@provaId, @dreId, @ueId, @turmaCodigo);";
-	            await conn.ExecuteAsync(query, new { provaId, dreId, ueId, turmaCodigo }, commandTimeout: 50000);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
-
-
-
-        public async Task ConsolidarProvaRespostasAdesaoManual(long provaId)
-        {
-            using var conn = ObterConexao();
-            try
-            {
-                var query = $@"call p_consolidar_dados_prova_adesao_manual(@provaId);";
-                await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 50000);
-            }
-            catch (System.Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
-
+        
         public async Task ConsolidarProvaRespostasPorProvaSerapId(long provaId)
         {
             using var conn = ObterConexao();
@@ -617,6 +558,10 @@ namespace SME.SERAp.Prova.Dados
 												ELSE NULL::text
 											END || ' '::text) || ue.nome::text as UeNome,
 											t.ano as TurmaAnoEscolar,
+							   				CASE
+                            					WHEN t.ano::text <> 'S'::text THEN (t.ano::text || 'ano'::text)::CHARACTER varying
+                            					ELSE t.ano
+                            				END AS TurmaAnoEscolarDescricao,
 											t.codigo AS TurmaCodigo,
 											t.nome AS TurmaDescricao                            
 										from tb_prova_turma_aluno_adesao_todos p
@@ -737,7 +682,7 @@ namespace SME.SERAp.Prova.Dados
 							   					CASE
                             						WHEN t.ano::text <> 'S'::text THEN (t.ano::text || 'ano'::text)::CHARACTER varying
                             						ELSE t.ano
-                            					END AS TurmaAnoEscolar,
+                            					END AS TurmaAnoEscolarDescricao,
                             					t.codigo AS TurmaCodigo,
                             					t.nome AS TurmaDescricao												
 											from tb_prova_turma_aluno_adesao_manual tb
@@ -908,6 +853,10 @@ namespace SME.SERAp.Prova.Dados
 												ELSE NULL::text
 											END || ' '::text) || ue.nome::text as UeNome,
 											t.ano as TurmaAnoEscolar,
+							   				CASE
+                            					WHEN t.ano::text <> 'S'::text THEN (t.ano::text || 'ano'::text)::CHARACTER varying
+                            					ELSE t.ano
+                            				END AS TurmaAnoEscolarDescricao,
 											t.codigo AS TurmaCodigo,
 											t.nome AS TurmaDescricao                            
 										from tb_prova_turma_aluno_adesao_todos p

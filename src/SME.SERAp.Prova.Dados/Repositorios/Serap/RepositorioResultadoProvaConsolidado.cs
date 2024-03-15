@@ -14,6 +14,7 @@ namespace SME.SERAp.Prova.Dados
         {
 
         }
+
         public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaRespostaFuncao(long provaSerapId, string dreCodigoEol, string ueCodigoEol)
         {
             using var conn = ObterConexaoLeitura();
@@ -168,7 +169,7 @@ namespace SME.SERAp.Prova.Dados
                 var query = $@"delete from resultado_prova_consolidado where prova_serap_estudantes_id = @provaSerapEstudantesId;";
                 await conn.ExecuteAsync(query, new { provaSerapEstudantesId }, commandTimeout: 50000);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -179,13 +180,12 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-
         public async Task ExcluirDadosConsolidadosPorProvaLegadoId(long provaSerapId)
         {
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = $@"delete from resultado_prova_consolidado where prova_serap_id = @provaSerapId;";
+                var query = "delete from resultado_prova_consolidado where prova_serap_id = @provaSerapId;";
                 await conn.ExecuteAsync(query, new { provaSerapId }, commandTimeout: 50000);
             }
             catch (System.Exception ex)
@@ -222,38 +222,6 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
-
-
-        public async Task ObterRespostasAlunoPorProvaIdEAlunoCodigoEol(long provaId, long alunoCodigoEol)
-        {
-            using var conn = ObterConexaoLeitura();
-            try
-            {
-
-                var query = @" select q.id as questao_id, 
-                                             q.ordem  as questao_ordem,
-                                             qar.resposta
-                                      from  questao   q                                                                                     
-                                      left join questao_aluno_resposta qar on qar.questao_id  = q.id  and  qar.aluno_ra  = @alunoCodigoEol
-                                      left join alternativa alt on alt.id = qar.alternativa_id
-                                      left join alternativa alt2 on alt2.questao_id = q.id and alt2.correta 
-                                      WHERE  q.prova_id = @provaId
-                                      order by q.ordem";
-
-                await conn.QueryAsync<string>(query, new { provaId, alunoCodigoEol }, commandTimeout: 9000);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-
-        }
-
     
         public async Task IncluirResultadoProvaConsolidado(ResultadoProvaConsolidado resultado)
         {
@@ -316,7 +284,6 @@ namespace SME.SERAp.Prova.Dados
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
             finally

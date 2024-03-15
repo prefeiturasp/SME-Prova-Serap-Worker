@@ -2,7 +2,7 @@
 using SME.SERAp.Prova.Infra.Dtos;
 using System.Collections.Generic;
 
-namespace SME.SERAp.Prova.Aplicacao.Queries.ObterQuestaoAlunoRespostaPorProvaIdEAlunoRa
+namespace SME.SERAp.Prova.Aplicacao
 {
     public class ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQuery : IRequest<IEnumerable<AlunoQuestaoRespostasDto>>
     {

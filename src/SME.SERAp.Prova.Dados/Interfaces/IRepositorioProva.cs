@@ -16,9 +16,7 @@ namespace SME.SERAp.Prova.Dados
         Task<long?> ObterProvaOrigemCadernoAsync(long provaId);
         Task CriarProvaRespostasExtracao(long provaId);
         Task ConsolidarProvaRespostasPorProvaSerapId(long provaId);
-        Task ConsolidarProvaRespostasPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo);
         Task<IEnumerable<ProvaBIBSyncDto>> ObterProvasBibAsync();
-        Task LimparDadosConsolidadosPorFiltros(long provaId, string dreId, string ueId, string turmaCodigo);
         Task<IEnumerable<ResultadoProvaConsolidado>> ObterDadosPorUeId(long provaId, string dreId, string ueId);
         Task<bool> FinalizarProvaAsync(ProvaParaAtualizarDto provaParaAtualizar);
         Task<IEnumerable<ProvaAlunoDto>> ObterProvasIniciadasPorModalidadeAsync(int modalidade);
@@ -26,7 +24,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<ProvaAtualizadaDto>> ObterProvaPorUltimaAtualizacao(DateTime dataBase);
         Task<bool> VerificaSePossuiDownload(long provaId);
         Task<IEnumerable<Dominio.Prova>> ObterProvasLiberadasNoPeriodoParaCacheAsync();
-        Task ConsolidarProvaRespostasAdesaoManual(long provaId);
         Task<bool> VerificaSePossuiTipoDeficiencia(long provaLegadoId);
         Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaAdesaoTodosPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);        
         Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaAdesaoManualPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);

@@ -1,10 +1,6 @@
 ﻿using FluentValidation;
-using SME.SERAp.Prova.Aplicacao.Commands.ConsolidarProvaRespostaAdesaoManual;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SME.SERAp.Prova.Aplicacao.Commands.ResultadoProvaConsolidado.Incluir
+namespace SME.SERAp.Prova.Aplicacao
 {
     public class InserirResultadoProvaConsolidadoCommandValidador : AbstractValidator<InserirResultadoProvaConsolidadoCommand>
     {

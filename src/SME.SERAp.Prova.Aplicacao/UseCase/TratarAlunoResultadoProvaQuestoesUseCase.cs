@@ -6,8 +6,6 @@ using SME.SERAp.Prova.Infra;
 using System;
 using System.Threading.Tasks;
 using SME.SERAp.Prova.Infra.Dtos;
-using SME.SERAp.Prova.Aplicacao.Commands.ResultadoProvaConsolidado.Incluir;
-using SME.SERAp.Prova.Aplicacao.Queries.ObterQuestaoAlunoRespostaPorProvaIdEAlunoRa;
 
 namespace SME.SERAp.Prova.Aplicacao.UseCase
 {

@@ -36,20 +36,61 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
                     return true;
                 
-                var consolidadoAlunoProva = Enumerable.Empty<ConsolidadoAlunoProvaDto>();
+                var consolidadoAlunosProva = Enumerable.Empty<ConsolidadoAlunoProvaDto>();
                 
                 if (filtro.AlunosComDeficiencia)
-                    consolidadoAlunoProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaId, filtro.TurmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaId, filtro.TurmaEolIds));
                 else if (filtro.AdesaoManual)
-                    consolidadoAlunoProva = await mediator.Send( new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaId, filtro.TurmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send( new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaId, filtro.TurmaEolIds));
                 else
-                    consolidadoAlunoProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaId, filtro.TurmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaId, filtro.TurmaEolIds));
 
+                if (consolidadoAlunosProva.Any())
+                {
+                    foreach (var consolidadoAlunoProva in consolidadoAlunosProva)
+                    {
+                        var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQuery(consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));
+                        if (respostas == null || !respostas.Any()) 
+                            continue;
+                        
+                        await mediator.Send(new ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand(consolidadoAlunoProva.ProvaSerapId));
+                        
+                        foreach (var resposta in respostas)
+                        {
+                            var res = new ResultadoProvaConsolidado
+                            {
+                                ProvaSerapId = consolidadoAlunoProva.ProvaSerapId,
+                                ProvaSerapEstudantesId = consolidadoAlunoProva.ProvaSerapEstudantesId,
+                                AlunoCodigoEol = consolidadoAlunoProva.AlunoCodigoEol,
+                                AlunoNome = consolidadoAlunoProva.AlunoNome,
+                                AlunoSexo = consolidadoAlunoProva.AlunoSexo,
+                                AlunoDataNascimento = consolidadoAlunoProva.AlunoDataNascimento,
+                                ProvaComponente = consolidadoAlunoProva.ProvaComponente,
+                                ProvaCaderno = consolidadoAlunoProva.ProvaCaderno,
+                                ProvaQuantidadeQuestoes = consolidadoAlunoProva.ProvaQuantidadeQuestoes,
+                                AlunoFrequencia = consolidadoAlunoProva.AlunoFrequencia,
+                                DataInicio = consolidadoAlunoProva.ProvaDataInicio,
+                                DataFim = consolidadoAlunoProva.ProvaDataEntregue,
+                                DreCodigoEol = consolidadoAlunoProva.DreCodigoEol,
+                                DreSigla = consolidadoAlunoProva.DreSigla,
+                                DreNome = consolidadoAlunoProva.DreNome,
+                                UeCodigoEol = consolidadoAlunoProva.UeCodigoEol,
+                                UeNome = consolidadoAlunoProva.UeNome,
+                                TurmaAnoEscolar = consolidadoAlunoProva.TurmaAnoEscolar,
+                                TurmaAnoEscolarDescricao = consolidadoAlunoProva.TurmaAnoEscolarDescricao,
+                                TurmaCodigo = consolidadoAlunoProva.TurmaCodigo,
+                                TurmaDescricao = consolidadoAlunoProva.TurmaDescricao,
+                                QuestaoId = resposta.QuestaoId,
+                                QuestaoOrdem = resposta.QuestaoOrdem,
+                                Resposta = resposta.Resposta
+                            };
+                            
+                            await mediator.Send(new InserirResultadoProvaConsolidadoCommand(res));                                    
+                        }
+                    }
+                }
                 
-                /* todo:
-                await mediator.Send(new ConsolidarProvaRespostaPorFiltroCommand(filtro.ProvaId, filtro.DreEolId, filtro.UeEolIds, filtro.TurmaEolIds));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
-                */
 
                 var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
                 if (existeItemProcesso)

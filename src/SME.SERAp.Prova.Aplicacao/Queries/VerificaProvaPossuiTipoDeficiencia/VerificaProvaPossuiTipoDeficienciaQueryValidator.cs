@@ -16,4 +16,4 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.VerificaProvaPossuiTipoDeficiencia
         }
     }
 }
-}
+

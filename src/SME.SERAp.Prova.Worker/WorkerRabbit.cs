@@ -295,6 +295,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoCicloTurma, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Turma", typeof(ITratarProficienciaCicloTurmaUseCase)));            
             comandos.Add(RotasRabbit.ImportarResultadoCicloDrePsp, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Dre ", typeof(IImportarResultadoCicloDreUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoCicloDre, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Dre", typeof(ITratarResultadoCicloDreUseCase)));
+
+            comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltroTurmaTratar, new ComandoRabbit("Tratar alunos resultado prova", typeof(ITratarAlunoResultadoProvaQuestoesUseCase)));
             
             // Propagar Cache
             comandos.Add(RotasRabbit.PropagarCache, new ComandoRabbit("Propagar o cache", typeof(IPropagarCacheUseCase)));

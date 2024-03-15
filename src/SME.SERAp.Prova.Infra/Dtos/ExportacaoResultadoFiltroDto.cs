@@ -17,6 +17,19 @@ namespace SME.SERAp.Prova.Infra
             ProcessoId = processoId;
             ProvaId = provaId;
             CaminhoArquivo = caminhoArquivo;
+
+        }
+
+        public ExportacaoResultadoFiltroDto(long processoId, long provaId, long itemId, string dreEolId, string[] ueEolIds, bool adesaoManual, bool alunosComDeficiencia)
+        {
+            ProcessoId = processoId;
+            ProvaId = provaId;
+            ItemId = itemId;
+            DreEolId = dreEolId;
+            UeEolIds = ueEolIds;
+            AdesaoManual = adesaoManual;
+            AlunosComDeficiencia = alunosComDeficiencia;
+
         }
 
 
@@ -32,5 +45,8 @@ namespace SME.SERAp.Prova.Infra
         public string[] UeEolIds { get; set; }
         public string[] TurmaEolIds { get; set; }
         public string CaminhoArquivo { get; set; }
+        public bool AdesaoManual { get; set; }
+        public bool AlunosComDeficiencia { get; set; }
+
     }
 }

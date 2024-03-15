@@ -38,9 +38,12 @@ namespace SME.SERAp.Prova.Aplicacao
                     throw new NegocioException("A exportação não foi encontrada");
 
                 if (exportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
+
+
                 {
                     foreach (string ueCodigo in filtro.UeEolIds)
                     {
+
                         var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
                         var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ueCodigo, filtro.ProvaId));
                         if (turmasUe != null && turmasUe.Any())
@@ -53,7 +56,7 @@ namespace SME.SERAp.Prova.Aplicacao
                                 var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, filtro.DreEolId, ueEolIds);
                                 exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
 
-                                var filtroDto = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, filtro.DreEolId, ueEolIds);
+                               var filtroDto = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, filtro.DreEolId, ueEolIds, filtro.AdesaoManual, filtro.AlunosComDeficiencia);
                                 filtroDto.TurmaEolIds = turmaEolIds;
                                 filtrosParaPublicar.Add(filtroDto);
                             }

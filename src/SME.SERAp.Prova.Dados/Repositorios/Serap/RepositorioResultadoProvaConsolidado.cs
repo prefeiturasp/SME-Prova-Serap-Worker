@@ -1,4 +1,6 @@
-﻿using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ namespace SME.SERAp.Prova.Dados
     {
         public RepositorioResultadoProvaConsolidado(ConnectionStringOptions connectionStringOptions) : base(connectionStringOptions)
         {
-            
+
         }
         public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> ObterExtracaoProvaRespostaFuncao(long provaSerapId, string dreCodigoEol, string ueCodigoEol)
         {
@@ -86,7 +88,7 @@ namespace SME.SERAp.Prova.Dados
 	                            rpc.questao_ordem as QuestaoOrdem,
 	                            rpc.resposta as Resposta
                               from resultado_prova_consolidado rpc 
-                                 ";                
+                                 ";
 
                 string where = " where 1=1 ";
                 where += @"     and rpc.prova_serap_id = @provaSerapId";
@@ -180,5 +182,141 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        // Criar DTOS RETORNO     e incluoir na interface
+
+        public async Task ObterRespostasAlunoPorProvaIdEAlunoCodigoEol(long provaId, long alunoCodigoEol)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+
+                var query = @" select q.id as questao_id, 
+                                             q.ordem  as questao_ordem,
+                                             qar.resposta
+                                      from  questao   q                                                                                     
+                                      left join questao_aluno_resposta qar on qar.questao_id  = q.id  and  qar.aluno_ra  = @alunoCodigoEol
+                                      left join alternativa alt on alt.id = qar.alternativa_id
+                                      left join alternativa alt2 on alt2.questao_id = q.id and alt2.correta 
+                                      WHERE  q.prova_id = @provaId
+                                      order by q.ordem";
+
+                await conn.QueryAsync<string>(query, new { provaId, alunoCodigoEol }, commandTimeout: 9000);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+
+        }
+
+    
+        public async Task IncluirResultadoProvaConsolidado(ResultadoProvaConsolidado resultado)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                string query = @"INSERT INTO public.resultado_prova_consolidado
+                                (prova_serap_id, 
+                                 prova_serap_estudantes_id, 
+                                 dre_codigo_eol,
+                                 dre_sigla, 
+                                 dre_nome, 
+                                 ue_codigo_eol, 
+                                 ue_nome,
+                                 turma_ano_escolar,
+                                 turma_ano_escolar_descricao, 
+                                 turma_codigo, 
+                                 turma_descricao,
+                                 aluno_codigo_eol, 
+                                 aluno_nome,
+                                 aluno_sexo,
+                                 aluno_data_nascimento,
+                                 prova_componente,
+                                 prova_caderno,
+                                 prova_quantidade_questoes, 
+                                 aluno_frequencia, 
+                                 questao_id, 
+                                 questao_ordem,
+                                 resposta, 
+                                 prova_data_inicio, 
+                                 prova_data_entregue)
+                                VALUES(@provaSerapId, 
+                                       @provaSerapEstudantesId, 
+                                       @DreCodigoEol, 
+                                       @DreSigla, 
+                                       @DreNome, 
+                                       @UeCodigoEol, 
+                                       @UeNome, 
+                                       @TurmaAnoEscolar, 
+                                       @TurmaAnoEscolarDescricao, 
+                                       @TurmaCodigo,
+                                       @TurmaDescricao, 
+                                       @AlunoCodigoEol, 
+                                       @AlunoNome,
+                                       @AlunoSexo, 
+                                       @AlunoDataNascimento,
+                                       @ProvaComponente,
+                                       @ProvaCaderno,
+                                       @ProvaQuantidadeQuestoes,
+                                       @AlunoFrequencia,
+                                       @QuestaoId, 
+                                       @QuestaoOrdem, 
+                                       @Resposta, 
+                                       @DataInicio,
+                                       @DataFim);
+                                ";
+
+                await conn.ExecuteAsync(query, resultado);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+
+
+        public async Task<IEnumerable<AlunoQuestaoRespostasDto>> ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRA(long provaLegadoId, long alunoRa)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"          
+                           select q.id as QuestaoId, 
+                                  q.ordem,
+                             CASE
+                             WHEN qar.alternativa_id IS NOT NULL THEN alt.numeracao
+                             ELSE qar.resposta
+                              END AS resposta 
+                           from questao q 
+                           inner join prova p on p.id  = q.prova_id  
+                           left join questao_aluno_resposta qar on qar.questao_id  = q.id and  qar.aluno_ra  = @alunoRa
+                           left join alternativa alt on alt.id = qar.alternativa_id
+                            left join alternativa alt2 on alt2.questao_id = q.id and alt2.correta 
+                           WHERE p.prova_legado_id  = @provaLegadoId
+                         order by q.ordem ";
+
+                return await conn.QueryAsync<AlunoQuestaoRespostasDto>(query, new { provaLegadoId, alunoRa });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
     }
 }

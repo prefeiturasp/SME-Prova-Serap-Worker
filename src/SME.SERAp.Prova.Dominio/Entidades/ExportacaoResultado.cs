@@ -17,6 +17,7 @@ namespace SME.SERAp.Prova.Dominio
             AtualizadoEm = DateTime.Now;
             ProvaSerapId = provaSerapId;
         }
+
         public string NomeArquivo { get; set; }        
         public ExportacaoResultadoStatus Status { get; set; }
         public DateTime CriadoEm { get; set; }

@@ -69,6 +69,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"select distinct
+                                    ue.id,
                                     ue.ue_id CodigoUe, 
                                     ue.data_atualizacao DataAtualizacao, 
                                     ue.dre_id DreId, 

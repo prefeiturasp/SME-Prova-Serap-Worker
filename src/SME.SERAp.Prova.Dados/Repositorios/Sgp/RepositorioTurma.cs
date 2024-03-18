@@ -367,7 +367,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
+                var query = @"select t.id, t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
                                     from prova p
                                     inner join prova_ano pa 
                                         on p.id = pa.prova_id

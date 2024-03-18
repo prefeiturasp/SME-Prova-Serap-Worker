@@ -13,7 +13,6 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class ConsolidarProvaRespostaPorFiltroUseCase : IConsolidarProvaRespostaPorFiltroUseCase
     {
-        
         private readonly IMediator mediator;
         private readonly IServicoLog serviceLog;
 
@@ -29,47 +28,51 @@ namespace SME.SERAp.Prova.Aplicacao
 
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova por filtro. msg: {mensagemRabbit.Mensagem}");
 
-            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaId));
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaSerapId));
             try
             {
                 if (filtro is null)
                     throw new NegocioException("O filtro precisa ser informado");
+
                 if (exportacaoResultado is null)
                     throw new NegocioException("A exportação não foi encontrada");
 
-                if (exportacaoResultado.Status == ExportacaoResultadoStatus.Processando)
+                if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando)
+                    return true;
+
+                foreach (var ueCodigo in filtro.UeEolIds)
                 {
-                    foreach (string ueCodigo in filtro.UeEolIds)
+                    var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
+                    var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ueCodigo, filtro.ProvaSerapId));
+                    
+                    if (turmasUe != null && turmasUe.Any())
                     {
-                        var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
-                        var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ueCodigo, filtro.ProvaId));
-                        if (turmasUe != null && turmasUe.Any())
+                        foreach (var turma in turmasUe)
                         {
-                            foreach (Turma turma in turmasUe)
+                            var turmaEolIds = new[] { turma.Codigo };
+                            var ueEolIds = new[] { ueCodigo };
+
+                            var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, filtro.DreEolId, ueEolIds);
+                            exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+
+                            var filtroDto = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id,
+                                exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, filtro.DreEolId, ueEolIds,
+                                filtro.AdesaoManual, filtro.AlunosComDeficiencia)
                             {
-                                var turmaEolIds = new string[] { turma.Codigo };
-                                var ueEolIds = new string[] { ueCodigo };
-
-                                var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, filtro.DreEolId, ueEolIds);
-                                exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
-
-                                var filtroDto = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, filtro.DreEolId, ueEolIds);
-                                filtroDto.TurmaEolIds = turmaEolIds;
-                                filtrosParaPublicar.Add(filtroDto);
-                            }
+                                TurmaEolIds = turmaEolIds
+                            };
+                            filtrosParaPublicar.Add(filtroDto);
                         }
-
-                        if (filtrosParaPublicar.Any())
-                        {
-                            foreach (ExportacaoResultadoFiltroDto filtroPublicar in filtrosParaPublicar)
-                            {
-                                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, filtroPublicar));
-                            }
-                        }                        
                     }
 
-                    await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
+                    if (!filtrosParaPublicar.Any()) 
+                        continue;
+
+                    foreach (var filtroPublicar in filtrosParaPublicar)
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, filtroPublicar));
                 }
+
+                await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
 
                 return true;
             }

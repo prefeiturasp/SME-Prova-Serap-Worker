@@ -9,15 +9,13 @@ using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterExtracaoProvaRespostaQueryHandler :
-        IRequestHandler<ObterExtracaoProvaRespostaQuery, IEnumerable<ConsolidadoProvaRespostaDto>>
+    public class ObterExtracaoProvaRespostaQueryHandler : IRequestHandler<ObterExtracaoProvaRespostaQuery, IEnumerable<ConsolidadoProvaRespostaDto>>
     {
         private readonly IRepositorioResultadoProvaConsolidado repositorioResultadoProvaConsolidado;
 
         public ObterExtracaoProvaRespostaQueryHandler(IRepositorioResultadoProvaConsolidado repositorioResultadoProvaConsolidado)
         {
-            this.repositorioResultadoProvaConsolidado = repositorioResultadoProvaConsolidado ??
-                                          throw new ArgumentNullException(nameof(repositorioResultadoProvaConsolidado));
+            this.repositorioResultadoProvaConsolidado = repositorioResultadoProvaConsolidado ?? throw new ArgumentNullException(nameof(repositorioResultadoProvaConsolidado));
         }
 
         public async Task<IEnumerable<ConsolidadoProvaRespostaDto>> Handle(ObterExtracaoProvaRespostaQuery request, CancellationToken cancellationToken)
@@ -27,31 +25,34 @@ namespace SME.SERAp.Prova.Aplicacao
 
             if (request.AderirATodos == false)
             {
-                var res = resultado.OrderBy(x => x.DreCodigoEol).ThenBy(x => x.UeCodigoEol).ThenBy(x => x.TurmaAnoEscolar).ThenBy(x => x.TurmaDescricao).ThenBy(x => x.AlunoNome).ThenBy(x => x.QuestaoOrdem).ToList();
+                var res = resultado.OrderBy(x => x.DreCodigoEol).ThenBy(x => x.UeCodigoEol)
+                    .ThenBy(x => x.TurmaAnoEscolar).ThenBy(x => x.TurmaDescricao).ThenBy(x => x.AlunoNome)
+                    .ThenBy(x => x.QuestaoOrdem).ToList();
+                
                 return res;
             }
 
             var resultadoRetorno = new List<ConsolidadoProvaRespostaDto>();
+
             foreach (var aluno in alunos)
             {
                 var turmas = await repositorioResultadoProvaConsolidado.ObterTurmasResultadoProvaAluno(request.ProvaSerapId, aluno);
                 var turma = turmas.FirstOrDefault();
 
-                var cadernoComResposta = resultado.Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma && !String.IsNullOrEmpty(x.Resposta))
+                var cadernoComResposta = resultado.Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma && !string.IsNullOrEmpty(x.Resposta))
                                                   .Select(x => x.ProvaCaderno).FirstOrDefault();
-                var caderno = string.Empty;
-                if (!String.IsNullOrEmpty(cadernoComResposta))
-                    caderno = cadernoComResposta;
-                else
-                    caderno = resultado.Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma).Select(x => x.ProvaCaderno).FirstOrDefault();
+                var caderno = !string.IsNullOrEmpty(cadernoComResposta)
+                    ? cadernoComResposta
+                    : resultado.Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma)
+                        .Select(x => x.ProvaCaderno).FirstOrDefault();
 
-                var questoesIds = resultado.Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma && x.ProvaCaderno == caderno).Select(x => x.QuestaoId).Distinct();
-                foreach (var questoesId in questoesIds)
-                {
-                    var rq = resultado.Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma && x.QuestaoId == questoesId && x.ProvaCaderno == caderno).FirstOrDefault();
-                    if (rq != null)
-                        resultadoRetorno.Add(rq);
-                }
+                var questoesIds = resultado
+                    .Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma && x.ProvaCaderno == caderno)
+                    .Select(x => x.QuestaoId).Distinct();
+
+                resultadoRetorno.AddRange(questoesIds.Select(questoesId => resultado.FirstOrDefault(x =>
+                    x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma && x.QuestaoId == questoesId &&
+                    x.ProvaCaderno == caderno)).Where(rq => rq != null));
             }
 
             return resultadoRetorno.AsEnumerable();

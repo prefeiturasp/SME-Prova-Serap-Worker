@@ -29,13 +29,12 @@ namespace SME.SERAp.Prova.Aplicacao
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova por filtro. msg: {mensagemRabbit.Mensagem}");
 
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaSerapId));
+            if (exportacaoResultado is null)
+                throw new NegocioException("A exportação não foi encontrada");            
             try
             {
                 if (filtro is null)
                     throw new NegocioException("O filtro precisa ser informado");
-
-                if (exportacaoResultado is null)
-                    throw new NegocioException("A exportação não foi encontrada");
 
                 if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando)
                     return true;

@@ -2,9 +2,9 @@
 
 namespace SME.SERAp.Prova.Aplicacao.Queries.ObterQuestaoAlunoRespostaPorProvaIdEAlunoRa
 {
-    public class ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQueryValidator : AbstractValidator<ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQuery>
+    public class ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQueryValidator : AbstractValidator<ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery>
     {
-        public ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQueryValidator()
+        public ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQueryValidator()
         {
             RuleFor(x => x.AlunoRa)
                 .NotEmpty()

@@ -18,7 +18,6 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.VerificaProvaPossuiTipoDeficiencia
         public async Task<bool> Handle(VerificaProvaPossuiTipoDeficienciaQuery request, CancellationToken cancellationToken)
         {
            return await repositorioProva.VerificaSePossuiTipoDeficiencia(request.ProvaLegadoId);
-
         }
     }
 }

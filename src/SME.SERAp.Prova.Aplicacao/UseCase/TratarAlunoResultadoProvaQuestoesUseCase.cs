@@ -44,7 +44,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
 
         private async Task BuscaRespostasEIncluiConsolidado(ExportacaoAlunoProvaResultadoQuestaoDto filtro)
         {
-            var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQuery(filtro.ConsolidadoProvaRespostaDto.ProvaSerapId, filtro.ConsolidadoProvaRespostaDto.AlunoCodigoEol)); // queryAdesao 
+            var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery(filtro.ConsolidadoProvaRespostaDto.ProvaSerapId, filtro.ConsolidadoProvaRespostaDto.AlunoCodigoEol)); // queryAdesao 
 
             foreach (var resposta in respostas)
             {

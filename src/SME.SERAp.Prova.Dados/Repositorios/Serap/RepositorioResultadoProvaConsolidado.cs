@@ -91,15 +91,15 @@ namespace SME.SERAp.Prova.Dados
                               from resultado_prova_consolidado rpc 
                                  ";
 
-                string where = " where 1=1 ";
-                where += @"     and rpc.prova_serap_id = @provaSerapId";
+                var where = " where 1=1 ";
+                where += " and rpc.prova_serap_id = @provaSerapId";
 
 
                 if (dreCodigoEol != null)
                     where += " and rpc.dre_codigo_eol = @dreCodigoEol ";
 
                 if (ueCodigoEol != null)
-                    where += "and rpc.ue_codigo_eol = @ueCodigoEol ";
+                    where += " and rpc.ue_codigo_eol = @ueCodigoEol ";
 
                 if (turmasCodigosEol != null)
                     where += " and rpc.turma_codigo = any(@turmasCodigosEol) ";
@@ -124,7 +124,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select 1 from resultado_prova_consolidado where prova_serap_id = @provaLegadoId limit 1;";
+                const string query = "select 1 from resultado_prova_consolidado where prova_serap_id = @provaLegadoId limit 1;";
                 return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaLegadoId }, commandTimeout: 9000);
             }
             catch (Exception ex)
@@ -140,13 +140,13 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task ExcluirResultadoProvaAlunoTurma(long provaLegadoId, long alunoCodigoEol, string turmaCodigo)
         {
-            using var conn = ObterConexaoLeitura();
+            using var conn = ObterConexao();
             try
             {
-                var query = @"delete from resultado_prova_consolidado 
-                                    where prova_serap_id = @provaLegadoId
-                                      and aluno_codigo_eol = @alunoCodigoEol
-                                      and turma_codigo = @turmaCodigo";
+                const string query = @"delete from resultado_prova_consolidado 
+                                        where prova_serap_id = @provaLegadoId
+                                        and aluno_codigo_eol = @alunoCodigoEol
+                                        and turma_codigo = @turmaCodigo";
 
                 await conn.ExecuteAsync(query, new { provaLegadoId, alunoCodigoEol, turmaCodigo }, commandTimeout: 9000);
             }
@@ -163,10 +163,10 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task ExcluirDadosConsolidadosPorProvaSerapEstudantesId(long provaSerapEstudantesId)
         {
-            using var conn = ObterConexaoLeitura(); 
+            using var conn = ObterConexao(); 
             try
             {
-                var query = $@"delete from resultado_prova_consolidado where prova_serap_estudantes_id = @provaSerapEstudantesId;";
+                const string query = "delete from resultado_prova_consolidado where prova_serap_estudantes_id = @provaSerapEstudantesId;";
                 await conn.ExecuteAsync(query, new { provaSerapEstudantesId }, commandTimeout: 50000);
             }
             catch (Exception ex)
@@ -182,13 +182,13 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task ExcluirDadosConsolidadosPorProvaLegadoId(long provaSerapId)
         {
-            using var conn = ObterConexaoLeitura();
+            using var conn = ObterConexao();
             try
             {
-                var query = "delete from resultado_prova_consolidado where prova_serap_id = @provaSerapId;";
+                const string query = "delete from resultado_prova_consolidado where prova_serap_id = @provaSerapId;";
                 await conn.ExecuteAsync(query, new { provaSerapId }, commandTimeout: 50000);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -199,13 +199,12 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-
         public async Task<IEnumerable<string>> ObterTurmasResultadoProvaAluno(long provaLegadoId, long alunoCodigoEol)
         {
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select distinct turma_codigo 
+                const string query = @"select distinct turma_codigo 
                                          from resultado_prova_consolidado 
                                         where prova_serap_id = @provaLegadoId 
                                           and aluno_codigo_eol = @alunoCodigoEol";
@@ -225,62 +224,61 @@ namespace SME.SERAp.Prova.Dados
     
         public async Task IncluirResultadoProvaConsolidado(ResultadoProvaConsolidado resultado)
         {
-            using var conn = ObterConexaoLeitura();
+            using var conn = ObterConexao();
             try
             {
-                string query = @"INSERT INTO public.resultado_prova_consolidado
-                                (prova_serap_id, 
-                                 prova_serap_estudantes_id, 
-                                 dre_codigo_eol,
-                                 dre_sigla, 
-                                 dre_nome, 
-                                 ue_codigo_eol, 
-                                 ue_nome,
-                                 turma_ano_escolar,
-                                 turma_ano_escolar_descricao, 
-                                 turma_codigo, 
-                                 turma_descricao,
-                                 aluno_codigo_eol, 
-                                 aluno_nome,
-                                 aluno_sexo,
-                                 aluno_data_nascimento,
-                                 prova_componente,
-                                 prova_caderno,
-                                 prova_quantidade_questoes, 
-                                 aluno_frequencia, 
-                                 questao_id, 
-                                 questao_ordem,
-                                 resposta, 
-                                 prova_data_inicio, 
-                                 prova_data_entregue)
-                                VALUES(@provaSerapId, 
-                                       @provaSerapEstudantesId, 
-                                       @DreCodigoEol, 
-                                       @DreSigla, 
-                                       @DreNome, 
-                                       @UeCodigoEol, 
-                                       @UeNome, 
-                                       @TurmaAnoEscolar, 
-                                       @TurmaAnoEscolarDescricao, 
-                                       @TurmaCodigo,
-                                       @TurmaDescricao, 
-                                       @AlunoCodigoEol, 
-                                       @AlunoNome,
-                                       @AlunoSexo, 
-                                       @AlunoDataNascimento,
-                                       @ProvaComponente,
-                                       @ProvaCaderno,
-                                       @ProvaQuantidadeQuestoes,
-                                       @AlunoFrequencia,
-                                       @QuestaoId, 
-                                       @QuestaoOrdem, 
-                                       @Resposta, 
-                                       @DataInicio,
-                                       @DataFim);
-                                ";
+                const string query = @"INSERT INTO public.resultado_prova_consolidado
+                                        (prova_serap_id, 
+                                         prova_serap_estudantes_id, 
+                                         dre_codigo_eol,
+                                         dre_sigla, 
+                                         dre_nome, 
+                                         ue_codigo_eol, 
+                                         ue_nome,
+                                         turma_ano_escolar,
+                                         turma_ano_escolar_descricao,
+                                         turma_codigo,
+                                         turma_descricao,
+                                         aluno_codigo_eol,
+                                         aluno_nome,
+                                         aluno_sexo,
+                                         aluno_data_nascimento,
+                                         prova_componente,
+                                         prova_caderno,
+                                         prova_quantidade_questoes,
+                                         aluno_frequencia,
+                                         questao_id,
+                                         questao_ordem,
+                                         resposta,
+                                         prova_data_inicio,
+                                         prova_data_entregue)
+                                        VALUES(@ProvaSerapId,
+                                               @ProvaSerapEstudantesId,
+                                               @DreCodigoEol,
+                                               @DreSigla,
+                                               @DreNome,
+                                               @UeCodigoEol,
+                                               @UeNome,
+                                               @TurmaAnoEscolar,
+                                               @TurmaAnoEscolarDescricao,
+                                               @TurmaCodigo,
+                                               @TurmaDescricao,
+                                               @AlunoCodigoEol,
+                                               @AlunoNome,
+                                               @AlunoSexo,
+                                               @AlunoDataNascimento,
+                                               @ProvaComponente,
+                                               @ProvaCaderno,
+                                               @ProvaQuantidadeQuestoes,
+                                               @AlunoFrequencia,
+                                               @QuestaoId, 
+                                               @QuestaoOrdem,
+                                               @Resposta,
+                                               @DataInicio,
+                                               @DataFim);
+                                        ";
 
                 await conn.ExecuteAsync(query, resultado);
-
             }
             catch (Exception ex)
             {

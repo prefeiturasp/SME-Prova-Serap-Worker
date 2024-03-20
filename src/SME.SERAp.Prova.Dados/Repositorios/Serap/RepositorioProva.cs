@@ -21,8 +21,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-
-                var query = $@"                            
+                var query = @"                            
                             select 
 	                        vape.prova_serap_id,
                             vape.prova_serap_estudantes_id,
@@ -59,7 +58,7 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryAsync<ResultadoProvaConsolidado>(query, new { provaId, dreId, ueId }, commandTimeout: 50000);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -160,7 +159,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<Dominio.Prova> ObterPorIdLegadoAsync(long id)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select * from prova where prova_legado_id = @id";
@@ -176,16 +175,11 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> VerificaSeExistePorProvaSerapId(long provaId)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select 1 from prova pa where prova_legado_id = @provaId";
-
                 return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaId });
-            }
-            catch (System.Exception)
-            {
-                throw;
             }
             finally
             {
@@ -196,16 +190,12 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> VerificaSeExisteProvaFinalizadaPorId(long id)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select 1 from prova_aluno pa where prova_id = @id and finalizado_em is not null limit 1";
 
                 return await conn.QueryFirstOrDefaultAsync<bool>(query, new { id });
-            }
-            catch (System.Exception)
-            {
-                throw;
             }
             finally
             {
@@ -216,7 +206,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> VerificaSeExisteRespostasPorId(long id)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select 1 
@@ -237,10 +227,11 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<ProvaAlunoDto>> ObterProvasIniciadasPorModalidadeAsync(int modalidade)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
-                int status = (int)ProvaStatus.Iniciado;
+                const int status = (int)ProvaStatus.Iniciado;
+                
                 var query = @"select
                                 pa.id provaAlunoId,
                                 pa.prova_id provaId,
@@ -269,7 +260,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<ProvaTaiSyncDto>> ObterProvasTaiAsync()
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 const string query = @"select p.id as ProvaId,
@@ -321,7 +312,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<ProvaBIBSyncDto>> ObterProvasBibAsync()
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select p.id as ProvaId, p.total_cadernos as TotalCadernos
@@ -339,7 +330,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<long?> ObterProvaOrigemCadernoAsync(long provaId)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select prova_id_origem_caderno from prova p where p.id = @provaId";
@@ -355,7 +346,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<ProvaAtualizadaDto>> ObterProvaPorUltimaAtualizacao(DateTime dataBase)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select p.id as provaId, p.ultima_atualizacao as UltimaAtualizacao
@@ -373,7 +364,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> VerificaSePossuiDownload(long provaId)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
                 var query = @"select 1
@@ -408,7 +399,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> VerificaSePossuiTipoDeficiencia(long provaLegadoId)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
 	            const string query = @"select 1
@@ -432,7 +423,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaAdesaoTodosPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
 	            var query = $@"with tb_prova_turma as (
@@ -586,7 +577,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaAdesaoManualPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
             try
             {
 	            var query = $@"with tb_prova_turma_aluno_adesao_manual as (
@@ -707,7 +698,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaDeficienciaPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos)
         {
-            using var conn = ObterConexao();
+            using var conn = ObterConexaoLeitura();
 
             try
             {

@@ -2,7 +2,6 @@
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Data;
-using System.Data.SqlClient;
 
 namespace SME.SERAp.Prova.Dados
 {
@@ -21,5 +20,12 @@ namespace SME.SERAp.Prova.Dados
             conexao.Open();
             return conexao;
         }
+        
+        protected IDbConnection ObterConexao()
+        {
+            var conexao = new NpgsqlConnection(connectionStrings.ApiSerap);
+            conexao.Open();
+            return conexao;
+        }        
     }
 }

@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using RabbitMQ.Client;
 using SME.SERAp.Prova.Aplicacao.Queries.VerificaProvaPossuiTipoDeficiencia;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Dominio.Enums;
@@ -40,6 +39,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (!checarProvaExiste)
                     throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
 
+                await mediator.Send(new ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand(extracao.ProvaSerapId));
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Processando));
 
                 var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));
@@ -77,6 +77,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 foreach (var filtro in filtrosParaPublicar)
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -85,8 +87,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 serviceLog.Registrar(LogNivel.Critico, $"Erro -- Consolidar os dados da prova. msg: {mensagemRabbit.Mensagem}", ex.Message, ex.StackTrace);
                 return false;
             }
-
-            return true;
         }
     }
 }

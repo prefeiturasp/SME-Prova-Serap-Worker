@@ -36,8 +36,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
                     return true;
-                
-                await mediator.Send(new ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand(filtro.ProvaSerapId));
 
                 IEnumerable<ConsolidadoAlunoProvaDto> consolidadoAlunosProva;
                 if (filtro.AlunosComDeficiencia)
@@ -51,10 +49,10 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     foreach (var consolidadoAlunoProva in consolidadoAlunosProva)
                     {
-                        var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaIdEAlunoRaQuery(consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));
-                        if (respostas == null || !respostas.Any()) 
+                        var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery(consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));
+                        if (respostas == null || !respostas.Any())
                             continue;
-                        
+
                         foreach (var resposta in respostas)
                         {
                             var res = new ResultadoProvaConsolidado

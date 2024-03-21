@@ -94,7 +94,6 @@ namespace SME.SERAp.Prova.Dados
                 var where = " where 1=1 ";
                 where += " and rpc.prova_serap_id = @provaSerapId";
 
-
                 if (dreCodigoEol != null)
                     where += " and rpc.dre_codigo_eol = @dreCodigoEol ";
 

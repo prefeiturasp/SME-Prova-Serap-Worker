@@ -88,8 +88,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 foreach (var filtro in filtrosParaPublicar)
                     await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
-                
-                await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Finalizado));
 
                 return true;
             }

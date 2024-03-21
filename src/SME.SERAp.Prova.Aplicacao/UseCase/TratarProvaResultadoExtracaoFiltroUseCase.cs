@@ -47,7 +47,10 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
                     if (!existeItemProcesso)
+                    {
+                        await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Finalizado));
                         await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
+                    }
                 }
             }
             catch (Exception ex)

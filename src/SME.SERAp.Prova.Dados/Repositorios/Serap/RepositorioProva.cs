@@ -738,8 +738,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = $@"
-                               
-                with v_prova_turma_aluno2 as ( select distinct p.id AS prova_id,
+                               with v_prova_turma_aluno2 as (select distinct p.id AS prova_id,
                                           p.prova_legado_id,
                                           p.aderir_todos,
                                           p.possui_bib,
@@ -756,23 +755,24 @@ namespace SME.SERAp.Prova.Dados
                                           t.modalidade_codigo AS turma_modalidade,
                                           t.etapa_eja AS turma_etapa_eja,
                                           t.ano_letivo AS turma_ano_letivo,
-                                          coalesce(a.id, a2.id) AS aluno_id,
-                                          coalesce(a.ra, a2.ra) AS aluno_ra,
-                                          coalesce(a.situacao, a2.situacao) AS aluno_situacao
+                                           coalesce(a2.id, a.id) AS aluno_id,
+                                          coalesce(a2.ra, a.ra) AS aluno_ra,
+                                          coalesce(a2.situacao, a.situacao) AS aluno_situacao
                                       from prova p
                                       LEFT JOIN prova_ano_original pa ON pa.prova_id = p.id
                                       LEFT JOIN turma t ON ((pa.modalidade = 3 OR pa.modalidade = 4) AND pa.etapa_eja = t.etapa_eja OR pa.modalidade <> 3 AND pa.modalidade <> 4)
                                       	AND t.ano::text = pa.ano::text
                                       	AND t.modalidade_codigo = pa.modalidade
                                       	AND t.ano_letivo::double precision = date_part('year'::text, p.inicio)
-                                      left JOIN aluno a ON a.turma_id = t.id 	
-                                      left join (select tah.turma_id, tah.aluno_id from turma_aluno_historico tah) tah2 on tah2.turma_id = t.id
-                                      left JOIN aluno a2 ON a2.id = tah2.aluno_id
-                                      inner join prova_aluno pa2 on pa2.prova_id = p.id
-                                      	and pa2.aluno_ra = coalesce(a.ra, a2.ra)
+                                      left JOIN aluno a ON a.turma_id = t.id                                      	
+                                      left join (select tah.turma_id, tah.aluno_id from turma_aluno_historico tah) tah2 on tah2.turma_id = t.id                                      
+                                      left JOIN aluno a2 ON a2.id = tah2.aluno_id    
+                                      inner join prova_aluno pa2 on pa2.prova_id = p.id    
+                                    	and pa2.aluno_ra = coalesce(a2.ra, a.ra)
                                       	and pa2.status in (2, 5, 6, 7)
                                       	and pa2.finalizado_em is not null
-                                      where p.prova_legado_id  =  @provaLegadoId ),
+                                      where p.prova_legado_id  = @provaLegadoId  ),
+                               
 
                                tb_prova_turma as (
                 				select distinct vpta.prova_id as prova_serap_estudantes_id,
@@ -792,10 +792,10 @@ namespace SME.SERAp.Prova.Dados
                 				from v_prova_turma_aluno2 vpta
                 				left join prova p on p.id = vpta.prova_id
                 				where vpta.aderir_todos = true
-                				and vpta.prova_legado_id = @provaLegadoId											
+                				and vpta.prova_legado_id = @provaLegadoId										
 							),                     
 			                tb_deficiencias as (
-                				select td.id as deficiencia_id, p.prova_legado_id 
+                				select td.id as deficiencia_id, p.prova_legado_id
                 				from prova p
                 				inner join tipo_prova tp on tp.id = p.tipo_prova_id
                 				inner join tipo_prova_deficiencia tpd on tpd.tipo_prova_id = tp.id  
@@ -859,7 +859,8 @@ namespace SME.SERAp.Prova.Dados
                 								where tah.aluno_id = a.id
                 								and tah.data_matricula::date <= tb_prova_turma_aluno.fim::date
                 								and (tah.data_situacao::date >= tb_prova_turma_aluno.inicio::date or tah.data_situacao is null)
-                								and tah.ano_letivo = extract(year from tb_prova_turma_aluno.inicio)
+                								and tah.ano_letivo = extract(year from tb_prova_turma_aluno.inicio) 
+                								and t.nome not similar to '(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|X|W|Y|Z)%'
                 								order by tah.data_matricula desc
 												limit 1)
                 						else
@@ -870,7 +871,9 @@ namespace SME.SERAp.Prova.Dados
                 								and tah.data_matricula::date <= palu.finalizado_em::date
                 								and (tah.data_situacao::date >= tb_prova_turma_aluno.inicio::date or tah.data_situacao is null)
                 								and tah.ano_letivo = extract(year from tb_prova_turma_aluno.inicio)
+                							    and t.nome not similar to '(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|X|W|Y|Z)%'
                 								order by tah.data_matricula desc
+                								
 												limit 1)
                 					end, a.turma_id) as TurmaId,
                 					a.situacao as AlunoSituacao
@@ -927,6 +930,7 @@ namespace SME.SERAp.Prova.Dados
 								inner join turma t on t.id = p.TurmaId 
 								inner join ue on ue.id = t.ue_id  
 								inner join dre on dre.id = ue.dre_id
+               
 							where t.codigo in ({string.Join(',', turmasCodigos.Select(c => $"'{c}'"))})";
 
                 return await conn.QueryAsync<ConsolidadoAlunoProvaDto>(query, new { provaLegadoId });

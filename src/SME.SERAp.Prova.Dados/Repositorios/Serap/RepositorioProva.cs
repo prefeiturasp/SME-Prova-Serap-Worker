@@ -767,7 +767,7 @@ namespace SME.SERAp.Prova.Dados
                                       left JOIN aluno a ON a.turma_id = t.id                                      	
                                       left join (select tah.turma_id, tah.aluno_id from turma_aluno_historico tah) tah2 on tah2.turma_id = t.id                                      
                                       left JOIN aluno a2 ON a2.id = tah2.aluno_id    
-                                      inner join prova_aluno pa2 on pa2.prova_id = p.id    
+                                      left join prova_aluno pa2 on pa2.prova_id = p.id    
                                     	and pa2.aluno_ra = coalesce(a2.ra, a.ra)
                                       	and pa2.status in (2, 5, 6, 7)
                                       	and pa2.finalizado_em is not null

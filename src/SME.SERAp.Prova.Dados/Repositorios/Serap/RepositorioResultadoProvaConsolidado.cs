@@ -295,19 +295,21 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                const string query = @"select q.id as QuestaoId, 
-                                             q.ordem as QuestaoOrdem,
-                                            CASE
-                                            WHEN qar.alternativa_id IS NOT NULL THEN alt.numeracao
-                                            ELSE qar.resposta
-                                             END AS resposta 
-                                          from questao q 
-                                          inner join prova p on p.id  = q.prova_id  
-                                          left join questao_aluno_resposta qar on qar.questao_id  = q.id and  qar.aluno_ra  = @alunoRa
-                                          left join alternativa alt on alt.id = qar.alternativa_id
-                                           left join alternativa alt2 on alt2.questao_id = q.id and alt2.correta 
-                                          WHERE p.prova_legado_id  = @provaLegadoId
-                                        order by q.ordem";
+                const string query = @" select qar.questao_id as QuestaoId,
+                                                   q.ordem as QuestaoOrdem,
+                                                   CASE
+                                                       WHEN qar.alternativa_id IS NOT NULL THEN alt.numeracao
+                                                       ELSE qar.resposta
+                                                   END AS resposta,
+                                                   qar.aluno_ra
+                                               from questao q
+                                               inner join prova p on p.id = q.prova_id
+                                               left join questao_aluno_resposta qar on qar.questao_id  = q.id and qar.aluno_ra = @alunoRa
+                                               LEFT JOIN alternativa alt on alt.questao_id = qar.questao_id and alt.id = qar.alternativa_id
+                                               WHERE (qar.id in (select max(qar2.id) from questao_aluno_resposta qar2 where qar2.questao_id = qar.questao_id and qar2.aluno_ra = qar.aluno_ra) or qar.id is null)
+                                               AND p.prova_legado_id  = @provaLegadoId
+                                               AND qar.aluno_ra =  @alunoRa
+                                               order by q.ordem";
 
                 return await conn.QueryAsync<AlunoQuestaoRespostasDto>(query, new { provaLegadoId, alunoRa });
             }

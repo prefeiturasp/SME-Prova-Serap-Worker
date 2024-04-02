@@ -4,11 +4,11 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
-using System.Collections.Generic;
+//using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static SME.SERAp.Prova.Infra.Utils.Paginacao;
+//using static SME.SERAp.Prova.Infra.Utils.Paginacao;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -31,16 +31,16 @@ namespace SME.SERAp.Prova.Aplicacao
             
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoPorIdQuery(extracao.ExtracaoResultadoId));
             if (exportacaoResultado is null)
-                throw new NegocioException("A exportação não foi encontrada");            
+                throw new NegocioException("A exportação não foi encontrada");
+            
+            if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
+                return true;            
 
             try
             {
                 var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
                 if (!checarProvaExiste)
                     throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
-
-                if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
-                    return true;
                 
                 var resultadoExtracaoProva = await mediator.Send(new VerificaResultadoExtracaoProvaExisteQuery(extracao.ProvaSerapId));
                 if (!resultadoExtracaoProva)
@@ -54,40 +54,39 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));                
                 await mediator.Send(new GerarCSVExtracaoProvaCommand(prova.TotalItens, caminhoCompletoArquivo));
-
-                var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
+                
                 var dres = await mediator.Send(new ObterDresSerapQuery());
-
+                if (dres == null || !dres.Any())
+                    return false;
+                
                 foreach (var dre in dres)
                 {
                     var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
-                    foreach (var ue in ues)
+                    if (ues == null || !ues.Any())
+                        continue;
+
+                    var turmas = await mediator.Send(new ObterTurmasPorCodigoDreEProvaSerapQuery(dre.CodigoDre, extracao.ProvaSerapId));
+                    if (turmas == null || !turmas.Any())
+                        continue;
+                    
+                    var ueEolIds = ues.Select(c => c.CodigoUe).Distinct().ToArray();
+                    var turmaEolIds = turmas.Select(c => c.Codigo).Distinct().ToArray();
+                    
+                    var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueEolIds, turmaEolIds);
+                    exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+
+                    foreach (var turma in turmas)
                     {
-                        var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ue.CodigoUe, prova.LegadoId));
-                        if (turmasUe == null || !turmasUe.Any())
+                        var ue = ues.FirstOrDefault(c => c.Id == turma.UeId);
+                        if (ue == null)
                             continue;
                         
-                        var paginasTurmas = Paginar(turmasUe.ToList());
-                        foreach (var turmas in paginasTurmas)
-                        {
-                            var ueIds = new[] { ue.CodigoUe };
-
-                            var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
-                            exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
-
-                            var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id,
-                                exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds)
-                            {
-                                TurmaEolIds = turmas.Select(t => t.Codigo).ToArray(),
-                                CaminhoArquivo = caminhoCompletoArquivo
-                            };
-                            filtrosParaPublicar.Add(filtro);
-                        }
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro,
+                            new TratarProvaResultadoExtracaoFiltroDto(exportacaoResultado.Id,
+                                extracao.ProvaSerapId, exportacaoResultadoItem.Id, caminhoCompletoArquivo, dre.CodigoDre,
+                                ue.CodigoUe, turma.Codigo)));
                     }
                 }
-
-                foreach (var filtro in filtrosParaPublicar)
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
 
                 return true;
             }
@@ -102,11 +101,13 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
 
+        /*
         private static List<List<Turma>> Paginar(IEnumerable<Turma> turmas)
         {
             var paginacao = new ListaPaginada<Turma>(turmas.ToList(), 5);
             return paginacao.ObterTodasAsPaginas();
         }
+        */
 
         private static string ObterCaminhoCompletoArquivo(string nomeArquivo)
         {

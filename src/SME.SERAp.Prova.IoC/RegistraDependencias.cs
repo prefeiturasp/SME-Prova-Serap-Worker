@@ -243,8 +243,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProvaTaiSyncUseCase, TratarProvaTaiSyncUseCase>();
             services.AddScoped<ITratarProvaTaiUseCase, TratarProvaTaiUseCase>();
 
-            services.AddScoped<ITratarAlunoResultadoProvaQuestoesUseCase, TratarAlunoResultadoProvaQuestoesUseCase>();
-            
             // Propagar cache
             services.AddScoped<IPropagarCacheParametrosUseCase, PropagarCacheParametrosUseCase>();
             services.AddScoped<IPropagarCacheProvasAnosUseCase, PropagarCacheProvasAnosUseCase>();

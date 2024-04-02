@@ -23,79 +23,46 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
+            var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroTurmaDto>();
+            if (filtro is null)
+                throw new NegocioException("O filtro precisa ser informado");            
             
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaSerapId));
             if (exportacaoResultado is null)
-                throw new NegocioException("A exportação não foi encontrada");            
+                throw new NegocioException("A exportação não foi encontrada");
+            
+            if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
+                return true;
+
+            var turmaEolIds = new[] { filtro.TurmaEolId };
 
             try
             {
-                if (filtro is null)
-                    throw new NegocioException("O filtro precisa ser informado");
-
-                if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
-                    return true;
-
                 IEnumerable<ConsolidadoAlunoProvaDto> consolidadoAlunosProva;
                 if (filtro.AlunosComDeficiencia)
-                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaSerapId, filtro.TurmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaSerapId, turmaEolIds));
                 else if (filtro.AdesaoManual)
-                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaSerapId, filtro.TurmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaSerapId, turmaEolIds));
                 else
-                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaSerapId, filtro.TurmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaSerapId, turmaEolIds));
 
-                if (consolidadoAlunosProva != null && consolidadoAlunosProva.Any())
-                {
-                    foreach (var consolidadoAlunoProva in consolidadoAlunosProva)
-                    {
-                        var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery(consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));
-                        if (respostas == null || !respostas.Any())
-                            continue;
+                if (consolidadoAlunosProva == null || !consolidadoAlunosProva.Any())
+                    return false;
 
-                        foreach (var resposta in respostas)
-                        {
-                            var res = new ResultadoProvaConsolidado
-                            {
-                                ProvaSerapId = consolidadoAlunoProva.ProvaSerapId,
-                                ProvaSerapEstudantesId = consolidadoAlunoProva.ProvaSerapEstudantesId,
-                                AlunoCodigoEol = consolidadoAlunoProva.AlunoCodigoEol,
-                                AlunoNome = consolidadoAlunoProva.AlunoNome,
-                                AlunoSexo = consolidadoAlunoProva.AlunoSexo,
-                                AlunoDataNascimento = consolidadoAlunoProva.AlunoDataNascimento,
-                                ProvaComponente = consolidadoAlunoProva.ProvaComponente,
-                                ProvaCaderno = consolidadoAlunoProva.ProvaCaderno,
-                                ProvaQuantidadeQuestoes = consolidadoAlunoProva.ProvaQuantidadeQuestoes,
-                                AlunoFrequencia = consolidadoAlunoProva.AlunoFrequencia,
-                                DataInicio = consolidadoAlunoProva.ProvaDataInicio,
-                                DataFim = consolidadoAlunoProva.ProvaDataEntregue,
-                                DreCodigoEol = consolidadoAlunoProva.DreCodigoEol,
-                                DreSigla = consolidadoAlunoProva.DreSigla,
-                                DreNome = consolidadoAlunoProva.DreNome,
-                                UeCodigoEol = consolidadoAlunoProva.UeCodigoEol,
-                                UeNome = consolidadoAlunoProva.UeNome,
-                                TurmaAnoEscolar = consolidadoAlunoProva.TurmaAnoEscolar,
-                                TurmaAnoEscolarDescricao = consolidadoAlunoProva.TurmaAnoEscolarDescricao,
-                                TurmaCodigo = consolidadoAlunoProva.TurmaCodigo,
-                                TurmaDescricao = consolidadoAlunoProva.TurmaDescricao,
-                                QuestaoId = resposta.QuestaoId,
-                                QuestaoOrdem = resposta.QuestaoOrdem,
-                                Resposta = resposta.Resposta
-                            };
-                            
-                            await mediator.Send(new InserirResultadoProvaConsolidadoCommand(res));                                    
-                        }
-                    }
-                }
+                foreach (var consolidadoAlunoProva in consolidadoAlunosProva)
+                    await BuscaRespostasEIncluiConsolidado(consolidadoAlunoProva);
+
+                var retorno = await AtualizarOuRemoverExportacaoResultadoItem(filtro.ProcessoId, filtro.DreEolId, filtro.TurmaEolId);
                 
-                await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
-
-                var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
-                if (existeItemProcesso)
-                    return true;
-
-                var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = filtro.ProcessoId, ProvaSerapId = filtro.ProvaSerapId };
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+                if (retorno.removido)
+                {
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva,
+                        new ProvaExtracaoDto
+                        {
+                            ExtracaoResultadoId = filtro.ProcessoId,
+                            ProvaSerapId = filtro.ProvaSerapId
+                        }));
+                }
 
                 return true;
             }
@@ -107,6 +74,71 @@ namespace SME.SERAp.Prova.Aplicacao
                 servicoLog.Registrar($"Erro ao consolidar os dados da prova por filtro. msg: {mensagemRabbit.Mensagem}", ex);
                 return false;
             }
+        }
+        
+        private async Task BuscaRespostasEIncluiConsolidado(ConsolidadoAlunoProvaDto consolidadoAlunoProva)
+        {
+            var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery(
+                consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));
+
+            foreach (var resposta in respostas)
+            {
+                var res = new ResultadoProvaConsolidado
+                {
+                    AlunoCodigoEol = consolidadoAlunoProva.AlunoCodigoEol,
+                    AlunoDataNascimento = consolidadoAlunoProva.AlunoDataNascimento,
+                    AlunoFrequencia = consolidadoAlunoProva.AlunoFrequencia,
+                    AlunoNome = consolidadoAlunoProva.AlunoNome,
+                    AlunoSexo = consolidadoAlunoProva.AlunoSexo,
+                    DataFim = consolidadoAlunoProva.ProvaDataInicio,
+                    DataInicio = consolidadoAlunoProva.ProvaDataEntregue,
+                    DreCodigoEol = consolidadoAlunoProva.DreCodigoEol,
+                    DreNome = consolidadoAlunoProva.DreNome,
+                    DreSigla = consolidadoAlunoProva.DreSigla,
+                    ProvaCaderno = consolidadoAlunoProva.ProvaCaderno,
+                    ProvaComponente = consolidadoAlunoProva.ProvaComponente,
+                    ProvaQuantidadeQuestoes = consolidadoAlunoProva.ProvaQuantidadeQuestoes,
+                    ProvaSerapEstudantesId = consolidadoAlunoProva.ProvaSerapEstudantesId,
+                    ProvaSerapId = consolidadoAlunoProva.ProvaSerapId,
+                    TurmaAnoEscolar = consolidadoAlunoProva.TurmaAnoEscolar,
+                    TurmaAnoEscolarDescricao = consolidadoAlunoProva.TurmaAnoEscolarDescricao,
+                    TurmaCodigo = consolidadoAlunoProva.TurmaCodigo,
+                    TurmaDescricao = consolidadoAlunoProva.TurmaDescricao,
+                    UeCodigoEol = consolidadoAlunoProva.UeCodigoEol,
+                    UeNome = consolidadoAlunoProva.UeNome,
+                    QuestaoId = resposta.QuestaoId,
+                    QuestaoOrdem = resposta.QuestaoOrdem,
+                    Resposta = resposta.Resposta
+                };
+
+                await mediator.Send(new InserirResultadoProvaConsolidadoCommand(res));
+            }
+        }
+
+        private async Task<(bool atualizado, bool removido)> AtualizarOuRemoverExportacaoResultadoItem(long processoId, string dreCodigo, string turmaCodigoEol)
+        {
+            var exportacaoResultadoItem = await mediator.Send(new ObterExportacaoResultadoItemPorProcessoIdDreCodigoQuery(processoId, dreCodigo));
+            if (exportacaoResultadoItem == null)
+                return (atualizado: false, removido: false);
+
+            var turmas = exportacaoResultadoItem.TurmaCodigoEol.Split(",");
+            var listaTurmas = turmas.ToList();
+            
+            if (turmas.Contains($"'{turmaCodigoEol}'"))
+                listaTurmas.Remove($"'{turmaCodigoEol}'");
+
+            if (listaTurmas.Any())
+            {
+                var ues = exportacaoResultadoItem.UeCodigoEol.Split(",");
+                var itemAlterado = new ExportacaoResultadoItem(exportacaoResultadoItem.ExportacaoResultadoId,
+                    exportacaoResultadoItem.DreCodigoEol, ues, listaTurmas.ToArray());
+
+                await mediator.Send(new AlterarExportacaoResultadoItemCommand(itemAlterado));
+                return (atualizado: true, removido: false);
+            }
+
+            await mediator.Send(new ExcluirExportacaoResultadoItemCommand(exportacaoResultadoItem.Id, processoId));
+            return (atualizado: false, removido: true);
         }
     }
 }

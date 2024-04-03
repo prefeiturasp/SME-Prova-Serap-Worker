@@ -367,21 +367,22 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select t.id, t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma 
-                                    from prova p
-                                    inner join prova_ano pa 
-                                        on p.id = pa.prova_id
-                                    inner join turma t 
-                                        on t.ano_letivo = EXTRACT(YEAR FROM p.inicio)
-                                        and (
-     		   									(p.modalidade not in(3,4) and p.modalidade = t.modalidade_codigo and t.ano = pa.ano)
-	     									 or (t.ano = pa.ano and t.modalidade_codigo = pa.modalidade and t.etapa_eja = pa.etapa_eja)
-     	 									)                                        
-                                    inner join ue 
-                                        on ue.id = t.ue_id
-                                    where 
-                                        ue.ue_id = @codigoUe
-                                        and p.prova_legado_id = @provaSerap;";
+                var query = @"with temp_prova_ano as (
+					select EXTRACT(YEAR FROM p.inicio) as inicio, p.modalidade
+					, pa.ano as pa_ano, pa.modalidade as pa_modalidade, pa.etapa_eja as pa_etapa_eja
+					from prova p
+					inner join prova_ano pa on p.id = pa.prova_id and p.prova_legado_id = @provaSerap),
+					tumas_ue as (
+					select t.id, t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma, t.modalidade_codigo, t.etapa_eja
+					from turma t
+					inner join ue on ue.id = t.ue_id and ue.ue_id = @codigoUe)
+					select t.id, t.ano, t.ano_letivo, t.codigo, t.ue_id, t.tipo_turma
+					from tumas_ue t
+					inner join temp_prova_ano p on t.ano_letivo = p.inicio
+					and (
+							(p.modalidade not in(3,4) and p.modalidade = t.modalidade_codigo and t.ano = p.pa_ano)
+						or (t.ano = p.pa_ano and t.modalidade_codigo = p.pa_modalidade and t.etapa_eja = p.pa_etapa_eja)
+					);";
 
                 return await conn.QueryAsync<Turma>(query, new { codigoUe, provaSerap });
             }

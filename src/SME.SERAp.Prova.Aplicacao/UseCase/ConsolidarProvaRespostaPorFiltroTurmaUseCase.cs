@@ -53,7 +53,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
 
                 foreach (var consolidadoAlunoProva in consolidadoAlunosProva)
-                    await BuscaRespostasEIncluiConsolidado(consolidadoAlunoProva);
+                    await BuscarRespostasEIncluirConsolidado(consolidadoAlunoProva);
 
                 await RemoverExportacaoResultadoItem(filtro.ItemId);
                 await ExtrairResultados(filtro.ProcessoId, filtro.ProvaSerapId);
@@ -69,7 +69,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
         }
         
-        private async Task BuscaRespostasEIncluiConsolidado(ConsolidadoAlunoProvaDto consolidadoAlunoProva)
+        private async Task BuscarRespostasEIncluirConsolidado(ConsolidadoAlunoProvaDto consolidadoAlunoProva)
         {
             var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery(
                 consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));

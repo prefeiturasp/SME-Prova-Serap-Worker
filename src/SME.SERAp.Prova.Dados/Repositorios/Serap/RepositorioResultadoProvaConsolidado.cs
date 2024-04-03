@@ -295,7 +295,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                const string query = @" select qar.questao_id as QuestaoId,
+                const string query = @" select coalesce(q.id, qar.questao_id) as QuestaoId,
                                                    q.ordem as QuestaoOrdem,
                                                    CASE
                                                        WHEN qar.alternativa_id IS NOT NULL THEN alt.numeracao
@@ -308,7 +308,6 @@ namespace SME.SERAp.Prova.Dados
                                                LEFT JOIN alternativa alt on alt.questao_id = qar.questao_id and alt.id = qar.alternativa_id
                                                WHERE (qar.id in (select max(qar2.id) from questao_aluno_resposta qar2 where qar2.questao_id = qar.questao_id and qar2.aluno_ra = qar.aluno_ra) or qar.id is null)
                                                AND p.prova_legado_id  = @provaLegadoId
-                                               AND qar.aluno_ra =  @alunoRa
                                                order by q.ordem";
 
                 return await conn.QueryAsync<AlunoQuestaoRespostasDto>(query, new { provaLegadoId, alunoRa });

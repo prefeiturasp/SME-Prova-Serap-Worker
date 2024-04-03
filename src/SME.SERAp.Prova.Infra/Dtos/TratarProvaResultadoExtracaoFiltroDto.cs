@@ -2,28 +2,24 @@
 {
     public class TratarProvaResultadoExtracaoFiltroDto : DtoBase
     {
-        public TratarProvaResultadoExtracaoFiltroDto(long processoId, long provaSerapId, long itemId,
-            string caminhoArquivo, string dreCodigoEol, string ueCodigoEol, string turmaCodigoEol) : this()
+        public TratarProvaResultadoExtracaoFiltroDto(long processoId, long provaSerapId, string caminhoArquivo, 
+            string dreCodigoEol, string ueCodigoEol) : this()
         {
             ProcessoId = processoId;
             ProvaSerapId = provaSerapId;
-            ItemId = itemId;
             CaminhoArquivo = caminhoArquivo;
             DreCodigoEol = dreCodigoEol;
             UeCodigoEol = ueCodigoEol;
-            TurmaCodigoEol = turmaCodigoEol;            
         }
 
         public TratarProvaResultadoExtracaoFiltroDto()
         {
         }
 
-        public long ProcessoId { get; }
-        public long ProvaSerapId { get; }
-        public long ItemId { get; }
-        public string CaminhoArquivo { get; }
-        public string DreCodigoEol { get; }
-        public string UeCodigoEol { get; }
-        public string TurmaCodigoEol { get; }
+        public long ProcessoId { get; set; }
+        public long ProvaSerapId { get; set; }
+        public string CaminhoArquivo { get; set; }
+        public string DreCodigoEol { get; set; }
+        public string UeCodigoEol { get; set; }
     }
 }

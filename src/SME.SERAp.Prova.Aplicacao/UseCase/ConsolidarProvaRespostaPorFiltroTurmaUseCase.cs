@@ -34,10 +34,9 @@ namespace SME.SERAp.Prova.Aplicacao
             if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
                 return true;
 
-            var turmaEolIds = new[] { filtro.TurmaEolId };
-
             try
             {
+                var turmaEolIds = new[] { filtro.TurmaEolId };
                 IEnumerable<ConsolidadoAlunoProvaDto> consolidadoAlunosProva;
                 if (filtro.AlunosComDeficiencia)
                     consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaSerapId, turmaEolIds));
@@ -47,23 +46,17 @@ namespace SME.SERAp.Prova.Aplicacao
                     consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaSerapId, turmaEolIds));
 
                 if (consolidadoAlunosProva == null || !consolidadoAlunosProva.Any())
+                {
+                    await RemoverExportacaoResultadoItem(filtro.ItemId);
+                    await ExtrairResultados(filtro.ProcessoId, filtro.ProvaSerapId);
                     return false;
+                }
 
                 foreach (var consolidadoAlunoProva in consolidadoAlunosProva)
                     await BuscaRespostasEIncluiConsolidado(consolidadoAlunoProva);
 
-                var retorno = await AtualizarOuRemoverExportacaoResultadoItem(filtro.ProcessoId, filtro.DreEolId, filtro.TurmaEolId);
-                
-                if (retorno.removido)
-                {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva,
-                        new ProvaExtracaoDto
-                        {
-                            ExtracaoResultadoId = filtro.ProcessoId,
-                            ProvaSerapId = filtro.ProvaSerapId
-                        }));
-                }
-
+                await RemoverExportacaoResultadoItem(filtro.ItemId);
+                await ExtrairResultados(filtro.ProcessoId, filtro.ProvaSerapId);
                 return true;
             }
             catch (Exception ex)
@@ -114,31 +107,25 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new InserirResultadoProvaConsolidadoCommand(res));
             }
         }
-
-        private async Task<(bool atualizado, bool removido)> AtualizarOuRemoverExportacaoResultadoItem(long processoId, string dreCodigo, string turmaCodigoEol)
+        
+        private async Task RemoverExportacaoResultadoItem(long itemId)
         {
-            var exportacaoResultadoItem = await mediator.Send(new ObterExportacaoResultadoItemPorProcessoIdDreCodigoQuery(processoId, dreCodigo));
+            var exportacaoResultadoItem = await mediator.Send(new ObterExportacaoResultadoItemPorIdQuery(itemId));
             if (exportacaoResultadoItem == null)
-                return (atualizado: false, removido: false);
+                return;
 
-            var turmas = exportacaoResultadoItem.TurmaCodigoEol.Split(",");
-            var listaTurmas = turmas.ToList();
+            await mediator.Send(new ExcluirExportacaoResultadoItemCommand(exportacaoResultadoItem.Id));
+        }
+
+        private async Task ExtrairResultados(long processoId, long provaSerapId)
+        {
+            var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(processoId));
             
-            if (turmas.Contains($"'{turmaCodigoEol}'"))
-                listaTurmas.Remove($"'{turmaCodigoEol}'");
-
-            if (listaTurmas.Any())
+            if (!existeItemProcesso)
             {
-                var ues = exportacaoResultadoItem.UeCodigoEol.Split(",");
-                var itemAlterado = new ExportacaoResultadoItem(exportacaoResultadoItem.ExportacaoResultadoId,
-                    exportacaoResultadoItem.DreCodigoEol, ues, listaTurmas.ToArray());
-
-                await mediator.Send(new AlterarExportacaoResultadoItemCommand(itemAlterado));
-                return (atualizado: true, removido: false);
-            }
-
-            await mediator.Send(new ExcluirExportacaoResultadoItemCommand(exportacaoResultadoItem.Id, processoId));
-            return (atualizado: false, removido: true);
+                var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = processoId, ProvaSerapId = provaSerapId };
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
+            }            
         }
     }
 }

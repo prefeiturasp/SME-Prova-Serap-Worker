@@ -5,6 +5,7 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,27 +39,24 @@ namespace SME.SERAp.Prova.Aplicacao
 
             try
             {
-                var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(filtro.ProvaSerapId, filtro.DreEolId));
-                if (ues == null || !ues.Any())
-                    return false;
-
-                var turmas = await mediator.Send(new ObterTurmasPorCodigoDreEProvaSerapQuery(filtro.DreEolId, filtro.ProvaSerapId));
+                var turmas = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(filtro.UeEolId, filtro.ProvaSerapId));
                 if (turmas == null || !turmas.Any())
-                    return false;                
-
-                var ueEolIds = ues.Select(c => c.CodigoUe).Distinct().ToArray();
-                var turmaEolIds = turmas.Select(c => c.Codigo).Distinct().ToArray();
+                    return false;
                 
-                var exportacaoResultadoItem = new ExportacaoResultadoItem(filtro.ProcessoId, filtro.DreEolId, ueEolIds, turmaEolIds);
-                exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
-
+                var listaFiltroTurma = new List<ExportacaoResultadoFiltroTurmaDto>();
                 foreach (var turma in turmas)
                 {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurma,
-                        new ExportacaoResultadoFiltroTurmaDto(filtro.ProcessoId, filtro.ProvaSerapId,
-                            exportacaoResultadoItem.Id, filtro.DreEolId, turma.Codigo, filtro.AdesaoManual,
-                            filtro.AlunosComDeficiencia)));
-                }                    
+                    var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, filtro.DreEolId,
+                        filtro.UeEolId, turma.Codigo);
+                    exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+
+                    listaFiltroTurma.Add(new ExportacaoResultadoFiltroTurmaDto(filtro.ProcessoId, filtro.ProvaSerapId,
+                        exportacaoResultadoItem.Id, filtro.DreEolId, turma.Codigo, filtro.AdesaoManual,
+                        filtro.AlunosComDeficiencia));
+                }
+                
+                foreach (var filtroTurma in listaFiltroTurma)
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, filtroTurma));
 
                 return true;
             }

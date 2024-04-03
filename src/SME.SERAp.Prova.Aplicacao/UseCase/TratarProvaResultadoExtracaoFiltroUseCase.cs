@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,19 +40,23 @@ namespace SME.SERAp.Prova.Aplicacao
 
             try
             {
-                var turmaEolIds = new[] { filtro.TurmaCodigoEol };
-                var resultados = await mediator.Send(new ObterExtracaoProvaRespostaQuery(filtro.ProvaSerapId, filtro.DreCodigoEol, filtro.UeCodigoEol, turmaEolIds));
-                if (resultados != null && resultados.Any())
-                    await mediator.Send(new EscreverDadosCSVExtracaoProvaCommand(resultados, filtro.CaminhoArquivo));
-
-                await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
-
-                var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
-                if (!existeItemProcesso)
+                var turmas = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(filtro.UeCodigoEol, filtro.ProvaSerapId));
+                if (turmas == null || !turmas.Any())
+                    return false;                
+                
+                var listaFiltroTurma = new List<TratarProvaResultadoExtracaoFiltroTurmaDto>();
+                foreach (var turma in turmas)
                 {
-                    await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Finalizado));
-                    await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
+                    var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id,
+                        filtro.DreCodigoEol, filtro.UeCodigoEol, turma.Codigo);
+                    exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
+
+                    listaFiltroTurma.Add(new TratarProvaResultadoExtracaoFiltroTurmaDto(filtro.ProcessoId, filtro.ProvaSerapId,
+                        filtro.DreCodigoEol, filtro.UeCodigoEol, turma.Codigo, exportacaoResultadoItem.Id, filtro.CaminhoArquivo));
                 }
+
+                foreach (var filtroTurma in listaFiltroTurma)
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltroTurma, filtroTurma));
             }
             catch (Exception ex)
             {
@@ -65,5 +70,13 @@ namespace SME.SERAp.Prova.Aplicacao
 
             return true;
         }
+        
+        /*
+        private static List<List<Turma>> Paginar(IEnumerable<Turma> turmas)
+        {
+            var paginacao = new ListaPaginada<Turma>(turmas.ToList(), 5);
+            return paginacao.ObterTodasAsPaginas();
+        }
+        */        
     }
 }

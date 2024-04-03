@@ -6,6 +6,7 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -24,6 +25,8 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
+            if (extracao is null)
+                throw new NegocioException("O id da prova serap precisa ser informado");            
 
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
 
@@ -41,16 +44,27 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Processando));
 
                 var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));
+                if (prova == null)
+                    return false;
+                
+                var adesaoManual = !prova.AderirTodos;
+                
                 var possuiTipoDeficiencia = await mediator.Send(new VerificaProvaPossuiTipoDeficienciaQuery(exportacaoResultado.ProvaSerapId));
 
                 var dres = await mediator.Send(new ObterDresSerapQuery());
                 foreach (var dre in dres)
                 {
-                    var adesaoManual = !prova.AderirTodos;
+                    var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(exportacaoResultado.ProvaSerapId, dre.CodigoDre));
+                    if (ues == null || !ues.Any())
+                        continue;
 
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro,
-                        new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId,
-                            dre.CodigoDre, adesaoManual, possuiTipoDeficiencia)));
+                    foreach (var ue in ues)
+                    {
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro,
+                            new ExportacaoResultadoFiltroDto(exportacaoResultado.Id,
+                                exportacaoResultado.ProvaSerapId, dre.CodigoDre, ue.CodigoUe, adesaoManual,
+                                possuiTipoDeficiencia)));
+                    }
                 }
 
                 return true;

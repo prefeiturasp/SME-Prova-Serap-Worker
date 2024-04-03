@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace SME.SERAp.Prova.Dominio
 {
@@ -9,12 +8,12 @@ namespace SME.SERAp.Prova.Dominio
         {
         }
 
-        public ExportacaoResultadoItem(long exportacaoResultadoId, string dreCodigoEol, string[] ueCodigoEol, string[] turmaCodigoEol) : this()
+        public ExportacaoResultadoItem(long exportacaoResultadoId, string dreCodigoEol, string ueCodigoEol, string turmaCodigoEol) : this()
         {
             ExportacaoResultadoId = exportacaoResultadoId;
             DreCodigoEol = dreCodigoEol;
-            UeCodigoEol = ueCodigoEol.Any() ? string.Join(',', ueCodigoEol.Select(a => $"'{a}'")) : string.Empty;
-            TurmaCodigoEol = turmaCodigoEol.Any() ? string.Join(',', turmaCodigoEol.Select(a => $"'{a}'")) : string.Empty;
+            UeCodigoEol = ueCodigoEol;
+            TurmaCodigoEol = turmaCodigoEol;
             CriadoEm = DateTime.Now;
         }
 

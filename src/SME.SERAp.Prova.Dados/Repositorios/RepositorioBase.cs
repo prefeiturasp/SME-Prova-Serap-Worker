@@ -55,7 +55,7 @@ namespace SME.SERAp.Prova.Dados
 
         public virtual async Task<T> ObterPorIdAsync(long id)
         {
-            var conexao = ObterConexao();
+            var conexao = ObterConexaoLeitura();
             try
             {
                 return await conexao.GetAsync<T>(id: id);

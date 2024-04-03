@@ -3,18 +3,16 @@ namespace SME.SERAp.Prova.Infra
 {
     public class ExportacaoResultadoFiltroDto : DtoBase
     {
-        public ExportacaoResultadoFiltroDto(long processoId, long provaSerapId, long itemId, string dreEolId, string[] ueEolIds)
+        public ExportacaoResultadoFiltroDto(long processoId, long provaSerapId, string dreEolId, string ueEolId) : this()
         {
             ProcessoId = processoId;
             ProvaSerapId = provaSerapId;
-            ItemId = itemId;
-            DreEolId = dreEolId;
-            UeEolIds = ueEolIds;
+            DreEolId = dreEolId;            
+            UeEolId = ueEolId;
         }
 
-        public ExportacaoResultadoFiltroDto(long processoId, long provaSerapId, long itemId, string dreEolId,
-            string[] ueEolIds, bool adesaoManual, bool alunosComDeficiencia) : this(processoId, provaSerapId, itemId,
-            dreEolId, ueEolIds)
+        public ExportacaoResultadoFiltroDto(long processoId, long provaSerapId, string dreEolId, string ueEolId,
+            bool adesaoManual, bool alunosComDeficiencia) : this(processoId, provaSerapId, dreEolId, ueEolId)
         {
             AdesaoManual = adesaoManual;
             AlunosComDeficiencia = alunosComDeficiencia;
@@ -26,11 +24,8 @@ namespace SME.SERAp.Prova.Infra
 
         public long ProcessoId { get; set; }
         public long ProvaSerapId { get; set; }
-        public long ItemId { get; set; }
         public string DreEolId { get; set; }
-        public string[] UeEolIds { get; set; }
-        public string[] TurmaEolIds { get; set; }
-        public string CaminhoArquivo { get; set; }
+        public string UeEolId { get; set; }
         public bool AdesaoManual { get; set; }
         public bool AlunosComDeficiencia { get; set; }
     }

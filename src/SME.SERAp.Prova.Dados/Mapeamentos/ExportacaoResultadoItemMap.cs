@@ -14,6 +14,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.DreCodigoEol).ToColumn("dre_codigo_eol");
             Map(c => c.UeCodigoEol).ToColumn("ue_codigo_eol");
             Map(c => c.CriadoEm).ToColumn("criado_em");
+            Map(c => c.TurmaCodigoEol).ToColumn("turma_codigo_eol");
         }
     }
 }

@@ -35,7 +35,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 var turmas = await repositorioResultadoProvaConsolidado.ObterTurmasResultadoProvaAluno(request.ProvaSerapId, aluno);
                 var turma = turmas.FirstOrDefault();
 
-                var cadernoComResposta = resultadoOrdenado.Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma && !string.IsNullOrEmpty(x.Resposta))
+                var cadernoComResposta = resultadoOrdenado.Where(x => x.AlunoCodigoEol == aluno && x.TurmaCodigo == turma)
                                                   .Select(x => x.ProvaCaderno).FirstOrDefault();
 
                 var caderno = !string.IsNullOrEmpty(cadernoComResposta)

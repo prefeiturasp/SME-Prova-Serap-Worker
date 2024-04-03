@@ -1,9 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dados;
-using SME.SERAp.Prova.Dominio;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

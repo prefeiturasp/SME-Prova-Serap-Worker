@@ -4,11 +4,9 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static SME.SERAp.Prova.Infra.Utils.Paginacao;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -31,63 +29,50 @@ namespace SME.SERAp.Prova.Aplicacao
             
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoPorIdQuery(extracao.ExtracaoResultadoId));
             if (exportacaoResultado is null)
-                throw new NegocioException("A exportação não foi encontrada");            
+                throw new NegocioException("A exportação não foi encontrada");
+            
+            if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
+                return true;
+            
+            var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
+            if (!checarProvaExiste)
+                throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
+            
+            var resultadoExtracaoProva = await mediator.Send(new VerificaResultadoExtracaoProvaExisteQuery(extracao.ProvaSerapId));
+            if (!resultadoExtracaoProva)
+                throw new NegocioException($"Os resultados da prova {extracao.ProvaSerapId} ainda não foram gerados");
+            
+            var caminhoCompletoArquivo = ObterCaminhoCompletoArquivo(exportacaoResultado.NomeArquivo);
+            if (string.IsNullOrEmpty(caminhoCompletoArquivo))
+                throw new NegocioException("O caminho do arquivo da exportação dos resultados não foi localizado.");
 
             try
             {
-                var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
-                if (!checarProvaExiste)
-                    throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
-
-                if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
-                    return true;
-                
-                var resultadoExtracaoProva = await mediator.Send(new VerificaResultadoExtracaoProvaExisteQuery(extracao.ProvaSerapId));
-                if (!resultadoExtracaoProva)
-                    throw new NegocioException($"Os resultados da prova {extracao.ProvaSerapId} ainda não foram gerados");
-
-                var caminhoCompletoArquivo = ObterCaminhoCompletoArquivo(exportacaoResultado.NomeArquivo);
-                if (string.IsNullOrEmpty(caminhoCompletoArquivo))
-                    throw new NegocioException("O caminho do arquivo da exportação dos resultados não foi localizado.");
-                
                 VerificarERemoverArquivoExistente(caminhoCompletoArquivo);
 
-                var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));                
+                var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));
+                if (prova == null)
+                    return false;
+                
                 await mediator.Send(new GerarCSVExtracaoProvaCommand(prova.TotalItens, caminhoCompletoArquivo));
-
-                var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
+                
                 var dres = await mediator.Send(new ObterDresSerapQuery());
-
+                if (dres == null || !dres.Any())
+                    return false;
+                
                 foreach (var dre in dres)
                 {
                     var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
+                    if (ues == null || !ues.Any())
+                        continue;
+
                     foreach (var ue in ues)
                     {
-                        var turmasUe = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(ue.CodigoUe, prova.LegadoId));
-                        if (turmasUe == null || !turmasUe.Any())
-                            continue;
-                        
-                        var paginasTurmas = Paginar(turmasUe.ToList());
-                        foreach (var turmas in paginasTurmas)
-                        {
-                            var ueIds = new[] { ue.CodigoUe };
-
-                            var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
-                            exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
-
-                            var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id,
-                                exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds)
-                            {
-                                TurmaEolIds = turmas.Select(t => t.Codigo).ToArray(),
-                                CaminhoArquivo = caminhoCompletoArquivo
-                            };
-                            filtrosParaPublicar.Add(filtro);
-                        }
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro,
+                            new TratarProvaResultadoExtracaoFiltroDto(exportacaoResultado.Id,
+                                extracao.ProvaSerapId, caminhoCompletoArquivo, dre.CodigoDre, ue.CodigoUe)));                        
                     }
                 }
-
-                foreach (var filtro in filtrosParaPublicar)
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProvaFiltro, filtro));
 
                 return true;
             }
@@ -100,12 +85,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 return false;
             }
-        }
-
-        private static List<List<Turma>> Paginar(IEnumerable<Turma> turmas)
-        {
-            var paginacao = new ListaPaginada<Turma>(turmas.ToList(), 5);
-            return paginacao.ObterTodasAsPaginas();
         }
 
         private static string ObterCaminhoCompletoArquivo(string nomeArquivo)

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
-using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
@@ -25,17 +24,17 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var filtro = mensagemRabbit.ObterObjetoMensagem<ExportacaoResultadoFiltroDto>();
-
+            
             var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(filtro.ProcessoId, filtro.ProvaSerapId));
             if (exportacaoResultado is null)
-                throw new NegocioException("A exportação não foi encontrada");
+                throw new NegocioException("A exportação não foi encontrada");            
 
             try
             {
                 if (filtro is null)
                     throw new NegocioException("O filtro precisa ser informado");
 
-                if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando)
+                if (exportacaoResultado.Status != ExportacaoResultadoStatus.Processando) 
                     return true;
 
                 IEnumerable<ConsolidadoAlunoProvaDto> consolidadoAlunosProva;
@@ -52,13 +51,43 @@ namespace SME.SERAp.Prova.Aplicacao
                     {
                         var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery(consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));
                         if (respostas == null || !respostas.Any())
-                            await IncluirAlunoSemRespostas(consolidadoAlunoProva);
+                            continue;
 
-                        else
-                            await IncluirAlunoComRespostas(consolidadoAlunoProva, respostas);
+                        foreach (var resposta in respostas)
+                        {
+                            var res = new ResultadoProvaConsolidado
+                            {
+                                ProvaSerapId = consolidadoAlunoProva.ProvaSerapId,
+                                ProvaSerapEstudantesId = consolidadoAlunoProva.ProvaSerapEstudantesId,
+                                AlunoCodigoEol = consolidadoAlunoProva.AlunoCodigoEol,
+                                AlunoNome = consolidadoAlunoProva.AlunoNome,
+                                AlunoSexo = consolidadoAlunoProva.AlunoSexo,
+                                AlunoDataNascimento = consolidadoAlunoProva.AlunoDataNascimento,
+                                ProvaComponente = consolidadoAlunoProva.ProvaComponente,
+                                ProvaCaderno = consolidadoAlunoProva.ProvaCaderno,
+                                ProvaQuantidadeQuestoes = consolidadoAlunoProva.ProvaQuantidadeQuestoes,
+                                AlunoFrequencia = consolidadoAlunoProva.AlunoFrequencia,
+                                DataInicio = consolidadoAlunoProva.ProvaDataInicio,
+                                DataFim = consolidadoAlunoProva.ProvaDataEntregue,
+                                DreCodigoEol = consolidadoAlunoProva.DreCodigoEol,
+                                DreSigla = consolidadoAlunoProva.DreSigla,
+                                DreNome = consolidadoAlunoProva.DreNome,
+                                UeCodigoEol = consolidadoAlunoProva.UeCodigoEol,
+                                UeNome = consolidadoAlunoProva.UeNome,
+                                TurmaAnoEscolar = consolidadoAlunoProva.TurmaAnoEscolar,
+                                TurmaAnoEscolarDescricao = consolidadoAlunoProva.TurmaAnoEscolarDescricao,
+                                TurmaCodigo = consolidadoAlunoProva.TurmaCodigo,
+                                TurmaDescricao = consolidadoAlunoProva.TurmaDescricao,
+                                QuestaoId = resposta.QuestaoId,
+                                QuestaoOrdem = resposta.QuestaoOrdem,
+                                Resposta = resposta.Resposta
+                            };
+                            
+                            await mediator.Send(new InserirResultadoProvaConsolidadoCommand(res));                                    
+                        }
                     }
                 }
-
+                
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(filtro.ItemId));
 
                 var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(exportacaoResultado.Id));
@@ -78,74 +107,6 @@ namespace SME.SERAp.Prova.Aplicacao
                 servicoLog.Registrar($"Erro ao consolidar os dados da prova por filtro. msg: {mensagemRabbit.Mensagem}", ex);
                 return false;
             }
-        }
-
-        private async Task IncluirAlunoComRespostas(ConsolidadoAlunoProvaDto consolidadoAlunoProva, IEnumerable<AlunoQuestaoRespostasDto> respostas)
-        {
-            foreach (var resposta in respostas)
-            {
-                var res = new ResultadoProvaConsolidado
-                {
-                    ProvaSerapId = consolidadoAlunoProva.ProvaSerapId,
-                    ProvaSerapEstudantesId = consolidadoAlunoProva.ProvaSerapEstudantesId,
-                    AlunoCodigoEol = consolidadoAlunoProva.AlunoCodigoEol,
-                    AlunoNome = consolidadoAlunoProva.AlunoNome,
-                    AlunoSexo = consolidadoAlunoProva.AlunoSexo,
-                    AlunoDataNascimento = consolidadoAlunoProva.AlunoDataNascimento,
-                    ProvaComponente = consolidadoAlunoProva.ProvaComponente,
-                    ProvaCaderno = consolidadoAlunoProva.ProvaCaderno,
-                    ProvaQuantidadeQuestoes = consolidadoAlunoProva.ProvaQuantidadeQuestoes,
-                    AlunoFrequencia = consolidadoAlunoProva.AlunoFrequencia,
-                    DataInicio = consolidadoAlunoProva.ProvaDataInicio,
-                    DataFim = consolidadoAlunoProva.ProvaDataEntregue,
-                    DreCodigoEol = consolidadoAlunoProva.DreCodigoEol,
-                    DreSigla = consolidadoAlunoProva.DreSigla,
-                    DreNome = consolidadoAlunoProva.DreNome,
-                    UeCodigoEol = consolidadoAlunoProva.UeCodigoEol,
-                    UeNome = consolidadoAlunoProva.UeNome,
-                    TurmaAnoEscolar = consolidadoAlunoProva.TurmaAnoEscolar,
-                    TurmaAnoEscolarDescricao = consolidadoAlunoProva.TurmaAnoEscolarDescricao,
-                    TurmaCodigo = consolidadoAlunoProva.TurmaCodigo,
-                    TurmaDescricao = consolidadoAlunoProva.TurmaDescricao,
-                    QuestaoId = resposta.QuestaoId,
-                    QuestaoOrdem = resposta.QuestaoOrdem,
-                    Resposta = resposta.Resposta
-                };
-
-                await mediator.Send(new InserirResultadoProvaConsolidadoCommand(res));
-            }
-        }
-
-        private async Task IncluirAlunoSemRespostas(ConsolidadoAlunoProvaDto consolidadoAlunoProva)
-        {
-            var res = new ResultadoProvaConsolidado
-            {
-
-
-                ProvaSerapId = consolidadoAlunoProva.ProvaSerapId,
-                ProvaSerapEstudantesId = consolidadoAlunoProva.ProvaSerapEstudantesId,
-                AlunoCodigoEol = consolidadoAlunoProva.AlunoCodigoEol,
-                AlunoNome = consolidadoAlunoProva.AlunoNome,
-                AlunoSexo = consolidadoAlunoProva.AlunoSexo,
-                AlunoDataNascimento = consolidadoAlunoProva.AlunoDataNascimento,
-                ProvaComponente = consolidadoAlunoProva.ProvaComponente,
-                ProvaCaderno = consolidadoAlunoProva.ProvaCaderno,
-                ProvaQuantidadeQuestoes = consolidadoAlunoProva.ProvaQuantidadeQuestoes,
-                AlunoFrequencia = consolidadoAlunoProva.AlunoFrequencia,
-                DataInicio = consolidadoAlunoProva.ProvaDataInicio,
-                DataFim = consolidadoAlunoProva.ProvaDataEntregue,
-                DreCodigoEol = consolidadoAlunoProva.DreCodigoEol,
-                DreSigla = consolidadoAlunoProva.DreSigla,
-                DreNome = consolidadoAlunoProva.DreNome,
-                UeCodigoEol = consolidadoAlunoProva.UeCodigoEol,
-                UeNome = consolidadoAlunoProva.UeNome,
-                TurmaAnoEscolar = consolidadoAlunoProva.TurmaAnoEscolar,
-                TurmaAnoEscolarDescricao = consolidadoAlunoProva.TurmaAnoEscolarDescricao,
-                TurmaCodigo = consolidadoAlunoProva.TurmaCodigo,
-                TurmaDescricao = consolidadoAlunoProva.TurmaDescricao,
-            };
-
-            await mediator.Send(new InserirResultadoProvaConsolidadoCommand(res));
         }
     }
 }

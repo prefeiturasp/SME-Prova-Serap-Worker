@@ -63,7 +63,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select
+                var query = @"select distinct
 	                            rpc.prova_serap_id ProvaSerapId,
                                 rpc.prova_serap_estudantes_id ProvaSerapEstudantesId,
 	                            rpc.dre_codigo_eol DreCodigoEol, 

@@ -64,7 +64,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
                 await mediator.Send(new ExcluirExportacaoResultadoItemCommand(0, exportacaoResultado.Id));
 
-                servicoLog.Registrar($"Erro ao consolidar os dados da prova por filtro. msg: {mensagemRabbit.Mensagem}", ex);
+                servicoLog.Registrar($"Erro ao consolidar os dados da prova por turma. msg: {mensagemRabbit.Mensagem}", ex);
                 return false;
             }
         }

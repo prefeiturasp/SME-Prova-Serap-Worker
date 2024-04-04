@@ -736,11 +736,9 @@ namespace SME.SERAp.Prova.Dados
         public async Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaDeficienciaPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos)
         {
             using var conn = ObterConexaoLeitura();
-
             try
             {
-                var query = $@"
-                             	 with v_prova_turma_aluno2 as (select distinct p.id AS prova_id,
+                var query = $@"with v_prova_turma_aluno2 as (select distinct p.id AS prova_id,
 											  p.prova_legado_id,
 											  p.aderir_todos,
 											  p.possui_bib,
@@ -774,10 +772,8 @@ namespace SME.SERAp.Prova.Dados
 											and pa2.aluno_ra = coalesce(a2.ra, a.ra)
 											and pa2.status in (2, 5, 6, 7)
 											and pa2.finalizado_em is not null
-										  where p.prova_legado_id  = @provaLegadoId  ),
-								   
-
-								   tb_prova_turma as (
+										  where p.prova_legado_id = @provaLegadoId),
+								tb_prova_turma as (
 									select distinct vpta.prova_id as prova_serap_estudantes_id,
 										vpta.prova_legado_id as prova_serap_id,
 										vpta.turma_id,
@@ -821,15 +817,11 @@ namespace SME.SERAp.Prova.Dados
 										and (tah.data_situacao >= tb_prova_turma.inicio or tah.data_situacao is null or tah.data_situacao <= a.data_atualizacao)
 										and tah.ano_letivo = extract(year from tb_prova_turma.inicio)	
 									left join turma t on t.id = coalesce(tah.turma_id, tb_prova_turma.turma_id)
-									where (exists (select 1
-												from aluno_deficiencia ad
-												where ad.aluno_ra = tb_prova_turma.aluno_ra
-												and ad.deficiencia_id in (select deficiencia_id from tb_deficiencias))
-											or exists (select 1 
-														from aluno_deficiencia ad 
-														join aluno a on a.ra = ad.aluno_ra
-														where a.id = coalesce(tah.aluno_id, tb_prova_turma.aluno_id) 
-														and ad.deficiencia_id in (select deficiencia_id from tb_deficiencias)))
+									left join aluno a2 on a2.id = tah.aluno_id
+									where exists (select 1
+													from aluno_deficiencia ad
+													where ad.aluno_ra = coalesce(a2.ra, tb_prova_turma.aluno_ra)
+													and ad.deficiencia_id in (select deficiencia_id from tb_deficiencias))
 								),
 								tb_prova_turma_aluno_adesao_todos as (
 									select tb_prova_turma_aluno.prova_serap_id as ProvaSerapId,
@@ -876,7 +868,6 @@ namespace SME.SERAp.Prova.Dados
 													and tah.ano_letivo = extract(year from tb_prova_turma_aluno.inicio)
 													and t.nome not similar to '(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|X|W|Y|Z)%'
 													order by tah.data_matricula desc
-													
 													limit 1)
 										end, a.turma_id) as TurmaId,
 										a.situacao as AlunoSituacao
@@ -932,8 +923,7 @@ namespace SME.SERAp.Prova.Dados
 								from tb_prova_turma_aluno_adesao_todos p
 									inner join turma t on t.id = p.TurmaId 
 									inner join ue on ue.id = t.ue_id  
-									inner join dre on dre.id = ue.dre_id
-               
+									inner join dre on dre.id = ue.dre_id               
 							where t.codigo in ({string.Join(',', turmasCodigos.Select(c => $"'{c}'"))})";
 
                 return await conn.QueryAsync<ConsolidadoAlunoProvaDto>(query, new { provaLegadoId });

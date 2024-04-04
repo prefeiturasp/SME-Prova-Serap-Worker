@@ -16,7 +16,7 @@ namespace SME.SERAp.Prova.Infra
         public string AlunoFrequencia {get; set; }
         public DateTime? ProvaDataInicio { get; set; }
         public DateTime? ProvaDataEntregue { get; set; }
-        public bool PossuiBib { get; set;}
+        public bool PossuiBib { get; set; }
         public long TurmaId { get; set; }
         public int AlunoSituacao { get; set; }
         public string DreCodigoEol { get; set; }

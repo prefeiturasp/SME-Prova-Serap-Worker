@@ -48,7 +48,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (consolidadoAlunosProva == null || !consolidadoAlunosProva.Any())
                 {
                     await RemoverExportacaoResultadoItem(filtro.ItemId);
-                    await ExtrairResultados(filtro.ProcessoId, filtro.ProvaSerapId);
+                    await ExtrairResultados(filtro.ProcessoId, filtro.ProvaSerapId, filtro.CaminhoArquivo);
                     return false;
                 }
 
@@ -56,7 +56,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     await BuscarRespostasEIncluirConsolidado(consolidadoAlunoProva);
 
                 await RemoverExportacaoResultadoItem(filtro.ItemId);
-                await ExtrairResultados(filtro.ProcessoId, filtro.ProvaSerapId);
+                await ExtrairResultados(filtro.ProcessoId, filtro.ProvaSerapId, filtro.CaminhoArquivo);
                 return true;
             }
             catch (Exception ex)
@@ -117,13 +117,13 @@ namespace SME.SERAp.Prova.Aplicacao
             await mediator.Send(new ExcluirExportacaoResultadoItemCommand(exportacaoResultadoItem.Id));
         }
 
-        private async Task ExtrairResultados(long processoId, long provaSerapId)
+        private async Task ExtrairResultados(long processoId, long provaSerapId, string caminhoArquivo)
         {
             var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(processoId));
             
             if (!existeItemProcesso)
             {
-                var extracao = new ProvaExtracaoDto { ExtracaoResultadoId = processoId, ProvaSerapId = provaSerapId };
+                var extracao = new TratarProvaResultadoExtracaoDto { ExtracaoResultadoId = processoId, ProvaSerapId = provaSerapId, CaminhoArquivo = caminhoArquivo };
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ExtrairResultadosProva, extracao));
             }            
         }

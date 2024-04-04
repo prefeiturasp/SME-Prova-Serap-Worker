@@ -6,6 +6,7 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,17 +30,23 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new NegocioException("O id da prova serap precisa ser informado");            
 
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
-
-            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));
+            
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoPorIdQuery(extracao.ExtracaoResultadoId));
             if (exportacaoResultado is null)
-                throw new NegocioException("A exportação não foi encontrada");
+                throw new NegocioException("A exportação não foi encontrada");            
             
             var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
             if (!checarProvaExiste)
-                throw new NegocioException("A prova informada não foi encontrada no serap estudantes");            
+                throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
+            
+            var caminhoCompletoArquivo = ObterCaminhoCompletoArquivo(exportacaoResultado.NomeArquivo);
+            if (string.IsNullOrEmpty(caminhoCompletoArquivo))
+                throw new NegocioException("O caminho do arquivo da exportação dos resultados não foi localizado.");            
 
             try
             {
+                VerificarERemoverArquivoExistente(caminhoCompletoArquivo);
+
                 await mediator.Send(new ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand(extracao.ProvaSerapId));
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Processando));
 
@@ -62,8 +69,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     {
                         await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro,
                             new ExportacaoResultadoFiltroDto(exportacaoResultado.Id,
-                                exportacaoResultado.ProvaSerapId, dre.CodigoDre, ue.CodigoUe, adesaoManual,
-                                possuiTipoDeficiencia)));
+                                exportacaoResultado.ProvaSerapId, dre.CodigoDre, ue.CodigoUe, caminhoCompletoArquivo,
+                                adesaoManual, possuiTipoDeficiencia)));
                     }
                 }
 
@@ -77,5 +84,21 @@ namespace SME.SERAp.Prova.Aplicacao
                 return false;
             }
         }
+        
+        private static string ObterCaminhoCompletoArquivo(string nomeArquivo)
+        {
+            var pathResultados = Environment.GetEnvironmentVariable("PathResultadosExportacaoSerap");
+            if (string.IsNullOrEmpty(pathResultados))
+                return string.Empty;
+            
+            var caminhoCompleto = Path.Combine(pathResultados, nomeArquivo);
+            return caminhoCompleto;
+        }
+        
+        private static void VerificarERemoverArquivoExistente(string caminhoArquivo)
+        {
+            if (File.Exists(caminhoArquivo))
+                File.Delete(caminhoArquivo);
+        }        
     }
 }

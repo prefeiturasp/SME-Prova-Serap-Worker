@@ -70,13 +70,5 @@ namespace SME.SERAp.Prova.Aplicacao
 
             return true;
         }
-        
-        /*
-        private static List<List<Turma>> Paginar(IEnumerable<Turma> turmas)
-        {
-            var paginacao = new ListaPaginada<Turma>(turmas.ToList(), 5);
-            return paginacao.ObterTodasAsPaginas();
-        }
-        */        
     }
 }

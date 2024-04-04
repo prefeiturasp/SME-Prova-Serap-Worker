@@ -51,8 +51,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
 
                     listaFiltroTurma.Add(new ExportacaoResultadoFiltroTurmaDto(filtro.ProcessoId, filtro.ProvaSerapId,
-                        exportacaoResultadoItem.Id, filtro.DreEolId, turma.Codigo, filtro.AdesaoManual,
-                        filtro.AlunosComDeficiencia));
+                        exportacaoResultadoItem.Id, filtro.DreEolId, turma.Codigo, filtro.CaminhoArquivo,
+                        filtro.AdesaoManual, filtro.AlunosComDeficiencia));
                 }
                 
                 foreach (var filtroTurma in listaFiltroTurma)

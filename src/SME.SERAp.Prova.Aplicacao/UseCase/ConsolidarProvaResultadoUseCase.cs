@@ -1,11 +1,12 @@
 ﻿using MediatR;
+using SME.SERAp.Prova.Aplicacao.Queries.VerificaProvaPossuiTipoDeficiencia;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Dominio.Enums;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         private readonly IMediator mediator;
         private readonly IServicoLog serviceLog;
+
         public ConsolidarProvaResultadoUseCase(IMediator mediator, IServicoLog serviceLog)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -24,51 +26,55 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var extracao = mensagemRabbit.ObterObjetoMensagem<ProvaExtracaoDto>();
+            if (extracao is null)
+                throw new NegocioException("O id da prova serap precisa ser informado");            
 
             serviceLog.Registrar(LogNivel.Informacao, $"Consolidar dados prova:{extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
+            
+            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoPorIdQuery(extracao.ExtracaoResultadoId));
+            if (exportacaoResultado is null)
+                throw new NegocioException("A exportação não foi encontrada");            
+            
+            var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
+            if (!checarProvaExiste)
+                throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
+            
+            var caminhoCompletoArquivo = ObterCaminhoCompletoArquivo(exportacaoResultado.NomeArquivo);
+            if (string.IsNullOrEmpty(caminhoCompletoArquivo))
+                throw new NegocioException("O caminho do arquivo da exportação dos resultados não foi localizado.");            
 
-            var exportacaoResultado = await mediator.Send(new ObterExportacaoResultadoStatusQuery(extracao.ExtracaoResultadoId, extracao.ProvaSerapId));
             try
             {
-                if (exportacaoResultado is null)
-                    throw new NegocioException("A exportação não foi encontrada");
+                VerificarERemoverArquivoExistente(caminhoCompletoArquivo);
 
-                var checarProvaExiste = await mediator.Send(new VerificaProvaExistePorSerapIdQuery(extracao.ProvaSerapId));
-
-                if (!checarProvaExiste)
-                    throw new NegocioException("A prova informada não foi encontrada no serap estudantes");
-
+                await mediator.Send(new ExcluirResultadoProvaConsolidadosPorProvaLegadoIdCommand(extracao.ProvaSerapId));
                 await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Processando));
 
-                var filtrosParaPublicar = new List<ExportacaoResultadoFiltroDto>();
-                var dres = await mediator.Send(new ObterDresSerapQuery());
-                foreach (Dre dre in dres)
-                {
-                    var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(extracao.ProvaSerapId, dre.CodigoDre));
-                    if(ues != null && ues.Any())
-                    {
-                        foreach (Ue ue in ues)
-                        {
-                            var ueIds = new string[] { ue.CodigoUe };
-                            var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, dre.CodigoDre, ueIds);
-                            exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
-                            var filtro = new ExportacaoResultadoFiltroDto(exportacaoResultado.Id, exportacaoResultado.ProvaSerapId, exportacaoResultadoItem.Id, dre.CodigoDre, ueIds);
-                            filtrosParaPublicar.Add(filtro);
-                        }
-                    }                    
-                }
-
-                if (!filtrosParaPublicar.Any())
-                {
-                    await mediator.Send(new ExportacaoResultadoAtualizarCommand(exportacaoResultado, ExportacaoResultadoStatus.Erro));
-                    serviceLog.Registrar(LogNivel.Critico, $"Não foi possível localizar escolas para consolidar os dados da prova: {extracao.ProvaSerapId}. msg: {mensagemRabbit.Mensagem}");
+                var prova = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(exportacaoResultado.ProvaSerapId));
+                if (prova == null)
                     return false;
+                
+                var adesaoManual = !prova.AderirTodos;
+                
+                var possuiTipoDeficiencia = await mediator.Send(new VerificaProvaPossuiTipoDeficienciaQuery(exportacaoResultado.ProvaSerapId));
+
+                var dres = await mediator.Send(new ObterDresSerapQuery());
+                foreach (var dre in dres)
+                {
+                    var ues = await mediator.Send(new ObterUesSerapPorProvaSerapEDreCodigoQuery(exportacaoResultado.ProvaSerapId, dre.CodigoDre));
+                    if (ues == null || !ues.Any())
+                        continue;
+
+                    foreach (var ue in ues)
+                    {
+                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro,
+                            new ExportacaoResultadoFiltroDto(exportacaoResultado.Id,
+                                exportacaoResultado.ProvaSerapId, dre.CodigoDre, ue.CodigoUe, caminhoCompletoArquivo,
+                                adesaoManual, possuiTipoDeficiencia)));
+                    }
                 }
 
-                foreach (ExportacaoResultadoFiltroDto filtro in filtrosParaPublicar)
-                {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltro, filtro));
-                }
+                return true;
             }
             catch (Exception ex)
             {
@@ -77,8 +83,22 @@ namespace SME.SERAp.Prova.Aplicacao
                 serviceLog.Registrar(LogNivel.Critico, $"Erro -- Consolidar os dados da prova. msg: {mensagemRabbit.Mensagem}", ex.Message, ex.StackTrace);
                 return false;
             }
-            return true;
+        }
+        
+        private static string ObterCaminhoCompletoArquivo(string nomeArquivo)
+        {
+            var pathResultados = Environment.GetEnvironmentVariable("PathResultadosExportacaoSerap");
+            if (string.IsNullOrEmpty(pathResultados))
+                return string.Empty;
+            
+            var caminhoCompleto = Path.Combine(pathResultados, nomeArquivo);
+            return caminhoCompleto;
+        }
+        
+        private static void VerificarERemoverArquivoExistente(string caminhoArquivo)
+        {
+            if (File.Exists(caminhoArquivo))
+                File.Delete(caminhoArquivo);
         }        
-
     }
 }

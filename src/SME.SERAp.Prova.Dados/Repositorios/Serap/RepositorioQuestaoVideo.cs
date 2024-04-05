@@ -72,5 +72,25 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<long> ObterQuestaoVideoIdPorQuestaoIdArquivoVideoId(long questaoId, long arquivoVideoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = @"select id 
+                                        from questao_video 
+                                        where questao_id = @questaoId 
+                                          and arquivo_video_id = @arquivoVideoId 
+                                          limit 1";
+                
+                return await conn.QueryFirstOrDefaultAsync<long>(query, new { questaoId, arquivoVideoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

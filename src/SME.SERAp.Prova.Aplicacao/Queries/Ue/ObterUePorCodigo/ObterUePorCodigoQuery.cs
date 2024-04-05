@@ -13,6 +13,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public string UeCodigo { get; }
     }
+
     public class ObterUePorCodigoQueryValidator : AbstractValidator<ObterUePorCodigoQuery>
     {
         public ObterUePorCodigoQueryValidator()

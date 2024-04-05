@@ -10,7 +10,7 @@ namespace SME.SERAp.Prova.Aplicacao
             ProcessoId = processoId;
         }
 
-        public long? ProcessoId { get; set; }
-        public long ItemId { get; set; }
+        public long? ProcessoId { get; }
+        public long ItemId { get; }
     }
 }

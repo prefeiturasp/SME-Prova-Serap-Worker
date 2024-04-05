@@ -1,6 +1,4 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra;
+﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -36,8 +34,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select ps.* from parametro_sistema ps";
-
+                const string query = "select ps.* from parametro_sistema ps";
                 return await conn.QueryAsync<ParametroSistema>(query);
             }
             finally

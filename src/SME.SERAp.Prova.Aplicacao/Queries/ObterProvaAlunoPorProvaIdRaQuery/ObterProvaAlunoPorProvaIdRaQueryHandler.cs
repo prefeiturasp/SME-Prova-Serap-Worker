@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao 
 { 
-
     public class ObterProvaAlunoPorProvaIdRaQueryHandler : IRequestHandler<ObterProvaAlunoPorProvaIdRaQuery, ProvaAluno>
     {
-
         private readonly IRepositorioProvaAluno repositorioProvaAluno;
 
         public ObterProvaAlunoPorProvaIdRaQueryHandler(IRepositorioProvaAluno repositorioProvaAluno)

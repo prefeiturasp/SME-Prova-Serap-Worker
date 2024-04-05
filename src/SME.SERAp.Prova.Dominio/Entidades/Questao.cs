@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 
 namespace SME.SERAp.Prova.Dominio
 {
@@ -20,7 +21,10 @@ namespace SME.SERAp.Prova.Dominio
         public string Caderno { get; set; }
         public IEnumerable<Arquivo> Arquivos { get; set; }
 
-        public Questao(string textoBase, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas)
+        public long? EixoId { get; set; }
+        public long? HabilidadeId { get; set; }
+
+        public Questao(string textoBase, long questaoLegadoId, string enunciado, int ordem, long provaId, QuestaoTipo tipo, string caderno, int quantidadeAlternativas, long? eixoId = null, long? habilidadeId = null)
         {
             Ordem = ordem;
             TextoBase = textoBase;
@@ -31,6 +35,8 @@ namespace SME.SERAp.Prova.Dominio
             Caderno = caderno;
             QuantidadeAlternativas = quantidadeAlternativas;
             TrataArquivos();
+            EixoId = eixoId;
+            HabilidadeId = habilidadeId;
         }
 
         private void TrataArquivos()

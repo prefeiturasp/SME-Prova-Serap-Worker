@@ -19,6 +19,8 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<IEnumerable<TurmaEolDto>> ObterTurmasAlunoHistoricoPorAlunosRa(long[] alunosRa)
         {
+            var anoLetivo = DateTime.Now.Year;
+
             var query = $@"select tb.CodigoMatricula as Matricula, 
                                   tb.AlunoRa, 
                                   tb.CodigoTurma, 
@@ -34,12 +36,12 @@ namespace SME.SERAp.Prova.Dados
 		                               max(case when matricula.CodigoSituacaoMatricula <> 1 then matricula.DataSituacao else null end) as DataSituacao
 	                            from alunos_matriculas_norm matricula
 	                            where matricula.CodigoAluno in @alunosRa  
-	                              and matricula.AnoLetivo >= 2021 
+	                              and matricula.AnoLetivo = @anoLetivo 
                                 group by  matricula.CodigoMatricula, matricula.CodigoAluno, matricula.CodigoTurma, matricula.AnoLetivo ) tb
                            order by tb.AnoLetivo, tb.DataMatricula";
 
             using var conn = new SqlConnection(connectionStringOptions.Eol);
-            return await conn.QueryAsync<TurmaEolDto>(query, new { alunosRa });
+            return await conn.QueryAsync<TurmaEolDto>(query, new { alunosRa, anoLetivo });
         }
     }
 }

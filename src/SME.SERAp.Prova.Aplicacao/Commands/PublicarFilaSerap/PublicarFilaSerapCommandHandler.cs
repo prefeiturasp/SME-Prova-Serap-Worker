@@ -12,14 +12,12 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class PublicarFilaSerapCommandHandler : IRequestHandler<PublicarFilaSerapCommand, bool>
     {
-
         private readonly IConnection connectionRabbit;
-        private readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
-        public PublicarFilaSerapCommandHandler(IConnection connectionRabbit, IMediator mediator, IServicoLog servicoLog)
+
+        public PublicarFilaSerapCommandHandler(IConnection connectionRabbit, IServicoLog servicoLog)
         {
             this.connectionRabbit = connectionRabbit ?? throw new ArgumentNullException(nameof(connectionRabbit));
-            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
@@ -28,11 +26,9 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var mensagem = new MensagemRabbit(request.Mensagem, Guid.NewGuid());
+                var body = Encoding.UTF8.GetBytes(mensagem.ConverterObjectParaJson());
 
-                var mensagemJson = JsonSerializer.Serialize(mensagem);
-                var body = Encoding.UTF8.GetBytes(mensagemJson);
-
-                using (IModel canal = connectionRabbit.CreateModel())
+                using (var canal = connectionRabbit.CreateModel())
                 {
                     var props = canal.CreateBasicProperties();
                     props.Persistent = true;

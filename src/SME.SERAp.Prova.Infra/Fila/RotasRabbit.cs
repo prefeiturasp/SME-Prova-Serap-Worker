@@ -13,6 +13,7 @@
         public const string AlternativaTratar = "serap.estudante.alternativa.legado.tratar";
         public const string ProvaBIBSync = "serap.estudante.provabib.sync";
         public const string ProvaBIBTratar = "serap.estudante.provabib.tratar";
+        public const string ProvaWebPushTesteSync = "serap.estudante.prova.webpush.teste.sync";
         public const string ProvaWebPushTeste = "serap.estudante.prova.webpush.teste";
         public const string IncluirRespostaAluno = "serap.estudante.resposta.aluno.incluir";
         public const string IncluirPreferenciasAluno = "serap.estudante.preferencias.aluno.incluir";
@@ -20,6 +21,7 @@
         public const string AtualizarFrequenciaAlunoProvaTratar = "serap.estudante.atualizar.frequencia.tratar";
         public const string ExtrairResultadosProva = "serap.estudante.prova.resultados.aluno.extrair";
         public const string ExtrairResultadosProvaFiltro = "serap.estudante.prova.resultados.aluno.extrair.filtro";
+        public const string ExtrairResultadosProvaFiltroTurma = "serap.estudante.prova.resultados.aluno.extrair.filtro.turma";
         public const string ConsolidarProvaResultado = "serap.estudante.prova.resultados.consolidar";
         public const string ConsolidarProvaResultadoFiltro = "serap.estudante.prova.resultados.consolidar.filtro";
         public const string ConsolidarProvaResultadoFiltroTurma = "serap.estudante.prova.resultados.consolidar.filtro.turma";
@@ -60,9 +62,9 @@
         public const string UsuarioGrupoAbrangenciaExcluirTratar = "serap.estudante.usuario.grupo.abrangencia.excluir.tratar";
 
         public const string QuestaoCompletaSync = "serap.estudante.questao.completa.legado.sync";
+        public const string QuestaoCompletaProva = "serap.estudante.questao.completa.legado.prova";
         public const string QuestaoCompletaTratar = "serap.estudante.questao.completa.legado.tratar";
 
-        public const string TratarCadernosProvaTai = "serap.estudante.prova.legado.tratar.cadernos.amostra.tai";
         public const string TratarCadernoAlunoProvaTai = "serap.estudante.prova.legado.tratar.caderno.aluno.tai";
         public const string TratarOrdemQuestaoAlunoProvaTai = "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
         public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";        
@@ -128,5 +130,20 @@
 
         public const string ImportarResultadoCicloDrePsp = "serap.resultados.psp.resultado.ciclo.dre";
         public const string TratarResultadoCicloDre = "serap.resultados.psp.resultado.ciclo.dre.tratar";
+   
+
+        public const string ProvaTaiSync = "serap.estudante.provatai.sync";
+        public const string ProvaTaiTratar = "serap.estudante.provatai.tratar";
+
+        public const string PropagarCache = "serap.estudante.propagar.cache";
+        public const string PropagarCacheParametros = "serap.estudante.propagar.cache.parametros";
+        public const string PropagarCacheProvasAnos = "serap.estudante.propagar.cache.provas.anos";
+        public const string PropagarCacheProvasLiberadas = "serap.estudante.propagar.cache.provas.liberadas";
+        public const string PropagarCacheProvasLiberadasTratar = "serap.estudante.propagar.cache.provas.liberadas.tratar";
+        public const string PropagarCacheResumoQuestoesProva = "serap.estudante.propagar.cache.resumo.questoes.prova";
+        public const string PropagarCacheQuestoesCompletasProva = "serap.estudante.propagar.cache.questoes.completas.prova";
+        public const string PropagarCacheQuestoesCompletasProvaTratar = "serap.estudante.propagar.cache.questoes.completas.prova.tratar";
+        public const string PropagarCacheQuestoesCompletasLegadoProva = "serap.estudante.propagar.cache.questoes.completas.legado.prova";
+        public const string PropagarCacheQuestoesCompletasLegadoProvaTratar = "serap.estudante.propagar.cache.questoes.completas.legado.prova.tratar";        
     }
 }

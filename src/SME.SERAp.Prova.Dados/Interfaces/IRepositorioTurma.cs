@@ -21,5 +21,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<Turma>> ObterTurmasPorCodigos(string[] codigos);
         Task<IEnumerable<Turma>> ObterTurmasPorCodigoUeEProvaSerap(string codigoUe, long provaSerap);
         Task<TurmaAtribuicaoDto> ObterTurmaAtribuicaoPorCodigo(int anoLetivo, string codigo);
+        Task<IEnumerable<Turma>> ObterTurmasPorCodigoDreEProvaSerap(string codigoDre, long provaSerap);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Dominio;
+﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -70,6 +69,7 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"select distinct
+                                    ue.id,
                                     ue.ue_id CodigoUe, 
                                     ue.data_atualizacao DataAtualizacao, 
                                     ue.dre_id DreId, 
@@ -92,6 +92,24 @@ namespace SME.SERAp.Prova.Dados
                                 order by ue.ue_id;";
 
                 return await conn.QueryAsync<Ue>(query, new { provaSerap, dreCodigo });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<Ue>> ObterUesPorCodigosAsync(string[] codigos)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"SELECT id, ue_id, dre_id, nome, tipo_escola, data_atualizacao
+                              FROM public.ue
+                              WHERE ue_id = any(@codigos)";
+
+                return await conn.QueryAsync<Ue>(query, new { codigos });
             }
             finally
             {

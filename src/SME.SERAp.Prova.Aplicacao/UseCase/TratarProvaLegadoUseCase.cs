@@ -22,12 +22,10 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var provaLegadoId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
-
             if (provaLegadoId == 0)
                 throw new NegocioException("O Id da prova deve ser informado.");
 
             var provaLegado = await mediator.Send(new ObterProvaLegadoDetalhesPorIdQuery(provaLegadoId));
-
             if (provaLegado == null)
                 throw new Exception($"Prova {provaLegadoId} não localizada!");
 
@@ -45,18 +43,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
             var modalidadeSerap = ObterModalidade(provaLegado.Modalidade, provaLegado.ModeloProva);
             var tipoProvaSerap = await ObterTipoProva(provaLegado.TipoProva);
-
-            ProvaFormatoTaiItem? provaFormatoTaiItem = null;
-            
-            if (provaLegado.FormatoTai)
-            {
-                provaFormatoTaiItem = await mediator.Send(new ObterProvaLegadoItemFormatoTaiQuery(provaLegadoId));
-
-                if (provaFormatoTaiItem == null)
-                    throw new Exception($"Formato Tai Item da prova {provaLegadoId} não localizado no legado.");
-            }
-
-            var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap, provaFormatoTaiItem);
+            var provaParaTratar = ObterProvaTratar(provaLegado, modalidadeSerap, tipoProvaSerap);
 
             if (provaAtual == null)
             {
@@ -68,6 +55,7 @@ namespace SME.SERAp.Prova.Aplicacao
             else
             {
                 provaParaTratar.Id = provaAtual.Id;
+
                 provaAtual.AderirTodos = provaParaTratar.AderirTodos;
                 provaAtual.Multidisciplinar = provaParaTratar.Multidisciplinar;
                 provaAtual.TipoProvaId = provaParaTratar.TipoProvaId;
@@ -79,7 +67,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.ApresentarResultadosPorItem = provaParaTratar.ApresentarResultadosPorItem;
                 provaAtual.ExibirAudio = provaParaTratar.ExibirAudio;
                 provaAtual.ExibirVideo = provaParaTratar.ExibirVideo;
-
+                
                 var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
 
                 if (verificaSePossuiRespostas)
@@ -90,14 +78,11 @@ namespace SME.SERAp.Prova.Aplicacao
                     provaAtual.QtdItensSincronizacaoRespostas = provaLegado.QtdItensSincronizacaoRespostas;
 
                     await mediator.Send(new ProvaAtualizarCommand(provaAtual));
-                    
-                    if (provaAtual.Modalidade == Modalidade.EJA || provaAtual.Modalidade == Modalidade.CIEJA)
-                    {
-                        await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
-                        await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
-                    }
-                    
                     await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
+
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
+
                     return true;
                 }
 
@@ -107,9 +92,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
 
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAdesaoProva, new ProvaAdesaoDto(provaParaTratar.Id, provaParaTratar.LegadoId, provaParaTratar.AderirTodos)));
-
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaAnoTratar, provaLegado.Id));
-
             await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ProvaGrupoPermissaoTratar, new ProvaIdsDto(provaParaTratar.Id, provaLegado.Id)));
 
             var contextosProva = (await mediator.Send(new ObterContextosProvaLegadoPorProvaIdQuery(provaLegadoId))).ToList();
@@ -129,24 +112,20 @@ namespace SME.SERAp.Prova.Aplicacao
                 }
             }
 
-            if (!provaLegado.FormatoTai)
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
-            else
-                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarCadernosProvaTai, provaAtual.Id));
-
+            await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoSync, provaLegado.Id));
             await mediator.Send(new RemoverProvasCacheCommand(provaAtual.Id));
 
             return true;
         }
 
-        private static Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap, ProvaFormatoTaiItem? provaFormatoTaiItem)
+        private static Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap)
         {
             return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
-                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, provaFormatoTaiItem,
-                provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem,
-                provaLegado.ExibirAudio, provaLegado.ExibirVideo);
+                provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, 
+                ProvaFormatoTaiItem.Todos, provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, 
+                provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem, provaLegado.ExibirAudio, provaLegado.ExibirVideo);
         }
 
         private static Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)
@@ -169,6 +148,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             await mediator.Send(new ProvaRemoverContextoProvaPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverCadernoAlunosPorProvaIdCommand(provaAtual.Id));
+            await mediator.Send(new RemoverQuestaoAlunoTaiPorProvaIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAnosPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverAlternativasPorIdCommand(provaAtual.Id));
             await mediator.Send(new ProvaRemoverQuestoesTriPorIdCommand(provaAtual.Id));

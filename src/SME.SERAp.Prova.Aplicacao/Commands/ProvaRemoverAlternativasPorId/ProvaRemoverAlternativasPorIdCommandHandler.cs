@@ -13,27 +13,32 @@ namespace SME.SERAp.Prova.Aplicacao
         private readonly IRepositorioAlternativaArquivo repositorioAlternativaArquivo;
         private readonly IRepositorioArquivo repositorioArquivo;
 
-        public ProvaRemoverAlternativasPorIdCommandHandler(IRepositorioAlternativa repositorioAlternativa, 
+        public ProvaRemoverAlternativasPorIdCommandHandler(IRepositorioAlternativa repositorioAlternativa,
             IRepositorioAlternativaArquivo repositorioAlternativaArquivo, IRepositorioArquivo repositorioArquivo)
         {
             this.repositorioAlternativa = repositorioAlternativa ?? throw new ArgumentNullException(nameof(repositorioAlternativa));
             this.repositorioAlternativaArquivo = repositorioAlternativaArquivo ?? throw new ArgumentNullException(nameof(repositorioAlternativaArquivo));
             this.repositorioArquivo = repositorioArquivo ?? throw new ArgumentNullException(nameof(repositorioArquivo));
         }
+
         public async Task<bool> Handle(ProvaRemoverAlternativasPorIdCommand request, CancellationToken cancellationToken)
         {
-            var alternativaArquivos = await repositorioAlternativaArquivo.ObterArquivosPorProvaIdAsync(request.Id);
-            if (alternativaArquivos.Any())
-            {
-                var idsAlternativasArquivos = alternativaArquivos.Select(a => a.Id).ToArray();
-                await repositorioAlternativaArquivo.RemoverPorIdsAsync(idsAlternativasArquivos);
-                var idsArquivos = alternativaArquivos.Select(a => a.ArquivoId).ToArray();
-                await repositorioArquivo.RemoverPorIdsAsync(idsArquivos);
-            }
-
+            await RemoverAlternativasArquivos(request.Id);
             await repositorioAlternativa.RemoverPorProvaId(request.Id);
-
             return true;
         }
+        
+        private async Task RemoverAlternativasArquivos(long provaId)
+        {
+            var alternativasArquivos = await repositorioAlternativaArquivo.ObterArquivosPorProvaIdAsync(provaId);
+            if (alternativasArquivos != null && alternativasArquivos.Any())
+            {
+                var idsAlternativasArquivos = alternativasArquivos.Select(a => a.Id);
+                await repositorioAlternativaArquivo.RemoverPorIdsAsync(idsAlternativasArquivos.ToArray());
+
+                var idsArquivos = alternativasArquivos.Select(a => a.ArquivoId).ToArray();
+                await repositorioArquivo.RemoverPorIdsAsync(idsArquivos);
+            }            
+        }        
     }
 }

@@ -24,7 +24,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<long> Handle(ExportacaoResultadoAtualizarCommand request, CancellationToken cancellationToken)
         {
-            string chaveRedis = $"exportacao-{request.ExportacaoResultado.Id}-prova-{request.ExportacaoResultado.ProvaSerapId}-status";
+            var chaveRedis = $"exportacao-{request.ExportacaoResultado.Id}-prova-{request.ExportacaoResultado.ProvaSerapId}-status";
             try
             {
                 var exportacao = await repositorioExportacaoResultado.ObterPorIdAsync(request.ExportacaoResultado.Id);
@@ -38,9 +38,12 @@ namespace SME.SERAp.Prova.Aplicacao
                 var exportacao = request.ExportacaoResultado;
                 exportacao.NomeArquivo = "";
                 exportacao.AtualizarStatus(ExportacaoResultadoStatus.Erro);
+                
                 servicoLog.Registrar(LogNivel.Critico, $"Atualizar exportação.Id Exportação:{ exportacao.Id}, Id Prova:{ exportacao.ProvaSerapId}", $" Erro: { ex.Message}", ex.StackTrace);
+
                 await repositorioExportacaoResultado.UpdateAsync(request.ExportacaoResultado);
                 await repositorioCache.RemoverRedisAsync(chaveRedis);
+
                 throw ex;
             }
         }

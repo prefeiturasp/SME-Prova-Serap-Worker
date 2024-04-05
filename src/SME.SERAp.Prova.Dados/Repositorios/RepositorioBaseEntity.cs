@@ -28,6 +28,7 @@ namespace SME.SERAp.Prova.Dados
 
             await uploader.InsertAsync(entidades);
         }
+
         public async Task AlterarVariosAsync(IEnumerable<T> entidades)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ContextoDbSerap>();

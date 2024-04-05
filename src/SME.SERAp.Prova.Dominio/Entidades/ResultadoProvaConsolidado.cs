@@ -19,18 +19,18 @@ namespace SME.SERAp.Prova.Dominio
 		public string TurmaAnoEscolarDescricao { get; set; }
 		public string TurmaCodigo { get; set; }
 		public string TurmaDescricao { get; set; }
-		public int ProvaQuantidadeQuestoes { get; set; }
 		public long AlunoCodigoEol { get; set; }
 		public string AlunoNome { get; set; }
 		public string AlunoSexo { get; set; }
 		public DateTime AlunoDataNascimento { get; set; }
 		public string ProvaComponente { get; set; }
 		public string ProvaCaderno { get; set; }
-		public DateTime? DataInicio { get; set; }
-		public DateTime? DataFim { get; set; }
+		public int ProvaQuantidadeQuestoes { get; set; }
 		public string AlunoFrequencia { get; set; }
 		public long QuestaoId { get; set; }
 		public int QuestaoOrdem { get; set; }
 		public string Resposta { get; set; }
+		public DateTime? DataInicio { get; set; }
+		public DateTime? DataFim { get; set; }
 	}
 }

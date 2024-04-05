@@ -24,6 +24,7 @@ namespace SME.SERAp.Prova.Dados
             conexao.Open();
             return conexao;
         }
+
         public virtual async Task<IEnumerable<T>> ObterTudoAsync()
         {
             var conexao = ObterConexaoLeitura();
@@ -37,6 +38,7 @@ namespace SME.SERAp.Prova.Dados
                 conexao.Dispose();
             }
         }
+
         protected IDbConnection ObterConexaoLeitura()
         {
             var conexao = new NpgsqlConnection(connectionStrings.ApiSerapLeitura);
@@ -50,9 +52,10 @@ namespace SME.SERAp.Prova.Dados
             conexao.Open();
             return conexao;
         }
+
         public virtual async Task<T> ObterPorIdAsync(long id)
         {
-            var conexao = ObterConexao();
+            var conexao = ObterConexaoLeitura();
             try
             {
                 return await conexao.GetAsync<T>(id: id);
@@ -80,13 +83,11 @@ namespace SME.SERAp.Prova.Dados
                 }
                 return entidade.Id;
             }
-
             finally
             {
                 conexao.Close();
                 conexao.Dispose();
             }
-
         }
 
         public virtual async Task<long> UpdateAsync(T entidade)
@@ -98,13 +99,11 @@ namespace SME.SERAp.Prova.Dados
 
                 return entidade.Id;
             }
-
             finally
             {
                 conexao.Close();
                 conexao.Dispose();
             }
-
         }
 
         public virtual async Task<long> IncluirAsync(T entidade)
@@ -115,13 +114,11 @@ namespace SME.SERAp.Prova.Dados
                 entidade.Id = (long)await conexao.InsertAsync(entidade);
                 return entidade.Id;
             }
-       
             finally
             {
                 conexao.Close();
                 conexao.Dispose();
             }
-
         }
     }
 }

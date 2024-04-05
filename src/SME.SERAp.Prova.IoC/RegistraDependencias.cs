@@ -138,6 +138,7 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<ITratarProvaResultadoExtracaoUseCase, TratarProvaResultadoExtracaoUseCase>();
             services.AddScoped<ITratarProvaResultadoExtracaoFiltroUseCase, TratarProvaResultadoExtracaoFiltroUseCase>();
+            services.AddScoped<ITratarProvaResultadoExtracaoFiltroTurmaUseCase, TratarProvaResultadoExtracaoFiltroTurmaUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
             services.AddScoped<IConsolidarProvaRespostaPorFiltroUseCase, ConsolidarProvaRespostaPorFiltroUseCase>();
             services.AddScoped<IConsolidarProvaRespostaPorFiltroTurmaUseCase, ConsolidarProvaRespostaPorFiltroTurmaUseCase>();
@@ -242,7 +243,7 @@ namespace SME.SERAp.Prova.IoC
             
             services.AddScoped<ITratarProvaTaiSyncUseCase, TratarProvaTaiSyncUseCase>();
             services.AddScoped<ITratarProvaTaiUseCase, TratarProvaTaiUseCase>();
-            
+
             // Propagar cache
             services.AddScoped<IPropagarCacheParametrosUseCase, PropagarCacheParametrosUseCase>();
             services.AddScoped<IPropagarCacheProvasAnosUseCase, PropagarCacheProvasAnosUseCase>();

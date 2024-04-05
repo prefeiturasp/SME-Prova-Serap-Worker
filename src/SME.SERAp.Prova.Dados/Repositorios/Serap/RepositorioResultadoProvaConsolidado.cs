@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -290,27 +291,38 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<AlunoQuestaoRespostasDto>> ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRA(long provaLegadoId, long alunoRa)
+        public async Task<IEnumerable<AlunoQuestaoRespostasDto>> ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRA(long provaLegadoId, long alunoRa, bool possuiBib)
         {
             using var conn = ObterConexaoLeitura();
             try
             {
-                const string query = @" select coalesce(q.id, qar.questao_id) as QuestaoId,
+                var query = new StringBuilder(@"select coalesce(q.id, qar.questao_id) as QuestaoId,
                                                    q.ordem as QuestaoOrdem,
                                                    CASE
                                                        WHEN qar.alternativa_id IS NOT NULL THEN alt.numeracao
                                                        ELSE qar.resposta
                                                    END AS resposta,
                                                    qar.aluno_ra
-                                               from questao q
-                                               inner join prova p on p.id = q.prova_id
-                                               left join questao_aluno_resposta qar on qar.questao_id  = q.id and qar.aluno_ra = @alunoRa
-                                               LEFT JOIN alternativa alt on alt.questao_id = qar.questao_id and alt.id = qar.alternativa_id
-                                               WHERE (qar.id in (select max(qar2.id) from questao_aluno_resposta qar2 where qar2.questao_id = qar.questao_id and qar2.aluno_ra = qar.aluno_ra) or qar.id is null)
-                                               AND p.prova_legado_id  = @provaLegadoId
-                                               order by q.ordem";
+                                                from questao q
+                                                inner join prova p on p.id = q.prova_id
+                                                left join questao_aluno_resposta qar on qar.questao_id  = q.id and qar.aluno_ra = @alunoRa
+                                                LEFT JOIN alternativa alt on alt.questao_id = qar.questao_id and alt.id = qar.alternativa_id
+                                                WHERE (qar.id in (select max(qar2.id) from questao_aluno_resposta qar2 where qar2.questao_id = qar.questao_id and qar2.aluno_ra = qar.aluno_ra) or qar.id is null)
+                                                AND p.prova_legado_id  = @provaLegadoId");
 
-                return await conn.QueryAsync<AlunoQuestaoRespostasDto>(query, new { provaLegadoId, alunoRa });
+                if (possuiBib)
+                {
+                    query.Append(@" and EXISTS(select 1 
+                                               	from caderno_aluno ca 
+                                           		join aluno a on a.id = ca.aluno_id
+                                               	where ca.prova_id = q.prova_id
+                                               	and a.ra = @alunoRa
+                                               	and ca.caderno = q.caderno) ");
+                }
+
+                query.Append(" order by q.ordem ");
+
+                return await conn.QueryAsync<AlunoQuestaoRespostasDto>(query.ToString(), new { provaLegadoId, alunoRa });
             }
             finally
             {

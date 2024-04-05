@@ -18,7 +18,7 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.ObterQuestaoAlunoRespostaPorProvaIdE
 
         public async Task<IEnumerable<AlunoQuestaoRespostasDto>> Handle(ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioResultadoProvaConsolidado.ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRA(request.ProvaLegadoId, request.AlunoRa);
+            return await repositorioResultadoProvaConsolidado.ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRA(request.ProvaLegadoId, request.AlunoRa, request.PossuiBib);
         }
     }
 }

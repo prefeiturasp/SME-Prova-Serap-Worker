@@ -72,7 +72,7 @@ namespace SME.SERAp.Prova.Aplicacao
         private async Task BuscarRespostasEIncluirConsolidado(ConsolidadoAlunoProvaDto consolidadoAlunoProva)
         {
             var respostas = await mediator.Send(new ObterQuestaoAlunoRespostaPorProvaLegadoIdEAlunoRaQuery(
-                consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol));
+                consolidadoAlunoProva.ProvaSerapId, consolidadoAlunoProva.AlunoCodigoEol, consolidadoAlunoProva.PossuiBib));
 
             foreach (var resposta in respostas)
             {

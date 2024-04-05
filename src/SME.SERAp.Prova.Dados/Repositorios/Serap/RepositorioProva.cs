@@ -461,7 +461,7 @@ namespace SME.SERAp.Prova.Dados
                                       	and pa2.finalizado_em is not null
                                       where p.prova_legado_id  =  @provaLegadoId ),
                                       
-                                       tb_prova_turma as (
+                            tb_prova_turma as (
 								select distinct vpta.prova_legado_id as prova_serap_id,
 									vpta.prova_id as prova_serap_estudantes_id,												
 									vpta.turma_id,

@@ -134,11 +134,7 @@ namespace SME.SERAp.Prova.Infra
 
         public static string ObterJsonObjetoResultado(object resultado)
         {
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            return JsonSerializer.Serialize(resultado, jsonSerializerOptions);
+            return resultado.ConverterObjectParaJson();
         }
         
         public static int? ConvertStringPraIntNullPsp(this string valor)

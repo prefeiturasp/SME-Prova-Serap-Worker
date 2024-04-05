@@ -12,7 +12,7 @@ namespace SME.SERAp.Prova.Aplicacao
             NomeArquivo = nomeArquivo;
         }
 
-        public IEnumerable<ConsolidadoProvaRespostaDto> Resultado { get; set; }
-        public string NomeArquivo { get; set; }
+        public IEnumerable<ConsolidadoProvaRespostaDto> Resultado { get; }
+        public string NomeArquivo { get; }
     }
 }

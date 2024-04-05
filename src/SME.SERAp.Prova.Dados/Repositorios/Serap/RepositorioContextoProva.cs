@@ -1,5 +1,4 @@
-﻿using Dapper;
-using SME.SERAp.Prova.Dominio;
+﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System.Threading.Tasks;
 

@@ -34,7 +34,7 @@ namespace SME.SERAp.Prova.Dominio
 
         public bool DeveAtualizar(Ue ueAtualizada)
         {
-            return Nome.Trim() != ueAtualizada.Nome.Trim() || TipoEscola != ueAtualizada.TipoEscola;
+            return Nome.Trim() != ueAtualizada.Nome.Trim() || TipoEscola != ueAtualizada.TipoEscola || DreId != ueAtualizada.DreId;
         }
 
         public void AtualizarCampos(Ue ueAtualizada)

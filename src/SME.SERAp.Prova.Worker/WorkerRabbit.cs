@@ -80,6 +80,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 }
                 catch (Exception ex)
                 {
+                    logger.LogCritical(null, ex, ex.Message);
                     servicolog.Registrar($"Erro ao tratar mensagem {ea.DeliveryTag}", ex);
                 }
             };
@@ -194,6 +195,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             // Questao completa
             comandos.Add(RotasRabbit.QuestaoCompletaSync, new ComandoRabbit("Sincronização das questoes completas", typeof(ITratarQuestaoCompletaSyncUseCase)));
+            comandos.Add(RotasRabbit.QuestaoCompletaProva, new ComandoRabbit("Sincronização das questoes completas por prova", typeof(ITratarQuestaoCompletaProvaUseCase)));
             comandos.Add(RotasRabbit.QuestaoCompletaTratar, new ComandoRabbit("Realiza a atualização dos dados completos da questão", typeof(ITratarQuestaoCompletaUseCase)));
 
             // proficiencia
@@ -203,6 +205,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
 
             comandos.Add(RotasRabbit.ExtrairResultadosProva, new ComandoRabbit("Realizar a extração de uma prova", typeof(ITratarProvaResultadoExtracaoUseCase)));
             comandos.Add(RotasRabbit.ExtrairResultadosProvaFiltro, new ComandoRabbit("Realizar a extração de uma prova por filtro", typeof(ITratarProvaResultadoExtracaoFiltroUseCase)));
+            comandos.Add(RotasRabbit.ExtrairResultadosProvaFiltroTurma, new ComandoRabbit("Realizar a extração de uma prova por turma", typeof(ITratarProvaResultadoExtracaoFiltroTurmaUseCase)));            
             comandos.Add(RotasRabbit.ConsolidarProvaResultado, new ComandoRabbit("Inicia consolidação dos dados da prova para exportação", typeof(IConsolidarProvaResultadoUseCase)));
             comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltro, new ComandoRabbit("Faz a consolidação dos dados da prova por filtro", typeof(IConsolidarProvaRespostaPorFiltroUseCase)));
             comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, new ComandoRabbit("Faz a consolidação dos dados da prova por turma", typeof(IConsolidarProvaRespostaPorFiltroTurmaUseCase)));
@@ -212,6 +215,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarTipoProvaDeficiencia, new ComandoRabbit("Faz a sincronização dos tipos de deficiência do tipo de prova", typeof(ITratarTipoProvaDeficienciaUseCase)));
             comandos.Add(RotasRabbit.TratarAlunoDeficiencia, new ComandoRabbit("Faz a sincronização dos tipos de deficiência do aluno", typeof(ITratarAlunoDeficienciaUseCase)));
 
+            comandos.Add(RotasRabbit.ProvaWebPushTesteSync, new ComandoRabbit("Faz a sincronização do teste de webpush", typeof(IProvaWebPushTesteSyncUseCase)));
             comandos.Add(RotasRabbit.ProvaWebPushTeste, new ComandoRabbit("Teste de webpush", typeof(IProvaWebPushTesteUseCase)));
 
             // Sincronização das UES e turmas
@@ -241,7 +245,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.UsuarioGrupoAbrangenciaExcluirTratar, new ComandoRabbit("", typeof(ITratarAbrangenciaUsuarioGrupoExcluirUseCase)));
 
             //Prova TAI
-            comandos.Add(RotasRabbit.TratarCadernosProvaTai, new ComandoRabbit("Tratamento cadernos amostra TAI", typeof(ITratarCadernosProvaTaiUseCase)));
+            comandos.Add(RotasRabbit.ProvaTaiSync, new ComandoRabbit("Sincronização das provas com TAI", typeof(ITratarProvaTaiSyncUseCase)));
+            comandos.Add(RotasRabbit.ProvaTaiTratar, new ComandoRabbit("Tratar as provas com TAI", typeof(ITratarProvaTaiUseCase)));            
             comandos.Add(RotasRabbit.TratarCadernoAlunoProvaTai, new ComandoRabbit("Tratamento cadernos alunos prova TAI", typeof(ITratarCadernoAlunoProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarOrdemQuestaoAlunoProvaTai, new ComandoRabbit("Tratamento da ordem da questão da prova tai do aluno", typeof(ITratarOrdemQuestaoAlunoProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));            
@@ -291,6 +296,18 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarResultadoCicloTurma, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Turma", typeof(ITratarProficienciaCicloTurmaUseCase)));            
             comandos.Add(RotasRabbit.ImportarResultadoCicloDrePsp, new ComandoRabbit("Importa dados arquivo csv proficiencia Ciclo Dre ", typeof(IImportarResultadoCicloDreUseCase)));
             comandos.Add(RotasRabbit.TratarResultadoCicloDre, new ComandoRabbit("Tratar registros arquivo csv proficiencia Ciclo Dre", typeof(ITratarResultadoCicloDreUseCase)));
+            
+            // Propagar Cache
+            comandos.Add(RotasRabbit.PropagarCache, new ComandoRabbit("Propagar o cache", typeof(IPropagarCacheUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheParametros, new ComandoRabbit("Propagar o cache dos parâmetros", typeof(IPropagarCacheParametrosUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheProvasAnos, new ComandoRabbit("Propagar o cache das provas e anos", typeof(IPropagarCacheProvasAnosUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheProvasLiberadas, new ComandoRabbit("Propagar o cache das provas liberadas", typeof(IPropagarCacheProvasLiberadasUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheProvasLiberadasTratar, new ComandoRabbit("Propagar o cache por prova", typeof(IPropagarCacheProvasLiberadasTratarUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheResumoQuestoesProva, new ComandoRabbit("Propagar o cache do resumo das questões da prova", typeof(IPropagarCacheResumoQuestoesProvaUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasProva, new ComandoRabbit("Propagar o cache das questões completas da prova", typeof(IPropagarCacheQuestoesCompletasProvaUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasProvaTratar, new ComandoRabbit("Propagar o cache da questão completa", typeof(IPropagarCacheQuestoesCompletasProvaTratarUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasLegadoProva, new ComandoRabbit("Propagar o cache das questões completas do legado", typeof(IPropagarCacheQuestoesCompletasLegadoProvaUseCase)));
+            comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasLegadoProvaTratar, new ComandoRabbit("Propagar o cache da questão completa do legado", typeof(IPropagarCacheQuestoesCompletasLegadoProvaTratarUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)
@@ -319,8 +336,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             if (comandos.ContainsKey(rota))
             {
                 logger.LogInformation("Worker rota: {Rota}", rota);
-                var transacao = servicoTelemetria.IniciarTransacao(rota);
 
+                var transacao = servicoTelemetria.IniciarTransacao(rota);
                 var mensagemRabbit = mensagem.ConverterObjectStringPraObjeto<MensagemRabbit>();
                 var comandoRabbit = comandos[rota];
 
@@ -328,7 +345,7 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
                 {
                     using var scope = serviceScopeFactory.CreateScope();
                     var casoDeUso = scope.ServiceProvider.GetService(comandoRabbit.TipoCasoUso);
-
+                    
                     await ObterMetodo(comandoRabbit.TipoCasoUso, "Executar").InvokeAsync(casoDeUso, mensagemRabbit);
 
                     channel.BasicAck(ea.DeliveryTag, false);

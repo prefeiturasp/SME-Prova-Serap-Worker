@@ -85,5 +85,21 @@ namespace SME.SERAp.Prova.Dados.Cache
 
             return default;
         }
+
+        public async Task SalvarRedisToJsonAsync(string nomeChave, string json, int minutosParaExpirar = 720)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var bytes = MessagePackSerializer.ConvertFromJson(json);                    
+                    await database.StringSetAsync(nomeChave, bytes, TimeSpan.FromMinutes(minutosParaExpirar));
+                }
+            }
+            catch (Exception ex)
+            {
+                servicoLog.Registrar(ex);
+            }
+        }
     }
 }

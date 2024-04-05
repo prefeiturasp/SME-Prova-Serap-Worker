@@ -103,7 +103,7 @@ namespace SME.SERAp.Prova.Dados
                 query.AppendLine(" join arquivo ar on ar.id = aa.arquivo_id ");
                 query.AppendLine(" where q.id = @id; ");
 
-                using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id });
+                using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { id }, commandTimeout: 300);
                 var questaoCompleta = await sqlMapper.ReadFirstOrDefaultAsync<QuestaoCompletaDto>();
 
                 if (questaoCompleta == null || questaoCompleta.Id <= 0)
@@ -132,18 +132,22 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas()
+        public async Task<IEnumerable<QuestaoAtualizada>> ObterQuestoesAtualizadas(long provaId, int pagina, int quantidade)
         {
+            var ignorarRegistros = ((pagina - 1) * quantidade);
             using var conn = ObterConexao();
             try
             {
-                var query = @"select q.id, p.ultima_atualizacao as UltimaAtualizacao 
-                              from prova p
-                              left join questao q on q.prova_id = p.id 
-                              left join questao_completa qc on qc.id = q.id 
-                              where p.ultima_atualizacao <> qc.ultima_atualizacao or qc.ultima_atualizacao is null";
-
-                return await conn.QueryAsync<QuestaoAtualizada>(query);
+                var query = @"select 
+                                q.id,
+                                qc.ultima_atualizacao as UltimaAtualizacaoQuestao 
+                              from questao q
+                              left join questao_completa qc on qc.id = q.id
+                              where q.prova_id = @provaId
+                              order by q.prova_id, q.id
+                              limit @quantidade offset @ignorarRegistros";
+                
+                return await conn.QueryAsync<QuestaoAtualizada>(query, new { provaId, quantidade, ignorarRegistros });
             }
             finally
             {
@@ -182,6 +186,77 @@ namespace SME.SERAp.Prova.Dados
                 await conn.ExecuteAsync(query, new { provaId });
 
                 return true;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<long> ObterIdQuestaoPorProvaIdCadernoLegadoId(long provaId, string caderno, long questaoLegadoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select id from questao where prova_id = @provaId and caderno = @caderno and questao_legado_id = @questaoLegadoId";
+                return await conn.ExecuteScalarAsync<long>(query, new { provaId, caderno, questaoLegadoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<ResumoQuestaoProvaDto>> ObterResumoQuestoesPorProvaIdParaCacheAsync(long provaId)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = new StringBuilder();
+                
+                query.Append(@" select q.prova_id as ProvaId, 
+                                    q.id as QuestaoId, 
+                                    q.questao_legado_id as QuestaoLegadoId, 
+                                    q.caderno, q.ordem 
+                                from questao q
+                                join prova p on (p.id = q.prova_id)
+                                where q.prova_id = @provaId;");
+
+                query.Append(@" select q.id as QuestaoId, 
+                                    a.id as AlternativaId,
+                                    a.alternativa_legado_id as AlternativaLegadoId,
+                                    a.ordem 
+                                from questao q 
+                                    left join alternativa a on a.questao_id = q.id 
+                                    inner join prova p on p.id = q.prova_id
+                                where q.prova_id = @provaId");
+
+                using var sqlMapper = await SqlMapper.QueryMultipleAsync(conn, query.ToString(), new { provaId });
+                
+                var questoes = await sqlMapper.ReadAsync<ResumoQuestaoProvaDto>();
+                var alternativas = await sqlMapper.ReadAsync<ResumoAlternativaQuestaoProvaDto>();
+                    
+                foreach (var questao in questoes)
+                    questao.Alternativas = alternativas.Where(t => t.QuestaoId == questao.QuestaoId);
+
+                return questoes;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<IEnumerable<long>> ObterIdsQuestoesPorProvaIdCadernoAsync(long provaId, string caderno)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = "select id from questao where prova_id = @provaId and caderno = @caderno";
+                return await conn.QueryAsync<long>(query, new { provaId, caderno });
             }
             finally
             {

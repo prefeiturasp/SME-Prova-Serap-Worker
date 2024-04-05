@@ -57,7 +57,7 @@ namespace SME.SERAp.Prova.Aplicacao
             {
                 ProvaId = provaId,
                 FinalizadoEm = DateTime.Now,
-                Status = (int)ProvaStatus.FinalizadoAutomaticamente,
+                Status = (int)ProvaStatus.FINALIZADA_AUTOMATICAMENTE_JOB,
                 IdsProvasAlunos = provasParaFinalizar.Select(pa => pa.ProvaAlunoId).ToArray()
             };
         }

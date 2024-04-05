@@ -29,6 +29,21 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task<long> ObterIdAlternativaPorQuestaoIdLegadoId(long questaoId, long alternativaLegadoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select id from alternativa where questao_id = @questaoId and alternativa_legado_id = @alternativaLegadoId";
+                return await conn.ExecuteScalarAsync<long>(query, new { questaoId, alternativaLegadoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<bool> RemoverPorProvaId(long provaId)
         {
             using var conn = ObterConexao();

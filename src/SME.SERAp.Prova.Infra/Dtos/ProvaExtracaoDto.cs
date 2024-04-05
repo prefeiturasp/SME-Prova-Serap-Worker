@@ -4,10 +4,9 @@
     {
         public long ProvaSerapId { get; set; }
         public long ExtracaoResultadoId { get; set; }
+
         public ProvaExtracaoDto()
         {
-
         }
-        
     }
 }

@@ -20,6 +20,10 @@ namespace SME.SERAp.Prova.Aplicacao
             if (existeProvaFinalizada)
                 return true;
 
+            var existeDownload = await repositorioProva.VerificaSePossuiDownload(request.ProvaId);
+            if (existeDownload)
+                return true;
+
             var existeRespostas = await repositorioProva.VerificaSeExisteRespostasPorId(request.ProvaId);
             return existeRespostas;
         }

@@ -107,7 +107,17 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select id, nome, turma_id as TurmaId, ra, Situacao from aluno where turma_id = ANY(@turmasIds)";
+                const string query = @"select id, 
+                                            nome, 
+                                            turma_id as TurmaId, 
+                                            ra, 
+                                            Situacao, 
+                                            data_atualizacao, 
+                                            nome_social, 
+                                            data_nascimento, 
+                                            sexo 
+                                        from aluno 
+                                        where turma_id = ANY(@turmasIds)";
 
                 return await conn.QueryAsync<Aluno>(query, new { turmasIds });
             }
@@ -153,7 +163,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCadernoProvaId(long provaId)
+        public async Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCadernoProvaId(long provaId, string ano)
         {
             using var conn = ObterConexaoLeitura();
             try
@@ -162,18 +172,18 @@ namespace SME.SERAp.Prova.Dados
                                      f.aluno_id as AlunoId,
                                      f.aluno_situacao as Situacao,
                                      f.prova_legado_id as ProvaLegadoId,
-                                     a.ra as AlunoRa
+                                     f.aluno_ra as AlunoRa
                                 from v_prova_turma_aluno f
-                                    inner join aluno a on a.id = f.aluno_id
                                where f.formato_tai = true
                                  and f.prova_id = @provaId
+                                 and f.turma_ano = @ano
                                  and not exists(select 1
                                                   from caderno_aluno ca 
                                                   where	ca.prova_id = f.prova_id 
                                                     and ca.aluno_id = f.aluno_id)
                                 order by f.prova_id";
 
-                return await conn.QueryAsync<ProvaAlunoTaiSemCadernoDto>(query, new { provaId });
+                return await conn.QueryAsync<ProvaAlunoTaiSemCadernoDto>(query, new { provaId, ano });
             }
             finally
             {
@@ -182,7 +192,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
         
-        public async Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCaderno()
+        public async Task<IEnumerable<ProvaAlunoTaiSemCadernoDto>> ObterAlunosProvaTaiSemCaderno(string ano)
         {
             using var conn = ObterConexaoLeitura();
             try
@@ -195,13 +205,14 @@ namespace SME.SERAp.Prova.Dados
                                 from v_prova_turma_aluno f
                                 inner join aluno a on a.id = f.aluno_id
                                where f.formato_tai = true
+                                 and f.turma_ano = @ano
                                  and not exists(select 1
                                                   from caderno_aluno ca 
                                                   where	ca.prova_id = f.prova_id 
                                                     and ca.aluno_id = f.aluno_id)
                                 order by f.prova_id";
 
-                return await conn.QueryAsync<ProvaAlunoTaiSemCadernoDto>(query);
+                return await conn.QueryAsync<ProvaAlunoTaiSemCadernoDto>(query, new { ano });
             }
             finally
             {

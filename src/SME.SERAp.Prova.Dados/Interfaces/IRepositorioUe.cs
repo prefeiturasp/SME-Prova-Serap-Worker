@@ -10,5 +10,6 @@ namespace SME.SERAp.Prova.Dados
         Task<Ue> ObterUePorCodigo(string ueCodigo);
         Task<IEnumerable<Ue>> ObterUesSerapPorDreCodigoAsync(string dreCodigo);
         Task<IEnumerable<Ue>> ObterUesSerapPorProvaSerapEDreCodigoAsync(long provaSerap, string dreCodigo);
+        Task<IEnumerable<Ue>> ObterUesPorCodigosAsync(string[] codigos);
     }
 }

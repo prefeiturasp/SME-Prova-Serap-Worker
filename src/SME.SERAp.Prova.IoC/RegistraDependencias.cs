@@ -108,7 +108,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoCicloEscola, RepositorioResultadoCicloEscola>();
             services.AddScoped<IRepositorioResultadoCicloTurma, RepositorioResultadoCicloTurma>();
             services.AddScoped<IRepositorioResultadoCicloDre, RepositorioResultadoCicloDre>();
-
+            services.AddScoped<IRepositorioQuestaoAlunoTai, RepositorioQuestaoAlunoTai>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -127,6 +127,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarQuestoesLegadoSyncUseCase, TratarQuestoesLegadoSyncUseCase>();
             services.AddScoped<ITratarProvaBIBSyncUseCase, TratarProvaBIBSyncUseCase>();
             services.AddScoped<ITratarProvaBIBUseCase, TratarProvaBIBUseCase>();
+            services.AddScoped<IProvaWebPushTesteSyncUseCase, ProvaWebPushTesteSyncUseCase>();
             services.AddScoped<IProvaWebPushTesteUseCase, ProvaWebPushTesteUseCase>();
             services.AddScoped<IAtualizaImagensQuestoesUseCase, AtualizaImagensQuestoesUseCase>();
             services.AddScoped<IAtualizaImagensAlternativasUseCase, AtualizaImagensAlternativasUseCase>();
@@ -137,6 +138,7 @@ namespace SME.SERAp.Prova.IoC
 
             services.AddScoped<ITratarProvaResultadoExtracaoUseCase, TratarProvaResultadoExtracaoUseCase>();
             services.AddScoped<ITratarProvaResultadoExtracaoFiltroUseCase, TratarProvaResultadoExtracaoFiltroUseCase>();
+            services.AddScoped<ITratarProvaResultadoExtracaoFiltroTurmaUseCase, TratarProvaResultadoExtracaoFiltroTurmaUseCase>();
             services.AddScoped<IConsolidarProvaResultadoUseCase, ConsolidarProvaResultadoUseCase>();
             services.AddScoped<IConsolidarProvaRespostaPorFiltroUseCase, ConsolidarProvaRespostaPorFiltroUseCase>();
             services.AddScoped<IConsolidarProvaRespostaPorFiltroTurmaUseCase, ConsolidarProvaRespostaPorFiltroTurmaUseCase>();
@@ -175,12 +177,13 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarAbrangenciaUsuarioGrupoExcluirUseCase, TratarAbrangenciaUsuarioGrupoExcluirUseCase>();
 
             services.AddScoped<ITratarQuestaoCompletaSyncUseCase, TratarQuestaoCompletaSyncUseCase>();
-            services.AddScoped<ITratarQuestaoCompletaUseCase, TratarQuestaoCompletaUseCase>();         
+            services.AddScoped<ITratarQuestaoCompletaProvaUseCase, TratarQuestaoCompletaProvaUseCase>();
+            services.AddScoped<ITratarQuestaoCompletaUseCase, TratarQuestaoCompletaUseCase>();    
+            
             services.AddScoped<IAjustarUeTurmasUseCase, AjustarUeTurmasesUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaSyncUseCase, TratarAlunoProvaProficienciaSyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaPorProvaIdSyncUseCase, TratarAlunoProvaProficienciaPorProvaIdSyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaUseCase, TratarAlunoProvaProficienciaUseCase>();
-            services.AddScoped<ITratarCadernosProvaTaiUseCase, TratarCadernosProvaTaiUseCase>();
             services.AddScoped<ITratarCadernoAlunoProvaTaiUseCase, TratarCadernoAlunoProvaTaiUseCase>();
             // Persistencia Serap 
 
@@ -237,7 +240,21 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProficienciaCicloTurmaUseCase, TratarProficienciaCicloTurmaUseCase>();
             services.AddScoped<IImportarResultadoCicloDreUseCase, ImportarResultadoCicloDreUseCase>();
             services.AddScoped<ITratarResultadoCicloDreUseCase, TratarResultadoCicloDreUseCase>();
+            
+            services.AddScoped<ITratarProvaTaiSyncUseCase, TratarProvaTaiSyncUseCase>();
+            services.AddScoped<ITratarProvaTaiUseCase, TratarProvaTaiUseCase>();
 
+            // Propagar cache
+            services.AddScoped<IPropagarCacheParametrosUseCase, PropagarCacheParametrosUseCase>();
+            services.AddScoped<IPropagarCacheProvasAnosUseCase, PropagarCacheProvasAnosUseCase>();
+            services.AddScoped<IPropagarCacheProvasLiberadasTratarUseCase, PropagarCacheProvasLiberadasTratarUseCase>();
+            services.AddScoped<IPropagarCacheProvasLiberadasUseCase, PropagarCacheProvasLiberadasUseCase>();
+            services.AddScoped<IPropagarCacheQuestoesCompletasLegadoProvaTratarUseCase, PropagarCacheQuestoesCompletasLegadoProvaTratarUseCase>();
+            services.AddScoped<IPropagarCacheQuestoesCompletasLegadoProvaUseCase, PropagarCacheQuestoesCompletasLegadoProvaUseCase>();
+            services.AddScoped<IPropagarCacheQuestoesCompletasProvaTratarUseCase, PropagarCacheQuestoesCompletasProvaTratarUseCase>();
+            services.AddScoped<IPropagarCacheQuestoesCompletasProvaUseCase, PropagarCacheQuestoesCompletasProvaUseCase>();
+            services.AddScoped<IPropagarCacheResumoQuestoesProvaUseCase, PropagarCacheResumoQuestoesProvaUseCase>();
+            services.AddScoped<IPropagarCacheUseCase, PropagarCacheUseCase>();
         }
     }
 }

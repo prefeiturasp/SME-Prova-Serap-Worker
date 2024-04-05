@@ -6,5 +6,6 @@ namespace SME.SERAp.Prova.Infra
     {
         public long Id { get; set; }
         public DateTime UltimaAtualizacao { get; set; }
+        public DateTime? UltimaAtualizacaoQuestao { get; set; }
     }
 }

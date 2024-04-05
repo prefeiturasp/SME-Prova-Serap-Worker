@@ -75,8 +75,61 @@ namespace SME.SERAp.Prova.Dados
 						or (ue_base.tp_unidade_educacao in @tiposEscola)))
 					) serv";
 
-			using var conn = new SqlConnection(connectionStringOptions.Eol);
+			await using var conn = new SqlConnection(connectionStringOptions.Eol);
 			return await conn.QueryAsync<string>(query, new { codigoRf, tiposEscola });
+		}
+
+		public async Task<IEnumerable<TurmaAtribuicaoEolDto>> ObterAtribuicoesEolAsync(string codigoRf, int anoInicial, int[] tiposEscola)
+		{
+			const string query = @"
+						select atb.an_atribuicao as AnoLetivo,
+								dre.cd_unidade_educacao as DreCodigo,
+								atb.cd_unidade_educacao as UeCodigo,
+								coalesce(stg.cd_turma_escola, tegp.cd_turma_escola) TurmaCodigo,
+								min(atb.dt_atribuicao_aula) as DataAtribuicao,
+								max(atb.dt_disponibilizacao_aulas) as DataDisponibilizacaoAula
+						from atribuicao_aula (nolock) atb
+
+						-- escolas
+						inner join escola (nolock) esc on atb.cd_unidade_educacao = esc.cd_escola
+						inner join v_cadastro_unidade_educacao (nolock) vue on vue.cd_unidade_educacao = esc.cd_escola
+						inner join (select v_ua.cd_unidade_educacao, v_ua.nm_unidade_educacao, v_ua.nm_exibicao_unidade 
+									from unidade_administrativa (nolock) ua
+									inner join v_cadastro_unidade_educacao (nolock) v_ua on v_ua.cd_unidade_educacao = ua.cd_unidade_administrativa
+									where tp_unidade_administrativa = 24) dre on dre.cd_unidade_educacao = vue.cd_unidade_administrativa_referencia
+
+						--Servidor
+						inner join v_cargo_base_cotic (nolock) cbs on atb.cd_cargo_base_servidor = cbs.cd_cargo_base_servidor
+						inner join v_servidor_cotic (nolock) vsc on cbs.cd_servidor = vsc.cd_servidor
+
+						-- SerieGrade
+						left join serie_turma_grade (nolock) stg on atb.cd_serie_grade = stg.cd_serie_grade
+						left join turma_escola (nolock) tur_reg on stg.cd_turma_escola = tur_reg.cd_turma_escola and tur_reg.an_letivo = atb.an_atribuicao and tur_reg.cd_tipo_turma <> 4
+
+						-- ProgramaGrade
+						left join turma_escola_grade_programa (nolock) tegp on tegp.cd_turma_escola_grade_programa = atb.cd_turma_escola_grade_programa
+						left join turma_escola (nolock) tur_pro on tegp.cd_turma_escola = tur_pro.cd_turma_escola and tur_pro.an_letivo = atb.an_atribuicao and tur_reg.cd_tipo_turma <> 4
+
+						where atb.dt_cancelamento is null
+						  and cbs.dt_cancelamento is null 
+						  and cbs.dt_fim_nomeacao is null
+						  and atb.an_atribuicao >= @anoInicial
+						  and vsc.cd_registro_funcional = @codigoRf
+						  and esc.tp_escola in @tiposEscola
+						  and (tur_reg.cd_turma_escola is not null or tur_pro.cd_turma_escola is not null)
+						group by atb.an_atribuicao,
+							dre.cd_unidade_educacao,
+							atb.cd_unidade_educacao,
+							coalesce(stg.cd_turma_escola, tegp.cd_turma_escola)";
+
+			await using var conn = new SqlConnection(connectionStringOptions.Eol);
+
+			var param = new DynamicParameters();
+			param.Add("@anoInicial", anoInicial);
+			param.Add("@codigoRf", codigoRf, System.Data.DbType.AnsiStringFixedLength, null, 7);
+			param.Add("@tiposEscola", tiposEscola);
+
+			return await conn.QueryAsync<TurmaAtribuicaoEolDto>(query, param);
 		}
 
 		public async Task<IEnumerable<TurmaAtribuicaoEolDto>> ObterTurmaAtribuicaoEol(int anoInicial, string codigoRf, int[] tiposEscola, long? turmaCodigo, int? anoLetivo)
@@ -122,7 +175,6 @@ namespace SME.SERAp.Prova.Dados
 			{
 				query += @" and atb.an_atribuicao = @anoLetivo 
 							and (stg.cd_turma_escola = @turmaCodigo or tegp.cd_turma_escola = @turmaCodigo) ";
-
 			}
 
 			query += @"	group by atb.an_atribuicao,
@@ -130,9 +182,9 @@ namespace SME.SERAp.Prova.Dados
 								atb.cd_unidade_educacao,
 								coalesce(stg.cd_turma_escola, tegp.cd_turma_escola)";
 
-			using var conn = new SqlConnection(connectionStringOptions.Eol);
+			await using var conn = new SqlConnection(connectionStringOptions.Eol);
 
-			DynamicParameters param = new DynamicParameters();
+			var param = new DynamicParameters();
 			param.Add("@anoInicial", anoInicial);
 			param.Add("@codigoRf", codigoRf, System.Data.DbType.AnsiStringFixedLength, null, 7);
 			param.Add("@tiposEscola", tiposEscola);

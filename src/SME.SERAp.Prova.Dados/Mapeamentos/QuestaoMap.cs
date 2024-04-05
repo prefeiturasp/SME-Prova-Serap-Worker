@@ -18,6 +18,8 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.Tipo).ToColumn("tipo");
             Map(c => c.Caderno).ToColumn("caderno");
             Map(c => c.QuantidadeAlternativas).ToColumn("quantidade_alternativas");
+            Map(c => c.EixoId).ToColumn("eixo_legado_id");
+            Map(c => c.HabilidadeId).ToColumn("habilidade_legado_id");
         }
     }
 }

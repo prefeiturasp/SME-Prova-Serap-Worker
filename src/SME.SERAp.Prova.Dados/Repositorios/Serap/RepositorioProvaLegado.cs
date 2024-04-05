@@ -20,24 +20,21 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 var query = @"
-	            select
-                    
-	                t.id,
-					t.UpdateDate,
-					tp.UpdateDate
-                from
-	                test t
-					left join TestPermission tp
-					on tp.Test_Id = t.Id
-                     AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
-				
-                where
-	                t.ShowOnSerapEstudantes = 1
-                    and (t.UpdateDate >  @ultimaAtualizacao or 
-					      tp.UpdateDate >  @ultimaAtualizacao )
-                    and t.State = 1
-                order by
-	                t.ApplicationStartDate desc";
+		            select
+		                t.id,
+						t.UpdateDate,
+						tp.UpdateDate
+	                from
+		                test t
+						left join TestPermission tp
+						on tp.Test_Id = t.Id 
+						AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+	                where
+		                t.ShowOnSerapEstudantes = 1
+	                    and (t.UpdateDate > @ultimaAtualizacao or tp.UpdateDate > @ultimaAtualizacao)
+	                    and t.State = 1
+	                order by
+		                t.ApplicationStartDate desc";
 
                 return await conn.QueryAsync<long>(query, new { ultimaAtualizacao });
             }
@@ -228,12 +225,12 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @" SELECT 
-                                    A.Id 
-                                FROM  Alternative A (NOLOCK)                             
-                                WHERE A.Item_Id = @questaoId;";
+	            const string query = @" SELECT A.Id 
+                                		FROM  Alternative A (NOLOCK)
+                                		WHERE A.Item_Id = @questaoId
+                                		and A.State = 1";
 
-                return await conn.QueryAsync<long>(query, new { questaoId });
+	            return await conn.QueryAsync<long>(query, new { questaoId });
             }
             finally
             {
@@ -247,17 +244,17 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"SELECT 
-                                    A.Id as AlternativaLegadoId,                                    
-                                    A.Numeration as Numeracao,
-                                    A.Description as Descricao,
-                                    A.[Order] as Ordem,
-                                    A.Correct as Correta
-                                FROM  Alternative A (NOLOCK)                             
-                                WHERE A.Item_Id = @questaoId and A.id = @alternativaId;";
+	            const string query = @"SELECT A.Id as AlternativaLegadoId,
+                                    		A.Numeration as Numeracao,
+                                    		A.Description as Descricao,
+                                    		A.[Order] as Ordem,
+                                    		A.Correct as Correta
+                                		FROM Alternative A (NOLOCK)
+                                		WHERE A.Item_Id = @questaoId 
+                                		and A.id = @alternativaId
+                                		and A.State = 1";
 
-
-                return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
+	            return await conn.QueryFirstOrDefaultAsync<AlternativasProvaIdDto>(query, new { questaoId, alternativaId });
             }
             finally
             {
@@ -394,76 +391,44 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<ProvaFormatoTaiItem?> ObterFormatoTaiItemPorId(long provaId)
+        public async Task<IEnumerable<AmostraProvaTaiDto>> ObterDadosAmostraProvaTai(long provaId)
         {
             using var conn = ObterConexao();
             try
             {
-                var query = @"select case when niat.Value = '' then 0 else niat.Value end as value
-                              from NumberItemTestTai nit
-                              left join NumberItemsAplicationTai niat on niat.Id = nit.ItemAplicationTaiId
-                              where nit.TestId = @provaId
-							   and nit.State = 1";
-                var formatos = await conn.QueryAsync<long>(query, new { provaId });
+                const string query = @"with DisciplinaMatriz as(
+											select tcg.Discipline_Id DisciplinaId,
+												tcg.EvaluationMatrix_Id MatrizId,
+												tcg.Test_Id
+											from TestTaiCurriculumGrade tcg 
+											where tcg.[State] = 1
+											and tcg.Test_Id = @provaId
+										)
+										select top 1 nit.TestId ProvaLegadoId,
+											dm.DisciplinaId,
+											nit.AdvanceWithoutAnswering AvancarSemResponder,
+											nit.BackToPreviousItem VoltarAoItemAnterior
+										from NumberItemTestTai nit
+										inner join DisciplinaMatriz dm on dm.Test_Id = nit.TestId
+										where nit.[State] = 1
+										and nit.TestId = @provaId
+										order by nit.Id desc
 
-                if (formatos.Any())
-                    return (ProvaFormatoTaiItem)formatos.FirstOrDefault();
-
-                return null;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
-
-        public async Task<AmostraProvaTaiDto> ObterDadosAmostraProvaTai(long provaId)
-        {
-            using var conn = ObterConexao();
-            try
-            {
-                var query = @"with DisciplinaMatriz as(
-								select top 1
-									tcg.Discipline_Id DisciplinaId,
-									tcg.EvaluationMatrix_Id MatrizId,
-									tcg.Test_Id
-								from TestTaiCurriculumGrade tcg 
-								where tcg.[State] = 1
-									and tcg.Test_Id = @provaId
-								)
-								select
-									nit.TestId ProvaLegadoId,
-									dm.DisciplinaId,
-									dm.MatrizId,
-									niat.[Value] NumeroItensAmostra,
-									nit.AdvanceWithoutAnswering AvancarSemResponder,
-									nit.BackToPreviousItem VoltarAoItemAnterior
-								from NumberItemTestTai nit
-								inner join NumberItemsAplicationTai niat
-									on nit.ItemAplicationTaiId = niat.Id
-								inner join DisciplinaMatriz dm on dm.Test_Id = nit.TestId
-								where nit.[State] = 1
-									and niat.[State] = 1
-									and nit.TestId = @provaId
-								order by nit.Id desc
-
-								select
-									tcg.TypeCurriculumGradeId TipoCurriculoGradeId,
-									tcg.[Percentage] Porcentagem
-								from TestTaiCurriculumGrade tcg 
-								where tcg.[State] = 1
-									and tcg.Test_Id = @provaId";
+										select tcg.EvaluationMatrix_Id as MatrizId, 
+											tcg.TypeCurriculumGradeId TipoCurriculoGradeId
+										from TestTaiCurriculumGrade tcg 
+										where tcg.[State] = 1
+										and tcg.Test_Id = @provaId";
 
                 var dados = await conn.QueryMultipleAsync(query, new { provaId });
 
-                var amostraProvaTai = await dados.ReadSingleOrDefaultAsync<AmostraProvaTaiDto>();
-                var configItens = (await dados.ReadAsync<ConfigAnoItensProvaTaiDto>()).ToList();
+                var amostrasProvaTai = await dados.ReadAsync<AmostraProvaTaiDto>();
+                var configItens = await dados.ReadAsync<ConfigAnoItensProvaTaiDto>();
 
-                if (configItens.Any())
-                    amostraProvaTai.ListaConfigItens = configItens.ToList();
+                foreach (var amostra in amostrasProvaTai)
+	                amostra.ListaConfigItens.AddRange(configItens);
 
-                return amostraProvaTai;
+                return amostrasProvaTai;
             }
             finally
             {

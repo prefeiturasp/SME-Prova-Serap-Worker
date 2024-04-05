@@ -2,7 +2,6 @@
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Data;
-using System.Data.SqlClient;
 
 namespace SME.SERAp.Prova.Dados
 {

@@ -19,7 +19,6 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
-
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
 

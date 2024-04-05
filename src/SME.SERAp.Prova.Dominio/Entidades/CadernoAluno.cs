@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SME.SERAp.Prova.Dominio
+﻿namespace SME.SERAp.Prova.Dominio
 {
     public class CadernoAluno : EntidadeBase
     {
@@ -8,7 +6,7 @@ namespace SME.SERAp.Prova.Dominio
         public long ProvaId { get; set; }
         public string Caderno { get; set; }
 
-        public CadernoAluno(long alunoId, long provaId, string caderno)
+        public CadernoAluno(long alunoId, long provaId, string caderno) : this()
         {
             AlunoId = alunoId;
             ProvaId = provaId;

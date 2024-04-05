@@ -5,7 +5,6 @@ using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,9 +27,7 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var mensagem = new MensagemRabbit(request.Mensagem, Guid.NewGuid());
-
-                var mensagemJson = JsonSerializer.Serialize(mensagem);
-                var body = Encoding.UTF8.GetBytes(mensagemJson);
+                var body = Encoding.UTF8.GetBytes(mensagem.ConverterObjectParaJson());
 
                 var props = model.CreateBasicProperties();
                 props.Persistent = true;

@@ -6,7 +6,10 @@ namespace SME.SERAp.Prova.Infra
         public long ItemId { get; set; }
         public string Enunciado { get; set; }
         public string ItemCodigo { get; set; }
+        public long MatrizId { get; set; }
         public long TipoCurriculoGradeId { get; set; }
+        public long EixoId { get; set; }
+        public string EixoNome { get; set; }
         public long HabilidadeId { get; set; }
         public string HabilidadeNome { get; set; }
         public string HabilidadeCodigo { get; set; }
@@ -20,6 +23,5 @@ namespace SME.SERAp.Prova.Infra
         public int QuantidadeAlternativas { get; set; }
         public int TipoItem { get; set; }
         public string TextoBase { get; set; }
-
     }
 }

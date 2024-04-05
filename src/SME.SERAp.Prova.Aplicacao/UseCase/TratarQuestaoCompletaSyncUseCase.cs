@@ -1,31 +1,28 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Infra;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class TratarQuestaoCompletaSyncUseCase : ITratarQuestaoCompletaSyncUseCase
+    public class TratarQuestaoCompletaSyncUseCase : AbstractUseCase, ITratarQuestaoCompletaSyncUseCase
     {
-
-        private readonly IRepositorioQuestao repositorioQuestao;
-        private readonly IMediator mediator;
-
-        public TratarQuestaoCompletaSyncUseCase(IRepositorioQuestao repositorioQuestao, IMediator mediator)
+        const int DIAS_ANTERIORES = -3;
+        public TratarQuestaoCompletaSyncUseCase(IMediator mediator) : base(mediator)
         {
-            this.repositorioQuestao = repositorioQuestao;
-            this.mediator = mediator;
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var questoesAtualizadas = await repositorioQuestao.ObterQuestoesAtualizadas();
-            if (questoesAtualizadas != null && questoesAtualizadas.Any())
+            var dataBase = DateTime.Now.AddDays(DIAS_ANTERIORES);
+            var provasAtualizadas = await mediator.Send(new ObterProvasPorUltimaAtualizacaoQuery(dataBase));
+
+            if (provasAtualizadas != null && provasAtualizadas.Any())
             {
-                foreach(var questaoAtualizada in questoesAtualizadas)
+                foreach (var provaAtualizada in provasAtualizadas)
                 {
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaTratar, questaoAtualizada));
+                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.QuestaoCompletaProva, provaAtualizada));
                 }
             }
 

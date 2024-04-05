@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -28,13 +27,10 @@ namespace SME.SERAp.Prova.Aplicacao.Commands.FilaWorker
             try
             {
                 var mensagem = new MensagemRabbit(request.Mensagem, Guid.NewGuid());
-
-                var mensagemJson = JsonSerializer.Serialize(mensagem);
-                var body = Encoding.UTF8.GetBytes(mensagemJson);
-
+                var body = Encoding.UTF8.GetBytes(mensagem.ConverterObjectParaJson());
                 var props = model.CreateBasicProperties();
-                props.Persistent = true;
                 
+                props.Persistent = true;
                 model.BasicPublish(ExchangeRabbit.SerapEstudante, request.NomeRota, props, body);
 
                 return Task.FromResult(true);

@@ -10,7 +10,6 @@ namespace SME.SERAp.Prova.Aplicacao
             Id = id;
         }
 
-        public long Id { get; set; }
-        public long ProvaSerapId { get; set; }
+        public long Id { get; }
     }
 }

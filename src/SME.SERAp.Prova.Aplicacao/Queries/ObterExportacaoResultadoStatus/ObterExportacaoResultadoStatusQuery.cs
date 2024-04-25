@@ -1,8 +1,5 @@
 ﻿using MediatR;
 using SME.SERAp.Prova.Dominio;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -14,7 +11,7 @@ namespace SME.SERAp.Prova.Aplicacao
             ProvaSerapId = provaSerapId;
         }
 
-        public long Id { get; set; }
-        public long ProvaSerapId { get; set; }
+        public long Id { get; }
+        public long ProvaSerapId { get; }
     }
 }

@@ -36,14 +36,13 @@ namespace SME.SERAp.Prova.Aplicacao
 
             try
             {
-                var turmaEolIds = new[] { filtro.TurmaEolId };
                 IEnumerable<ConsolidadoAlunoProvaDto> consolidadoAlunosProva;
                 if (filtro.AlunosComDeficiencia)
-                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaSerapId, turmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaDeficienciaQuery(filtro.ProvaSerapId, filtro.TurmasEolIds));
                 else if (filtro.AdesaoManual)
-                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaSerapId, turmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoManualQuery(filtro.ProvaSerapId, filtro.TurmasEolIds));
                 else
-                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaSerapId, turmaEolIds));
+                    consolidadoAlunosProva = await mediator.Send(new ObterAlunosResultadoProvaAdesaoTodosQuery(filtro.ProvaSerapId, filtro.TurmasEolIds));
 
                 if (consolidadoAlunosProva == null || !consolidadoAlunosProva.Any())
                 {
@@ -120,7 +119,6 @@ namespace SME.SERAp.Prova.Aplicacao
         private async Task ExtrairResultados(long processoId, long provaSerapId, string caminhoArquivo)
         {
             var existeItemProcesso = await mediator.Send(new ConsultarSeExisteItemProcessoPorIdQuery(processoId));
-            
             if (!existeItemProcesso)
             {
                 var extracao = new TratarProvaResultadoExtracaoDto { ExtracaoResultadoId = processoId, ProvaSerapId = provaSerapId, CaminhoArquivo = caminhoArquivo };

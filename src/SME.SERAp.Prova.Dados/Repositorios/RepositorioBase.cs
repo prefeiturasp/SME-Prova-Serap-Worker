@@ -60,7 +60,6 @@ namespace SME.SERAp.Prova.Dados
             {
                 return await conexao.GetAsync<T>(id: id);
             }
-
             finally
             {
                 conexao.Close();

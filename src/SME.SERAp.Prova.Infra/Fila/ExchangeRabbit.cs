@@ -8,5 +8,6 @@
         public static string SerapEstudanteAcompanhamento => "serap.estudante.acomp.workers";
         public static string Logs => "EnterpriseApplicationLog";
         public static int SerapDeadLetterTtl => 10 * 60 * 1000; /*10 Min * 60 Seg * 1000 milisegundos = 10 minutos em milisegundos*/
+        public static int SerapDeadLetterTtl_3 => 3 * 60 * 1000; /*10 Min * 60 Seg * 1000 milisegundos = 10 minutos em milisegundos*/
     }
 }

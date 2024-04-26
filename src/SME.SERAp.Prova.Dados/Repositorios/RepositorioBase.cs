@@ -27,7 +27,7 @@ namespace SME.SERAp.Prova.Dados
 
         public virtual async Task<IEnumerable<T>> ObterTudoAsync()
         {
-            var conexao = ObterConexaoLeitura();
+            using var conexao = ObterConexaoLeitura();
             try
             {
                 return await conexao.GetAllAsync<T>();
@@ -55,7 +55,7 @@ namespace SME.SERAp.Prova.Dados
 
         public virtual async Task<T> ObterPorIdAsync(long id)
         {
-            var conexao = ObterConexaoLeitura();
+            using var conexao = ObterConexaoLeitura();
             try
             {
                 return await conexao.GetAsync<T>(id: id);

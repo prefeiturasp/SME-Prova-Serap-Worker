@@ -6,6 +6,7 @@ using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -24,7 +25,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<long> Handle(ExportacaoResultadoAtualizarCommand request, CancellationToken cancellationToken)
         {
-            var chaveRedis = $"exportacao-{request.ExportacaoResultado.Id}-prova-{request.ExportacaoResultado.ProvaSerapId}-status";
+            var chaveRedis = string.Format(CacheChave.ExportacaoResultadoStatus, request.ExportacaoResultado.Id, request.ExportacaoResultado.ProvaSerapId);
             try
             {
                 var exportacao = await repositorioExportacaoResultado.ObterPorIdAsync(request.ExportacaoResultado.Id);

@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -10,6 +9,6 @@ namespace SME.SERAp.Prova.Aplicacao
             Id = id;
         }
 
-        public long Id { get; private set; }
+        public long Id { get; }
     }
 }

@@ -10,10 +10,12 @@ namespace SME.SERAp.Prova.Aplicacao
     public class ObterExportacaoResultadoPorIdQueryHandler : IRequestHandler<ObterExportacaoResultadoPorIdQuery, ExportacaoResultado>
     {
         private readonly IRepositorioExportacaoResultado repositorioExportacaoResultado;
+
         public ObterExportacaoResultadoPorIdQueryHandler(IRepositorioExportacaoResultado repositorioExportacaoResultado)
         {
             this.repositorioExportacaoResultado = repositorioExportacaoResultado ?? throw new ArgumentNullException(nameof(repositorioExportacaoResultado));
         }
+
         public async Task<ExportacaoResultado> Handle(ObterExportacaoResultadoPorIdQuery request, CancellationToken cancellationToken)
         {
             try
@@ -22,7 +24,7 @@ namespace SME.SERAp.Prova.Aplicacao
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Obter processo de exportação por id. Exportação Id:{request.Id}, ProvaSerapId:{request.ProvaSerapId}, Erro:{ex.Message}");
+                throw new ArgumentException($"Obter processo de exportação por id. Exportação Id:{request.Id}, Erro:{ex.Message}");
             }
         }
     }

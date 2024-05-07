@@ -7,7 +7,7 @@ namespace SME.SERAp.Prova.Aplicacao
         public InserirResultadoProvaConsolidadoCommandValidador()
         {
             RuleFor(x => x.ResultadoProvaConsolidado)
-                .NotNull().NotEmpty()
+                .NotNull()
                 .WithMessage("O Objeto ResultadoProvaConsolidado é obrigatório");
         }
     }

@@ -8,7 +8,8 @@ namespace SME.SERAp.Prova.Dominio
         {
         }
 
-        public ExportacaoResultadoItem(long exportacaoResultadoId, string dreCodigoEol, string ueCodigoEol, string turmaCodigoEol) : this()
+        public ExportacaoResultadoItem(long exportacaoResultadoId, string dreCodigoEol, string ueCodigoEol,
+            string turmaCodigoEol = null) : this()
         {
             ExportacaoResultadoId = exportacaoResultadoId;
             DreCodigoEol = dreCodigoEol;

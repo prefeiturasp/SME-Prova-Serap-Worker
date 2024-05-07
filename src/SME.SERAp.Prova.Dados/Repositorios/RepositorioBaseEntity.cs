@@ -22,7 +22,7 @@ namespace SME.SERAp.Prova.Dados
             var optionsBuilder = new DbContextOptionsBuilder<ContextoDbSerap>();
             optionsBuilder.UseNpgsql(connectionStrings.ApiSerap);
 
-            using ContextoDbSerap dbContext = new ContextoDbSerap(optionsBuilder.Options);
+            await using var dbContext = new ContextoDbSerap(optionsBuilder.Options);
 
             var uploader = new NpgsqlBulkUploader(dbContext);
 
@@ -34,7 +34,7 @@ namespace SME.SERAp.Prova.Dados
             var optionsBuilder = new DbContextOptionsBuilder<ContextoDbSerap>();
             optionsBuilder.UseNpgsql(connectionStrings.ApiSerap);
 
-            using ContextoDbSerap dbContext = new ContextoDbSerap(optionsBuilder.Options);
+            await using var dbContext = new ContextoDbSerap(optionsBuilder.Options);
 
             var uploader = new NpgsqlBulkUploader(dbContext);
 

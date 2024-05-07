@@ -42,22 +42,16 @@ namespace SME.SERAp.Prova.Aplicacao
                 var turmas = await mediator.Send(new ObterTurmasPorCodigoUeEProvaSerapQuery(filtro.UeEolId, filtro.ProvaSerapId));
                 if (turmas == null || !turmas.Any())
                     return false;
-                
-                var listaFiltroTurma = new List<ExportacaoResultadoFiltroTurmaDto>();
-                foreach (var turma in turmas)
-                {
-                    var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, filtro.DreEolId,
-                        filtro.UeEolId, turma.Codigo);
-                    exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
 
-                    listaFiltroTurma.Add(new ExportacaoResultadoFiltroTurmaDto(filtro.ProcessoId, filtro.ProvaSerapId,
-                        exportacaoResultadoItem.Id, filtro.DreEolId, turma.Codigo, filtro.CaminhoArquivo,
-                        filtro.AdesaoManual, filtro.AlunosComDeficiencia));
-                }
-                
-                foreach (var filtroTurma in listaFiltroTurma)
-                    await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, filtroTurma));
+                var exportacaoResultadoItem = new ExportacaoResultadoItem(exportacaoResultado.Id, filtro.DreEolId, filtro.UeEolId);
+                exportacaoResultadoItem.Id = await mediator.Send(new InserirExportacaoResultadoItemCommand(exportacaoResultadoItem));
 
+                var turmasEolIds = turmas.Select(c => c.Codigo).ToArray();
+                var exportacaoResultadoFiltroTurma = new ExportacaoResultadoFiltroTurmaDto(filtro.ProcessoId,
+                    filtro.ProvaSerapId, exportacaoResultadoItem.Id, turmasEolIds,
+                    filtro.CaminhoArquivo, filtro.AdesaoManual, filtro.AlunosComDeficiencia);
+                
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, exportacaoResultadoFiltroTurma));
                 return true;
             }
             catch (Exception ex)

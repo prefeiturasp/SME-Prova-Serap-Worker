@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
@@ -16,10 +17,11 @@ namespace SME.SERAp.Prova.IoC
 {
     public static class RegistraDependencias
     {
-        public static void Registrar(IServiceCollection services)
+        public static void Registrar(IServiceCollection services, IConfiguration configuration)
         {
             services.AdicionarMediatr();
             services.AdicionarValidadoresFluentValidation();
+            services.AdicionarElasticSearch(configuration);
             services.AddPolicies();
             RegistrarRepositorios(services);
             RegistrarServicos(services);

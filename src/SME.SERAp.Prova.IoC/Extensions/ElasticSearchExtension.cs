@@ -31,13 +31,12 @@ namespace SME.SERAp.Prova.IoC
                 nodes.AddRange(urls.Select(url => new Uri(url)));
             }
             else
-            {
                 nodes.Add(new Uri(elasticOptions.Urls));
-            }
 
             var connectionPool = new StaticConnectionPool(nodes);
-            var connectionStrings = new ConnectionSettings(connectionPool);
-            connectionStrings.DefaultIndex(elasticOptions.DefaultIndex);
+            var connectionStrings =
+                new ConnectionSettings(connectionPool).ServerCertificateValidationCallback(
+                    (sender, cert, chain, errors) => true);
 
             if (!string.IsNullOrEmpty(elasticOptions.Username) && !string.IsNullOrEmpty(elasticOptions.Password))
                 connectionStrings.BasicAuthentication(elasticOptions.Username, elasticOptions.Password);

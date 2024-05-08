@@ -20,5 +20,9 @@ namespace SME.SERAp.Prova.Infra
         public string SituacaoMatricula { get; set; }
         [Date(Name = "datasituacao", Format = "MMddyyyy")]
         public DateTime DataSituacao { get; set; }
+        [Number(Name = "codigomatricula")]
+        public long CodigoMatricula { get; set; }       
+        [Date(Name = "datamatricula", Format = "MMddyyyy")]
+        public DateTime DataMatricula { get; set; }        
     }
 }

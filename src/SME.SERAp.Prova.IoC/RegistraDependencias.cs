@@ -72,7 +72,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioTipoProvaDeficiencia, RepositorioTipoProvaDeficiencia>();
             services.AddScoped<IRepositorioAlunoDeficiencia, RepositorioAlunoDeficiencia>();
             services.AddScoped<IRepositorioQuestaoVideo, RepositorioQuestaoVideo>();
-            services.AddScoped<IRepositorioTurmaEol, RepositorioTurmaEol>();
             services.AddScoped<IRepositorioTurmaAlunoHistorico, RepositorioTurmaAlunoHistorico>();
             services.AddScoped<IRepositorioGrupoSerapCoreSso, RepositorioGrupoSerapCoreSso>();
             services.AddScoped<IRepositorioUsuarioSerapCoreSso, RepositorioUsuarioSerapCoreSso>();
@@ -111,6 +110,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoCicloTurma, RepositorioResultadoCicloTurma>();
             services.AddScoped<IRepositorioResultadoCicloDre, RepositorioResultadoCicloDre>();
             services.AddScoped<IRepositorioQuestaoAlunoTai, RepositorioQuestaoAlunoTai>();
+            services.AddScoped<IRepositorioElasticTurma, RepositorioElasticTurma>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)

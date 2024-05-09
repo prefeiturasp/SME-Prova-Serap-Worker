@@ -4,7 +4,6 @@ using Elastic.Apm.SqlClient;
 using Elastic.Apm.StackExchange.Redis;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +35,7 @@ namespace SME.SERAp.Prova.Worker
 
         public void ConfigureServices(IServiceCollection services)
         {
-            RegistraDependencias.Registrar(services);
+            RegistraDependencias.Registrar(services, configuration);
             ConfigEnvoiromentVariables(services);
             services.AddHostedService<WorkerRabbit>();
         }
@@ -87,7 +86,7 @@ namespace SME.SERAp.Prova.Worker
             services.AddSingleton(factory);
 
             var conexaoRabbit = factory.CreateConnection();
-            IModel channel = conexaoRabbit.CreateModel();
+            var channel = conexaoRabbit.CreateModel();
 
             services.AddSingleton(channel);
             services.AddSingleton(conexaoRabbit);
@@ -113,7 +112,8 @@ namespace SME.SERAp.Prova.Worker
             };
 
             var conexaoRabbitLog = factoryLog.CreateConnection();
-            IModel channelLog = conexaoRabbitLog.CreateModel();
+            var channelLog = conexaoRabbitLog.CreateModel();
+
             var fireBaseOptions = new FireBaseOptions();
             configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(fireBaseOptions);

@@ -4,6 +4,7 @@ using MediatR;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra.Exceptions;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -55,18 +56,15 @@ namespace SME.SERAp.Prova.Aplicacao
         
         private async Task IncluirPrimeiraQuestaoAlunoTai(long provaId, long alunoId, string caderno)
         {
-            var idsQuestoes = (await mediator.Send(new ObterIdsQuestoesPorProvaIdCadernoQuery(provaId, caderno))).Distinct();
+            var idsQuestoes = (await mediator.Send(new ObterIdsQuestoesPorProvaIdCadernoQuery(provaId, caderno))).Distinct().ToList();
             var sortear = new Random();
-
-            var minQuestao = unchecked((int)idsQuestoes.Min());
-            var maxQuestao = unchecked((int)idsQuestoes.Max());
-            var questaoIdSorteada = sortear.Next(minQuestao, maxQuestao);
+            var questaoIdSorteada = idsQuestoes[sortear.Next(idsQuestoes.Count)];
             
             var questaoAlunoTai = new QuestaoAlunoTai(questaoIdSorteada, alunoId, 0);
             var questaoAlunoTaiId = await mediator.Send(new QuestaoAlunoTaiIncluirCommand(questaoAlunoTai));
             
             if (questaoAlunoTaiId <= 0)
-                throw new Exception($"As questões TAI do aluno {alunoId} não foram inseridas.");            
+                throw new NegocioException($"As questões TAI do aluno {alunoId} não foram inseridas.");            
         }        
 
         private async Task RemoverQuestaoAmostraTaiAlunoCache(long alunoRa, long provaId)

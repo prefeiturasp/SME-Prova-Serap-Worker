@@ -17,43 +17,39 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var alunos = mensagemRabbit.ObterObjetoMensagem<List<AlunoParaSincronizacaoInstitucionalDto>>();
-            
             if (alunos == null || !alunos.Any())
                 throw new NegocioException("Não foi possível localizar os alunos para sincronizar os históricos.");
 
             var alunosCodigos = alunos.Select(c => c.AlunoCodigo).ToArray();
+            
             var turmasHistoricoEol = (await mediator.Send(new ObterTurmaAlunoHistoricoEolPorAlunosRaQuery(alunosCodigos))).ToList();
-
             if (!turmasHistoricoEol.Any())
                 return true;
 
             var codigosTrumas = turmasHistoricoEol.Select(c => c.CodigoTurma.ToString()).Distinct().ToArray();
             var turmas = (await mediator.Send(new ObterTurmaPorCodigosQuery(codigosTrumas))).ToList();
-
             var turmasHistoricoSerap = (await mediator.Send(new ObterTurmaAlunoHistoricoSerapPorAlunosRaQuery(alunosCodigos))).ToList();
 
             foreach (var turmaHistoricoEol in turmasHistoricoEol)
             {
                 var turma = turmas.FirstOrDefault(c => c.Codigo == turmaHistoricoEol.CodigoTurma.ToString());
-                
                 if (turma == null)
                     continue;
 
-                var aluno = alunos.FirstOrDefault(c => c.AlunoCodigo == turmaHistoricoEol.AlunoRa);
-                
+                var aluno = alunos.FirstOrDefault(c => c.AlunoCodigo == turmaHistoricoEol.CodigoAluno);
                 if (aluno == null)
                     continue;
 
                 var turmaHistoricoSerap = turmasHistoricoSerap.FirstOrDefault(c =>
-                    c.Matricula == turmaHistoricoEol.Matricula &&
-                    c.AlunoRa == turmaHistoricoEol.AlunoRa &&
+                    c.Matricula == turmaHistoricoEol.CodigoMatricula &&
+                    c.AlunoRa == turmaHistoricoEol.CodigoAluno &&
                     c.TurmaId == turma.Id &&
                     c.AnoLetivo == turmaHistoricoEol.AnoLetivo);
 
                 if (turmaHistoricoSerap == null)
                 {
                     await mediator.Send(new TurmaAlunoHistoricoIncluirCommand(new TurmaAlunoHistorico(
-                        turmaHistoricoEol.Matricula,
+                        turmaHistoricoEol.CodigoMatricula,
                         turma.Id,
                         turmaHistoricoEol.AnoLetivo, 
                         aluno.Id, 
@@ -65,7 +61,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 {
                     await mediator.Send(new TurmaAlunoHistoricoAlterarCommand(new TurmaAlunoHistorico(
                         turmaHistoricoSerap.Id, 
-                        turmaHistoricoEol.Matricula,
+                        turmaHistoricoEol.CodigoMatricula,
                         turma.Id, 
                         turmaHistoricoEol.AnoLetivo, 
                         aluno.Id, 

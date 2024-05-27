@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Dominio;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -11,19 +12,19 @@ namespace SME.SERAp.Prova.Aplicacao
     {
         private readonly IRepositorioExportacaoResultado repositorioExportacaoResultado;
         private readonly IRepositorioCache repositorioCache;
+
         public ObterExportacaoResultadoStatusQueryHandler(IRepositorioExportacaoResultado repositorioExportacaoResultado, IRepositorioCache repositorioCache)
         {
             this.repositorioExportacaoResultado = repositorioExportacaoResultado ?? throw new ArgumentNullException(nameof(repositorioExportacaoResultado));
             this.repositorioCache = repositorioCache ?? throw new ArgumentNullException(nameof(repositorioCache));
         }
+
         public async Task<ExportacaoResultado> Handle(ObterExportacaoResultadoStatusQuery request, CancellationToken cancellationToken)
         {
+            var chaveRedis = string.Format(CacheChave.ExportacaoResultadoStatus, request.Id, request.ProvaSerapId);
             try
             {
-                var exportacao = new ExportacaoResultado { Id = request.Id, ProvaSerapId = request.ProvaSerapId };
-                var chaveRedis = $"exportacao-{exportacao.Id}-prova-{exportacao.ProvaSerapId}-status";
-                exportacao.Status = (ExportacaoResultadoStatus)await repositorioCache.ObterRedisAsync(chaveRedis, async () => await repositorioExportacaoResultado.ObterStatusPorIdAsync(exportacao.Id));
-                return exportacao;
+                return await repositorioCache.ObterRedisAsync(chaveRedis, async () => await repositorioExportacaoResultado.ObterPorIdAsync(request.Id));
             }
             catch(Exception ex)
             {

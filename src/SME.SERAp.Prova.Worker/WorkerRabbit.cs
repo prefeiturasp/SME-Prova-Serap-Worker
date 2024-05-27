@@ -203,12 +203,12 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.AlunoProvaProficienciaPorProvaSync, new ComandoRabbit("Sincronização das proficiencia do aluno por prova", typeof(ITratarAlunoProvaProficienciaPorProvaIdSyncUseCase)));            
             comandos.Add(RotasRabbit.AlunoProvaProficienciaTratar, new ComandoRabbit("Realiza a atuaização das proficiencia do aluno na prova", typeof(ITratarAlunoProvaProficienciaUseCase)));
 
-            comandos.Add(RotasRabbit.ExtrairResultadosProva, new ComandoRabbit("Realizar a extração de uma prova", typeof(ITratarProvaResultadoExtracaoUseCase)));
-            comandos.Add(RotasRabbit.ExtrairResultadosProvaFiltro, new ComandoRabbit("Realizar a extração de uma prova por filtro", typeof(ITratarProvaResultadoExtracaoFiltroUseCase)));
-            comandos.Add(RotasRabbit.ExtrairResultadosProvaFiltroTurma, new ComandoRabbit("Realizar a extração de uma prova por turma", typeof(ITratarProvaResultadoExtracaoFiltroTurmaUseCase)));            
-            comandos.Add(RotasRabbit.ConsolidarProvaResultado, new ComandoRabbit("Inicia consolidação dos dados da prova para exportação", typeof(IConsolidarProvaResultadoUseCase)));
-            comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltro, new ComandoRabbit("Faz a consolidação dos dados da prova por filtro", typeof(IConsolidarProvaRespostaPorFiltroUseCase)));
-            comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, new ComandoRabbit("Faz a consolidação dos dados da prova por turma", typeof(IConsolidarProvaRespostaPorFiltroTurmaUseCase)));
+            comandos.Add(RotasRabbit.ExtrairResultadosProva, new ComandoRabbit("Realizar a extração de uma prova", typeof(ITratarProvaResultadoExtracaoUseCase), true, 20, ExchangeRabbit.SerapDeadLetterTtl_3));
+            comandos.Add(RotasRabbit.ExtrairResultadosProvaFiltro, new ComandoRabbit("Realizar a extração de uma prova por filtro", typeof(ITratarProvaResultadoExtracaoFiltroUseCase), true, 20, ExchangeRabbit.SerapDeadLetterTtl_3));
+            comandos.Add(RotasRabbit.ExtrairResultadosProvaFiltroTurma, new ComandoRabbit("Realizar a extração de uma prova por turma", typeof(ITratarProvaResultadoExtracaoFiltroTurmaUseCase), true, 20, ExchangeRabbit.SerapDeadLetterTtl_3));            
+            comandos.Add(RotasRabbit.ConsolidarProvaResultado, new ComandoRabbit("Inicia consolidação dos dados da prova para exportação", typeof(IConsolidarProvaResultadoUseCase), true, 20, ExchangeRabbit.SerapDeadLetterTtl_3));
+            comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltro, new ComandoRabbit("Faz a consolidação dos dados da prova por filtro", typeof(IConsolidarProvaRespostaPorFiltroUseCase), true, 20, ExchangeRabbit.SerapDeadLetterTtl_3));
+            comandos.Add(RotasRabbit.ConsolidarProvaResultadoFiltroTurma, new ComandoRabbit("Faz a consolidação dos dados da prova por turma", typeof(IConsolidarProvaRespostaPorFiltroTurmaUseCase), true, 20, ExchangeRabbit.SerapDeadLetterTtl_3));
             comandos.Add(RotasRabbit.TratarAdesaoProva, new ComandoRabbit("Faz a sincronização da adesão da prova do legado para o serap estudantes", typeof(ITratarAdesaoProvaUseCase)));
             comandos.Add(RotasRabbit.TratarAdesaoProvaAluno, new ComandoRabbit("Faz a sincronização da adesão do aluno na prova do legado para o serap estudantes", typeof(ITratarAdesaoProvaAlunoUseCase)));
 

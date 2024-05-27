@@ -51,20 +51,30 @@ namespace SME.SERAp.Prova.Dados
         public async Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo)
         {            
             var query = $@";with mtr_norm as (
-								select ROW_NUMBER() OVER(PARTITION BY amn.CodigoMatricula ORDER BY amn.DataSituacao DESC, amn.CodigoSituacaoMatricula) AS Linha,
-									amn.CodigoAluno,
-									amn.CodigoTurma,
-									amn.AnoLetivo,
-									amn.CodigoSituacaoMatricula,
-									amn.DataSituacao
-								from alunos_matriculas_norm amn
-								inner join turma_escola te on te.cd_turma_escola = amn.CodigoTurma
-								inner join serie_turma_grade stg on te.cd_turma_escola = stg.cd_turma_escola
-								inner join serie_ensino se on se.cd_serie_ensino = stg.cd_serie_ensino
-								where amn.CodigoTurma in ({string.Join(',', turmasCodigo)})
+								SELECT
+									ROW_NUMBER() OVER(PARTITION BY matrTurma.cd_matricula ORDER BY matrTurma.dt_situacao_aluno DESC, matrTurma.cd_situacao_aluno) AS Linha,
+									aluno.cd_aluno as CodigoAluno,
+									turesc.cd_turma_escola as CodigoTurma,
+									turesc.an_letivo as AnoLetivo,
+									matrTurma.cd_situacao_aluno as CodigoSituacaoMatricula,
+									matrTurma.dt_situacao_aluno as DataSituacao
+								FROM
+									v_matricula_cotic matricula
+								INNER JOIN v_aluno_cotic aluno ON
+									matricula.cd_aluno = aluno.cd_aluno
+								INNER JOIN matricula_turma_escola matrTurma ON
+									matricula.cd_matricula = matrTurma.cd_matricula
+								INNER JOIN turma_escola turesc ON
+									matrTurma.cd_turma_escola = turesc.cd_turma_escola
+								INNER JOIN escola e ON
+									turesc.cd_escola = e.cd_escola
+								INNER JOIN serie_turma_escola ste ON
+									ste.cd_turma_escola = turesc.cd_turma_escola
+								INNER JOIN serie_ensino se ON
+									se.cd_serie_ensino = ste.cd_serie_ensino							
+								WHERE turesc.cd_turma_escola in ({string.Join(',', turmasCodigo)})
 								  and se.cd_etapa_ensino not in (14, 18)
 							)
-
 							SELECT distinct
 								aluno.cd_aluno CodigoAluno,
 								aluno.nm_aluno as Nome,
@@ -94,7 +104,7 @@ namespace SME.SERAp.Prova.Dados
 							  and CodigoSituacaoMatricula in (1, 6, 10, 13, 5) -- Alunos que podem acessar o serap
 							order by aluno.nm_aluno";
 
-            using var conn = new SqlConnection(connectionStringOptions.Eol);
+            await using var conn = new SqlConnection(connectionStringOptions.Eol);
             return await conn.QueryAsync<AlunoEolDto>(query);
         }
 

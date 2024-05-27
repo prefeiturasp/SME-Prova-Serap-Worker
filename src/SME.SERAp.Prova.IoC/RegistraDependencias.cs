@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
@@ -16,10 +17,11 @@ namespace SME.SERAp.Prova.IoC
 {
     public static class RegistraDependencias
     {
-        public static void Registrar(IServiceCollection services)
+        public static void Registrar(IServiceCollection services, IConfiguration configuration)
         {
             services.AdicionarMediatr();
             services.AdicionarValidadoresFluentValidation();
+            services.AdicionarElasticSearch(configuration);
             services.AddPolicies();
             RegistrarRepositorios(services);
             RegistrarServicos(services);
@@ -70,7 +72,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioTipoProvaDeficiencia, RepositorioTipoProvaDeficiencia>();
             services.AddScoped<IRepositorioAlunoDeficiencia, RepositorioAlunoDeficiencia>();
             services.AddScoped<IRepositorioQuestaoVideo, RepositorioQuestaoVideo>();
-            services.AddScoped<IRepositorioTurmaEol, RepositorioTurmaEol>();
             services.AddScoped<IRepositorioTurmaAlunoHistorico, RepositorioTurmaAlunoHistorico>();
             services.AddScoped<IRepositorioGrupoSerapCoreSso, RepositorioGrupoSerapCoreSso>();
             services.AddScoped<IRepositorioUsuarioSerapCoreSso, RepositorioUsuarioSerapCoreSso>();
@@ -109,6 +110,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoCicloTurma, RepositorioResultadoCicloTurma>();
             services.AddScoped<IRepositorioResultadoCicloDre, RepositorioResultadoCicloDre>();
             services.AddScoped<IRepositorioQuestaoAlunoTai, RepositorioQuestaoAlunoTai>();
+            services.AddScoped<IRepositorioElasticTurma, RepositorioElasticTurma>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)

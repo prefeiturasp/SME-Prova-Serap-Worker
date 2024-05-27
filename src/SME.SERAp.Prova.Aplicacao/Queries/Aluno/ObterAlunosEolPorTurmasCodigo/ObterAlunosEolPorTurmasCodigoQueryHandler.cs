@@ -16,6 +16,7 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.repositorioAlunoEol = repositorioAlunoEol ?? throw new ArgumentNullException(nameof(repositorioAlunoEol));
         }
+
         public async Task<IEnumerable<AlunoEolDto>> Handle(ObterAlunosEolPorTurmasCodigoQuery request, CancellationToken cancellationToken)
         {
             return await repositorioAlunoEol.ObterAlunosPorTurmasCodigoAsync(request.TurmasCodigo);

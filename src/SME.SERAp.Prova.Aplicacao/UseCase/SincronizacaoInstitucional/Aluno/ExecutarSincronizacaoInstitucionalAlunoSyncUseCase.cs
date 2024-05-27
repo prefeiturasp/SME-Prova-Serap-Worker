@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SME.SERAp.Prova.Dominio.Enums;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -26,13 +25,11 @@ namespace SME.SERAp.Prova.Aplicacao
             try
             {
                 var turmas = mensagemRabbit.ObterObjetoMensagem<List<TurmaParaSincronizacaoInstitucionalDto>>();
-
                 if (turmas == null || !turmas.Any())
                     throw new NegocioException("Não foi possível localizar as Turmas para sincronizar os alunos.");
 
                 var turmasCodigos = turmas.Select(c => long.Parse(c.Codigo)).ToArray();
                 var todosAlunosTurmaEol = await mediator.Send(new ObterAlunosEolPorTurmasCodigoQuery(turmasCodigos));
-
                 if (todosAlunosTurmaEol == null || !todosAlunosTurmaEol.Any())
                     throw new NegocioException("Não foi possível localizar os alunos no Eol para a sincronização instituicional.");
 

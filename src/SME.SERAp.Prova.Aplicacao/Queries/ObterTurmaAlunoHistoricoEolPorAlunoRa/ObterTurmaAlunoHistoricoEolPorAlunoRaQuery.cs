@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterTurmaAlunoHistoricoEolPorAlunosRaQuery : IRequest<IEnumerable<TurmaEolDto>>
+    public class ObterTurmaAlunoHistoricoEolPorAlunosRaQuery : IRequest<IEnumerable<AlunoMatriculaTurmaDreDto>>
     {
         public ObterTurmaAlunoHistoricoEolPorAlunosRaQuery(long[] alunoRa)
         {

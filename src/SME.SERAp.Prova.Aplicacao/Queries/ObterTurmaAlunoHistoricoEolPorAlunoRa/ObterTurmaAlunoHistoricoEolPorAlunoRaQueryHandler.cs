@@ -1,24 +1,23 @@
 ﻿using MediatR;
-using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Infra;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SME.SERAp.Prova.Dados.Interfaces;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
-    public class ObterTurmaAlunoHistoricoEolPorAlunosRaQueryHandler : IRequestHandler<ObterTurmaAlunoHistoricoEolPorAlunosRaQuery, IEnumerable<TurmaEolDto>>
+    public class ObterTurmaAlunoHistoricoEolPorAlunosRaQueryHandler : IRequestHandler<ObterTurmaAlunoHistoricoEolPorAlunosRaQuery, IEnumerable<AlunoMatriculaTurmaDreDto>>
     {
+        private readonly IRepositorioElasticTurma repositorioElasticTurma;
 
-        private readonly IRepositorioTurmaEol repositorioTurmaEol;
-
-        public ObterTurmaAlunoHistoricoEolPorAlunosRaQueryHandler(IRepositorioTurmaEol repositorioTurmaEol)
+        public ObterTurmaAlunoHistoricoEolPorAlunosRaQueryHandler(IRepositorioElasticTurma repositorioElasticTurma)
         {
-            this.repositorioTurmaEol = repositorioTurmaEol ?? throw new ArgumentNullException(nameof(repositorioTurmaEol));
+            this.repositorioElasticTurma = repositorioElasticTurma ?? throw new ArgumentNullException(nameof(repositorioElasticTurma));
         }
 
-        public async Task<IEnumerable<TurmaEolDto>> Handle(ObterTurmaAlunoHistoricoEolPorAlunosRaQuery request, CancellationToken cancellationToken)
-            => await repositorioTurmaEol.ObterTurmasAlunoHistoricoPorAlunosRa(request.AlunoRa);
+        public async Task<IEnumerable<AlunoMatriculaTurmaDreDto>> Handle(ObterTurmaAlunoHistoricoEolPorAlunosRaQuery request, CancellationToken cancellationToken)
+            => await repositorioElasticTurma.ObterTurmasAlunoHistoricoPorAlunosRa(request.AlunoRa);
     }
 }

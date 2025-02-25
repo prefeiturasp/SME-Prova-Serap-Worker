@@ -39,6 +39,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.ApresentarResultadosPorItem).ToColumn("apresentar_resultados_por_item");
             Map(c => c.ExibirVideo).ToColumn("exibir_video");
             Map(c => c.ExibirAudio).ToColumn("exibir_audio");
+            Map(c => c.ExibirNoBoletim).ToColumn("exibir_no_boletim");
         }
     }
 }

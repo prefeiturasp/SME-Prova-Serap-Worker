@@ -40,6 +40,7 @@ namespace SME.SERAp.Prova.Infra
         public bool ApresentarResultadosPorItem { get; set; }
         public bool ExibirVideo { get; set; }
         public bool ExibirAudio { get; set; }
+        public bool ExibirNoBoletim { get; set; }
 
         public void AddAno(string ano)
         {

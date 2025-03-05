@@ -67,6 +67,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaAtual.ApresentarResultadosPorItem = provaParaTratar.ApresentarResultadosPorItem;
                 provaAtual.ExibirAudio = provaParaTratar.ExibirAudio;
                 provaAtual.ExibirVideo = provaParaTratar.ExibirVideo;
+                provaAtual.ExibirNoBoletim = provaParaTratar.ExibirNoBoletim;
                 
                 var verificaSePossuiRespostas = await mediator.Send(new VerificaProvaPossuiRespostasPorProvaIdQuery(provaAtual.Id));
 
@@ -125,7 +126,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
                 provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, 
                 ProvaFormatoTaiItem.Todos, provaLegado.PermiteAvancarSemResponder, provaLegado.PermiteVoltarAoItemAnterior, provaLegado.ProvaComProficiencia, 
-                provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem, provaLegado.ExibirAudio, provaLegado.ExibirVideo);
+                provaLegado.ApresentarResultados, provaLegado.ApresentarResultadosPorItem, provaLegado.ExibirAudio, provaLegado.ExibirVideo, provaLegado.ExibirNoBoletim);
         }
 
         private static Modalidade ObterModalidade(ModalidadeSerap modalidade, ModeloProva modeloProva)

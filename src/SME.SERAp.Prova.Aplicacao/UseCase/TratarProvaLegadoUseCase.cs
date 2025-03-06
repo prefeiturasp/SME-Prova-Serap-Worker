@@ -76,6 +76,8 @@ namespace SME.SERAp.Prova.Aplicacao
                     provaAtual.InicioDownload = provaLegado.InicioDownload;
                     provaAtual.Inicio = provaLegado.Inicio;
                     provaAtual.Fim = provaLegado.Fim;
+                    provaAtual.DataCorrecaoInicio = provaLegado.DataCorrecaoInicio;
+                    provaAtual.DataCorrecaoFim = provaLegado.DataCorrecaoFim;
                     provaAtual.QtdItensSincronizacaoRespostas = provaLegado.QtdItensSincronizacaoRespostas;
 
                     await mediator.Send(new ProvaAtualizarCommand(provaAtual));
@@ -121,7 +123,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private static Dominio.Prova ObterProvaTratar(ProvaLegadoDetalhesIdDto provaLegado, Modalidade modalidadeSerap, long tipoProvaSerap)
         {
-            return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim,
+            return new Dominio.Prova(0, provaLegado.Descricao, provaLegado.InicioDownload, provaLegado.Inicio, provaLegado.Fim, provaLegado.DataCorrecaoInicio, provaLegado.DataCorrecaoFim,
                 provaLegado.TotalItens, provaLegado.Id, provaLegado.TempoExecucao, provaLegado.Senha, provaLegado.PossuiBIB,
                 provaLegado.TotalCadernos, modalidadeSerap, provaLegado.DisciplinaId, provaLegado.Disciplina, provaLegado.OcultarProva, provaLegado.AderirTodos,
                 provaLegado.Multidisciplinar, (int)tipoProvaSerap, provaLegado.FormatoTai, provaLegado.QtdItensSincronizacaoRespostas, provaLegado.UltimaAtualizacao, 

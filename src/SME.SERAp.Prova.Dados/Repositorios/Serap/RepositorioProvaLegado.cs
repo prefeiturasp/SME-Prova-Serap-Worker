@@ -57,6 +57,8 @@ namespace SME.SERAp.Prova.Dados
 										t.DownloadStartDate as InicioDownload,
 										t.ApplicationStartDate as Inicio,
 										t.ApplicationEndDate as Fim,
+                                        t.CorrectionStartDate as DataCorrecaoInicio,
+		                                t.CorrectionEndDate as DataCorrecaoFim,
 										case 
 	            							when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
 										end TotalItens,
@@ -160,6 +162,8 @@ namespace SME.SERAp.Prova.Dados
                         t.DownloadStartDate as InicioDownload,
 	                    t.ApplicationStartDate as Inicio,
 	                    t.ApplicationEndDate as Fim,
+                        t.CorrectionStartDate as DataCorrecaoInicio,
+		                t.CorrectionEndDate as DataCorrecaoFim,
 	                    case 
 	            	        when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
 	                    end TotalItens,

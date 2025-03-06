@@ -18,6 +18,8 @@ namespace SME.SERAp.Prova.Infra
         public DateTime? InicioDownload { get; set; }
         public DateTime Inicio { get; set; }
         public DateTime Fim { get; set; }
+        public DateTime DataCorrecaoInicio { get; set; }
+        public DateTime DataCorrecaoFim { get; set; }
         public DateTime UltimaAtualizacao { get; set; }
         public int TotalItens { get; set; }
         public int TempoExecucao { get; set; }

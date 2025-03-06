@@ -57,6 +57,8 @@ namespace SME.SERAp.Prova.Dados
 										t.DownloadStartDate as InicioDownload,
 										t.ApplicationStartDate as Inicio,
 										t.ApplicationEndDate as Fim,
+                                        t.CorrectionStartDate as DataCorrecaoInicio,
+		                                t.CorrectionEndDate as DataCorrecaoFim,
 										case 
 	            							when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
 										end TotalItens,
@@ -74,7 +76,8 @@ namespace SME.SERAp.Prova.Dados
 										  case 
 	            							when tt.tcp_id = 61 then 'S' else  CAST(tt.tcp_ordem as  VARCHAR)
 										end Ano,	           
-										case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva
+										case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
+                                        case when t.ShowInReport is null then 0 else t.ShowInReport end ExibirNoBoletim
 									FROM
 										Test t 
 										INNER JOIN TestCurriculumGrade tcg ON
@@ -153,65 +156,67 @@ namespace SME.SERAp.Prova.Dados
             {
                 var query = @"
            
-				SELECT DISTINCT  
-	            t.Id,
-	            t.Description as descricao,
-                t.DownloadStartDate as InicioDownload,
-	            t.ApplicationStartDate as Inicio,
-	            t.ApplicationEndDate as Fim,
-	            case 
-	            	when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
-	            end TotalItens,
-	            t.NumberBlock as TotalCadernos,
-	            t.UpdateDate as UltimaAtualizacao,
-                ttime.Segundos AS TempoExecucao,
-                t.Password as Senha,
-                d.id as DisciplinaId,
-                d.Description as Disciplina,
-                t.Bib as PossuiBIB,
-	            tne.tne_id as Modalidade,
-	            tne.tne_nome as ModalidadeNome,
-                mt.Id ModeloProva,	             	           
-                case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
-				convert(bit, t.AllAdhered) as AderirTodos,
-                convert(bit, t.Multidiscipline) as Multidisciplinar,
-                t.TestType_Id as TipoProva,
-                case when t.TestTai  is null then 0 else t.TestTai end FormatoTai,
-                t.NumberSynchronizedResponseItems as  QtdItensSincronizacaoRespostas,
-				nit.AdvanceWithoutAnswering as PermiteAvancarSemResponder, 
-				nit.BackToPreviousItem as  PermiteVoltarAoItemAnterior,
-                t.ProvaComProficiencia,
-                t.ApresentarResultados,
-                t.ApresentarResultadosPorItem,
-                t.showVideoFiles as ExibirVideo, 
-                t.ShowAudioFiles as ExibirAudio
-            FROM
-	            Test t 
-	            INNER JOIN TestCurriculumGrade tcg ON
-	            t.Id = tcg.Test_Id	
-            INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
-	            tcg.TypeCurriculumGradeId = tt.tcp_id
-            INNER JOIN TESTTIME ttime on
-                t.TestTime_Id = ttime.id
-            LEFT JOIN Discipline d ON
-	            t.Discipline_Id = d.Id 
-	        INNER JOIN TestType on
-	        	t.TestType_Id = TestType.id
-	       	INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
-	       		TestType.TypeLevelEducationId = tne.tne_id
-            INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
-            LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
-			  AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
-            LEFT JOIN NumberItemTestTai nit on nit.TestId = t.id
-			                                   AND nit.State = 1
+				        SELECT DISTINCT  
+	                    t.Id,
+	                    t.Description as descricao,
+                        t.DownloadStartDate as InicioDownload,
+	                    t.ApplicationStartDate as Inicio,
+	                    t.ApplicationEndDate as Fim,
+                        t.CorrectionStartDate as DataCorrecaoInicio,
+		                t.CorrectionEndDate as DataCorrecaoFim,
+	                    case 
+	            	        when t.NumberBlock > 0 then t.NumberItemsBlock else t.NumberItem
+	                    end TotalItens,
+	                    t.NumberBlock as TotalCadernos,
+	                    t.UpdateDate as UltimaAtualizacao,
+                        ttime.Segundos AS TempoExecucao,
+                        t.Password as Senha,
+                        d.id as DisciplinaId,
+                        d.Description as Disciplina,
+                        t.Bib as PossuiBIB,
+	                    tne.tne_id as Modalidade,
+	                    tne.tne_nome as ModalidadeNome,
+                        mt.Id ModeloProva,	             	           
+                        case when tp.TestHide  is null then 0 else tp.TestHide end OcultarProva,
+				        convert(bit, t.AllAdhered) as AderirTodos,
+                        convert(bit, t.Multidiscipline) as Multidisciplinar,
+                        t.TestType_Id as TipoProva,
+                        case when t.TestTai  is null then 0 else t.TestTai end FormatoTai,
+                        t.NumberSynchronizedResponseItems as  QtdItensSincronizacaoRespostas,
+				        nit.AdvanceWithoutAnswering as PermiteAvancarSemResponder, 
+				        nit.BackToPreviousItem as  PermiteVoltarAoItemAnterior,
+                        t.ProvaComProficiencia,
+                        t.ApresentarResultados,
+                        t.ApresentarResultadosPorItem,
+                        t.showVideoFiles as ExibirVideo, 
+                        t.ShowAudioFiles as ExibirAudio,
+                        case when t.ShowInReport is null then 0 else t.ShowInReport end ExibirNoBoletim
+                    FROM
+	                    Test t 
+	                    INNER JOIN TestCurriculumGrade tcg ON
+	                    t.Id = tcg.Test_Id	
+                    INNER JOIN SGP_ACA_TipoCurriculoPeriodo tt ON
+	                    tcg.TypeCurriculumGradeId = tt.tcp_id
+                    INNER JOIN TESTTIME ttime on
+                        t.TestTime_Id = ttime.id
+                    LEFT JOIN Discipline d ON
+	                    t.Discipline_Id = d.Id 
+	                INNER JOIN TestType on
+	        	        t.TestType_Id = TestType.id
+	       	        INNER JOIN SGP_ACA_TipoNivelEnsino tne ON 
+	       		        TestType.TypeLevelEducationId = tne.tne_id
+                    INNER JOIN modeltest mt on TestType.modeltest_id = mt.id
+                    LEFT JOIN TestPermission tp on tp.Test_Id = t.Id 
+			          AND tp.gru_id = 'BD6D9CE6-9456-E711-9541-782BCB3D218E'
+                    LEFT JOIN NumberItemTestTai nit on nit.TestId = t.id
+			                                           AND nit.State = 1
             
-            where
-                exists(select top 1 1 from TestTypeCourse ttc where ttc.TestType_Id = t.TestType_Id)
-				and exists(select top 1 1 from SGP_TUR_TurmaTipoCurriculoPeriodo ttcp where ttcp.crp_ordem = tt.tcp_ordem and tt.tme_id = ttcp.tme_id) 
-	            and t.id = @id";
+                    where
+                        exists(select top 1 1 from TestTypeCourse ttc where ttc.TestType_Id = t.TestType_Id)
+				        and exists(select top 1 1 from SGP_TUR_TurmaTipoCurriculoPeriodo ttcp where ttcp.crp_ordem = tt.tcp_ordem and tt.tme_id = ttcp.tme_id) 
+	                    and t.id = @id";
 
                 return await conn.QueryFirstOrDefaultAsync<ProvaLegadoDetalhesIdDto>(query, new { id });
-
             }
             finally
             {

@@ -8,16 +8,19 @@ namespace SME.SERAp.Prova.Dominio
         {
             Inclusao = DateTime.Now;
         }
-        public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB,
+
+        public Prova(long id, string descricao, DateTime? inicioDownload, DateTime inicio, DateTime fim, DateTime dataCorrecaoInicio, DateTime dataCorrecaoFim, int totalItens, long legadoId, int tempoExecucao, string senha, bool possuiBIB,
             int totalCadernos, Modalidade modalidade, long? disciplinaId, string disciplina, bool ocultarProva, bool aderirTodos, bool multidisciplinar, int tipoProvaId, bool formatoTai,
             int? qtdItensSincronizacaoRespostas, DateTime ultimaAtualizacao, ProvaFormatoTaiItem? provaFormatoTaiItem = Dominio.ProvaFormatoTaiItem.Todos, bool permiteAvancarSemResponderTai = false,
-            bool permiteVoltarItemAnteriorTai = false, bool provaComProficiencia = false, bool apresentarResultados = false, bool apresentarResultadosPorItem = false, bool exibirAudio = false, bool exibirVideo = false)
+            bool permiteVoltarItemAnteriorTai = false, bool provaComProficiencia = false, bool apresentarResultados = false, bool apresentarResultadosPorItem = false, bool exibirAudio = false, bool exibirVideo = false, bool exibirNoBoletim = false)
         {
             Id = id;
             Descricao = descricao;
             InicioDownload = inicioDownload;
             Inicio = inicio;
             Fim = fim;
+            DataCorrecaoInicio = dataCorrecaoInicio;
+            DataCorrecaoFim = dataCorrecaoFim;
             TotalItens = totalItens;
             LegadoId = legadoId;
             Inclusao = DateTime.Now;
@@ -43,12 +46,15 @@ namespace SME.SERAp.Prova.Dominio
             ApresentarResultadosPorItem = apresentarResultadosPorItem;
             ExibirAudio = exibirAudio;
             ExibirVideo = exibirVideo;
+            ExibirNoBoletim = exibirNoBoletim;
         }
 
         public string Descricao { get; set; }
         public DateTime? InicioDownload { get; set; }
         public DateTime Inicio { get; set; }
         public DateTime Fim { get; set; }
+        public DateTime DataCorrecaoInicio { get; set; }
+        public DateTime DataCorrecaoFim { get; set; }
         public DateTime Inclusao { get; set; }
         public int TotalItens { get; set; }
         public int TempoExecucao { get; set; }
@@ -74,5 +80,6 @@ namespace SME.SERAp.Prova.Dominio
         public bool ApresentarResultadosPorItem { get; set; }
         public bool ExibirVideo { get; set; }
         public bool ExibirAudio { get; set; }
+        public bool ExibirNoBoletim { get; set; }
     }
 }

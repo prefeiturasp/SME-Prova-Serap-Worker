@@ -14,9 +14,11 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.Descricao).ToColumn("descricao");
             Map(c => c.InicioDownload).ToColumn("inicio_download");
             Map(c => c.Inicio).ToColumn("inicio");
+            Map(c => c.DataCorrecaoInicio).ToColumn("data_correcao_inicio");
             Map(c => c.DisciplinaId).ToColumn("disciplina_id");
             Map(c => c.Disciplina).ToColumn("disciplina");
             Map(c => c.Fim).ToColumn("fim");
+            Map(c => c.DataCorrecaoFim).ToColumn("data_correcao_fim");
             Map(c => c.Inclusao).ToColumn("inclusao");
             Map(c => c.TotalItens).ToColumn("total_itens");
             Map(c => c.TempoExecucao).ToColumn("tempo_execucao");
@@ -39,6 +41,7 @@ namespace SME.SERAp.Prova.Dados
             Map(c => c.ApresentarResultadosPorItem).ToColumn("apresentar_resultados_por_item");
             Map(c => c.ExibirVideo).ToColumn("exibir_video");
             Map(c => c.ExibirAudio).ToColumn("exibir_audio");
+            Map(c => c.ExibirNoBoletim).ToColumn("exibir_no_boletim");
         }
     }
 }

@@ -6,5 +6,6 @@ namespace SME.SERAp.Prova.Dados
     public interface IRepositorioQuestaoAlunoTai : IRepositorioBase<QuestaoAlunoTai>
     {
         Task<bool> RemoverQuestaoAlunoTaiPorProvaIdAsync(long provaId);
+        Task<bool> ExisteQuestaoAlunoTaiPorAlunoId(long alunoId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Dapper;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 
@@ -23,6 +24,22 @@ namespace SME.SERAp.Prova.Dados
                 await conn.ExecuteAsync(query, new { provaId });
 
                 return true;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<bool> ExisteQuestaoAlunoTaiPorAlunoId(long alunoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = @"SELECT CASE WHEN EXISTS ( SELECT 1 FROM questao_aluno_tai WHERE aluno_id = @alunoId) THEN 1 ELSE 0 END";
+
+                return await conn.ExecuteScalarAsync<bool>(query, new { alunoId });                
             }
             finally
             {

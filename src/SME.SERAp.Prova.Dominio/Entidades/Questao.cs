@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using SME.SERAp.Prova.Dominio.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
@@ -49,7 +50,7 @@ namespace SME.SERAp.Prova.Dominio
                 htmlDoc.LoadHtml(Enunciado);
                 
                 arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
-                    .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)))
+                    .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.ObterImagemId()))
                     .Where(a => a.Caminho.Substring(0, 4).ToLower() == "http"));
             }
 
@@ -58,7 +59,7 @@ namespace SME.SERAp.Prova.Dominio
                 htmlDoc.LoadHtml(TextoBase);
 
                 arquivos.AddRange(htmlDoc.DocumentNode.Descendants("img")
-                    .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.GetAttributeValue("id", 0)))
+                    .Select(e => new Arquivo(e.GetAttributeValue("src", string.Empty), 0, e.ObterImagemId()))
                     .Where(a => a.Caminho.Substring(0, 4).ToLower() == "http"));
             }
 

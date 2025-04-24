@@ -25,20 +25,27 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             var provaAno = new Dictionary<long, string>
             {
-                {548, "9"},
+                //{548, "9"},
                 {549, "5"},
-                {550, "5"},
-                {551, "9"},
+                //{550, "5"},
+                //{551, "9"},
             };
 
             foreach(var prova in provaAno)
             {
                 var resultado = await repositorioAluno.ObterAlunoSemProvaTai(prova.Key, prova.Value);
 
+                var countRegistros = resultado.Count();
                 foreach (var alunoProva in resultado)
                 {
+                    if (alunoProva.AlunoId == 1864096)
+                        continue;
+
+
                     alunoProva.Caderno = "1";
                     alunoProva.ProvaId = prova.Key;
+
+
 
                     var nomeChave = string.Format(CacheChave.SincronizandoProvaTaiAluno, alunoProva.ProvaId, alunoProva.AlunoId);
                     try
@@ -77,6 +84,8 @@ namespace SME.SERAp.Prova.Aplicacao
                         await mediator.Send(new RemoverCacheCommand(nomeChave));
                         throw;
                     }
+
+                    countRegistros--;
 
                 }
 

@@ -1,7 +1,9 @@
 ﻿using Dapper;
+using Nest;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -76,7 +78,7 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select
+                /*var query = @"select
 	                            a.ra as alunoRa,
 	                            a.id as alunoId
                             from
@@ -93,7 +95,29 @@ namespace SME.SERAp.Prova.Dados
 	                            and not exists(
 		                            select 1 from questao q
 		                            inner join questao_aluno_tai qat on qat.questao_id = q.id and qat.aluno_id = a.id
-		                            where q.prova_id = pa.prova_id )";
+		                            where q.prova_id = pa.prova_id )";*/
+
+
+                var query = @"select
+                                a.ra as alunoRa,
+                                a.id as alunoId
+                            from
+                                aluno a
+                            inner join turma t on
+                                a.turma_id = t.id
+                                and t.ano_letivo = 2025
+                                and ano = @ano
+                            left join prova_aluno pa on
+                                pa.aluno_ra = a.ra
+                                and pa.prova_id = @provaId
+                            where
+                                a.situacao in (1)
+                                and not exists(
+                                    select 1 from questao q
+                                    inner join questao_aluno_tai qat on qat.questao_id = q.id and qat.aluno_id = a.id
+                                    where q.prova_id = @provaId )
+                            order by a.ra asc
+                            limit 15000 offset 30000";
 
                 return await conn.QueryAsync<AlunoCadernoProvaTaiTratarDto2>(query, new { provaId, ano});
             }

@@ -71,18 +71,31 @@ namespace SME.SERAp.Prova.Dados
         }
 
 
-        public async Task<IEnumerable<AlunoCadernoProvaTaiTratarDto2>> Correcao()
+        public async Task<IEnumerable<AlunoCadernoProvaTaiTratarDto2>> ObterAlunoSemProvaTai(long provaId, string ano)
         {
             using var conn = ObterConexaoLeitura();
             try
             {
-                var query = @"select c.prova_id as provaid, c.aluno_id as alunoid, c.caderno as caderno, a.aluno_ra as alunora  
-from caderno_aluno c 
-inner join aluno al on (al.id = c.aluno_id) 
-inner join prova_aluno a on (a.prova_id = c.prova_id and a.aluno_ra = al.ra)
-where c.prova_id in (548, 549, 550, 551) and a.status = 1 and a.criado_em >= '2025-04-24'";
+                var query = @"select
+	                            a.ra as alunoRa,
+	                            a.id as alunoId
+                            from
+	                            aluno a
+                            inner join turma t on
+	                            a.turma_id = t.id
+	                            and t.ano_letivo = 2025
+	                            and ano = @ano
+                            left join prova_aluno pa on
+	                            pa.aluno_ra = a.ra
+	                            and pa.prova_id = @provaId
+                            where
+	                            a.situacao in (1)
+	                            and not exists(
+		                            select 1 from questao q
+		                            inner join questao_aluno_tai qat on qat.questao_id = q.id and qat.aluno_id = a.id
+		                            where q.prova_id = pa.prova_id )";
 
-                return await conn.QueryAsync<AlunoCadernoProvaTaiTratarDto2>(query);
+                return await conn.QueryAsync<AlunoCadernoProvaTaiTratarDto2>(query, new { provaId, ano});
             }
             catch ( Exception e)
             {

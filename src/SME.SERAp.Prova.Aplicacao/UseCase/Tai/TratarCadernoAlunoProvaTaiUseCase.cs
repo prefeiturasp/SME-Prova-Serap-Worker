@@ -6,59 +6,95 @@ using SME.SERAp.Prova.Infra;
 using System.Threading.Tasks;
 using SME.SERAp.Prova.Infra.Exceptions;
 using SME.SERAp.Prova.Aplicacao.Queries.Questao.ExisteQuestaoAlunoTaiPorId;
+using SME.SERAp.Prova.Dados;
+using SME.SERAp.Prova.Dados.Mapeamentos;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarCadernoAlunoProvaTaiUseCase : AbstractUseCase, ITratarCadernoAlunoProvaTaiUseCase
     {
-        public TratarCadernoAlunoProvaTaiUseCase(IMediator mediator) : base(mediator)
+
+        private IRepositorioAluno repositorioAluno;
+        public TratarCadernoAlunoProvaTaiUseCase(IMediator mediator, IRepositorioAluno _repositorioAluno) : base(mediator)
         {
+            repositorioAluno = _repositorioAluno;
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
+            var resultado = await repositorioAluno.Correcao();
 
-            var nomeChave = string.Format(CacheChave.SincronizandoProvaTaiAluno, alunoProva.ProvaId, alunoProva.AlunoId);
-            try
+            foreach (var alunoProva in resultado)
             {
-                var sincronizandoProvaAlunoTai = (bool)await mediator.Send(new ObterCacheQuery(nomeChave));
-                if (sincronizandoProvaAlunoTai)
-                    return false;
 
-                await mediator.Send(new SalvarCacheCommand(nomeChave, true));
+                //var alunoProva = mensagemRabbit.ObterObjetoMensagem<AlunoCadernoProvaTaiTratarDto>();
 
-                var cadernoAluno = new CadernoAluno(
-                    alunoProva.AlunoId,
-                    alunoProva.ProvaId,
-                    alunoProva.Caderno);
+                //var alunoProva = new AlunoCadernoProvaTaiTratarDto(547, 1870156, 11739, 8366123, "Matemática", 9, 1  , "1")
 
-                var existeCadernoAluno = await mediator.Send(new ExisteCadernoAlunoPorProvaIdAlunoIdQuery(cadernoAluno.ProvaId, cadernoAluno.AlunoId));
-                var existeQuestaoAlunoTai = await mediator.Send(new ExisteQuestaoAlunoTaiPorAlunoIdQuery(cadernoAluno.AlunoId));
-
-                if (!existeCadernoAluno)
-                {
-                    await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
-                }
-
-                if (!existeQuestaoAlunoTai)
-                {
-                    await IncluirPrimeiraQuestaoAlunoTai(alunoProva.ProvaId, alunoProva.AlunoId, alunoProva.Caderno);
-                }
-
-                //-> Limpar o cache
-                await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
-                await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
-                await RemoverQuestaoProvaAlunoResumoCache(alunoProva.ProvaId, alunoProva.AlunoId);
-                await mediator.Send(new RemoverCacheCommand(nomeChave));
                 
-                return true;
+
+
+
+
+                //var alunoProva = new AlunoCadernoProvaTaiTratarDto(551, 1274378, 11744, 5584405, "Matemática", "9", "1");
+
+
+                var nomeChave = string.Format(CacheChave.SincronizandoProvaTaiAluno, alunoProva.ProvaId, alunoProva.AlunoId);
+                try
+                {
+                    /*var sincronizandoProvaAlunoTai = (bool)await mediator.Send(new ObterCacheQuery(nomeChave));
+                    if (sincronizandoProvaAlunoTai)
+                        return false;
+
+                    await mediator.Send(new SalvarCacheCommand(nomeChave, true));*/
+
+                    var cadernoAluno = new CadernoAluno(
+
+                        alunoProva.AlunoId,
+                        alunoProva.ProvaId,
+                        alunoProva.Caderno);
+
+                    var existeCadernoAluno = await mediator.Send(new ExisteCadernoAlunoPorProvaIdAlunoIdQuery(cadernoAluno.ProvaId, cadernoAluno.AlunoId));
+                    var existeQuestaoAlunoTai = await mediator.Send(new ExisteQuestaoAlunoTaiPorAlunoIdQuery(cadernoAluno.ProvaId, cadernoAluno.AlunoId));
+
+                    if (!existeCadernoAluno)
+                    {
+                        await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
+                    }
+
+                    if (!existeQuestaoAlunoTai)
+                    {
+                        await IncluirPrimeiraQuestaoAlunoTai(alunoProva.ProvaId, alunoProva.AlunoId, alunoProva.Caderno);
+
+                        //-> Limpar o cache
+                        await RemoverQuestaoAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
+                        await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
+                        await RemoverQuestaoProvaAlunoResumoCache(alunoProva.ProvaId, alunoProva.AlunoId);
+
+                        await RemoverCaches(alunoProva.ProvaId, alunoProva.AlunoRa);
+                        await RemoverCaches2(alunoProva.ProvaId, alunoProva.AlunoId);
+
+                        await mediator.Send(new RemoverCacheCommand(nomeChave));
+                    }
+
+
+
+                    
+
+                    
+                }
+                catch
+                {
+                    await mediator.Send(new RemoverCacheCommand(nomeChave));
+                    throw;
+                }
+
             }
-            catch
-            {
-                await mediator.Send(new RemoverCacheCommand(nomeChave));
-                throw;
-            }
+
+            return true;
+
+
+
         }
         
         private async Task IncluirPrimeiraQuestaoAlunoTai(long provaId, long alunoId, string caderno)
@@ -90,6 +126,17 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.QuestaoProvaAlunoResumo,
                 provaId, alunoId)));
+        }
+
+
+        private async Task RemoverCaches(long provaId, long alunoRA)
+        {
+            await mediator.Send(new RemoverCacheCommand($"al-prova-{provaId}-{alunoRA}"));            
+        }
+
+        private async Task RemoverCaches2(long provaId, long alunoId)
+        {
+            await mediator.Send(new RemoverCacheCommand($"al-q-administrado-tai-prova-{alunoId}-{provaId}"));
         }
     }
 }

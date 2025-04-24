@@ -70,6 +70,33 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+
+        public async Task<IEnumerable<AlunoCadernoProvaTaiTratarDto2>> Correcao()
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select c.prova_id as provaid, c.aluno_id as alunoid, c.caderno as caderno, a.aluno_ra as alunora  
+from caderno_aluno c 
+inner join aluno al on (al.id = c.aluno_id) 
+inner join prova_aluno a on (a.prova_id = c.prova_id and a.aluno_ra = al.ra)
+where c.prova_id in (548, 549, 550, 551) and a.status = 1 and a.criado_em >= '2025-04-24'";
+
+                return await conn.QueryAsync<AlunoCadernoProvaTaiTratarDto2>(query);
+            }
+            catch ( Exception e)
+            {
+
+                var obj = e;
+                return default;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<IEnumerable<Aluno>> ObterAlunoPorCodigosAsync(long[] codigos)
         {
             using var conn = ObterConexao();

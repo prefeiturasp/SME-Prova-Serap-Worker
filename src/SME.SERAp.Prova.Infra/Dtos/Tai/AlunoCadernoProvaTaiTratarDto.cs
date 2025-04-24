@@ -2,6 +2,11 @@
 {
     public class AlunoCadernoProvaTaiTratarDto : DtoBase
     {
+
+        public AlunoCadernoProvaTaiTratarDto()
+        {
+            
+        }
         public AlunoCadernoProvaTaiTratarDto(long provaId, long alunoId, long provaLegadoId, long alunoRa,
             string disciplina, string ano, string caderno)
         {
@@ -21,5 +26,20 @@
         public string Disciplina { get; }
         public string Ano { get; }
         public string Caderno { get; }
+    }
+
+
+    public class AlunoCadernoProvaTaiTratarDto2
+    {
+
+        public AlunoCadernoProvaTaiTratarDto2()
+        {
+
+        }
+
+        public long ProvaId { get; set; }
+        public long AlunoId { get; set; }
+        public string Caderno { get; set; }
+        public long AlunoRa { get; set; }
     }
 }

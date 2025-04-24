@@ -32,14 +32,14 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        public async Task<bool> ExisteQuestaoAlunoTaiPorAlunoId(long alunoId)
+        public async Task<bool> ExisteQuestaoAlunoTaiPorAlunoId(long provaId, long alunoId)
         {
             using var conn = ObterConexao();
             try
             {
-                const string query = @"SELECT CASE WHEN EXISTS ( SELECT 1 FROM questao_aluno_tai WHERE aluno_id = @alunoId) THEN 1 ELSE 0 END";
+                const string query = @"SELECT CASE WHEN EXISTS ( SELECT 1 FROM questao_aluno_tai qat join questao q on qat.questao_id = q.id WHERE aluno_id = @alunoId and q.prova_id = @provaId) THEN 1 ELSE 0 END";
 
-                return await conn.ExecuteScalarAsync<bool>(query, new { alunoId });                
+                return await conn.ExecuteScalarAsync<bool>(query, new { alunoId, provaId });                
             }
             finally
             {

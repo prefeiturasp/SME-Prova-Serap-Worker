@@ -19,7 +19,7 @@ namespace SME.SERAp.Prova.Aplicacao.Queries.Questao.ExisteQuestaoAlunoTaiPorId
 
         public async Task<bool> Handle(ExisteQuestaoAlunoTaiPorAlunoIdQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioQuestaoAlunoTai.ExisteQuestaoAlunoTaiPorAlunoId(request.AlunoId);
+            return await repositorioQuestaoAlunoTai.ExisteQuestaoAlunoTaiPorAlunoId(request.ProvaId, request.AlunoId);
         }
     }
 }

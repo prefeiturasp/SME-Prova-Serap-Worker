@@ -308,6 +308,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasProvaTratar, new ComandoRabbit("Propagar o cache da questão completa", typeof(IPropagarCacheQuestoesCompletasProvaTratarUseCase)));
             comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasLegadoProva, new ComandoRabbit("Propagar o cache das questões completas do legado", typeof(IPropagarCacheQuestoesCompletasLegadoProvaUseCase)));
             comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasLegadoProvaTratar, new ComandoRabbit("Propagar o cache da questão completa do legado", typeof(IPropagarCacheQuestoesCompletasLegadoProvaTratarUseCase)));
+
+
+            comandos.Add(RotasRabbit.BuscarAlunosComRespostasSemQuestoes, new ComandoRabbit("Buscar alunos com respostas sem questões", typeof(IBuscarAlunosComRespostasSemQuestoesUseCase)));
+            comandos.Add(RotasRabbit.TratarAlunosComRespostasSemQuestoes, new ComandoRabbit("Tratar alunos com respostas sem questões", typeof(ITratarAlunosComRespostasSemQuestoesUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

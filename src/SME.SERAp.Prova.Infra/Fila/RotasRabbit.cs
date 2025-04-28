@@ -144,6 +144,9 @@
         public const string PropagarCacheQuestoesCompletasProva = "serap.estudante.propagar.cache.questoes.completas.prova";
         public const string PropagarCacheQuestoesCompletasProvaTratar = "serap.estudante.propagar.cache.questoes.completas.prova.tratar";
         public const string PropagarCacheQuestoesCompletasLegadoProva = "serap.estudante.propagar.cache.questoes.completas.legado.prova";
-        public const string PropagarCacheQuestoesCompletasLegadoProvaTratar = "serap.estudante.propagar.cache.questoes.completas.legado.prova.tratar";        
+        public const string PropagarCacheQuestoesCompletasLegadoProvaTratar = "serap.estudante.propagar.cache.questoes.completas.legado.prova.tratar";   
+        
+        public const string BuscarAlunosComRespostasSemQuestoes = "serap.estudante.buscar.alunos.com.respostas.sem.questoes";        
+        public const string TratarAlunosComRespostasSemQuestoes = "serap.estudante.tratar.alunos.com.respostas.sem.questoes";        
     }
 }

@@ -133,5 +133,23 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<bool> VerificaProvaAlunoDuplicada(long provaId, long alunoRa)
+        {
+            using var conn = ObterConexaoLeitura();
+            try
+            {
+                var query = @"select case when count(*) > 1 then true else false end as provaDuplicada  
+                            from prova_aluno pa 
+                            where pa.aluno_ra = @alunoRa and pa.prova_id = @provaId";
+
+                return await conn.QueryFirstOrDefaultAsync<bool>(query, new { provaId, alunoRa});
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

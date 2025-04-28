@@ -5,6 +5,7 @@ using SME.SERAp.Prova.Aplicacao.Queries;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,28 +36,39 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
                 if (provaAlunoDuplicada)
                     return true;
 
-                var respostasComOrdem = await ObterQuestoesAlunoRespostaComOrdem(alunoRa, provaId);
-                if (respostasComOrdem?.Count() > 0)
+                var questoesAlunoRespostaComOrdem = await ObterQuestoesAlunoRespostaComOrdem(alunoRa, provaId);
+                if (questoesAlunoRespostaComOrdem?.Count() > 0)
                 {
+                    var todasQuestoesAlunoTai = new List<QuestaoAlunoTai>();
+                    var questaoAlunoRespostaSemQuestaoAlunoTai = questoesAlunoRespostaComOrdem.ToList();
+
                     var questoesAlunoTai = await ObterQuestoesAlunoTaiPorAlunoRaProvaId(alunoRa, provaId);
                     if (questoesAlunoTai?.Count() > 0)
                     {
-                        if (questoesAlunoTai.Count() > 1)
-                        {
-                            return true;
-                        }
+                        todasQuestoesAlunoTai.AddRange(questoesAlunoTai);
 
-                        var questaoAlunoTaiRestante = questoesAlunoTai.FirstOrDefault();
-                        respostasComOrdem = respostasComOrdem.Where(x => x.QuestaoId != questaoAlunoTaiRestante.QuestaoId).ToList();
-                        AtualizarQuestoesOrdem(respostasComOrdem);
-
-                        questaoAlunoTaiRestante.Ordem = respostasComOrdem.Max(x => x.Ordem) + 1;
-                        await AlterarQuestaoAlunoTai(questaoAlunoTaiRestante);
+                        var questoesAlunoTaiIds = questoesAlunoTai.Select(x => x.QuestaoId).ToList();
+                        questaoAlunoRespostaSemQuestaoAlunoTai = questoesAlunoRespostaComOrdem.Where(x => !questoesAlunoTaiIds.Contains(x.QuestaoId)).ToList();
                     }
 
-                    foreach (var questaoAlunoRespostaComOrdem in respostasComOrdem.OrderBy(x => x.Ordem))
+                    todasQuestoesAlunoTai.AddRange(CriarNovasQuestaoAlunoTai(questaoAlunoRespostaSemQuestaoAlunoTai, alunoId));
+
+                    AtualizarQuestoesAlunoTaiOrdem(todasQuestoesAlunoTai);
+
+                    var questoesAlunoTaiAtualizar = todasQuestoesAlunoTai.Where(x => x.Id > 0);
+                    var questoesAlunoTaiIncluir = todasQuestoesAlunoTai.Where(x => x.Id == 0);
+
+                    if (questoesAlunoTaiAtualizar?.Count() > 0)
                     {
-                        await IncluirQuestaoAlunoTai(questaoAlunoRespostaComOrdem, alunoId);
+                        foreach (var questaoAlunoTai in questoesAlunoTaiAtualizar)
+                        {
+                            await AlterarQuestaoAlunoTai(questaoAlunoTai);
+                        }
+                    }
+
+                    foreach (var questaoAlunoTai in questoesAlunoTaiIncluir)
+                    {
+                        await IncluirQuestaoAlunoTai(questaoAlunoTai);
                     }
 
                     await LimparCachesProvaAluno(alunoRa, alunoId, provaId);
@@ -68,6 +80,12 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             {
                 return false;
             }
+        }
+
+        private IEnumerable<QuestaoAlunoTai> CriarNovasQuestaoAlunoTai(List<QuestaoAlunoRespostaComOrdemDto> questaoAlunoRespostaSemQuestaoAlunoTai, long alunoId)
+        {
+            return questaoAlunoRespostaSemQuestaoAlunoTai.Select(questaoAlunoResposta => new QuestaoAlunoTai(questaoAlunoResposta.QuestaoId, alunoId,
+                0, questaoAlunoResposta.CriadoEm));
         }
 
         private async Task<IEnumerable<QuestaoAlunoTai>> ObterQuestoesAlunoTaiPorAlunoRaProvaId(long aluno, long prova)
@@ -85,11 +103,8 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             await mediator.Send(new AlterarQuestaoAlunoTaiCommand(questaoAlunoTaiRestante));
         }
 
-        private async Task IncluirQuestaoAlunoTai(QuestaoAlunoRespostaComOrdemDto questaoAlunoRespostaComOrdem, long alunoId)
+        private async Task IncluirQuestaoAlunoTai(QuestaoAlunoTai questaoAlunoTai)
         {
-            var questaoAlunoTai = new QuestaoAlunoTai(questaoAlunoRespostaComOrdem.QuestaoId, alunoId,
-                questaoAlunoRespostaComOrdem.Ordem, questaoAlunoRespostaComOrdem.CriadoEm);
-
             await mediator.Send(new IncluirQuestaoAlunoTaiCommand(questaoAlunoTai));
         }
 
@@ -99,13 +114,15 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             await mediator.Send(new RemoverCacheCommand($"al-q-administrado-tai-prova-{alunoId}-{provaId}"));
         }
 
-        private void AtualizarQuestoesOrdem(IEnumerable<QuestaoAlunoRespostaComOrdemDto> lista)
+        private void AtualizarQuestoesAlunoTaiOrdem(IEnumerable<QuestaoAlunoTai> lista)
         {
-            var ordenados = lista.OrderBy(x => x.Ordem).ToList();
+            var ordenados = lista.OrderBy(x => x.CriadoEm).ToList();
 
-            for (int i = 0; i < ordenados.Count; i++)
+            var ordem = 0;
+            foreach (var item in ordenados)
             {
-                ordenados[i].Ordem = i;
+                item.Ordem = ordem;
+                ordem++;
             }
         }
     }

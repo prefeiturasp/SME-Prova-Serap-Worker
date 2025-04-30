@@ -26,7 +26,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             try
             {
                 var inicio = new DateTime(2025, 4, 22, 0, 0, 0);
-                var fim = new DateTime(2025, 4, 29, 23, 59, 59);
+                var fim = new DateTime(2025, 4, 30, 23, 59, 59);
                 long? alunoRaValidacao = null;
 
                 var alunosProvas = await ObterAlunoComRespostasSemQuestoes(inicio, fim, alunoRaValidacao);

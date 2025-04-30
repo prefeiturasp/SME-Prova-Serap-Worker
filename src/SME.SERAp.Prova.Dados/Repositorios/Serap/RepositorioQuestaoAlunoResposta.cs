@@ -43,9 +43,11 @@ namespace SME.SERAp.Prova.Dados
                             inner join aluno a on a.ra = qar.aluno_ra
                             inner join questao q on q.id = qar.questao_id
                             inner join prova_aluno pa on pa.aluno_ra = a.ra and pa.prova_id = q.prova_id
+                            inner join prova p on p.id = q.prova_id
                             where qar.criado_em between @inicio and @fim
                             and not exists(select 1 from questao_aluno_tai qat where qat.questao_id = qar.questao_id and qat.aluno_id = a.id)
-                            and pa.status = 1";
+                            and pa.status = 1
+                            and p.formato_tai";
 
                 if(alunoRa > 0)
                 {

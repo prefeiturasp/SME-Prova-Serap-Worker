@@ -7,21 +7,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using SME.SERAp.Prova.Aplicacao.Queries;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Dados;
+using System.Text.Json;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarQuestoesLegadoSyncUseCase : ITratarQuestoesLegadoSyncUseCase
     {
         private readonly IMediator mediator;
+        private readonly IRepositorioQuestao repositorioQuestaoTemp;
 
-        public TratarQuestoesLegadoSyncUseCase(IMediator mediator)
+        public TratarQuestoesLegadoSyncUseCase(IMediator mediator, IRepositorioQuestao _repositorioQuestaoTemp)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.repositorioQuestaoTemp = _repositorioQuestaoTemp;
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
-            var provaLegadoId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
+            /*var provaLegadoId = long.Parse(mensagemRabbit.Mensagem.ToString() ?? string.Empty);
             
             var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(provaLegadoId));
             if (provaAtual == null)
@@ -32,7 +36,32 @@ namespace SME.SERAp.Prova.Aplicacao
             else
                 await TratarQuestoes(provaLegadoId, provaAtual.Id);
 
+            return true;*/
+
+
+            //var provaLegadoId = 99999999;
+            //var provaAtual = await mediator.Send(new ObterProvaDetalhesPorProvaLegadoIdQuery(provaLegadoId));
+
+
+            var objLS = new List<long>();
+
+            objLS.Add(552);
+            //objLS.Add(553);
+            //objLS.Add(554);
+            //objLS.Add(555);
+            //objLS.Add(556);
+            //objLS.Add(557);
+            //objLS.Add(558);
+            //objLS.Add(559);
+
+            foreach (var item in objLS)
+            {
+                await TratarQuestoesTEMP(9999999, item);
+            }
+
             return true;
+
+
         }
 
         private async Task TratarQuestoes(long provaLegadoId, long provaId)
@@ -70,6 +99,47 @@ namespace SME.SERAp.Prova.Aplicacao
                 if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
                     await TratarAlternativasQuestao(questaoSerap.QuestaoId, questaoId);
             }            
+        }
+
+
+        private async Task TratarQuestoesTEMP(long provaLegadoId, long provaId)
+        {
+
+
+            var questoesProva = await repositorioQuestaoTemp.ObterQuestoesComImagemNaoSincronizadasTEMP(provaId);
+            //var questoesSerap = await mediator.Send(new ObterQuestoesPorProvaIdQuery(999999));
+            foreach (var questao in questoesProva)
+            {
+                /*var questaoParaPersistir = new Questao(
+                    questaoSerap.TextoBase,
+                    questaoSerap.QuestaoId,
+                    questaoSerap.Enunciado,
+                    questaoSerap.Ordem,
+                    provaId,
+                    (QuestaoTipo)questaoSerap.TipoItem,
+                    questaoSerap.Caderno,
+                    questaoSerap.QuantidadeAlternativas
+                );
+
+                var questaoId = await mediator.Send(new QuestaoParaIncluirCommand(questaoParaPersistir));
+
+                if (questaoParaPersistir.Arquivos != null && questaoParaPersistir.Arquivos.Any())
+                {
+                    questaoParaPersistir.Arquivos = await mediator.Send(new ObterTamanhoArquivosQuery(questaoParaPersistir.Arquivos));
+
+                    foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
+                    {
+                        var arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
+                        await mediator.Send(new QuestaoArquivoPersistirCommand(questaoId, arquivoId));
+                    }
+                }*/
+
+                await TratarAudiosQuestao(questao.QuestaoLegadoId, questao.Id);
+               // await TratarVideosQuestao(questaoSerap.QuestaoId, questaoId);
+
+                /*if (questaoParaPersistir.Tipo == QuestaoTipo.MultiplaEscolha)
+                    await TratarAlternativasQuestao(questaoSerap.QuestaoId, questaoId);*/
+            }
         }
 
         private async Task TratarQuestoesTai(long provaLegadoId, long provaId)
@@ -199,10 +269,27 @@ namespace SME.SERAp.Prova.Aplicacao
                     if (arquivoId == 0)
                         arquivoId = await mediator.Send(new ArquivoPersistirCommand(audioParaPersistir));
                     
-                    var questaoAudioId = await mediator.Send(new ObterQuestaoAudioIdPorArquivoIdQuery(arquivoId));
+                    var questaoAudioId = await mediator.Send(new ObterQuestaoAudioIdPorArquivoIdQuery(questaoId, arquivoId));
+                    
                     if (questaoAudioId == 0)
-                        await mediator.Send(new QuestaoAudioPersistirCommand(questaoId, arquivoId));                       
+                    {
+                        await mediator.Send(new QuestaoAudioPersistirCommand(questaoId, arquivoId));
 
+                        var questaoCompleta = await mediator.Send(new MontarQuestaoCompletaPorIdQuery(questaoId));
+
+                        if (questaoCompleta == null || questaoCompleta.Id <= 0)
+                            continue;
+
+                        if (questaoCompleta.QuantidadeAlternativas != questaoCompleta.Alternativas.Count())
+                            throw new NegocioException($"Total de alternativas diferente do informado na questão {questaoId}");
+
+                        var json = JsonSerializer.Serialize(questaoCompleta, new JsonSerializerOptions
+                        { IgnoreNullValues = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+                        await mediator.Send(new QuestaoCompletaIncluirCommand(questaoId, questaoCompleta.QuestaoLegadoId, json, DateTime.Now));
+                        await mediator.Send(new RemoverQuestaoCacheCommand(questaoId, questaoCompleta.QuestaoLegadoId));
+
+                    }
                 }
             }
         }

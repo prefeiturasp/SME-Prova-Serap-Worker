@@ -23,7 +23,7 @@ namespace SME.SERAp.Prova.Aplicacao
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             var resultado = await repositorioAluno.Correcao();
-
+            var contador = resultado.Count();
             foreach (var alunoProva in resultado)
             {
 
@@ -42,6 +42,9 @@ namespace SME.SERAp.Prova.Aplicacao
                 var nomeChave = string.Format(CacheChave.SincronizandoProvaTaiAluno, alunoProva.ProvaId, alunoProva.AlunoId);
                 try
                 {
+
+                    if (alunoProva.AlunoRa == 934352 || alunoProva.AlunoId == 934352 || alunoProva.AlunoRa == 700021 || alunoProva.AlunoId == 700021 || alunoProva.AlunoRa == 171162 || alunoProva.AlunoId == 171162)
+                        continue;
                     /*var sincronizandoProvaAlunoTai = (bool)await mediator.Send(new ObterCacheQuery(nomeChave));
                     if (sincronizandoProvaAlunoTai)
                         return false;
@@ -71,23 +74,27 @@ namespace SME.SERAp.Prova.Aplicacao
                         await RemoverRespostaAmostraTaiAlunoCache(alunoProva.AlunoRa, alunoProva.ProvaId);
                         await RemoverQuestaoProvaAlunoResumoCache(alunoProva.ProvaId, alunoProva.AlunoId);
 
-                        await RemoverCaches(alunoProva.ProvaId, alunoProva.AlunoRa);
-                        await RemoverCaches2(alunoProva.ProvaId, alunoProva.AlunoId);
+                       
 
                         await mediator.Send(new RemoverCacheCommand(nomeChave));
                     }
 
+                    await RemoverCaches(alunoProva.ProvaId, alunoProva.AlunoRa);
+                    await RemoverCaches2(alunoProva.ProvaId, alunoProva.AlunoId);
 
 
-                    
 
-                    
+
+
+
                 }
                 catch
                 {
                     await mediator.Send(new RemoverCacheCommand(nomeChave));
-                    throw;
+                    continue;
                 }
+
+                contador--;
 
             }
 

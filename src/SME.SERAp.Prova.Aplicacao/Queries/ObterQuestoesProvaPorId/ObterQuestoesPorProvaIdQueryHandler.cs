@@ -21,6 +21,6 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public async Task<IEnumerable<QuestoesPorProvaIdDto>> Handle(ObterQuestoesPorProvaIdQuery request,
             CancellationToken cancellationToken)
-            => await repositorioProvaLegado.ObterQuestoesPorProvaId(request.ProvaId);
+            => await repositorioProvaLegado.ObterQuestoesPorProvaIdTEMP(request.ProvaId);
     }
 }

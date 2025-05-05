@@ -80,7 +80,66 @@ namespace SME.SERAp.Prova.Dados
 from caderno_aluno c 
 inner join aluno al on (al.id = c.aluno_id) 
 inner join prova_aluno a on (a.prova_id = c.prova_id and a.aluno_ra = al.ra)
-where c.prova_id in (548, 549, 550, 551) and a.status = 1 and a.criado_em >= '2025-04-24'";
+where c.prova_id in (548, 549, 550, 551) and a.status = 1 and a.criado_em >= '2025-04-23'
+
+
+and (al.ra = 5219029 
+or al.ra = 8192209 
+or al.ra = 6081513 
+or al.ra = 5655740 
+or al.ra = 5560801 
+or al.ra = 5665155 
+
+or al.ra = 6111668 
+or al.ra = 5604730 
+or al.ra = 8400610 
+or al.ra = 6215436 
+or al.ra = 7831951 
+or al.ra = 1330259 
+or al.ra = 5193247 
+or al.ra = 6278456 
+or al.ra = 5127989 
+or al.ra = 5564993 
+
+or al.ra = 5640411 
+or al.ra = 6228106 
+or al.ra = 6034116 
+or al.ra = 5602133 
+or al.ra = 5226914 
+or al.ra = 6144696 
+or al.ra = 5626142 
+or al.ra = 4764812
+
+
+
+
+
+
+or al.ra = 6233933 
+or al.ra = 5788737 
+or al.ra = 5964424 
+or al.ra = 5754917 
+or al.ra = 5189563
+or al.ra = 5127393
+or al.ra = 6497545
+
+
+
+
+
+
+
+
+)
+
+
+
+
+
+
+
+
+";
 
                 return await conn.QueryAsync<AlunoCadernoProvaTaiTratarDto2>(query);
             }

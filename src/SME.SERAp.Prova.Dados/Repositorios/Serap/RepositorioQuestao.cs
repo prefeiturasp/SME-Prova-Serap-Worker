@@ -172,6 +172,22 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
+        public async Task<IEnumerable<Questao>> ObterQuestoesComImagemNaoSincronizadasTEMP(long provaId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = @"select * from questao where prova_id = @provaId";
+
+                return await conn.QueryAsync<Questao>(query, new { provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
         public async Task<bool> RemoverPorProvaIdAsync(long provaId)
         {
             using var conn = ObterConexao();

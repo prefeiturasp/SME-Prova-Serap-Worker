@@ -13,6 +13,7 @@ namespace SME.SERAp.Prova.Dados
         Task<ProvaLegadoDetalhesIdDto> ObterProvaPorId(long id);
         Task<IEnumerable<long>> ObterAlternativasPorProvaIdEQuestaoId(long questaoId);
         Task<IEnumerable<QuestoesPorProvaIdDto>> ObterQuestoesPorProvaId(long provaId);
+        Task<IEnumerable<QuestoesPorProvaIdDto>> ObterQuestoesPorProvaIdTEMP(long provaId);
         Task<QuestoesPorProvaIdDto> ObterDetalheQuestoesPorProvaId(long provaLegadoId, long questaoLegadoId);
         Task<AlternativasProvaIdDto> ObterDetalheAlternativasPorProvaIdEQuestaoId(long questaoId,
             long alternativaId);

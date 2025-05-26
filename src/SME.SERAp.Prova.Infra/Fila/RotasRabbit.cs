@@ -67,7 +67,8 @@
 
         public const string TratarCadernoAlunoProvaTai = "serap.estudante.prova.legado.tratar.caderno.aluno.tai";
         public const string TratarOrdemQuestaoAlunoProvaTai = "serap.estudante.prova.tai.ordem.questao.aluno.tratar";
-        public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";        
+        public const string TratarProficienciaAlunoProvaTai = "serap.estudante.prova.tai.proficiencia.aluno.tratar";
+        public const string TratarCadernoAlunoProva = "serap.estudante.prova.legado.tratar.caderno.aluno.prova";
 
         public const string IncluirUsuario = "serap.estudantes.usuario.incluir";
         public const string AlterarUsuario = "serap.estudantes.usuario.alterar";

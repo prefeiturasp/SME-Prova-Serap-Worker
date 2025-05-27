@@ -199,7 +199,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     if (arquivoId == 0)
                         arquivoId = await mediator.Send(new ArquivoPersistirCommand(audioParaPersistir));
                     
-                    var questaoAudioId = await mediator.Send(new ObterQuestaoAudioIdPorArquivoIdQuery(arquivoId));
+                    var questaoAudioId = await mediator.Send(new ObterQuestaoAudioIdPorArquivoIdQuery(questaoId, arquivoId));
                     if (questaoAudioId == 0)
                         await mediator.Send(new QuestaoAudioPersistirCommand(questaoId, arquivoId));                       
 

@@ -5,12 +5,14 @@ namespace SME.SERAp.Prova.Aplicacao.Queries
 {
     public class ObterQuestaoAudioIdPorArquivoIdQuery : IRequest<long>
     {
-        public ObterQuestaoAudioIdPorArquivoIdQuery(long arquivoId)
+        public ObterQuestaoAudioIdPorArquivoIdQuery(long questaoId, long arquivoId)
         {
             ArquivoId = arquivoId;
+            QuestaoId = questaoId;
         }
 
         public long ArquivoId { get; }
+        public long QuestaoId { get; }
     }
 
     public class ObterQuestaoAudioIdPorArquivoIdQueryValidator : AbstractValidator<ObterQuestaoAudioIdPorArquivoIdQuery>

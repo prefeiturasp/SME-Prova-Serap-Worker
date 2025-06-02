@@ -5,6 +5,7 @@ using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using System.Threading.Tasks;
 using SME.SERAp.Prova.Infra.Exceptions;
+using SME.SERAp.Prova.Aplicacao.Queries.Questao.ExisteQuestaoAlunoTaiPorId;
 
 namespace SME.SERAp.Prova.Aplicacao
 {
@@ -32,10 +33,16 @@ namespace SME.SERAp.Prova.Aplicacao
                     alunoProva.ProvaId,
                     alunoProva.Caderno);
 
-                var existe = await mediator.Send(new ExisteCadernoAlunoPorProvaIdAlunoIdQuery(cadernoAluno.ProvaId, cadernoAluno.AlunoId));
-                if (!existe)
+                var existeCadernoAluno = await mediator.Send(new ExisteCadernoAlunoPorProvaIdAlunoIdQuery(cadernoAluno.ProvaId, cadernoAluno.AlunoId));
+                var existeQuestaoAlunoTai = await mediator.Send(new ExisteQuestaoAlunoTaiPorAlunoIdQuery(cadernoAluno.AlunoId));
+
+                if (!existeCadernoAluno)
                 {
                     await mediator.Send(new CadernoAlunoIncluirCommand(cadernoAluno));
+                }
+
+                if (!existeQuestaoAlunoTai)
+                {
                     await IncluirPrimeiraQuestaoAlunoTai(alunoProva.ProvaId, alunoProva.AlunoId, alunoProva.Caderno);
                 }
 

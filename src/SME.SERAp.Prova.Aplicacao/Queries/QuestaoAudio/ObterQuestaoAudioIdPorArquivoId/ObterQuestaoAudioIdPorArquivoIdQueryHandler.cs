@@ -17,7 +17,7 @@ namespace SME.SERAp.Prova.Aplicacao.Queries
 
         public async Task<long> Handle(ObterQuestaoAudioIdPorArquivoIdQuery request, CancellationToken cancellationToken)
         {
-            return await repositorioQuestaoAudio.ObterQuestaoAudioIdPorArquivoId(request.ArquivoId);
+            return await repositorioQuestaoAudio.ObterQuestaoAudioIdPorArquivoId(request.QuestaoId, request.ArquivoId);
         }
     }
 }

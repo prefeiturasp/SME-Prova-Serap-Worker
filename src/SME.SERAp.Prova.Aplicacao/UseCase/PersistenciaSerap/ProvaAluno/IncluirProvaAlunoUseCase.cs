@@ -15,14 +15,21 @@ namespace SME.SERAp.Prova.Aplicacao
         {
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
-        
+
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {
             try
             {
                 var provaAluno = mensagemRabbit.ObterObjetoMensagem<ProvaAluno>();
-                provaAluno.Id = await mediator.Send(new IncluirProvaAlunoCommand(provaAluno));
-                await mediator.Send(new SalvarCacheCommand(string.Format(CacheChave.AlunoProva, provaAluno.ProvaId, provaAluno.AlunoRA), provaAluno));
+
+                var provaAlunoBanco = await mediator.Send(new ObterProvaAlunoPorProvaIdRaQuery(provaAluno.ProvaId, provaAluno.AlunoRA));
+
+                if (provaAlunoBanco == null)
+                {
+                    provaAluno.Id = await mediator.Send(new IncluirProvaAlunoCommand(provaAluno));
+
+                    await mediator.Send(new SalvarCacheCommand(string.Format(CacheChave.AlunoProva, provaAluno.ProvaId, provaAluno.AlunoRA), provaAluno));
+                }
 
                 return true;
             }

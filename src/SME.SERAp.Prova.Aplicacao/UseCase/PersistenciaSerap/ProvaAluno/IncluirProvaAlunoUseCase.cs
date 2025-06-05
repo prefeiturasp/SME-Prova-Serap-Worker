@@ -30,6 +30,16 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     await mediator.Send(new SalvarCacheCommand(string.Format(CacheChave.AlunoProva, provaAluno.ProvaId, provaAluno.AlunoRA), provaAluno));
                 }
+                else
+                {
+                    provaAlunoBanco.Status = provaAluno.Status;
+                    provaAlunoBanco.Frequencia = provaAluno.Frequencia;
+                    provaAlunoBanco.DispositivoId = provaAluno.DispositivoId;
+                    provaAlunoBanco.TipoDispositivo = provaAluno.TipoDispositivo;
+                    provaAlunoBanco.FinalizadoEm = provaAluno.FinalizadoEm;
+                    await mediator.Send(new AtualizarProvaAlunoCommand(provaAlunoBanco));
+                    await mediator.Send(new SalvarCacheCommand(string.Format(CacheChave.AlunoProva, provaAluno.ProvaId, provaAluno.AlunoRA), provaAlunoBanco));
+                }
 
                 return true;
             }

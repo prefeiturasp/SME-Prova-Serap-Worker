@@ -142,7 +142,7 @@ namespace SME.SERAp.Prova.Aplicacao
                     //-> Valida se existe alguma informação a ser alterada.
                     if (alunoAntigo.Nome == alunoQuePodeAlterar.Nome &&
                         alunoAntigo.Situacao == alunoQuePodeAlterar.SituacaoAluno &&
-                        alunoAntigo.DataNascimento.ToUniversalTime().Date == alunoQuePodeAlterar.DataNascimento.Date &&
+                        alunoAntigo.DataNascimento.Date == alunoQuePodeAlterar.DataNascimento.Date &&
                         alunoAntigo.NomeSocial?.ToString() == alunoQuePodeAlterar.NomeSocial?.ToString() &&
                         alunoAntigo.Sexo == alunoQuePodeAlterar.Sexo &&
                         turmaAntigaDoAluno.Codigo == alunoQuePodeAlterar.TurmaCodigo.ToString())

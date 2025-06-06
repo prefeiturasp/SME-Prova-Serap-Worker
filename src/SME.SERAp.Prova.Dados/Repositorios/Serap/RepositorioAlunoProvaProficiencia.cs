@@ -134,7 +134,7 @@ namespace SME.SERAp.Prova.Dados
                                                         where app.prova_id = p.id
                                                         and app.aluno_id = a.id
                                                         and app.ultima_atualizacao = p.ultima_atualizacao)
-		
+                                        and p.fim >= CURRENT_DATE		
                                         union all 
  
                                         select p.id as provaid,
@@ -162,7 +162,8 @@ namespace SME.SERAp.Prova.Dados
 				                                        from aluno_prova_proficiencia app
 				                                        where app.prova_id = p.id
 				                                        and app.aluno_id = a.id
-				                                        and app.ultima_atualizacao = p.ultima_atualizacao)";
+				                                        and app.ultima_atualizacao = p.ultima_atualizacao)
+                                        and p.fim >= CURRENT_DATE";
 
                 return await conn.QueryAsync<AlunoProvaDto>(query);
             }

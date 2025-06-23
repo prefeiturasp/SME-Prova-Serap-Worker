@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dapper;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.Dtos;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
@@ -17,10 +18,13 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                const string query = @"delete from questao_aluno_tai 
-                                        where questao_id in (select q.id 
-                                                                from questao q 
-                                                                where q.prova_id = @prova_id)";
+                const string query = @"DELETE FROM questao_aluno_tai WHERE id IN (
+									    SELECT qat.id 
+									    FROM questao_aluno_tai qat
+									    INNER JOIN aluno a ON qat.aluno_id = a.id
+									    INNER JOIN prova_aluno pa ON a.ra = pa.aluno_ra
+									    WHERE pa.prova_id = @provaId
+									)";
 
                 await conn.ExecuteAsync(query, new { provaId });
 
@@ -44,6 +48,22 @@ namespace SME.SERAp.Prova.Dados
                                 where a.ra = @alunoRa and q.prova_id = @provaId";
 
                 return await conn.QueryAsync<QuestaoAlunoTai>(query, new { alunoRa, provaId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<bool> ExisteQuestaoAlunoTaiPorAlunoId(long alunoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = @"SELECT CASE WHEN EXISTS ( SELECT 1 FROM questao_aluno_tai WHERE aluno_id = @alunoId) THEN 1 ELSE 0 END";
+
+                return await conn.ExecuteScalarAsync<bool>(query, new { alunoId });                
             }
             finally
             {

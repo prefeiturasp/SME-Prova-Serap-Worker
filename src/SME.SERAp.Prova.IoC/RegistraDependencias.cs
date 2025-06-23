@@ -187,6 +187,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarAlunoProvaProficienciaPorProvaIdSyncUseCase, TratarAlunoProvaProficienciaPorProvaIdSyncUseCase>();
             services.AddScoped<ITratarAlunoProvaProficienciaUseCase, TratarAlunoProvaProficienciaUseCase>();
             services.AddScoped<ITratarCadernoAlunoProvaTaiUseCase, TratarCadernoAlunoProvaTaiUseCase>();
+            services.AddScoped<ITratarCadernoAlunoProvaUseCase, TratarCadernoAlunoProvaUseCase>();
             // Persistencia Serap 
 
             services.AddScoped<IIncluirUsuarioSerapUseCase, IncluirAtualizarUsuarioSerapUseCase>();

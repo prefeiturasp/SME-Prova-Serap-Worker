@@ -9,5 +9,6 @@ namespace SME.SERAp.Prova.Dados
         Task<bool> RemoverQuestaoAlunoTaiPorProvaIdAsync(long provaId);
 
         Task<IEnumerable<QuestaoAlunoTai>> ObterQuestoesAlunoTaiPorAlunoRaProvaId(long alunoRa, long provaId);
+        Task<bool> ExisteQuestaoAlunoTaiPorAlunoId(long alunoId);
     }
 }

@@ -17,12 +17,11 @@ namespace SME.SERAp.Prova.Dados
             try
             {
                 const string query = @"DELETE FROM questao_aluno_tai WHERE id IN (
-									    SELECT qat.id 
-									    FROM questao_aluno_tai qat
-									    INNER JOIN aluno a ON qat.aluno_id = a.id
-									    INNER JOIN prova_aluno pa ON a.ra = pa.aluno_ra
-									    WHERE pa.prova_id = @provaId
-									)";
+							                  SELECT qat.id 
+                                              FROM questao_aluno_tai qat
+                                              INNER JOIN questao q ON qat.questao_id = q.id
+                                              WHERE q.prova_id = @provaId
+							        )";
 
                 await conn.ExecuteAsync(query, new { provaId });
 

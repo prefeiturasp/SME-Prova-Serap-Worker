@@ -46,5 +46,20 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<long> ObterIdArquivoPorCaminhoLegadoId(string caminho, long legadoId)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = "select id from arquivo where caminho = @caminho and legado_id = @legadoId limit 1";
+                return await conn.QueryFirstOrDefaultAsync<long>(query, new { caminho, legadoId });
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

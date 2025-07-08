@@ -108,7 +108,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
                     foreach (var arquivoParaPersistir in questaoParaPersistir.Arquivos)
                     {
-                        var arquivoId = await mediator.Send(new ObterIdArquivoPorCaminhoQuery(arquivoParaPersistir.Caminho));
+                        var arquivoId = await mediator.Send(new ObterIdArquivoPorCaminhoLegadoIdQuery(arquivoParaPersistir.Caminho, arquivoParaPersistir.LegadoId));
                         if (arquivoId == 0)
                             arquivoId = await mediator.Send(new ArquivoPersistirCommand(arquivoParaPersistir));
 

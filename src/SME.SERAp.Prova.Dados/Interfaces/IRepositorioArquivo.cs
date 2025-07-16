@@ -7,5 +7,6 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<bool> RemoverPorIdsAsync(long[] idsArquivos);
         Task<long> ObterIdArquivoPorCaminho(string caminho);
+        Task<long> ObterIdArquivoPorCaminhoLegadoId(string caminho, long legadoId);
     }
 }

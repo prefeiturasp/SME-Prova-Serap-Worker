@@ -1,6 +1,7 @@
 ﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -274,6 +275,40 @@ namespace SME.SERAp.Prova.Dados
                     erroMedida = alunoProvaProficiencia.ErroMedida
                 });
                 return true;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+
+        public async Task<int> ExcluirAlunoProvaProficiencia(long provaId, long alunoRa)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                var query = $@"delete
+                                from
+	                                aluno_prova_proficiencia
+                                where
+	                                id in (
+	                                select
+		                                app.id
+	                                from
+		                                aluno_prova_proficiencia app
+	                                inner join aluno a on
+		                                a.id = app.aluno_id
+	                                where
+		                                a.ra = @alunoRa
+		                                and app.prova_id = @provaId
+		                                and app.tipo <> 0)";
+
+                return await conn.ExecuteAsync(query, new { provaId, alunoRa });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
             finally
             {

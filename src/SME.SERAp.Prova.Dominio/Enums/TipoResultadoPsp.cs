@@ -53,6 +53,6 @@ namespace SME.SERAp.Prova.Dominio
         ResultadoCicloEscola = 9,
         
         [Description("ResultadoCicloTurma")]
-        ResultadoCicloTurma = 8        
+        ResultadoCicloTurma = 12
     }
 }

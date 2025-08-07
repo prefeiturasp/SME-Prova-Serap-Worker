@@ -132,5 +132,19 @@
         /// 0 - RF do usuário
         /// </summary>
         public const string UeDreAtribuidasEolUsuario = "ue-dre-atribuidas-eol-usuario-{0}";
+
+        /// <summary>
+        /// Ultima Proficiencia do aluno na prova
+        /// 0 - Código ra do aluno
+        /// 1 - Código da Prova
+        /// </summary>
+        public const string UltimaProficienciaProva = "al-prof-prova-{0}-{1}";
+
+        /// <summary>
+        /// Questões administrado do aluno na prova
+        /// 0 - ID do aluno
+        /// 1 - ID da prova
+        /// </summary>
+        public const string QuestaoAdministradoTaiAluno = "al-q-administrado-tai-prova-{0}-{1}";
     }
 }

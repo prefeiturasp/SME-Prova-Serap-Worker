@@ -6,5 +6,6 @@ namespace SME.SERAp.Prova.Dados
     public interface IRepositorioQuestaoAlunoResposta : IRepositorioBase<QuestaoAlunoResposta>
     {
         Task<QuestaoAlunoResposta> ObterPorIdRaAsync(long questaoId, long alunoRa);
+        Task<int> ExcluirRespostaAluno(long provaId, long alunoRa);
     }
 }

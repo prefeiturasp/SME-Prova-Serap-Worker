@@ -49,5 +49,28 @@ namespace SME.SERAp.Prova.Dados
                 conn.Dispose();
             }
         }
+
+        public async Task<int> ExcluirQuestaoAlunoTai(long provaId, long alunoRa)
+        {
+            using var conn = ObterConexao();
+            try
+            {
+                const string query = @"delete
+                                        from
+	                                        questao_aluno_tai qat
+                                        where
+	                                        qat.id in(select qat2.id from questao_aluno_tai qat2
+                                        inner join aluno a on a.id = qat2.aluno_id
+                                        inner join questao q on q.id = qat2.questao_id
+                                        where a.ra = @alunoRa and q.prova_id = @provaId)";
+
+                return await conn.ExecuteAsync(query, new { provaId, alunoRa }); ;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
     }
 }

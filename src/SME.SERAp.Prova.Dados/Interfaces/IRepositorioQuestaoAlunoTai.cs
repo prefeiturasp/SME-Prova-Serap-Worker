@@ -7,5 +7,6 @@ namespace SME.SERAp.Prova.Dados
     {
         Task<bool> RemoverQuestaoAlunoTaiPorProvaIdAsync(long provaId);
         Task<bool> ExisteQuestaoAlunoTaiPorAlunoId(long alunoId);
+        Task<int> ExcluirQuestaoAlunoTai(long provaId, long alunoRa);
     }
 }

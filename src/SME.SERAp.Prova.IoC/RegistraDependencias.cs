@@ -258,6 +258,8 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IPropagarCacheQuestoesCompletasProvaUseCase, PropagarCacheQuestoesCompletasProvaUseCase>();
             services.AddScoped<IPropagarCacheResumoQuestoesProvaUseCase, PropagarCacheResumoQuestoesProvaUseCase>();
             services.AddScoped<IPropagarCacheUseCase, PropagarCacheUseCase>();
+
+            services.AddScoped<IReabrirProvaTaiAlunoUseCase, ReabrirProvaTaiAlunoUseCase>();
         }
     }
 }

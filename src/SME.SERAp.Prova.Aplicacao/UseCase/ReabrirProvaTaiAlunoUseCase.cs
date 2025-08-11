@@ -34,10 +34,6 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
                 if(!prova.FormatoTai)
                     throw new NegocioException($"prova {provaAluno.ProvaId} deve ser formato TAI.");
 
-                var provaAlunoBanco = await mediator.Send(new ObterProvaAlunoPorProvaIdRaQuery(provaAluno.ProvaId, provaAluno.AlunoRA));
-                if (provaAlunoBanco == null)
-                    throw new NegocioException($"A prova {provaAluno.ProvaId} não possui registro de inicio para o aluno {provaAluno.AlunoRA}");
-
                 await mediator.Send(new ExcluirRespostaAlunoCommand(provaAluno.ProvaId, provaAluno.AlunoRA));
                 await mediator.Send(new ExcluirQuestaoAlunoTaiCommand(provaAluno.ProvaId, provaAluno.AlunoRA));
                 await mediator.Send(new ExcluirProvaAlunoCommand(provaAluno.ProvaId, provaAluno.AlunoRA));

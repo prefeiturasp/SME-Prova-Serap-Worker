@@ -23,10 +23,11 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
         {
 
             var MensagemRabbitProvaAlunoReabertura = mensagemRabbit.ObterObjetoMensagem<ProvaAlunoReabertura>();
+            var prova = await mediator.Send(new ObterProvaPorIdQuery(MensagemRabbitProvaAlunoReabertura.ProvaId));
             var provaAlunoBanco = await mediator.Send(new ObterProvaAlunoPorProvaIdRaQuery(MensagemRabbitProvaAlunoReabertura.ProvaId, MensagemRabbitProvaAlunoReabertura.AlunoRA));
             if (provaAlunoBanco == null)
                 throw new NegocioException($"A prova {MensagemRabbitProvaAlunoReabertura.ProvaId} não possui registro de inicio para o aluno {MensagemRabbitProvaAlunoReabertura.AlunoRA}");
-          
+
             await mediator.Send(new ExcluirProvaAlunoCommand(MensagemRabbitProvaAlunoReabertura.ProvaId, MensagemRabbitProvaAlunoReabertura.AlunoRA));
             await mediator.Send(new RemoverCacheCommand(string.Format(CacheChave.AlunoProva, MensagemRabbitProvaAlunoReabertura.ProvaId, MensagemRabbitProvaAlunoReabertura.AlunoRA)));
 
@@ -45,6 +46,10 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             servicoLog.Registrar(Dominio.Enums.LogNivel.Informacao, $"Solicitação de reabertura da prova {MensagemRabbitProvaAlunoReabertura.ProvaId} para o aluno {MensagemRabbitProvaAlunoReabertura.AlunoRA} em {DateTime.Now}. Solicitação feita pelo login: {MensagemRabbitProvaAlunoReabertura.LoginCoresso}.");
 
             await mediator.Send(new PublicarFilaRabbitSerapAcompanhamentoCommand(RotasRabbit.ProvaAlunoReaberturaTratarAcompanhamento, MensagemRabbitProvaAlunoReabertura));
+
+            if(prova?.FormatoTai is true)
+                await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.ReabrirAlunoProvaTai, MensagemRabbitProvaAlunoReabertura));
+
             return true;
         }
     }

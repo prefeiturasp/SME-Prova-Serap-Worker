@@ -35,13 +35,11 @@ namespace SME.SERAp.Aplicacao.Teste.UseCase
             var prova = ObterProva(provaAluno.ProvaId);
 
             mediator.Setup(m => m.Send(It.IsAny<ObterProvaPorIdQuery>(), CancellationToken.None)).ReturnsAsync(prova);
-            mediator.Setup(m => m.Send(It.IsAny<ObterProvaAlunoPorProvaIdRaQuery>(), CancellationToken.None)).ReturnsAsync(provaAluno);
 
             var resultado = await useCase.Executar(new MensagemRabbit(JsonSerializer.Serialize(provaAluno), Guid.NewGuid()));
 
             Assert.True(resultado);
             mediator.Verify(m => m.Send(It.IsAny<ObterProvaPorIdQuery>(), CancellationToken.None), Times.Once);
-            mediator.Verify(m => m.Send(It.IsAny<ObterProvaAlunoPorProvaIdRaQuery>(), CancellationToken.None), Times.Once);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirRespostaAlunoCommand>(), CancellationToken.None), Times.Once);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirQuestaoAlunoTaiCommand>(), CancellationToken.None), Times.Once);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirProvaAlunoCommand>(), CancellationToken.None), Times.Once);
@@ -56,7 +54,6 @@ namespace SME.SERAp.Aplicacao.Teste.UseCase
 
             Assert.False(resultado);
             mediator.Verify(m => m.Send(It.IsAny<ObterProvaPorIdQuery>(), CancellationToken.None), Times.Never);
-            mediator.Verify(m => m.Send(It.IsAny<ObterProvaAlunoPorProvaIdRaQuery>(), CancellationToken.None), Times.Never);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirRespostaAlunoCommand>(), CancellationToken.None), Times.Never);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirQuestaoAlunoTaiCommand>(), CancellationToken.None), Times.Never);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirProvaAlunoCommand>(), CancellationToken.None), Times.Never);
@@ -74,7 +71,6 @@ namespace SME.SERAp.Aplicacao.Teste.UseCase
 
             Assert.False(resultado);
             mediator.Verify(m => m.Send(It.IsAny<ObterProvaPorIdQuery>(), CancellationToken.None), Times.Once);
-            mediator.Verify(m => m.Send(It.IsAny<ObterProvaAlunoPorProvaIdRaQuery>(), CancellationToken.None), Times.Never);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirRespostaAlunoCommand>(), CancellationToken.None), Times.Never);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirQuestaoAlunoTaiCommand>(), CancellationToken.None), Times.Never);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirProvaAlunoCommand>(), CancellationToken.None), Times.Never);
@@ -91,35 +87,11 @@ namespace SME.SERAp.Aplicacao.Teste.UseCase
             prova.FormatoTai = false;
 
             mediator.Setup(m => m.Send(It.IsAny<ObterProvaPorIdQuery>(), CancellationToken.None)).ReturnsAsync(prova);
-            mediator.Setup(m => m.Send(It.IsAny<ObterProvaAlunoPorProvaIdRaQuery>(), CancellationToken.None)).ReturnsAsync(provaAluno);
 
             var resultado = await useCase.Executar(new MensagemRabbit(JsonSerializer.Serialize(provaAluno), Guid.NewGuid()));
 
             Assert.False(resultado);
             mediator.Verify(m => m.Send(It.IsAny<ObterProvaPorIdQuery>(), CancellationToken.None), Times.Once);
-            mediator.Verify(m => m.Send(It.IsAny<ObterProvaAlunoPorProvaIdRaQuery>(), CancellationToken.None), Times.Never);
-            mediator.Verify(m => m.Send(It.IsAny<ExcluirRespostaAlunoCommand>(), CancellationToken.None), Times.Never);
-            mediator.Verify(m => m.Send(It.IsAny<ExcluirQuestaoAlunoTaiCommand>(), CancellationToken.None), Times.Never);
-            mediator.Verify(m => m.Send(It.IsAny<ExcluirProvaAlunoCommand>(), CancellationToken.None), Times.Never);
-            mediator.Verify(m => m.Send(It.IsAny<ExcluirAlunoProvaProficienciaCommand>(), CancellationToken.None), Times.Never);
-            mediator.Verify(m => m.Send(It.IsAny<LimparCacheProvaTaiCommand>(), CancellationToken.None), Times.Never);
-            servicoLog.Verify(l => l.Registrar(It.IsAny<Exception>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task Deve_Lancar_Excecao_Quando_ProvaAlunoBanco_Null()
-        {
-            var provaAluno = new ProvaAluno { ProvaId = 1, AlunoRA = 123 };
-            var prova = ObterProva(provaAluno.ProvaId);
-
-            mediator.Setup(m => m.Send(It.IsAny<ObterProvaPorIdQuery>(), CancellationToken.None)).ReturnsAsync(prova);
-            mediator.Setup(m => m.Send(It.IsAny<ObterProvaAlunoPorProvaIdRaQuery>(), default)).ReturnsAsync((ProvaAluno)null);
-
-            var resultado = await useCase.Executar(new MensagemRabbit(JsonSerializer.Serialize(provaAluno), Guid.NewGuid()));
-
-            Assert.False(resultado);
-            mediator.Verify(m => m.Send(It.IsAny<ObterProvaPorIdQuery>(), CancellationToken.None), Times.Once);
-            mediator.Verify(m => m.Send(It.IsAny<ObterProvaAlunoPorProvaIdRaQuery>(), CancellationToken.None), Times.Once);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirRespostaAlunoCommand>(), CancellationToken.None), Times.Never);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirQuestaoAlunoTaiCommand>(), CancellationToken.None), Times.Never);
             mediator.Verify(m => m.Send(It.IsAny<ExcluirProvaAlunoCommand>(), CancellationToken.None), Times.Never);

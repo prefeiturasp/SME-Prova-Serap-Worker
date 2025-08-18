@@ -252,6 +252,8 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarProficienciaAlunoProvaTai, new ComandoRabbit("Tratamento da proficiencia da prova tai do aluno", typeof(ITratarProficienciaAlunoProvaTaiUseCase)));
             comandos.Add(RotasRabbit.TratarCadernoAlunoProva, new ComandoRabbit("Tratamento cadernos alunos prova", typeof(ITratarCadernoAlunoProvaUseCase)));
 
+            comandos.Add(RotasRabbit.ReabrirAlunoProvaTai, new ComandoRabbit("Reabrir aluno prova TAI", typeof(IReabrirProvaTaiAlunoUseCase)));
+
             // Persistencia Serap Estudantes
             comandos.Add(RotasRabbit.IncluirUsuario, new ComandoRabbit("Incluir Usuario Persistencia Serap", typeof(IIncluirUsuarioSerapUseCase)));
             comandos.Add(RotasRabbit.AlterarUsuario, new ComandoRabbit("Alterar Usuario Persistencia Serap", typeof(IAlterarUsuarioSerapUseCase)));

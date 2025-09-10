@@ -111,6 +111,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioResultadoCicloDre, RepositorioResultadoCicloDre>();
             services.AddScoped<IRepositorioQuestaoAlunoTai, RepositorioQuestaoAlunoTai>();
             services.AddScoped<IRepositorioElasticTurma, RepositorioElasticTurma>();
+            services.AddScoped<IRepositorioAlunoProvaSpProficiencia, RepositorioAlunoProvaSpProficiencia>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -260,6 +261,10 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IPropagarCacheUseCase, PropagarCacheUseCase>();
 
             services.AddScoped<IReabrirProvaTaiAlunoUseCase, ReabrirProvaTaiAlunoUseCase>();
+
+            services.AddScoped<IBuscarAlunoProvaSpProficienciaUseCase, BuscarAlunoProvaSpProficienciaUseCase>();
+            services.AddScoped<ITratarAlunoProvaSpProficienciaUseCase, TratarAlunoProvaSpProficienciaUseCase>();
+            services.AddScoped<IBuscarProvaAlunosProvaSpProficienciaUseCase, BuscarProvaAlunosProvaSpProficienciaUseCase>();
         }
     }
 }

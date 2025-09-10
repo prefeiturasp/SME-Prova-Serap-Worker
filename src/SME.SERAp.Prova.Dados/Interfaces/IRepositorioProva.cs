@@ -28,5 +28,6 @@ namespace SME.SERAp.Prova.Dados
         Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaAdesaoTodosPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);        
         Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaAdesaoManualPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);
         Task<IEnumerable<ConsolidadoAlunoProvaDto>> ObterAlunosProvaDeficienciaPorProvaLegadoIdETurmasCodigos(long provaLegadoId, string[] turmasCodigos);
+        Task<int?> ObterAnoProva(long provaId);
     }
 }

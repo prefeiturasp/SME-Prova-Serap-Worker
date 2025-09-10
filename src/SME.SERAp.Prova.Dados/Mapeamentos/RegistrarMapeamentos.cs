@@ -53,6 +53,8 @@ namespace SME.SERAp.Prova.Dados
                 config.AddMap(new QuestaoTriMap());
                 config.AddMap(new ResultadoAlunoMap());
                 config.AddMap(new QuestaoAlunoTaiMap());
+                config.AddMap(new AlunoProvaSpProficienciaMap());
+                config.AddMap(new BoletimProvaAlunoMap());
 
                 config.ForDommel();
             });

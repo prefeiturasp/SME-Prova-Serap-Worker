@@ -1,5 +1,6 @@
 ﻿using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.Dtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,5 +16,6 @@ namespace SME.SERAp.Prova.Dados
         Task<AlunoProvaProficiencia> ObterProficienciaAlunoAsync(long provaId, long alunoId, AlunoProvaProficienciaTipo tipo, AlunoProvaProficienciaOrigem origem);
         Task<bool> AtualizarValorProficienciaAluno(AlunoProvaProficiencia alunoProvaProficiencia);
         Task<int> ExcluirAlunoProvaProficiencia(long provaId, long alunoRa);
+        Task<IEnumerable<AlunoProvaProficienciaBoletimDto>> ObterAlunosProvaProficienciaBoletimPorProvaId(long provaId);
     }
 }

@@ -31,8 +31,6 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
                 if (alunosProvaProficienciaBoletim == null || !alunosProvaProficienciaBoletim.Any())
                     return false;
 
-                alunosProvaProficienciaBoletim = alunosProvaProficienciaBoletim.Take(1);
-
                 foreach (var alunoProvaProficienciaBoletim in alunosProvaProficienciaBoletim)
                 {
                     var alunoProvaSpProficiencia = ObterBoletimProvaAluno(alunoProvaProficienciaBoletim);

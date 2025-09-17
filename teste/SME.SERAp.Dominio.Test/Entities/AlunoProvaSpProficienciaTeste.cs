@@ -18,6 +18,7 @@ namespace SME.SERAp.Dominio.Test.Entities
             var proficiencia = 85.5m;
             var nivelProficiencia = 3;
             var dataAtualizacao = new DateTime(2024, 6, 1);
+            var ueCodigo = "000191";
 
             aluno.AlunoRa = alunoRa;
             aluno.AnoEscolar = anoEscolar;
@@ -26,6 +27,7 @@ namespace SME.SERAp.Dominio.Test.Entities
             aluno.Proficiencia = proficiencia;
             aluno.NivelProficiencia = nivelProficiencia;
             aluno.DataAtualizacao = dataAtualizacao;
+            aluno.UeCodigo = ueCodigo;
 
             Assert.Equal(alunoRa, aluno.AlunoRa);
             Assert.Equal(anoEscolar, aluno.AnoEscolar);
@@ -33,6 +35,7 @@ namespace SME.SERAp.Dominio.Test.Entities
             Assert.Equal(disciplinaId, aluno.DisciplinaId);
             Assert.Equal(proficiencia, aluno.Proficiencia);
             Assert.Equal(dataAtualizacao, aluno.DataAtualizacao);
+            Assert.Equal(nivelProficiencia, aluno.NivelProficiencia);
             Assert.Equal(nivelProficiencia, aluno.NivelProficiencia);
         }
 

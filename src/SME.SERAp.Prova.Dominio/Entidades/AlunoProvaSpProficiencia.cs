@@ -15,6 +15,8 @@ namespace SME.SERAp.Prova.Dominio.Entidades
         public decimal Proficiencia { get; set; }
         public int NivelProficiencia { get; set; }
 
+        public string UeCodigo { get; set; }
+
         public DateTime DataAtualizacao { get; set; }
     }
 }

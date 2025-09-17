@@ -25,7 +25,8 @@ namespace SME.SERAp.Boletim.Aplicacao.Testes.Commands
                 DataAtualizacao = DateTime.Now,
                 DisciplinaId = 1,
                 NivelProficiencia = 2,
-                Proficiencia = 250.5M
+                Proficiencia = 250.5M,
+                UeCodigo = "000191",
             };
 
             var command = new InserirAlunoProvaSpProficienciaCommand(alunoProvaSpProficiencia);
@@ -53,7 +54,8 @@ namespace SME.SERAp.Boletim.Aplicacao.Testes.Commands
                 DataAtualizacao = DateTime.Now,
                 DisciplinaId = 1,
                 NivelProficiencia = 2,
-                Proficiencia = 250.5M
+                Proficiencia = 250.5M,
+                UeCodigo = "000191",
             };
 
             var command = new InserirAlunoProvaSpProficienciaCommand(alunoProvaSpProficiencia);

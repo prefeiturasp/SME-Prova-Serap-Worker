@@ -18,6 +18,7 @@ namespace SME.SERAp.Prova.Dados.Mapeamentos
             Map(c => c.NivelProficiencia).ToColumn("nivel_proficiencia");
             Map(c => c.Proficiencia).ToColumn("proficiencia");
             Map(c => c.DataAtualizacao).ToColumn("data_atualizacao");
+            Map(c => c.UeCodigo).ToColumn("ue_codigo");
         }
     }
 }

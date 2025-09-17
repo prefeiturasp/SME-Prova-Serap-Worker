@@ -39,6 +39,7 @@ namespace SME.SERAp.Prova.Dados.Test.Mapeamentos
             Assert.Equal("proficiencia", map.PropertyMaps.First(p => p.PropertyInfo.Name == nameof(AlunoProvaSpProficiencia.Proficiencia)).ColumnName);
             Assert.Equal("nivel_proficiencia", map.PropertyMaps.First(p => p.PropertyInfo.Name == nameof(AlunoProvaSpProficiencia.NivelProficiencia)).ColumnName);
             Assert.Equal("data_atualizacao", map.PropertyMaps.First(p => p.PropertyInfo.Name == nameof(AlunoProvaSpProficiencia.DataAtualizacao)).ColumnName);
+            Assert.Equal("ue_codigo", map.PropertyMaps.First(p => p.PropertyInfo.Name == nameof(AlunoProvaSpProficiencia.UeCodigo)).ColumnName);
         }
 
         [Fact]

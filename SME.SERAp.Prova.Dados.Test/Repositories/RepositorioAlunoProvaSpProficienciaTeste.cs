@@ -105,7 +105,9 @@ namespace SME.SERAp.Prova.Dados.Test.Repositories
                 AnoLetivo = 2024,
                 DisciplinaId = 3,
                 NivelProficiencia = 2,
-                Proficiencia = 75.5m
+                Proficiencia = 75.5m,
+                UeCodigo = "000191",
+
             };
 
             servicoTelemetria
@@ -123,6 +125,7 @@ namespace SME.SERAp.Prova.Dados.Test.Repositories
             Assert.Equal(3, resultado.DisciplinaId);
             Assert.Equal(2, resultado.NivelProficiencia);
             Assert.Equal(75.5M, resultado.Proficiencia);
+            Assert.Equal("000191", resultado.UeCodigo);
         }
 
         [Fact]

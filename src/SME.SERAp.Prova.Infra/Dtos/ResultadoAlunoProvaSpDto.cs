@@ -13,5 +13,7 @@
         public int NivelProficiencia { get; set; }
 
         public decimal Valor { get; set; }
+
+        public string CodigoUe { get; set; }
     }
 }

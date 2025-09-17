@@ -49,7 +49,8 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
                     AnoLetivo = anoLetivo,
                     NivelProficiencia = ResultadoAlunoProvaSp.NivelProficiencia,
                     Proficiencia = ResultadoAlunoProvaSp.Valor,
-                    DataAtualizacao = DateTime.Now
+                    DataAtualizacao = DateTime.Now,
+                    UeCodigo = ResultadoAlunoProvaSp.CodigoUe
                 };
 
                 await mediator.Send(new PublicaFilaRabbitCommand(RotasRabbit.TratarAlunoProvaSpProficiencia, alunoProvaSpProficiencia));

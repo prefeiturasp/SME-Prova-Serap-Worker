@@ -27,6 +27,7 @@ namespace SME.SERAp.Aplicacao.Test.Queries
                 DisciplinaId = disciplinaId,
                 NivelProficiencia = 2,
                 Proficiencia = 250.5m,
+                UeCodigo = "000191",
                 DataAtualizacao = DateTime.Now
             };
 

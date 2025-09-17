@@ -24,7 +24,8 @@ namespace SME.SERAp.Prova.Dados.Repositorios.Serap
 	                            ra.AnoEscolar,
 	                            ra.alu_matricula as AlunoMatricula,
                                 ra.NivelProficienciaID as NivelProficiencia,
-	                            ra.Valor
+	                            ra.Valor, 
+	                            ra.esc_codigo as CodigoUe
                             from
 	                            ResultadoAluno ra
                             where
@@ -54,7 +55,8 @@ namespace SME.SERAp.Prova.Dados.Repositorios.Serap
 	                            apsp.disciplina_id as disciplinaId,
 	                            apsp.proficiencia,
                                 apsp.nivel_proficiencia as nivelProficiencia,
-	                            apsp.data_atualizacao as dataAtualizacao
+	                            apsp.data_atualizacao as dataAtualizacao, 
+                                apsp.ue_codigo as ueCodigo
                             from
 	                            aluno_prova_sp_proficiencia apsp
                             where

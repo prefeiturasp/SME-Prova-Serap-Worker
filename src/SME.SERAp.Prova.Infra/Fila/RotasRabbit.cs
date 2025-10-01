@@ -147,6 +147,11 @@
         public const string PropagarCacheQuestoesCompletasProva = "serap.estudante.propagar.cache.questoes.completas.prova";
         public const string PropagarCacheQuestoesCompletasProvaTratar = "serap.estudante.propagar.cache.questoes.completas.prova.tratar";
         public const string PropagarCacheQuestoesCompletasLegadoProva = "serap.estudante.propagar.cache.questoes.completas.legado.prova";
-        public const string PropagarCacheQuestoesCompletasLegadoProvaTratar = "serap.estudante.propagar.cache.questoes.completas.legado.prova.tratar";        
+        public const string PropagarCacheQuestoesCompletasLegadoProvaTratar = "serap.estudante.propagar.cache.questoes.completas.legado.prova.tratar";
+
+        public const string BuscarAlunoProvaSpProficiencia = "serap.boletim.buscar.aluno.prova.sp.proficiencia";
+        public const string TratarAlunoProvaSpProficiencia = "serap.boletim.tratar.aluno.prova.sp.proficiencia";
+
+        public const string BuscarProvaAlunosProvaSpProficiencia = "serap.boletim.buscar.prova.alunos.prova.sp.proficiencia";
     }
 }

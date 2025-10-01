@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31025.194
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A02A688A-248E-4B5C-BFB1-68F75E77EE26}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.SERAp.Dominio.Test", "teste\SME.SERAp.Dominio.Test\SME.SERAp.Dominio.Test.csproj", "{B4A9C01D-EEC8-4F84-B7BE-CFC0ABDB43F6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.SERAp.Prova.Worker", "src\SME.SERAp.Prova.Worker\SME.SERAp.Prova.Worker.csproj", "{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SME.SERAp.Prova.Dados.Test", "SME.SERAp.Prova.Dados.Test\SME.SERAp.Prova.Dados.Test.csproj", "{25E00BBA-7A55-4AA9-9888-0E39FACA23BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,10 @@ Global
 		{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25E00BBA-7A55-4AA9-9888-0E39FACA23BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25E00BBA-7A55-4AA9-9888-0E39FACA23BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25E00BBA-7A55-4AA9-9888-0E39FACA23BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25E00BBA-7A55-4AA9-9888-0E39FACA23BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{75C29D4C-6FD5-4378-A266-FF43765D38CB} = {2EBCDF4C-D424-4985-A56F-9C23E402AD1D}
 		{B4A9C01D-EEC8-4F84-B7BE-CFC0ABDB43F6} = {2EBCDF4C-D424-4985-A56F-9C23E402AD1D}
 		{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C} = {A02A688A-248E-4B5C-BFB1-68F75E77EE26}
+		{25E00BBA-7A55-4AA9-9888-0E39FACA23BA} = {2EBCDF4C-D424-4985-A56F-9C23E402AD1D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DC2C6D23-D996-4997-B119-79E686CE3904}

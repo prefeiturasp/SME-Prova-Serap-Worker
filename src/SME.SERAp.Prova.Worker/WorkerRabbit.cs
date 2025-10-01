@@ -311,6 +311,11 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasProvaTratar, new ComandoRabbit("Propagar o cache da questão completa", typeof(IPropagarCacheQuestoesCompletasProvaTratarUseCase)));
             comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasLegadoProva, new ComandoRabbit("Propagar o cache das questões completas do legado", typeof(IPropagarCacheQuestoesCompletasLegadoProvaUseCase)));
             comandos.Add(RotasRabbit.PropagarCacheQuestoesCompletasLegadoProvaTratar, new ComandoRabbit("Propagar o cache da questão completa do legado", typeof(IPropagarCacheQuestoesCompletasLegadoProvaTratarUseCase)));
+
+            comandos.Add(RotasRabbit.BuscarAlunoProvaSpProficiencia, new ComandoRabbit("Buscar aluno prova sp proficiencia", typeof(IBuscarAlunoProvaSpProficienciaUseCase)));
+            comandos.Add(RotasRabbit.TratarAlunoProvaSpProficiencia, new ComandoRabbit("Tratar aluno prova sp proficiencia", typeof(ITratarAlunoProvaSpProficienciaUseCase)));
+
+            comandos.Add(RotasRabbit.BuscarProvaAlunosProvaSpProficiencia, new ComandoRabbit("Buscar prova alunos prova sp proficiencia", typeof(IBuscarProvaAlunosProvaSpProficienciaUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)

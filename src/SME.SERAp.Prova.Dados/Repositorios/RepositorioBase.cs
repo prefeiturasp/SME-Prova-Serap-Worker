@@ -5,6 +5,7 @@ using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -18,7 +19,7 @@ namespace SME.SERAp.Prova.Dados
             this.connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
         }
 
-        protected IDbConnection ObterConexao()
+        protected virtual IDbConnection ObterConexao()
         {
             var conexao = new NpgsqlConnection(connectionStrings.ApiSerap);
             conexao.Open();
@@ -39,7 +40,7 @@ namespace SME.SERAp.Prova.Dados
             }
         }
 
-        protected IDbConnection ObterConexaoLeitura()
+        protected virtual IDbConnection ObterConexaoLeitura()
         {
             var conexao = new NpgsqlConnection(connectionStrings.ApiSerapLeitura);
             conexao.Open();
@@ -49,6 +50,13 @@ namespace SME.SERAp.Prova.Dados
         protected IDbConnection ObterConexaoSgp()
         {
             var conexao = new NpgsqlConnection(connectionStrings.ApiSgp);
+            conexao.Open();
+            return conexao;
+        }
+
+        protected virtual IDbConnection ObterConexaoProvaSp()
+        {
+            var conexao = new SqlConnection(connectionStrings.ProvaSP);
             conexao.Open();
             return conexao;
         }

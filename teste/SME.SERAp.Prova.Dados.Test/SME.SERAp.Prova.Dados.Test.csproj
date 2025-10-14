@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\SME.SERAp.Prova.Dados\SME.SERAp.Prova.Dados.csproj" />
+    <ProjectReference Include="..\..\src\SME.SERAp.Prova.Dados\SME.SERAp.Prova.Dados.csproj" />
   </ItemGroup>
 
 </Project>

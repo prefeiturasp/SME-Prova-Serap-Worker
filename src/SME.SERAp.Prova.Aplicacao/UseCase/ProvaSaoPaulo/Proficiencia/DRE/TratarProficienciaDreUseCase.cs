@@ -11,8 +11,8 @@ namespace SME.SERAp.Prova.Aplicacao
     public class TratarProficienciaDreUseCase : AbstractTratarProficienciaPspUseCase, ITratarProficienciaDreUseCase
     {
         public TratarProficienciaDreUseCase(IMediator mediator, 
-                                            IServicoLog servicoLog, 
-                                            IModel model) : base(mediator, servicoLog, model){}
+                                            IServicoLog servicoLog,
+                                            IConnection rabbitConnection) : base(mediator, servicoLog, rabbitConnection){}
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {

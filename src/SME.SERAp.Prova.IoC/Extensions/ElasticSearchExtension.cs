@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Elasticsearch.Net;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Mapping;
+using Elastic.Transport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Nest;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.IoC
 {
@@ -17,49 +19,73 @@ namespace SME.SERAp.Prova.IoC
         internal static void AdicionarElasticSearch(this IServiceCollection services, IConfiguration configuration)
         {
             RegistrarElasticOptions(services, configuration);
-            
+
             var serviceProvider = services.BuildServiceProvider();
-            var options = serviceProvider.GetService<IOptions<ElasticOptions>>();
-            var elasticOptions = options?.Value;
-            if (elasticOptions == null)
-                return;
+            var options = serviceProvider.GetService<IOptions<ElasticOptions>>()?.Value;
+            if (options == null) return;
 
-            var nodes = new List<Uri>();
-            if (elasticOptions.Urls.Contains(','))
+            var uri = new Uri(options.Urls.Split(',')[0].Trim());
+
+            var settings = new ElasticsearchClientSettings(uri)
+                .DefaultFieldNameInferrer(f => f.ToLowerInvariant())
+                .ServerCertificateValidationCallback((_, _, _, _) => true);
+
+            if (!string.IsNullOrEmpty(options.Username) && !string.IsNullOrEmpty(options.Password))
             {
-                var urls = elasticOptions.Urls.Split(',');
-                nodes.AddRange(urls.Select(url => new Uri(url)));
+                settings = settings.Authentication(new BasicAuthentication(options.Username, options.Password));
             }
-            else
-                nodes.Add(new Uri(elasticOptions.Urls));
 
-            var connectionPool = new StaticConnectionPool(nodes);
-            var connectionStrings =
-                new ConnectionSettings(connectionPool).ServerCertificateValidationCallback(
-                    (sender, cert, chain, errors) => true);
+            var client = new ElasticsearchClient(settings);
 
-            if (!string.IsNullOrEmpty(elasticOptions.Username) && !string.IsNullOrEmpty(elasticOptions.Password))
-                connectionStrings.BasicAuthentication(elasticOptions.Username, elasticOptions.Password);
+            MapearIndicesAsync(client).GetAwaiter().GetResult();
 
-            var elasticClient = new ElasticClient(connectionStrings);
-            
-            MapearIndices(elasticClient);
-            
-            services.AddSingleton<IElasticClient>(elasticClient);            
+            services.AddSingleton(client);
         }
 
         private static void RegistrarElasticOptions(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddOptions<ElasticOptions>().Bind(configuration.GetSection(ElasticOptions.Secao),
-                c => c.BindNonPublicProperties = true);
-            services.AddSingleton<ElasticOptions>();            
+            services.AddOptions<ElasticOptions>()
+                .Bind(configuration.GetSection(ElasticOptions.Secao),
+                    c => c.BindNonPublicProperties = true);
+            services.AddSingleton<ElasticOptions>();
         }
 
-        private static void MapearIndices(IElasticClient elasticClient)
+        private static async Task MapearIndicesAsync(ElasticsearchClient elasticClient)
         {
-            elasticClient
-                .Map<AlunoMatriculaTurmaDreDto>(map =>
-                    map.Index(Indices.Index(IndicesElastic.INDICE_ALUNO_MATRICULA_TURMA_DRE)).AutoMap());
+            const string indiceAlunoMatriculaTurmaDre = IndicesElastic.INDICE_ALUNO_MATRICULA_TURMA_DRE;
+            const string indiceTurma = IndicesElastic.INDICE_TURMA;
+
+            var existsResponse = await elasticClient.Indices.ExistsAsync(indiceAlunoMatriculaTurmaDre);
+            if (existsResponse.Exists)
+                return;
+
+            await elasticClient.Indices.CreateAsync(indiceAlunoMatriculaTurmaDre, c => c
+                .Mappings(m => m
+                    .Properties<AlunoMatriculaTurmaDreDto>(p => p
+                        .Text("id")
+                        .IntegerNumber("codigoaluno")
+                        .Text("nomealuno")
+                        .Date("datanascimento", new DateProperty { Format = "MMddyyyy" })
+                        .Text("nomesocialaluno")
+                        .IntegerNumber("codigosituacaomatricula")
+                        .Text("situacaomatricula")
+                        .Date("datasituacao", new DateProperty { Format = "MMddyyyy" })
+                        .LongNumber("codigomatricula")
+                        .Date("datamatricula", new DateProperty { Format = "MMddyyyy" })
+                    )
+                )
+            );
+
+            await elasticClient.Indices.CreateAsync(indiceTurma, c => c
+                .Mappings(m => m
+                    .Properties<DocumentoElasticTurmaDto>(p => p
+                        .Text("codigoaluno")
+                        .IntegerNumber("codigoturma")
+                        .Text("codigoescola")
+                        .IntegerNumber("anoletivo")
+                    )
+                )
+            );
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados

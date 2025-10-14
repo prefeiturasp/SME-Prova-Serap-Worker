@@ -35,7 +35,7 @@ namespace SME.SERAp.Prova.Infra.Services
             return true;
         }
 
-        private Task PublicarMensagem(string rota, byte[] body, string exchange = null)
+        private async Task PublicarMensagem(string rota, byte[] body, string exchange = null)
         {
             var factory = new ConnectionFactory
             {
@@ -45,13 +45,20 @@ namespace SME.SERAp.Prova.Infra.Services
                 VirtualHost = rabbitOptions.VirtualHost
             };
 
-            using var conexaoRabbit = factory.CreateConnection();
-            using var channel = conexaoRabbit.CreateModel();
-            var props = channel.CreateBasicProperties();
-            props.Persistent = true;
-            channel.BasicPublish(exchange, rota, true, props, body);
+            using var conexaoRabbit = await factory.CreateConnectionAsync();
+            using var channel = await conexaoRabbit.CreateChannelAsync();
+            var props = new BasicProperties
+            {
+                Persistent = true
+            };
 
-            return Task.CompletedTask;            
+            await channel.BasicPublishAsync(
+                ExchangeRabbit.Logs,
+                RotasRabbit.RotaLogs,
+                true,
+                props,
+                body
+            );
         }
     }
 }

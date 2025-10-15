@@ -99,7 +99,7 @@ namespace SME.SERAp.Prova.Worker
 
             if(telemetriaOptions.Apm == true)
             {
-                services.AddElasticApm(new HttpDiagnosticsSubscriber(), new SqlClientDiagnosticSubscriber());
+                services.AddElasticApm(new HttpDiagnosticsSubscriber());
             }
 
             var configuracaoRabbitLogOptions = new RabbitLogOptions();

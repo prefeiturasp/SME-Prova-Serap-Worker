@@ -59,6 +59,7 @@ namespace SME.SERAp.Prova.Aplicacao.UseCase
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 servicoLog.Registrar(ex);
                 return false;
             }

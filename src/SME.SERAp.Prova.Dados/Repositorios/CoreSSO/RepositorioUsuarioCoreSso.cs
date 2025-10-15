@@ -1,5 +1,4 @@
-﻿using Dapper;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;

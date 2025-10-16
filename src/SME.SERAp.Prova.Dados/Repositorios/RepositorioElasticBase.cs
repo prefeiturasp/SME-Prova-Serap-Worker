@@ -3,6 +3,7 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 using SME.SERAp.Prova.Infra;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<T> ObterAsync(string indice, string id, string nomeConsulta, object parametro = null)
         {
-            var response = await servicoTelemetria.RegistrarComRetornoAsync<GetResponse<T>>(async () =>
+            GetResponse<T> response = await servicoTelemetria.RegistrarComRetornoAsync<GetResponse<T>>(async () =>
                 await elasticClient.GetAsync<T>(id, g => g.Index(indice)), NomeTelemetria, nomeConsulta, indice, parametro?.ToString()
             );
 
@@ -40,7 +41,7 @@ namespace SME.SERAp.Prova.Dados
         {
             var lista = new List<TResponse>();
 
-            var response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TResponse>>(async () =>
+            SearchResponse<TResponse> response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TResponse>>(async () =>
                 await elasticClient.SearchAsync<TResponse>(s => s
                     .Indices(indice)
                     .Query(q => query(q))
@@ -68,7 +69,7 @@ namespace SME.SERAp.Prova.Dados
                 lista.AddRange(response.Documents);
             }
 
-            if (!string.IsNullOrEmpty(response.ScrollId))
+            if (response.ScrollId is not null)
             {
                 await elasticClient.ClearScrollAsync(new ClearScrollRequest { ScrollId = response.ScrollId });
             }
@@ -79,7 +80,7 @@ namespace SME.SERAp.Prova.Dados
         public async Task<IEnumerable<TResponse>> ObterTodosAsync<TResponse>(string indice, string nomeConsulta,
             object parametro = null) where TResponse : class
         {
-            var response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TResponse>>(
+            SearchResponse<TResponse> response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TResponse>>(
                 async () => await elasticClient.SearchAsync<TResponse>(s => s
                     .Indices(indice)
                     .Query(q => q.MatchAll())
@@ -99,11 +100,11 @@ namespace SME.SERAp.Prova.Dados
         public async Task<long> ObterTotalDeRegistroAsync<TDocument>(string indice, string nomeConsulta,
             object parametro = null) where TDocument : class
         {
-            var response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TDocument>>(
+            SearchResponse<TDocument> response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TDocument>>(
                 async () => await elasticClient.SearchAsync<TDocument>(s => s
                     .Indices(indice)
                     .Query(q => q.MatchAll())
-                    .Size(0) // não precisa trazer documentos
+                    .Size(0)
                 ),
                 NomeTelemetria,
                 nomeConsulta,
@@ -124,7 +125,7 @@ namespace SME.SERAp.Prova.Dados
         {
             try
             {
-                var response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TDocument>>(
+                SearchResponse<TDocument> response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TDocument>>(
                     async () => await elasticClient.SearchAsync<TDocument>(s => s
                         .Indices(indice)
                         .Query(q => query(q))
@@ -148,7 +149,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> ExisteAsync(string indice, string id, string nomeConsulta, object parametro = null)
         {
-            var response = await servicoTelemetria.RegistrarComRetornoAsync<GetResponse<T>>(async () =>
+            GetResponse<T> response = await servicoTelemetria.RegistrarComRetornoAsync<GetResponse<T>>(async () =>
                 await elasticClient.GetAsync<T>(id, g => g
                     .Index(indice)
                     .Source(false)
@@ -177,7 +178,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> InserirAsync<TRequest>(TRequest entidade, string indice) where TRequest : class
         {
-            var response = await servicoTelemetria.RegistrarComRetornoAsync<IndexResponse>(
+            IndexResponse response = await servicoTelemetria.RegistrarComRetornoAsync<IndexResponse>(
                 async () => await elasticClient.IndexAsync(entidade, d => d.Index(indice)),
                 NomeTelemetria,
                 $"Insert {entidade.GetType().Name}",
@@ -194,7 +195,7 @@ namespace SME.SERAp.Prova.Dados
         {
             using var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(5));
 
-            var response = await servicoTelemetria.RegistrarComRetornoAsync<DeleteByQueryResponse>(
+            DeleteByQueryResponse response = await servicoTelemetria.RegistrarComRetornoAsync<DeleteByQueryResponse>(
                 async () => await elasticClient.DeleteByQueryAsync<TDocument>(
                     d => d.Indices(indice).Query(q => q.MatchAll()), cancellationToken.Token),
                 NomeTelemetria,

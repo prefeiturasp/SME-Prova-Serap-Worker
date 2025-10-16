@@ -18,21 +18,23 @@ namespace SME.SERAp.Prova.IoC
     {
         internal static void AdicionarElasticSearch(this IServiceCollection services, IConfiguration configuration)
         {
-            RegistrarElasticOptions(services, configuration);
+            var elasticOptions = new ElasticOptions();
+            configuration.GetSection(ElasticOptions.Secao).Bind(elasticOptions, c => c.BindNonPublicProperties = true);
+            services.AddSingleton(elasticOptions);
 
-            var serviceProvider = services.BuildServiceProvider();
-            var options = serviceProvider.GetService<IOptions<ElasticOptions>>()?.Value;
-            if (options == null) return;
+            if (elasticOptions == null) return;
 
-            var uri = new Uri(options.Urls.Split(',')[0].Trim());
+            var uri = new Uri(elasticOptions.Urls.Split(',')[0].Trim());
 
             var settings = new ElasticsearchClientSettings(uri)
                 .DefaultFieldNameInferrer(f => f.ToLowerInvariant())
                 .ServerCertificateValidationCallback((_, _, _, _) => true);
 
-            if (!string.IsNullOrEmpty(options.Username) && !string.IsNullOrEmpty(options.Password))
+            settings.DefaultIndex(elasticOptions.DefaultIndex);
+
+            if (!string.IsNullOrEmpty(elasticOptions.Username) && !string.IsNullOrEmpty(elasticOptions.Password))
             {
-                settings = settings.Authentication(new BasicAuthentication(options.Username, options.Password));
+                settings = settings.Authentication(new BasicAuthentication(elasticOptions.Username, elasticOptions.Password));
             }
 
             var client = new ElasticsearchClient(settings);
@@ -40,14 +42,6 @@ namespace SME.SERAp.Prova.IoC
             MapearIndicesAsync(client).GetAwaiter().GetResult();
 
             services.AddSingleton(client);
-        }
-
-        private static void RegistrarElasticOptions(IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddOptions<ElasticOptions>()
-                .Bind(configuration.GetSection(ElasticOptions.Secao),
-                    c => c.BindNonPublicProperties = true);
-            services.AddSingleton<ElasticOptions>();
         }
 
         private static async Task MapearIndicesAsync(ElasticsearchClient elasticClient)

@@ -47,4 +47,6 @@ RUN echo "\n[tls_system_default]" >> /etc/ssl/openssl.cnf \
     && echo "MinProtocol = TLSv1" >> /etc/ssl/openssl.cnf \
     && echo "CipherString = DEFAULT@SECLEVEL=0" >> /etc/ssl/openssl.cnf``
 
+ENV ASPNETCORE_HTTP_PORTS=80
+
 ENTRYPOINT ["dotnet", "SME.SERAp.Prova.Worker.dll"]

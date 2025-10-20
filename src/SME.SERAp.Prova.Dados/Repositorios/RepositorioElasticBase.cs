@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using SME.SERAp.Prova.Infra;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Nest;
-using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Dados
 {
@@ -12,12 +13,12 @@ namespace SME.SERAp.Prova.Dados
     {
         private const int QuantidadeRetorno = 200;
         private const string TempoCursor = "10s";
-        private const string NomeTelemetria = "Elastic";        
-        
-        private readonly IServicoTelemetria servicoTelemetria;
-        private readonly IElasticClient elasticClient;
+        private const string NomeTelemetria = "Elastic";
 
-        protected RepositorioElasticBase(IServicoTelemetria servicoTelemetria, IElasticClient elasticClient)
+        private readonly IServicoTelemetria servicoTelemetria;
+        private readonly ElasticsearchClient elasticClient;
+
+        protected RepositorioElasticBase(IServicoTelemetria servicoTelemetria, ElasticsearchClient elasticClient)
         {
             this.servicoTelemetria = servicoTelemetria ?? throw new ArgumentNullException(nameof(servicoTelemetria));
             this.elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
@@ -25,105 +26,122 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<T> ObterAsync(string indice, string id, string nomeConsulta, object parametro = null)
         {
-            GetResponse<T> response = await servicoTelemetria.RegistrarComRetornoAsync<GetResponse<T>>(async () => 
-                    await elasticClient.GetAsync(DocumentPath<T>.Id(id).Index(indice)),
-                NomeTelemetria,
-                nomeConsulta,
-                indice,
-                parametro?.ToString());
+            GetResponse<T> response = await servicoTelemetria.RegistrarComRetornoAsync<GetResponse<T>>(async () =>
+                await elasticClient.GetAsync<T>(id, g => g.Index(indice)), NomeTelemetria, nomeConsulta, indice, parametro?.ToString()
+            );
 
-            return response.IsValid ? response.Source : null;
+            return response.Found == true ? response.Source : null;
         }
 
-        public async Task<IEnumerable<TResponse>> ObterListaAsync<TResponse>(string indice,
-            Func<QueryContainerDescriptor<TResponse>, QueryContainer> request, string nomeConsulta,
-            object parametro = null) where TResponse : class
+        public async Task<IEnumerable<TResponse>> ObterListaAsync<TResponse>(
+            string indice,
+            Func<QueryDescriptor<TResponse>, Query> query,
+            string nomeConsulta,
+            object? parametro = null) where TResponse : class
         {
-            var listaDeRetorno = new List<TResponse>();
+            var lista = new List<TResponse>();
 
-            ISearchResponse<TResponse> response =
-                await servicoTelemetria.RegistrarComRetornoAsync<ISearchResponse<TResponse>>(
-                    async () => await elasticClient.SearchAsync<TResponse>(c =>
-                        c.Index(indice).Query(request).Scroll(TempoCursor).Size(QuantidadeRetorno)), NomeTelemetria,
-                    nomeConsulta, indice, parametro?.ToString());
-            
-            if (!response.IsValid)
-                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
-            
-            listaDeRetorno.AddRange(response.Documents);
+            SearchResponse<TResponse> response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TResponse>>(async () =>
+                await elasticClient.SearchAsync<TResponse>(s => s
+                    .Indices(indice)
+                    .Query(q => query(q))
+                    .Scroll(TempoCursor)
+                    .Size(QuantidadeRetorno)),
+                NomeTelemetria, nomeConsulta, indice, parametro?.ToString());
+
+            if (response is null || !response.IsValidResponse)
+                throw new Exception(response?.ElasticsearchServerError?.ToString());
+
+            lista.AddRange(response.Documents);
 
             while (response.Documents.Any() && response.Documents.Count == QuantidadeRetorno)
             {
-                response = await servicoTelemetria.RegistrarComRetornoAsync<ISearchResponse<TResponse>>(
-                    async () => await elasticClient.ScrollAsync<TResponse>(TempoCursor, response.ScrollId),
-                    NomeTelemetria, $"{nomeConsulta} scroll", indice, parametro?.ToString());
+                response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TResponse>>(async () =>
+                    await elasticClient.ScrollAsync<TResponse>(new ScrollRequest(response.ScrollId) { Scroll = TimeSpan.FromSeconds(10) }),
+                    NomeTelemetria,
+                    $"{nomeConsulta} scroll",
+                    indice,
+                    parametro?.ToString());
 
-                listaDeRetorno.AddRange(response.Documents);
+                if (!response.IsValidResponse)
+                    throw new Exception(response.ElasticsearchServerError?.ToString());
+
+                lista.AddRange(response.Documents);
             }
 
-            await elasticClient.ClearScrollAsync(new ClearScrollRequest(response.ScrollId));
+            if (response.ScrollId is not null)
+            {
+                await elasticClient.ClearScrollAsync(new ClearScrollRequest { ScrollId = response.ScrollId });
+            }
 
-            return listaDeRetorno;
+            return lista;
         }
 
         public async Task<IEnumerable<TResponse>> ObterTodosAsync<TResponse>(string indice, string nomeConsulta,
             object parametro = null) where TResponse : class
         {
-            var search = new SearchDescriptor<T>(indice).MatchAll();
-
-            ISearchResponse<TResponse> response = await servicoTelemetria.RegistrarComRetornoAsync<ISearchResponse<T>>(
-                async () => await elasticClient.SearchAsync<TResponse>(search),
+            SearchResponse<TResponse> response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TResponse>>(
+                async () => await elasticClient.SearchAsync<TResponse>(s => s
+                    .Indices(indice)
+                    .Query(q => q.MatchAll())
+                    .Size(QuantidadeRetorno)
+                ),
                 NomeTelemetria,
                 nomeConsulta,
                 indice,
                 parametro?.ToString());
 
-            if (!response.IsValid)
-                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+            if (!response.IsValidResponse)
+                throw new Exception(response.ElasticsearchServerError?.ToString());
 
-            return response.Hits.Select(hit => hit.Source).ToList();
+            return response.Documents.ToList();
         }
 
         public async Task<long> ObterTotalDeRegistroAsync<TDocument>(string indice, string nomeConsulta,
             object parametro = null) where TDocument : class
         {
-            var search = new SearchDescriptor<TDocument>(indice).MatchAll();
-            ISearchResponse<TDocument> response = await servicoTelemetria.RegistrarComRetornoAsync<ISearchResponse<T>>(
-                async () => await elasticClient.SearchAsync<TDocument>(search),
+            SearchResponse<TDocument> response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TDocument>>(
+                async () => await elasticClient.SearchAsync<TDocument>(s => s
+                    .Indices(indice)
+                    .Query(q => q.MatchAll())
+                    .Size(0)
+                ),
                 NomeTelemetria,
                 nomeConsulta,
                 indice,
                 parametro?.ToString());
 
-            if (!response.IsValid)
-                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+            if (!response.IsValidResponse)
+                throw new Exception(response.ElasticsearchServerError?.ToString());
 
             return response.Total;
         }
 
-        public async Task<long> ObterTotalDeRegistroAPartirDeUmaCondicaoAsync<TDocument>(string indice,
-            string nomeConsulta, Func<QueryContainerDescriptor<TDocument>, QueryContainer> request,
+        public async Task<long> ObterTotalDeRegistroAPartirDeUmaCondicaoAsync<TDocument>(
+            string indice,
+            string nomeConsulta,
+            Func<QueryDescriptor<TDocument>, Query> query,
             object parametro = null) where TDocument : class
         {
             try
             {
-                ISearchResponse<T> response =
-                    await servicoTelemetria.RegistrarComRetornoAsync<ISearchResponse<TDocument>>(async () =>
-                            await elasticClient.SearchAsync<TDocument>(s => s.Index(indice)
-                                .Query(request)
-                                .Scroll(TempoCursor)
-                                .Size(QuantidadeRetorno)),
-                        NomeTelemetria,
-                        nomeConsulta,
-                        indice,
-                        parametro?.ToString());
+                SearchResponse<TDocument> response = await servicoTelemetria.RegistrarComRetornoAsync<SearchResponse<TDocument>>(
+                    async () => await elasticClient.SearchAsync<TDocument>(s => s
+                        .Indices(indice)
+                        .Query(q => query(q))
+                        .Size(0)
+                    ),
+                    NomeTelemetria,
+                    nomeConsulta,
+                    indice,
+                    parametro?.ToString());
 
-                if (!response.IsValid)
-                    throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+                if (!response.IsValidResponse)
+                    throw new Exception(response.ElasticsearchServerError?.ToString());
 
                 return response.Total;
             }
-            catch(Exception ex)
+            catch
             {
                 return 0;
             }
@@ -131,17 +149,20 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<bool> ExisteAsync(string indice, string id, string nomeConsulta, object parametro = null)
         {
-            ExistsResponse response = await servicoTelemetria.RegistrarComRetornoAsync<ExistsResponse>(async () =>
-                    await elasticClient.DocumentExistsAsync(DocumentPath<T>.Id(id).Index(indice)),
+            GetResponse<T> response = await servicoTelemetria.RegistrarComRetornoAsync<GetResponse<T>>(async () =>
+                await elasticClient.GetAsync<T>(id, g => g
+                    .Index(indice)
+                    .Source(false)
+                ),
                 NomeTelemetria,
                 nomeConsulta,
                 indice,
                 parametro?.ToString());
 
-            if (!response.IsValid)
-                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+            if (!response.IsValidResponse)
+                throw new Exception(response.ElasticsearchServerError?.ToString());
 
-            return response.Exists;
+            return response.Found;
         }
 
         public async Task InserirBulk<TRequest>(IEnumerable<TRequest> listaDeDocumentos, string indice)
@@ -151,38 +172,38 @@ namespace SME.SERAp.Prova.Dados
                 .Index(indice)
                 .UpdateMany(listaDeDocumentos, (bu, d) => bu.Doc(d).DocAsUpsert()));
 
-            if (!response.IsValid && response.Errors)
-                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+            if (!response.IsValidResponse || response.Errors)
+                throw new Exception(response.ElasticsearchServerError?.ToString());
         }
 
         public async Task<bool> InserirAsync<TRequest>(TRequest entidade, string indice) where TRequest : class
         {
-            var response = await servicoTelemetria.RegistrarComRetornoAsync<ISearchResponse<T>>(async () =>
-                    await elasticClient.IndexAsync(entidade, descriptor => descriptor.Index(indice)),
+            IndexResponse response = await servicoTelemetria.RegistrarComRetornoAsync<IndexResponse>(
+                async () => await elasticClient.IndexAsync(entidade, d => d.Index(indice)),
                 NomeTelemetria,
                 $"Insert {entidade.GetType().Name}",
                 indice,
                 entidade.ConverterObjectParaJson());
 
-            if (!response.IsValid)
-                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+            if (!response.IsValidResponse)
+                throw new Exception(response.ElasticsearchServerError?.ToString());
 
             return true;
         }
 
         public async Task ExcluirTodos<TDocument>(string indice = "", string nomeConsulta = "") where TDocument : class
         {
-            var cancelationToken = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+            using var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(5));
 
             DeleteByQueryResponse response = await servicoTelemetria.RegistrarComRetornoAsync<DeleteByQueryResponse>(
                 async () => await elasticClient.DeleteByQueryAsync<TDocument>(
-                    q => q.Index(indice).Query(rq => rq.MatchAll()), cancelationToken.Token),
-                "Elastic",
+                    d => d.Indices(indice).Query(q => q.MatchAll()), cancellationToken.Token),
+                NomeTelemetria,
                 nomeConsulta,
                 indice);
 
-            if (!response.IsValid)
-                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+            if (!response.IsValidResponse)
+                throw new Exception(response.ElasticsearchServerError?.ToString());
         }
     }
 }

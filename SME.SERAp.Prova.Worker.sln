@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.SERAp.Dominio.Test", "t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SME.SERAp.Prova.Worker", "src\SME.SERAp.Prova.Worker\SME.SERAp.Prova.Worker.csproj", "{D1D8544C-9DDB-4F7F-BBED-07095E7B2B3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SME.SERAp.Prova.Dados.Test", "SME.SERAp.Prova.Dados.Test\SME.SERAp.Prova.Dados.Test.csproj", "{25E00BBA-7A55-4AA9-9888-0E39FACA23BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SME.SERAp.Prova.Dados.Test", "teste\SME.SERAp.Prova.Dados.Test\SME.SERAp.Prova.Dados.Test.csproj", "{25E00BBA-7A55-4AA9-9888-0E39FACA23BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -20,14 +20,14 @@ namespace SME.SERAp.Aplicacao.Test.UseCase
     public class BuscarAlunoProvaSpProficienciaUseCaseTeste
     {
         private readonly Mock<IMediator> mediator;
-        private readonly Mock<IModel> model;
+        private readonly Mock<IChannel> channel;
         private readonly Mock<IServicoLog> servicoLog;
         private readonly BuscarAlunoProvaSpProficienciaUseCase useCase;
 
         public BuscarAlunoProvaSpProficienciaUseCaseTeste()
         {
             mediator = new Mock<IMediator>();
-            model = new Mock<IModel>();
+            channel = new Mock<IChannel>();
             servicoLog = new Mock<IServicoLog>();
             useCase = new BuscarAlunoProvaSpProficienciaUseCase(mediator.Object, servicoLog.Object);
         }

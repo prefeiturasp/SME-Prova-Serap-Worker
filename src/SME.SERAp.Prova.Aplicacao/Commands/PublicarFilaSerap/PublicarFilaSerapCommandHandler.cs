@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -21,26 +22,28 @@ namespace SME.SERAp.Prova.Aplicacao
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
         }
 
-        public Task<bool> Handle(PublicarFilaSerapCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(PublicarFilaSerapCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var mensagem = new MensagemRabbit(request.Mensagem, Guid.NewGuid());
                 var body = Encoding.UTF8.GetBytes(mensagem.ConverterObjectParaJson());
 
-                using (var canal = connectionRabbit.CreateModel())
+                using var channel = await connectionRabbit.CreateChannelAsync();
+                var props = new BasicProperties()
                 {
-                    var props = canal.CreateBasicProperties();
-                    props.Persistent = true;
-                    canal.BasicPublish(ExchangeRabbit.Serap, request.Fila, props, body);
-                }
+                    Persistent = true
+                };
 
-                return Task.FromResult(true);
+                var address = new PublicationAddress(ExchangeType.Direct, ExchangeRabbit.Serap, request.Fila);
+                await channel.BasicPublishAsync(address, props, body, cancellationToken);
+
+                return true;
             }
             catch (Exception ex)
             {
                 servicoLog.Registrar($"Erros: PublicarFilaSerapCommand: Fila -> {request.Fila}", ex);
-                return Task.FromResult(false);
+                return false;
             }
         }
     }

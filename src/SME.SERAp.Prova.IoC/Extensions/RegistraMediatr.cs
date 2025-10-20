@@ -10,7 +10,7 @@ namespace SME.SERAp.Prova.IoC
         public static void AdicionarMediatr(this IServiceCollection services)
         {
             var assembly = AppDomain.CurrentDomain.Load("SME.SERAp.Prova.Aplicacao");
-            services.AddMediatR(assembly);
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidacoesPipeline<,>));
         }
     }

@@ -1,8 +1,8 @@
-﻿using SME.SERAp.Prova.Infra;
+﻿using Microsoft.Data.SqlClient;
+using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -15,7 +15,7 @@ namespace SME.SERAp.Prova.Dados
         {
             this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
         }
-        
+
         public async Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmaCodigoAsync(long turmaCodigo)
         {
             var query = @"SELECT 
@@ -49,7 +49,7 @@ namespace SME.SERAp.Prova.Dados
         }
 
         public async Task<IEnumerable<AlunoEolDto>> ObterAlunosPorTurmasCodigoAsync(long[] turmasCodigo)
-        {            
+        {
             var query = $@";with mtr_norm as (
 								SELECT
 									ROW_NUMBER() OVER(PARTITION BY matrTurma.cd_matricula ORDER BY matrTurma.dt_situacao_aluno DESC, matrTurma.cd_situacao_aluno) AS Linha,

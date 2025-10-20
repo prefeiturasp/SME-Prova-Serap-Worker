@@ -1,6 +1,9 @@
-﻿using Elastic.Apm.AspNetCore;
+﻿using Elastic.Apm;
+using Elastic.Apm.Api;
+using Elastic.Apm.AspNetCore;
+using Elastic.Apm.Config;
 using Elastic.Apm.DiagnosticSource;
-using Elastic.Apm.SqlClient;
+using Elastic.Apm.Instrumentations.SqlClient;
 using Elastic.Apm.StackExchange.Redis;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Builder;
@@ -22,10 +25,10 @@ namespace SME.SERAp.Prova.Worker
 {
     public class Startup
     {
-        private readonly IConfiguration configuration;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration configuration;
         private readonly IHostEnvironment env;
 
-        public Startup(IConfiguration configuration, IHostEnvironment env)
+        public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration, IHostEnvironment env)
         {
             this.configuration = configuration ??
                 throw new ArgumentNullException(nameof(configuration));
@@ -42,17 +45,6 @@ namespace SME.SERAp.Prova.Worker
 
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
-            var telemetriaOptions = app.ApplicationServices.GetService<TelemetriaOptions>();
-            if (telemetriaOptions != null && telemetriaOptions.Apm)
-            {
-                app.UseElasticApm(configuration,
-                   new SqlClientDiagnosticSubscriber(),
-                   new HttpDiagnosticsSubscriber());
-
-                var muxer = app.ApplicationServices.GetService<IConnectionMultiplexer>();
-                muxer.UseElasticApm();
-            }
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -85,11 +77,17 @@ namespace SME.SERAp.Prova.Worker
 
             services.AddSingleton(factory);
 
-            var conexaoRabbit = factory.CreateConnection();
-            var channel = conexaoRabbit.CreateModel();
+            services.AddSingleton<RabbitMQ.Client.IConnection>(provider =>
+            {
+                var factory = provider.GetRequiredService<ConnectionFactory>();
+                return factory.CreateConnectionAsync().Result;
+            });
 
-            services.AddSingleton(channel);
-            services.AddSingleton(conexaoRabbit);
+            services.AddSingleton<IChannel>(provider =>
+            {
+                var connection = provider.GetRequiredService<RabbitMQ.Client.IConnection>();
+                return connection.CreateChannelAsync().Result;
+            });
 
             var pathOptions = new PathOptions();
             configuration.GetSection("Path").Bind(pathOptions, c => c.BindNonPublicProperties = true);
@@ -98,6 +96,11 @@ namespace SME.SERAp.Prova.Worker
             var telemetriaOptions = new TelemetriaOptions();
             configuration.GetSection(TelemetriaOptions.Secao).Bind(telemetriaOptions, c => c.BindNonPublicProperties = true);
             services.AddSingleton(telemetriaOptions);
+
+            if(telemetriaOptions.Apm == true)
+            {
+                services.AddElasticApm(new HttpDiagnosticsSubscriber());
+            }
 
             var configuracaoRabbitLogOptions = new RabbitLogOptions();
             configuration.GetSection("RabbitLog").Bind(configuracaoRabbitLogOptions, c => c.BindNonPublicProperties = true);
@@ -111,8 +114,8 @@ namespace SME.SERAp.Prova.Worker
                 VirtualHost = configuracaoRabbitLogOptions.VirtualHost
             };
 
-            var conexaoRabbitLog = factoryLog.CreateConnection();
-            var channelLog = conexaoRabbitLog.CreateModel();
+            var conexaoRabbitLog = factoryLog.CreateConnectionAsync().Result;
+            var channelLog = conexaoRabbitLog.CreateChannelAsync().Result;
 
             var fireBaseOptions = new FireBaseOptions();
             configuration.GetSection("FireBase").Bind(fireBaseOptions, c => c.BindNonPublicProperties = true);

@@ -15,16 +15,16 @@ namespace SME.SERAp.Prova.Aplicacao
 
         private readonly IMediator mediator;
         private readonly IServicoLog servicoLog;
-        private readonly IModel model;
+        private readonly IConnection rabbitConnection;
         private long idArquivoResultadoPsp = 0;
 
         public TratarStatusProcessoResultadoPspUseCase(IMediator mediator,
                                             IServicoLog servicoLog,
-                                            IModel model)
+                                            IConnection rabbitConnection)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.servicoLog = servicoLog ?? throw new ArgumentNullException(nameof(servicoLog));
-            this.model = model ?? throw new ArgumentNullException(nameof(model));
+            this.rabbitConnection = rabbitConnection ?? throw new ArgumentNullException(nameof(rabbitConnection));
         }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
@@ -41,7 +41,8 @@ namespace SME.SERAp.Prova.Aplicacao
 
                 TipoResultadoPsp tipoResultadoProcesso = (TipoResultadoPsp)arquivoResultadoPsp.CodigoTipoResultado;
 
-                var qtd = model.MessageCount(ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp(tipoResultadoProcesso));
+                using var channel = await rabbitConnection.CreateChannelAsync();
+                var qtd = await channel.MessageCountAsync(ResultadoPsp.ObterFilaTratarPorTipoResultadoPsp(tipoResultadoProcesso));
                 if (qtd == 0)
                 {
                     await AtualizaStatusDoProcesso(StatusImportacao.Processado);

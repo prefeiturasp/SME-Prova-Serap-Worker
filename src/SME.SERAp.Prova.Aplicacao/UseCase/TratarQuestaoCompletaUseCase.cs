@@ -4,6 +4,7 @@ using SME.SERAp.Prova.Infra.Exceptions;
 using System;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Aplicacao
@@ -30,7 +31,7 @@ namespace SME.SERAp.Prova.Aplicacao
                 throw new NegocioException($"Total de alternativas diferente do informado na questão {questaoAtualizada.Id}");
 
             var json = JsonSerializer.Serialize(questaoCompleta, new JsonSerializerOptions
-                { IgnoreNullValues = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
             await mediator.Send(new QuestaoCompletaIncluirCommand(questaoAtualizada.Id, questaoCompleta.QuestaoLegadoId, json, questaoAtualizada.UltimaAtualizacao));
             await mediator.Send(new RemoverQuestaoCacheCommand(questaoAtualizada.Id, questaoCompleta.QuestaoLegadoId));

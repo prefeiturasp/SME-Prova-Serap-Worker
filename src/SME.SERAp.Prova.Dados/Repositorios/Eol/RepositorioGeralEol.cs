@@ -1,26 +1,26 @@
 ﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
 {
-	public class RepositorioGeralEol : IRepositorioGeralEol
-	{
+    public class RepositorioGeralEol : IRepositorioGeralEol
+    {
 
-		private readonly ConnectionStringOptions connectionStringOptions;
+        private readonly ConnectionStringOptions connectionStringOptions;
 
-		public RepositorioGeralEol(ConnectionStringOptions connectionStringOptions)
-		{
-			this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
-		}
+        public RepositorioGeralEol(ConnectionStringOptions connectionStringOptions)
+        {
+            this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
+        }
 
-		public async Task<IEnumerable<string>> ObterUeDreAtribuidasEolAsync(string codigoRf, int[] tiposEscola)
-		{
-			var query = @"
+        public async Task<IEnumerable<string>> ObterUeDreAtribuidasEolAsync(string codigoRf, int[] tiposEscola)
+        {
+            var query = @"
 				select coalesce(CdUnidadeEducacaoSobre, CdUnidadeEducacaoBase) as Codigo
 				from (
 					select sev.cd_registro_funcional         AS Rf,
@@ -75,13 +75,13 @@ namespace SME.SERAp.Prova.Dados
 						or (ue_base.tp_unidade_educacao in @tiposEscola)))
 					) serv";
 
-			await using var conn = new SqlConnection(connectionStringOptions.Eol);
-			return await conn.QueryAsync<string>(query, new { codigoRf, tiposEscola });
-		}
+            await using var conn = new SqlConnection(connectionStringOptions.Eol);
+            return await conn.QueryAsync<string>(query, new { codigoRf, tiposEscola });
+        }
 
-		public async Task<IEnumerable<TurmaAtribuicaoEolDto>> ObterAtribuicoesEolAsync(string codigoRf, int anoInicial, int[] tiposEscola)
-		{
-			const string query = @"
+        public async Task<IEnumerable<TurmaAtribuicaoEolDto>> ObterAtribuicoesEolAsync(string codigoRf, int anoInicial, int[] tiposEscola)
+        {
+            const string query = @"
 						select atb.an_atribuicao as AnoLetivo,
 								dre.cd_unidade_educacao as DreCodigo,
 								atb.cd_unidade_educacao as UeCodigo,
@@ -122,19 +122,19 @@ namespace SME.SERAp.Prova.Dados
 							atb.cd_unidade_educacao,
 							coalesce(stg.cd_turma_escola, tegp.cd_turma_escola)";
 
-			await using var conn = new SqlConnection(connectionStringOptions.Eol);
+            await using var conn = new SqlConnection(connectionStringOptions.Eol);
 
-			var param = new DynamicParameters();
-			param.Add("@anoInicial", anoInicial);
-			param.Add("@codigoRf", codigoRf, System.Data.DbType.AnsiStringFixedLength, null, 7);
-			param.Add("@tiposEscola", tiposEscola);
+            var param = new DynamicParameters();
+            param.Add("@anoInicial", anoInicial);
+            param.Add("@codigoRf", codigoRf, System.Data.DbType.AnsiStringFixedLength, null, 7);
+            param.Add("@tiposEscola", tiposEscola);
 
-			return await conn.QueryAsync<TurmaAtribuicaoEolDto>(query, param);
-		}
+            return await conn.QueryAsync<TurmaAtribuicaoEolDto>(query, param);
+        }
 
-		public async Task<IEnumerable<TurmaAtribuicaoEolDto>> ObterTurmaAtribuicaoEol(int anoInicial, string codigoRf, int[] tiposEscola, long? turmaCodigo, int? anoLetivo)
-		{
-			var query = @"
+        public async Task<IEnumerable<TurmaAtribuicaoEolDto>> ObterTurmaAtribuicaoEol(int anoInicial, string codigoRf, int[] tiposEscola, long? turmaCodigo, int? anoLetivo)
+        {
+            var query = @"
 						select atb.an_atribuicao as AnoLetivo,
 								dre.cd_unidade_educacao as DreCodigo,
 								atb.cd_unidade_educacao as UeCodigo,
@@ -171,27 +171,27 @@ namespace SME.SERAp.Prova.Dados
 						  and esc.tp_escola in @tiposEscola
 						  and (tur_reg.cd_turma_escola is not null or tur_pro.cd_turma_escola is not null)";
 
-			if (turmaCodigo.HasValue && anoLetivo.HasValue)
-			{
-				query += @" and atb.an_atribuicao = @anoLetivo 
+            if (turmaCodigo.HasValue && anoLetivo.HasValue)
+            {
+                query += @" and atb.an_atribuicao = @anoLetivo 
 							and (stg.cd_turma_escola = @turmaCodigo or tegp.cd_turma_escola = @turmaCodigo) ";
-			}
+            }
 
-			query += @"	group by atb.an_atribuicao,
+            query += @"	group by atb.an_atribuicao,
 								dre.cd_unidade_educacao,
 								atb.cd_unidade_educacao,
 								coalesce(stg.cd_turma_escola, tegp.cd_turma_escola)";
 
-			await using var conn = new SqlConnection(connectionStringOptions.Eol);
+            await using var conn = new SqlConnection(connectionStringOptions.Eol);
 
-			var param = new DynamicParameters();
-			param.Add("@anoInicial", anoInicial);
-			param.Add("@codigoRf", codigoRf, System.Data.DbType.AnsiStringFixedLength, null, 7);
-			param.Add("@tiposEscola", tiposEscola);
-			param.Add("@turmaCodigo", turmaCodigo);
-			param.Add("@anoLetivo", anoLetivo.GetValueOrDefault());
+            var param = new DynamicParameters();
+            param.Add("@anoInicial", anoInicial);
+            param.Add("@codigoRf", codigoRf, System.Data.DbType.AnsiStringFixedLength, null, 7);
+            param.Add("@tiposEscola", tiposEscola);
+            param.Add("@turmaCodigo", turmaCodigo);
+            param.Add("@anoLetivo", anoLetivo.GetValueOrDefault());
 
-			return await conn.QueryAsync<TurmaAtribuicaoEolDto>(query, param);
-		}
-	}
+            return await conn.QueryAsync<TurmaAtribuicaoEolDto>(query, param);
+        }
+    }
 }

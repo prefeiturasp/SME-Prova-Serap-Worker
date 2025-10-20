@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SME.SERAp.Prova.Infra
 {
@@ -9,7 +10,7 @@ namespace SME.SERAp.Prova.Infra
             return new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                IgnoreNullValues = true
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };            
         }
         

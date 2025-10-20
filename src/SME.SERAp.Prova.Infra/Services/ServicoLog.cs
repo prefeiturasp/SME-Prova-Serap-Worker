@@ -5,6 +5,7 @@ using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.Infra.Interfaces;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Infra.Services
 {
@@ -49,7 +50,7 @@ namespace SME.SERAp.Prova.Infra.Services
             servicoTelemetria.Registrar(() => PublicarMensagem(body), "RabbitMQ", "Salvar Log Via Rabbit", RotasRabbit.RotaLogs);
         }
 
-        private void PublicarMensagem(byte[] body)
+        private async void PublicarMensagem(byte[] body)
         {
             var factory = new ConnectionFactory
             {
@@ -59,11 +60,20 @@ namespace SME.SERAp.Prova.Infra.Services
                 VirtualHost = configuracaoRabbitOptions.VirtualHost
             };
 
-            using var conexaoRabbit = factory.CreateConnection();
-            using var channel = conexaoRabbit.CreateModel();
-            var props = channel.CreateBasicProperties();
-            props.Persistent = true;
-            channel.BasicPublish(ExchangeRabbit.Logs, RotasRabbit.RotaLogs, props, body);
+            using var conexaoRabbit = await factory.CreateConnectionAsync();
+            using var channel = await conexaoRabbit.CreateChannelAsync();
+            var props = new BasicProperties
+            {
+                Persistent = true
+            };
+
+            await channel.BasicPublishAsync(
+                ExchangeRabbit.Logs,
+                RotasRabbit.RotaLogs,
+                true,
+                props,
+                body
+            );
         }
     }
 }

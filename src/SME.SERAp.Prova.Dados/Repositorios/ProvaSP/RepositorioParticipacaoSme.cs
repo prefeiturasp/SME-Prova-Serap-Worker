@@ -22,7 +22,7 @@ namespace SME.SERAp.Prova.Dados
                                   ,[TotalPrevisto]
                                   ,[TotalPresente]
                                   ,[PercentualParticipacao]
-                              FROM [ProvaSP].[dbo].[ParticipacaoSme] WITH (NOLOCK)
+                              FROM [dbo].[ParticipacaoSme] WITH (NOLOCK)
                             where Edicao = @edicao
 						      and AnoEscolar = @anoEscolar
                              order by Edicao desc";

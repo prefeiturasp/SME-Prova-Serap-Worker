@@ -1,11 +1,12 @@
-﻿using SME.SERAp.Prova.Dominio;
+﻿using Microsoft.EntityFrameworkCore;
+using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 
 namespace SME.SERAp.Prova.Dados
 {
     public class RepositorioResultadoProvaConsolidadoEntity : RepositorioBaseEntity<ResultadoProvaConsolidado>, IRepositorioResultadoProvaConsolidadoEntity
     {
-        public RepositorioResultadoProvaConsolidadoEntity(ConnectionStringOptions connectionStrings) : base(connectionStrings)
+        public RepositorioResultadoProvaConsolidadoEntity(DbContextOptions<ContextoDbSerap> dbContextOptions) : base(dbContextOptions)
         {
 
         }

@@ -38,6 +38,10 @@ namespace SME.SERAp.Prova.Dados
 
                 return await conn.QueryAsync<long>(query, new { ultimaAtualizacao });
             }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao obter provas para sincronização. Detalhes: {ex.Message}", ex);
+            }
             finally
             {
                 conn.Close();
@@ -451,7 +455,7 @@ namespace SME.SERAp.Prova.Dados
                                       [gru_id] as GrupoCoressoId
                                      ,[Test_Id] as ProvaLegadoId
                                      ,[TestHide] as OcultarProva
-                                 FROM [GestaoAvaliacao].[dbo].[TestPermission]
+                                 FROM [dbo].[TestPermission]
                                  Where Test_id = @provaId";
 
                 return await conn.QueryAsync<ProvaGrupoPermissaoDto>(query, new { provaId });

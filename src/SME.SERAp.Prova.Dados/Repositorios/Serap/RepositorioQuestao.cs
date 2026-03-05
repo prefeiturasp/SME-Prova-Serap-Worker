@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
 {
@@ -183,9 +184,13 @@ namespace SME.SERAp.Prova.Dados
                                 where
 	                               prova_id = @provaId";
 
-                await conn.ExecuteAsync(query, new { provaId });
+                await conn.ExecuteAsync(query, new { provaId }, commandTimeout: 120);
 
                 return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao obter provas para sincronização. Detalhes: {ex.Message}", ex);
             }
             finally
             {

@@ -25,6 +25,9 @@ namespace SME.SERAp.Prova.Dominio
         public DateTime DataNascimento { get; set; }
         public DateTime DataAtualizacao { get; set; }
         public string NomeSocial { get; set; }
+        public bool Pap { get; set; }
+        public bool Aee { get; set; }
+        public string? Raca { get; set; }
 
         public bool Ativo()
         {

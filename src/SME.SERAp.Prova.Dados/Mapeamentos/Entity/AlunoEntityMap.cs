@@ -40,6 +40,17 @@ namespace SME.SERAp.Prova.Dados
             builder.Property(c => c.Situacao)
                 .HasColumnName("situacao")
                 .IsRequired();
+
+            builder.Property(c => c.Pap)
+                .HasColumnName("pap")
+                .IsRequired();
+
+            builder.Property(c => c.Aee)
+                .HasColumnName("aee")
+                .IsRequired();
+
+            builder.Property(c => c.Raca)
+                .HasColumnName("raca");
         }
     }
 }

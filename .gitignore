@@ -272,3 +272,4 @@ worker.env
 # cover xmls do coverlet
 *.opencover.xml
 
+.github/copilot-instructions.md

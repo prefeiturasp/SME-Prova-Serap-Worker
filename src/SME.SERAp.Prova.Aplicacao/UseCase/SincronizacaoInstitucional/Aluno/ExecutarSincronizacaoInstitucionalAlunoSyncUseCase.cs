@@ -87,7 +87,10 @@ namespace SME.SERAp.Prova.Aplicacao
                             Sexo = a.Sexo,
                             DataNascimento = a.DataNascimento,
                             TurmaId = turmaId,
-                            DataAtualizacao = a.DataSituacao
+                            DataAtualizacao = a.DataSituacao,
+                            Pap = a.Pap,
+                            Aee = a.Aee,
+                            Raca = a.Raca
                     }).ToList();
                     
                     await mediator.Send(new InserirAlunosCommand(alunosNovosParaIncluirNormalizada));
@@ -145,7 +148,10 @@ namespace SME.SERAp.Prova.Aplicacao
                         alunoAntigo.DataNascimento.Date == alunoQuePodeAlterar.DataNascimento.Date &&
                         alunoAntigo.NomeSocial?.ToString() == alunoQuePodeAlterar.NomeSocial?.ToString() &&
                         alunoAntigo.Sexo == alunoQuePodeAlterar.Sexo &&
-                        turmaAntigaDoAluno.Codigo == alunoQuePodeAlterar.TurmaCodigo.ToString())
+                        turmaAntigaDoAluno.Codigo == alunoQuePodeAlterar.TurmaCodigo.ToString() &&
+                        alunoAntigo.Pap == alunoQuePodeAlterar.Pap &&
+                        alunoAntigo.Aee == alunoQuePodeAlterar.Aee &&
+                        alunoAntigo.Raca == alunoQuePodeAlterar.Raca)
                     {
                         continue;
                     }
@@ -177,7 +183,10 @@ namespace SME.SERAp.Prova.Aplicacao
                         Sexo = alunoQuePodeAlterar.Sexo,
                         DataAtualizacao = alunoQuePodeAlterar.DataSituacao,
                         DataNascimento = alunoQuePodeAlterar.DataNascimento,
-                        TurmaId = turmaId
+                        TurmaId = turmaId,
+                        Pap = alunoQuePodeAlterar.Pap,
+                        Aee = alunoQuePodeAlterar.Aee,
+                        Raca = alunoQuePodeAlterar.Raca
                     });
                 }
 

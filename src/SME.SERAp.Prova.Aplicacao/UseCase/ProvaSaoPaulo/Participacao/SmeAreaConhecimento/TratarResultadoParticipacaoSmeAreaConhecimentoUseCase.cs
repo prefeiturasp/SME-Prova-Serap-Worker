@@ -14,7 +14,7 @@ namespace SME.SERAp.Prova.Aplicacao
 
         public TratarResultadoParticipacaoSmeAreaConhecimentoUseCase(IMediator mediator,
                                             IServicoLog servicoLog,
-                                            IModel model) : base(mediator, servicoLog, model) { }
+                                            IConnection rabbitConnection) : base(mediator, servicoLog, rabbitConnection) { }
 
         public async Task<bool> Executar(MensagemRabbit mensagemRabbit)
         {

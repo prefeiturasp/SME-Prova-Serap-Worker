@@ -10,8 +10,8 @@ namespace SME.SERAp.Prova.Aplicacao
 {
     public class TratarProficienciaCicloEscolaUseCase : AbstractTratarProficienciaPspUseCase, ITratarProficienciaCicloEscolaUseCase
     {
-        public TratarProficienciaCicloEscolaUseCase(IMediator mediator, IServicoLog servicoLog, IModel model) : base(
-            mediator, servicoLog, model)
+        public TratarProficienciaCicloEscolaUseCase(IMediator mediator, IServicoLog servicoLog, IConnection rabbitConnection) : base(
+            mediator, servicoLog, rabbitConnection)
         {
         }
 

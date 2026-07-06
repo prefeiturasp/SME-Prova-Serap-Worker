@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql.Bulk;
 using SME.SERAp.Prova.Dominio;
-using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,34 +9,26 @@ namespace SME.SERAp.Prova.Dados
 {
     public abstract class RepositorioBaseEntity<T> where T : EntidadeBase
     {
-        private readonly ConnectionStringOptions connectionStrings;
+        private readonly DbContextOptions<ContextoDbSerap> _dbContextOptions;
 
-        public RepositorioBaseEntity(ConnectionStringOptions connectionStrings)
+        public RepositorioBaseEntity(DbContextOptions<ContextoDbSerap> dbContextOptions)
         {
-            this.connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _dbContextOptions = dbContextOptions ?? throw new ArgumentNullException(nameof(dbContextOptions));
         }
+
+        private ContextoDbSerap CriarContexto() => new(_dbContextOptions);
 
         public async Task InserirVariosAsync(IEnumerable<T> entidades)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ContextoDbSerap>();
-            optionsBuilder.UseNpgsql(connectionStrings.ApiSerap);
-
-            await using var dbContext = new ContextoDbSerap(optionsBuilder.Options);
-
+            await using var dbContext = CriarContexto();
             var uploader = new NpgsqlBulkUploader(dbContext);
-
             await uploader.InsertAsync(entidades);
         }
 
         public async Task AlterarVariosAsync(IEnumerable<T> entidades)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ContextoDbSerap>();
-            optionsBuilder.UseNpgsql(connectionStrings.ApiSerap);
-
-            await using var dbContext = new ContextoDbSerap(optionsBuilder.Options);
-
+            await using var dbContext = CriarContexto();
             var uploader = new NpgsqlBulkUploader(dbContext);
-
             await uploader.UpdateAsync(entidades);
         }
     }

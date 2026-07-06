@@ -1,11 +1,11 @@
 ﻿using Dommel;
+using Microsoft.Data.SqlClient;
 using Npgsql;
 using SME.SERAp.Prova.Dominio;
 using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados

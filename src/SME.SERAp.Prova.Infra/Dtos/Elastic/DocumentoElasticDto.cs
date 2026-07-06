@@ -1,10 +1,7 @@
-﻿using Nest;
-
-namespace SME.SERAp.Prova.Infra
+﻿namespace SME.SERAp.Prova.Infra
 {
     public class DocumentoElasticDto
     {
-        [Text(Name = "Id")]
-        public string Id { get; set; }        
+        public string Id { get; set; }
     }
 }

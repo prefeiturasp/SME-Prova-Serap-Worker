@@ -3,6 +3,7 @@ using SME.SERAp.Prova.Aplicacao.Commands;
 using SME.SERAp.Prova.Dados;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SME.SERAp.Aplicacao.Teste.Commands
@@ -18,7 +19,7 @@ namespace SME.SERAp.Aplicacao.Teste.Commands
         }
 
         [Fact]
-        public async void Deve_Excluir_Resposta_Aluno()
+        public async Task Deve_Excluir_Resposta_Aluno()
         {
             var resultadoEsperado = 1;
             var comando = new ExcluirRespostaAlunoCommand(1, 1);
@@ -31,7 +32,7 @@ namespace SME.SERAp.Aplicacao.Teste.Commands
         }
 
         [Fact]
-        public async void Deve_Retornar_Excecao()
+        public async Task Deve_Retornar_Excecao()
         {
             var mensagemExcecao = "teste exceção.";
             var comando = new ExcluirRespostaAlunoCommand(1, 1);

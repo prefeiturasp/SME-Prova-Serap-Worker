@@ -24,7 +24,7 @@ namespace SME.SERAp.Prova.Dados
                                   ,[TotalPrevisto]
                                   ,[TotalPresente]
                                   ,[PercentualParticipacao]
-                              FROM [ProvaSP].[dbo].[ParticipacaoSmeAreaConhecimento] WITH (NOLOCK)
+                              FROM [dbo].[ParticipacaoSmeAreaConhecimento] WITH (NOLOCK)
                             where Edicao = @edicao
 						      and AnoEscolar = @anoEscolar
                               and AreaConhecimentoID = @areaConhecimentoId

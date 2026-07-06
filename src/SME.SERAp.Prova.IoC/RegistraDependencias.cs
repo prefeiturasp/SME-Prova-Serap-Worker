@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
@@ -10,8 +12,11 @@ using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dados.Repositorios;
 using SME.SERAp.Prova.Dados.Repositorios.ProvaSP;
 using SME.SERAp.Prova.Dados.Repositorios.Serap;
+using SME.SERAp.Prova.Dominio;
+using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using SME.SERAp.Prova.Infra.Interfaces;
 using SME.SERAp.Prova.Infra.Services;
+using System.Linq;
 
 namespace SME.SERAp.Prova.IoC
 {
@@ -23,10 +28,57 @@ namespace SME.SERAp.Prova.IoC
             services.AdicionarValidadoresFluentValidation();
             services.AdicionarElasticSearch(configuration);
             services.AddPolicies();
+            RegistrarContextos(services);
             RegistrarRepositorios(services);
             RegistrarServicos(services);
             RegistrarCasosDeUso(services);
             RegistrarMapeamentos.Registrar();
+        }
+
+        private static void MapearEnumsAutomaticamente(NpgsqlDataSourceBuilder builder)
+        {
+            var mapEnumMethod = typeof(NpgsqlDataSourceBuilder)
+                .GetMethods()
+                .First(m => m.Name == nameof(NpgsqlDataSourceBuilder.MapEnum)
+                            && m.GetParameters().Length == 2
+                            && m.GetParameters()[0].ParameterType == typeof(string)
+                            && m.GetParameters()[1].ParameterType == typeof(INpgsqlNameTranslator));
+
+            var assemblies = new[]
+            {
+                typeof(EntidadeBase).Assembly,
+            };
+
+            var enumTypes = assemblies
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.IsEnum)
+                .Distinct();
+
+            foreach (var enumType in enumTypes)
+            {
+                mapEnumMethod!
+                    .MakeGenericMethod(enumType)
+                    .Invoke(builder, [null, null]);
+            }
+        }
+
+        private static void RegistrarContextos(IServiceCollection services)
+        {
+            services.AddSingleton<NpgsqlDataSource>(sp =>
+            {
+                var connectionStrings = sp.GetRequiredService<ConnectionStringOptions>();
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionStrings.ApiSerap);
+                MapearEnumsAutomaticamente(dataSourceBuilder);
+                return dataSourceBuilder.Build();
+            });
+
+            services.AddSingleton<DbContextOptions<ContextoDbSerap>>(sp =>
+            {
+                var dataSource = sp.GetRequiredService<NpgsqlDataSource>();
+                var optionsBuilder = new DbContextOptionsBuilder<ContextoDbSerap>();
+                optionsBuilder.UseNpgsql(dataSource);
+                return optionsBuilder.Options;
+            });
         }
 
         private static void RegistrarRepositorios(IServiceCollection services)

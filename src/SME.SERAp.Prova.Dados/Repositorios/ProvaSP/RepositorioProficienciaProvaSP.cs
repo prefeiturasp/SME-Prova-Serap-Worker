@@ -1,6 +1,6 @@
-﻿using SME.SERAp.Prova.Infra.EnvironmentVariables;
+﻿using Microsoft.Data.SqlClient;
+using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace SME.SERAp.Prova.Dados
@@ -12,7 +12,7 @@ namespace SME.SERAp.Prova.Dados
         public RepositorioProficienciaProvaSP(ConnectionStringOptions connectionStringOptions)
         {
             this.connectionStringOptions = connectionStringOptions ?? throw new ArgumentNullException(nameof(connectionStringOptions));
-        }        
+        }
 
         public async Task<decimal> ObterProficienciaAluno(string alunoRa, string codigoAnoTurma, string anoTurma, string codigoEscola, long areaConhecimentoId)
         {
@@ -32,7 +32,7 @@ namespace SME.SERAp.Prova.Dados
 
         public async Task<decimal> ObterMediaProficienciaEscolaAluno(string alunoRa, long areaConhecimentoId)
         {
-	        const string query = @"with edicao_aluno as (
+            const string query = @"with edicao_aluno as (
 										select top 1 AnoEscolar, Edicao, esc_codigo, AreaConhecimentoID
 										from ResultadoAluno
 										where alu_matricula = @alunoRa
@@ -51,13 +51,13 @@ namespace SME.SERAp.Prova.Dados
 									select COALESCE(media, 0) as media
 									from total_aluno";
 
-	        await using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
+            await using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
             return await conn.QueryFirstOrDefaultAsync<decimal>(query, new { alunoRa, areaConhecimentoId });
         }
 
-		public async Task<decimal> ObterMediaProficienciaDre(string dreSigla, string anoEscolar, long areaConhecimentoId)
-		{
-			var query = $@";with edicao_dre as (
+        public async Task<decimal> ObterMediaProficienciaDre(string dreSigla, string anoEscolar, long areaConhecimentoId)
+        {
+            var query = $@";with edicao_dre as (
 							select top 1 rd.uad_sigla, rd.Edicao, rd.AnoEscolar, rd.AreaConhecimentoID
 							from ResultadoDre rd
 							where rd.uad_sigla = @dreSigla
@@ -74,8 +74,8 @@ namespace SME.SERAp.Prova.Dados
 							select COALESCE(media, 0) as media_dre
 							from total_dre";
 
-			await using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
-			return await conn.QueryFirstOrDefaultAsync<decimal>(query, new { dreSigla, anoEscolar, areaConhecimentoId });
-		}
-	}
+            await using var conn = new SqlConnection(connectionStringOptions.ProvaSP);
+            return await conn.QueryFirstOrDefaultAsync<decimal>(query, new { dreSigla, anoEscolar, areaConhecimentoId });
+        }
+    }
 }

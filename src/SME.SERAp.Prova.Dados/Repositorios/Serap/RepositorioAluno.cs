@@ -75,7 +75,20 @@ namespace SME.SERAp.Prova.Dados
             using var conn = ObterConexao();
             try
             {
-                var query = @"select id, nome, turma_id as TurmaId, ra, situacao, data_atualizacao, nome_social, data_nascimento, sexo from aluno where ra = ANY(@codigos)";
+                var query = @"SELECT id, 
+                             nome, 
+                             turma_id        AS TurmaId, 
+                             ra, 
+                             situacao, 
+                             data_atualizacao, 
+                             nome_social, 
+                             data_nascimento, 
+                             sexo,
+                             pap,
+                             aee,
+                             raca
+                      FROM aluno 
+                      WHERE ra = ANY(@codigos)";
 
                 return await conn.QueryAsync<Aluno>(query, new { codigos });
             }
@@ -254,4 +267,3 @@ namespace SME.SERAp.Prova.Dados
         }
     }
 }
-

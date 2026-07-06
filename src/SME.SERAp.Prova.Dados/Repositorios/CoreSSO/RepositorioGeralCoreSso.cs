@@ -1,9 +1,9 @@
-﻿using SME.SERAp.Prova.Infra.EnvironmentVariables;
+﻿using Microsoft.Data.SqlClient;
+using SME.SERAp.Prova.Infra;
+using SME.SERAp.Prova.Infra.EnvironmentVariables;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
-using SME.SERAp.Prova.Infra;
 
 namespace SME.SERAp.Prova.Dados
 {

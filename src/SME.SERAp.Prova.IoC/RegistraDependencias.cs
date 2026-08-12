@@ -5,11 +5,13 @@ using Npgsql;
 using SME.SERAp.Prova.Aplicacao;
 using SME.SERAp.Prova.Aplicacao.Interfaces;
 using SME.SERAp.Prova.Aplicacao.UseCase;
+using SME.SERAp.Prova.Aplicacao.UseCase.Presenca;
 using SME.SERAp.Prova.Aplicacao.UseCase.ProvaSaoPaulo.Participacao.CicloDre;
 using SME.SERAp.Prova.Dados;
 using SME.SERAp.Prova.Dados.Cache;
 using SME.SERAp.Prova.Dados.Interfaces;
 using SME.SERAp.Prova.Dados.Repositorios;
+using SME.SERAp.Prova.Dados.Repositorios.Presenca;
 using SME.SERAp.Prova.Dados.Repositorios.ProvaSP;
 using SME.SERAp.Prova.Dados.Repositorios.Serap;
 using SME.SERAp.Prova.Dominio;
@@ -164,6 +166,7 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IRepositorioQuestaoAlunoTai, RepositorioQuestaoAlunoTai>();
             services.AddScoped<IRepositorioElasticTurma, RepositorioElasticTurma>();
             services.AddScoped<IRepositorioAlunoProvaSpProficiencia, RepositorioAlunoProvaSpProficiencia>();
+            services.AddScoped<IRepositorioProvaPresenca, RepositorioProvaPresenca>();
         }
 
         private static void RegistrarServicos(IServiceCollection services)
@@ -296,7 +299,6 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<ITratarProficienciaCicloTurmaUseCase, TratarProficienciaCicloTurmaUseCase>();
             services.AddScoped<IImportarResultadoCicloDreUseCase, ImportarResultadoCicloDreUseCase>();
             services.AddScoped<ITratarResultadoCicloDreUseCase, TratarResultadoCicloDreUseCase>();
-            
             services.AddScoped<ITratarProvaTaiSyncUseCase, TratarProvaTaiSyncUseCase>();
             services.AddScoped<ITratarProvaTaiUseCase, TratarProvaTaiUseCase>();
 
@@ -317,6 +319,11 @@ namespace SME.SERAp.Prova.IoC
             services.AddScoped<IBuscarAlunoProvaSpProficienciaUseCase, BuscarAlunoProvaSpProficienciaUseCase>();
             services.AddScoped<ITratarAlunoProvaSpProficienciaUseCase, TratarAlunoProvaSpProficienciaUseCase>();
             services.AddScoped<IBuscarProvaAlunosProvaSpProficienciaUseCase, BuscarProvaAlunosProvaSpProficienciaUseCase>();
+
+            // Prova presença
+            services.AddScoped<ICriarProvaPresencaUseCase, CriarProvaPresencaUseCase>();
+            services.AddScoped<IAtualizarProvaPresencaUseCase, AtualizarProvaPresencaUseCase>();
+            services.AddScoped<IDeletarProvaPresencaUseCase, DeletarProvaPresencaUseCase>();
         }
     }
 }

@@ -153,5 +153,9 @@
         public const string TratarAlunoProvaSpProficiencia = "serap.boletim.tratar.aluno.prova.sp.proficiencia";
 
         public const string BuscarProvaAlunosProvaSpProficiencia = "serap.boletim.buscar.prova.alunos.prova.sp.proficiencia";
+
+        public const string CriarProvaPresenca = "serap.estudantes.provaPresenca.criar";
+        public const string AtualizarProvaPresenca = "serap.estudantes.provaPresenca.atualizar";
+        public const string DeletarProvaPresenca = "serap.estudantes.provaPresenca.deletar";
     }
 }

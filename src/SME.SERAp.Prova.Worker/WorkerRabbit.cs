@@ -326,6 +326,10 @@ namespace SME.SERAp.Prova.Aplicacao.Worker
             comandos.Add(RotasRabbit.TratarAlunoProvaSpProficiencia, new ComandoRabbit("Tratar aluno prova sp proficiencia", typeof(ITratarAlunoProvaSpProficienciaUseCase)));
 
             comandos.Add(RotasRabbit.BuscarProvaAlunosProvaSpProficiencia, new ComandoRabbit("Buscar prova alunos prova sp proficiencia", typeof(IBuscarProvaAlunosProvaSpProficienciaUseCase)));
+
+            comandos.Add(RotasRabbit.CriarProvaPresenca, new ComandoRabbit("Criação de Prova de Presença", typeof(ICriarProvaPresencaUseCase)));
+            comandos.Add(RotasRabbit.AtualizarProvaPresenca, new ComandoRabbit("Atualização de Prova de Presença", typeof(IAtualizarProvaPresencaUseCase)));
+            comandos.Add(RotasRabbit.DeletarProvaPresenca, new ComandoRabbit("Exclusão de Prova de Presença", typeof(IDeletarProvaPresencaUseCase)));
         }
 
         private static MethodInfo ObterMetodo(Type objType, string method)
